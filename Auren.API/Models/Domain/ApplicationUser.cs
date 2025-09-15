@@ -1,0 +1,18 @@
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Auren.API.Models.Domain
+{
+	public class ApplicationUser : IdentityUser
+	{
+        public Guid UserId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string? ProfilePictureUrl { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? LastLoginAt { get; set; }
+        public bool IsGoogleUser { get; set; }
+        public string Currency { get; set; } = "USD";
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    }
+}
