@@ -24,7 +24,6 @@
     <Folder Include="DTOs\Responses\" />
     <Folder Include="DTOs\Requests\" />
     <Folder Include="Middleware\" />
-    <Folder Include="Models\Enums\" />
     <Folder Include="Repositories\Interfaces\" />
     <Folder Include="Repositories\Implementations\" />
   </ItemGroup>
