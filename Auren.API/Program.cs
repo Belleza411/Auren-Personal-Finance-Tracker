@@ -15,6 +15,11 @@ builder.Services.AddDbContext<AurenAuthDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("AurenAuthDbConnection"));
 });
+builder.Services.AddDbContext<AurenDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AurenDbConnection"));
+});
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
