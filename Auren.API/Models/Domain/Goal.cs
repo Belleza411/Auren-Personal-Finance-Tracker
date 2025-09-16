@@ -1,4 +1,6 @@
-﻿namespace Auren.API.Models.Domain
+﻿using Auren.API.Models.Enums;
+
+namespace Auren.API.Models.Domain
 {
 	public class Goal
 	{

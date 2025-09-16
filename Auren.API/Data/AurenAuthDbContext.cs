@@ -11,12 +11,18 @@ namespace Auren.API.Data
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Goal> Goals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUser>().HasAlternateKey(u => u.UserId);
+            builder.Entity<Transaction>().HasKey(t => t.TransactionId);
+            builder.Entity<Category>().HasKey(c => c.CategoryId);
+            builder.Entity<Goal>().HasKey(g => g.GoalId);
 
             builder.Entity<RefreshToken>(entity =>
             {
