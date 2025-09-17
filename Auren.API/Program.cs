@@ -1,5 +1,7 @@
 using Auren.API.Data;
 using Auren.API.Models.Domain;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,8 @@ builder.Services.AddDbContext<AurenDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AurenDbConnection"));
 });
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
