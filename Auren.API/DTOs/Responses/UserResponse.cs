@@ -8,6 +8,6 @@
          string? ProfilePictureUrl,
          bool IsGoogleUser,
          DateTime CreatedAt,
-         DateTime? LastLoginAt,
+         DateTime? LastLoginAt
     );
 }
