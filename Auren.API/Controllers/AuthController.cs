@@ -59,7 +59,7 @@ namespace Auren.API.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
         }
 
-		[HttpPost]
+		[HttpPost("login")]
 		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
 		{
 			if(!ModelState.IsValid)
