@@ -1,7 +1,11 @@
 using Auren.API.Data;
 using Auren.API.Models.Domain;
+using Auren.API.Repositories.Implementations;
+using Auren.API.Repositories.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,6 +50,33 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
     .AddEntityFrameworkStores<AurenAuthDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+  //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.Cookie.Name = "Auren_Session";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Short access token lifetime
+        options.SlidingExpiration = false;
+        options.LoginPath = "/auth/login";
+        options.LogoutPath = "/auth/logout";
+        options.AccessDeniedPath = "/auth/access-denied";
+
+        options.Events.OnValidatePrincipal = async context =>
+        {
+            var tokenService = context.HttpContext.RequestServices.GetRequiredService<ITokenRepository>();
+            await tokenService.ValidateRefreshTokenAsync(context);
+        };
+    });
+
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 var app = builder.Build();
 
