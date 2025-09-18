@@ -58,5 +58,26 @@ namespace Auren.API.Controllers
 
 			return result.Success ? Ok(result) : BadRequest(result);
         }
+
+		[HttpPost]
+		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
+		{
+			if(!ModelState.IsValid)
+			{
+				return BadRequest(new AuthResponse
+				{
+					Success = false,
+					Message = "Invalid input",
+                    Errors = ModelState.SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>()).ToList()
+                });
+			}
+
+			var result = await _userRepository.LoginAsync(request);
+
+			if (result.Success) return Ok(result);
+
+			await Task.Delay(1000);
+			return BadRequest(result);
+		}
     }
 }
