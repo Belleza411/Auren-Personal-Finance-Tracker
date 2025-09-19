@@ -1,4 +1,5 @@
 using Auren.API.Data;
+using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Implementations;
 using Auren.API.Repositories.Interfaces;
@@ -79,6 +80,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<CookieHelper>();
 
 var app = builder.Build();
 
