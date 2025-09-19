@@ -3,7 +3,7 @@ using Auren.API.Models.Enums;
 
 namespace Auren.API.DTOs.Requests
 {
-	public sealed record TransactionRequest(
+	public sealed record TransactionDto(
         string Name,
         decimal Amount,
         string Category,

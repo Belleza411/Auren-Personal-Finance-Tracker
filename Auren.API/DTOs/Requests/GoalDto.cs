@@ -2,7 +2,7 @@
 
 namespace Auren.API.DTOs.Requests
 {
-    public sealed record GoalRequest(
+	public sealed record GoalDto(
         string Name,
         string Description,
         decimal Spent,

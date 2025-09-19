@@ -2,7 +2,7 @@
 
 namespace Auren.API.DTOs.Requests
 {
-	public sealed record CategoryRequest(
+	public sealed record CategoryDto(
         string Name,
         TransactionType TransactionType
     );
