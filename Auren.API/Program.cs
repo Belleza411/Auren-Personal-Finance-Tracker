@@ -1,4 +1,5 @@
 using Auren.API.Data;
+using Auren.API.Extensions;
 using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Implementations;
@@ -93,8 +94,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSecurityHeaders();
 
 app.UseAuthentication();
+app.UseTokenManagement();
 app.UseAuthorization();
 
 app.MapControllers();
