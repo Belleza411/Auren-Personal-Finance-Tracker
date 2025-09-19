@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Auren.API.Validators
 {
-	public class TransactionValidator : AbstractValidator<TransactionRequest>
+	public class TransactionValidator : AbstractValidator<TransactionDto>
 	{
 		public TransactionValidator()
 		{

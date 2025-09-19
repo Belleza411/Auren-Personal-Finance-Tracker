@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Auren.API.Validators
 {
-	public class GoalValidator : AbstractValidator<GoalRequest>
+	public class GoalValidator : AbstractValidator<GoalDto>
 	{
 		public GoalValidator()
 		{

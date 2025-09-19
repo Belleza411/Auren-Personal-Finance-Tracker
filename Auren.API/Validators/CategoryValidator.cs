@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Auren.API.Validators
 {
-	public class CategoryValidator : AbstractValidator<CategoryRequest>
+	public class CategoryValidator : AbstractValidator<CategoryDto>
 	{
 		public CategoryValidator()
 		{
