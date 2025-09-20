@@ -22,7 +22,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetAllTransaction(CancellationToken cancellationToken)
+		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken)
 		{
             var userId = GetCurrentUserId();
             if (userId == null)
