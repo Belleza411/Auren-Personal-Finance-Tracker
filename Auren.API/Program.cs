@@ -81,6 +81,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<CookieHelper>();
 
 var app = builder.Build();
