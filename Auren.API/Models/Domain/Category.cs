@@ -9,6 +9,5 @@ namespace Auren.API.Models.Domain
         public string Name { get; set; } = string.Empty;
         public TransactionType TransactionType { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
     }
 }

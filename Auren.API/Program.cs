@@ -101,6 +101,15 @@ app.UseAuthentication();
 app.UseTokenManagement();
 app.UseAuthorization();
 
+using (var scope = app.Services.CreateScope())
+{
+    var authDbContext = scope.ServiceProvider.GetRequiredService<AurenAuthDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AurenDbContext>();
+
+    authDbContext.Database.EnsureCreated();
+    dbContext.Database.EnsureCreated();
+}
+
 app.MapControllers();
 
 app.Run();
