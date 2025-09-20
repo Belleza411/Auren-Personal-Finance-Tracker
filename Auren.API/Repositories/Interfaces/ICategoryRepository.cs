@@ -1,0 +1,14 @@
+﻿using Auren.API.DTOs.Requests;
+using Auren.API.Models.Domain;
+
+namespace Auren.API.Repositories.Interfaces
+{
+	public interface ICategoryRepository
+	{
+        Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken);
+        Task<Category?> GetCategoryByIdAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
+        Task<Category> CreateCategoryAsync(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken);
+        Task<Category?> UpdateCategoryAsync(Guid categoryId, Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken);
+        Task<bool> DeleteCategoryAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
+    }
+}
