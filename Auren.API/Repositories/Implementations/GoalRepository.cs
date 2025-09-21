@@ -160,5 +160,30 @@ namespace Auren.API.Repositories.Implementations
 				return false;
 			}
 		}
+
+		public async Task<Goal?> AddMoneyToGoalAsync(Guid goalId, Guid userId, decimal amount, CancellationToken cancellationToken)
+		{
+			if(amount < 0)
+			{
+				_logger.LogWarning("Amount must be greater than zero for user {UserId}", userId);
+				throw new ArgumentException("Amount must be greater than zero");
+            }
+
+			var goal = await _dbContext.Goals
+				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
+
+			if (goal == null)
+			{
+				_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
+                return null;
+			}
+
+			goal.Spent += amount;
+
+			await _dbContext.SaveChangesAsync(cancellationToken);
+
+			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goalId, userId);
+			return goal;
+        }
 	}
 }

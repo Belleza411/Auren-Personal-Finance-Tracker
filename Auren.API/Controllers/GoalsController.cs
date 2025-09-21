@@ -1,6 +1,8 @@
 ﻿using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
+using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -137,7 +139,7 @@ namespace Auren.API.Controllers
             }
             try
             {
-                var deleted = await _goalRepository.DeleteCategoryAsync(goalId, userId.Value, cancellationToken);
+                var deleted = await _goalRepository.DeleteGoalAsync(goalId, userId.Value, cancellationToken);
                 if (!deleted)
                 {
                     return NotFound($"Goal id of {goalId} not found. ");
@@ -160,21 +162,74 @@ namespace Auren.API.Controllers
                 return Unauthorized();
             }
 
+            if(amount < 0)
+            {
+                return BadRequest("Amount to add must be greater than 0");
+            }
+
             try
             {
-                var goal = _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
-
-                if (goal == null)
+                var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
+                
+                if(goal == null)
                 {
                     return NotFound($"Goal id of {goalId} not found. ");
                 }
 
-                var balance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
+                var currentBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
 
-                if(amount < balance)
+                if (currentBalance < amount)
                 {
-                    return 
+                    return BadRequest("Insufficient Balance");
                 }
+
+                var category = new Category
+                {
+                    CategoryId = Guid.NewGuid(),
+                    UserId = userId.Value,
+                    Name = "Goal Transfer",
+                    TransactionType = TransactionType.Expense,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                var transaction = await _transactionRepository.CreateTransactionAsync(new TransactionDto(
+                    $"Transfer to goal: {goal.Name}",
+                    amount,
+                    category,
+                    TransactionType.Expense,
+                    PaymentType.Other
+                ), userId.Value, cancellationToken);
+
+
+                var updatedGoal = await _goalRepository.AddMoneyToGoalAsync(goalId, userId.Value, amount, cancellationToken);
+
+                if(updatedGoal == null)
+                {
+                    _logger.LogError("Transaction created but failed to update goal {GoalId} for user {UserId}. Manual reconciliation needed.", goalId, userId);
+                    return StatusCode(500, "Transaction created but goal update failed. ");
+                }
+
+                var newBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
+
+                _logger.LogInformation("Successfully added {Amount:C} to goal '{GoalName}' ({GoalId}) for user {UserId}. Balance: {OldBalance:C} -> {NewBalance:C}",
+                    amount, updatedGoal.Name, goalId, userId, currentBalance, newBalance);
+
+                return Ok(new
+                {
+                    Goal = updatedGoal,
+                    Transaction = new
+                    {
+                        Id = transaction.TransactionId,
+                        Amount = amount,
+                        Description = $"Transfer to goal: {goal.Name}"
+                    },
+                    Balance = new
+                    {
+                        Previous = currentBalance,
+                        Current = newBalance,
+                        Difference = newBalance - currentBalance
+                    }
+                });
 
             }
             catch (Exception ex)

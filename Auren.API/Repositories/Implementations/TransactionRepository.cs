@@ -1,6 +1,7 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
+using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -80,6 +81,32 @@ namespace Auren.API.Repositories.Implementations
 				return false;
             }
         }
+
+		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken)
+		{
+			try
+            {
+                var income = await _dbContext.Transactions
+                    .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Income)
+                    .SumAsync(t => t.Amount, cancellationToken);
+
+                var expense = await _dbContext.Transactions
+                    .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Expense)
+                    .SumAsync(t => t.Amount, cancellationToken);
+
+                return income - expense;
+            }
+            catch(InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Failed to calculate balance for {UserId}", userId);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while calculating balance for {UserId}", userId);
+                throw;
+            }
+		}
 
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
 		{

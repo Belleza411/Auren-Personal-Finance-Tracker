@@ -12,5 +12,6 @@ namespace Auren.API.Repositories.Interfaces
 		Task<Transaction> CreateTransactionAsync(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken);
 		Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken);
 		Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken);
+		Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken);
     }
 }
