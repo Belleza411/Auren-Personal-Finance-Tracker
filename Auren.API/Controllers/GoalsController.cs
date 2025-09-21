@@ -217,12 +217,7 @@ namespace Auren.API.Controllers
                 return Ok(new
                 {
                     Goal = updatedGoal,
-                    Transaction = new
-                    {
-                        Id = transaction.TransactionId,
-                        Amount = amount,
-                        Description = $"Transfer to goal: {goal.Name}"
-                    },
+                    Transaction = transaction,
                     Balance = new
                     {
                         Previous = currentBalance,
