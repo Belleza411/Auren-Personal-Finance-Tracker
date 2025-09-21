@@ -22,7 +22,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken)
+		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken, [FromQuery] int? pageSize = 5, [FromQuery] int? pageNumber = 1)
 		{
             var userId = GetCurrentUserId();
             if (userId == null)
@@ -32,7 +32,7 @@ namespace Auren.API.Controllers
 
             try
 			{
-                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken);
+                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken, pageSize, pageNumber);
 
                 return Ok(transactions);
             }

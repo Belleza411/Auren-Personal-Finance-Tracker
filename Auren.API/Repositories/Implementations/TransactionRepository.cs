@@ -130,13 +130,19 @@ namespace Auren.API.Repositories.Implementations
 
         }
 
-		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(Guid userId, CancellationToken cancellationToken)
+		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize = 5, int? pageNumber = 1)
 		{
 			try
 			{
+                var skip = (pageNumber - 1) * pageSize;
+
                 var transaction = await _dbContext.Transactions
 					.Where(t => t.UserId == userId)
-					.ToListAsync(cancellationToken);
+                    .OrderBy(t => t.TransactionId)
+                    .Skip(skip ?? 1)
+                    .Take(pageSize ?? 5)
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
 
                 if (!transaction.Any())
                 {
