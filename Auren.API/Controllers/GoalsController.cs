@@ -13,14 +13,16 @@ namespace Auren.API.Controllers
 	{
 		private readonly ILogger<GoalsController> _logger;
 		private readonly IGoalRepository _goalRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
-		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository)
+		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository)
 		{
 			_logger = logger;
 			_goalRepository = goalRepository;
+			_transactionRepository = transactionRepository;
 		}
 
-        [HttpGet]
+		[HttpGet]
         public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken)
         {
             var userId = GetCurrentUserId();
@@ -146,6 +148,39 @@ namespace Auren.API.Controllers
             {
                 _logger.LogError(ex, "Failed to delete goal {GoalId} for user {UserId}", goalId, userId);
                 return StatusCode(500, "An error occurred while deleting the goal. Please try again later.");
+            }
+        }
+
+        [HttpPut("{goalId:guid}/add-money")]
+        public async Task<IActionResult> AddMoneyToGoal([FromBody] decimal amount, [FromRoute] Guid goalId, CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var goal = _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
+
+                if (goal == null)
+                {
+                    return NotFound($"Goal id of {goalId} not found. ");
+                }
+
+                var balance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
+
+                if(amount < balance)
+                {
+                    return 
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to add moeny to goal {GoalId} for user {UserId}", goalId, userId);
+                return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
             }
         }
 

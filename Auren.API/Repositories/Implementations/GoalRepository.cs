@@ -135,7 +135,7 @@ namespace Auren.API.Repositories.Implementations
 
         }
 
-		public async Task<bool> DeleteCategoryAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
+		public async Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
 			try
 			{
