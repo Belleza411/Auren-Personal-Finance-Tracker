@@ -1,0 +1,171 @@
+﻿using Auren.API.DTOs.Requests;
+using Auren.API.Models.Domain;
+using Auren.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace Auren.API.Controllers
+{
+	[Route("api/goals")]
+	[ApiController]
+	public class GoalsController : ControllerBase
+	{
+		private readonly ILogger<GoalsController> _logger;
+		private readonly IGoalRepository _goalRepository;
+
+		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository)
+		{
+			_logger = logger;
+			_goalRepository = goalRepository;
+		}
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var goals = await _goalRepository.GetGoalsAsync(userId.Value, cancellationToken);
+                return Ok(goals);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve goals for user {UserId}", userId);
+                return StatusCode(500, "An error occurred while retrieving goals. Please try again later.");
+            }
+        }
+
+        [HttpGet("{goalId:guid}")]
+        public async Task<ActionResult<Goal>> GetGoalById([FromRoute] Guid goalId, CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
+                if (goal == null)
+                {
+                    return NotFound($"Goal id of {goalId} not found. ");
+                }
+                return Ok(goal);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve goal {GoalId} for user {UserId}", goalId, userId);
+                return StatusCode(500, "An error occurred while retrieving the goal. Please try again later.");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Goal>> CreateGoal([FromBody] GoalDto goalDto, CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var createdGoal = await _goalRepository.CreateGoalAsync(goalDto, userId.Value, cancellationToken);
+
+                return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.GoalId }, createdGoal);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create goal for user {UserId}", userId);
+                return StatusCode(500, "An error occurred while creating the goal. Please try again later.");
+            }
+        }
+
+        [HttpPut("{goalId:guid}")]
+        public async Task<ActionResult<Goal>> UpdateGoal([FromRoute] Guid goalId, [FromBody] GoalDto goalDto, CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var updatedGoal = await _goalRepository.UpdateGoalAsync(goalId, userId.Value, goalDto, cancellationToken);
+                if (updatedGoal == null)
+                {
+                    return NotFound($"Goal id of {goalId} not found. ");
+                }
+                return Ok(updatedGoal);
+            }
+            catch(ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid goal data provided for user {UserId}", userId);
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update goal {GoalId} for user {UserId}", goalId, userId);
+                return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
+            }
+        }
+
+        [HttpDelete("{goalId:guid}")]
+        public async Task<IActionResult> DeleteGoal([FromRoute] Guid goalId, CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var deleted = await _goalRepository.DeleteCategoryAsync(goalId, userId.Value, cancellationToken);
+                if (!deleted)
+                {
+                    return NotFound($"Goal id of {goalId} not found. ");
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete goal {GoalId} for user {UserId}", goalId, userId);
+                return StatusCode(500, "An error occurred while deleting the goal. Please try again later.");
+            }
+        }
+
+        private Guid? GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                _logger.LogWarning("User ID claim not found in token");
+                return null;
+            }
+
+            if (Guid.TryParse(userIdClaim, out var userId))
+            {
+                return userId;
+            }
+
+            _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
+            return null;
+        }
+    }
+}

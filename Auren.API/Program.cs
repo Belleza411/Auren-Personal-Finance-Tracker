@@ -83,7 +83,7 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<CookieHelper>();
+builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 
 var app = builder.Build();
 
