@@ -1,5 +1,6 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Requests;
+using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -150,5 +151,30 @@ namespace Auren.API.Repositories.Implementations
                 throw;
             }
         }
-	}
+
+        public async Task<List<Category>> SeedDefaultCategoryToUserAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var categories = CategorySeeder.DefaultCategories.Select(c => new Category
+                {
+                    CategoryId = Guid.NewGuid(),
+                    UserId = userId,
+                    Name = c.Name,
+                    TransactionType = c.transactionType,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _dbContext.Categories.AddRange(categories);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                return categories;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to seed default categories for user {UserId}", userId);
+                throw;
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using Auren.API.DTOs.Requests;
 using Auren.API.DTOs.Responses;
+using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -17,16 +18,20 @@ namespace Auren.API.Repositories.Implementations
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly ILogger<UserRepository> _logger;
 		private readonly ITokenRepository _tokenRepository;
+		private readonly ICategoryRepository _categoryRepository;
 
-		public UserRepository(UserManager<ApplicationUser> userManager,
+		public UserRepository(
+			UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
 			ILogger<UserRepository> logger,
-			ITokenRepository tokenRepository)
+			ITokenRepository tokenRepository,
+			ICategoryRepository categoryRepository)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_logger = logger;
 			_tokenRepository = tokenRepository;
+			_categoryRepository = categoryRepository;
 		}
 
 		public bool ValidateInput(object input, out List<string> errors)
@@ -78,7 +83,7 @@ namespace Auren.API.Repositories.Implementations
 			}
 		}
 
-		public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+		public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -130,7 +135,11 @@ namespace Auren.API.Repositories.Implementations
 
                     _logger.LogInformation("User {Email} registered successfully", request.Email);
 
-					return new AuthResponse
+					await _categoryRepository.SeedDefaultCategoryToUserAsync(user.UserId, cancellationToken);
+
+					_logger.LogInformation("Default categories seeded for user {Email}", request.Email);
+
+                    return new AuthResponse
 					{
 						Success = true,
 						Message = "User registered successfully",

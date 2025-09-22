@@ -32,7 +32,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpPost("register")]
-		public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+		public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -44,7 +44,7 @@ namespace Auren.API.Controllers
                 });
 			}
 
-			var result = await _userRepository.RegisterAsync(request);
+			var result = await _userRepository.RegisterAsync(request, cancellationToken);
 
 			if(result.Success && result.User != null)
 			{
