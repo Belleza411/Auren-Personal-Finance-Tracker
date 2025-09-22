@@ -34,7 +34,13 @@ namespace Auren.API.Controllers
 			{
                 var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken, pageSize, pageNumber);
 
-                return Ok(transactions);
+                return Ok(new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalTransaction = transactions.Count(),
+                    Transaction = transactions
+                });
             }
 			catch (Exception ex)
 			{
