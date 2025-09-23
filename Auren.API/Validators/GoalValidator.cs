@@ -17,11 +17,13 @@ namespace Auren.API.Validators
 
             RuleFor(g => g.Spent)
                 .NotEmpty().WithMessage("Goal spent amount is required.")
-                .GreaterThanOrEqualTo(0).WithMessage("Goal spent amount cannot be negative.");
+                .GreaterThanOrEqualTo(0).WithMessage("Goal spent amount cannot be negative.")
+                .PrecisionScale(2, 12, true);
 
             RuleFor(g => g.Budget)
                 .NotEmpty().WithMessage("Goal budget is required.")
-                .GreaterThan(0).WithMessage("Goal budget must be greater than zero.");
+                .GreaterThan(0).WithMessage("Goal budget must be greater than zero.")
+                .PrecisionScale(2, 12, true);
 
             RuleFor(g => g.Status)
                 .NotEmpty().WithMessage("Goal status is required.")

@@ -17,8 +17,25 @@ namespace Auren.API.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Transaction>().HasKey(t => t.TransactionId);
+
+            builder.Entity<Transaction>(entity =>
+            {
+                entity.Property(t => t.Amount)
+                    .HasPrecision(12, 2);
+            });
+                
             builder.Entity<Category>().HasKey(c => c.CategoryId);
+
             builder.Entity<Goal>().HasKey(g => g.GoalId);
+
+            builder.Entity<Goal>(entity =>
+            {
+                entity.Property(g => g.Spent)
+                    .HasPrecision(12, 2);
+
+                entity.Property(g => g.Budget)
+                    .HasPrecision(12, 2);
+            });
         }
     }
 }
