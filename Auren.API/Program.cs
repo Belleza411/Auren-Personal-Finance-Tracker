@@ -32,7 +32,7 @@ builder.Services.AddDbContext<AurenDbContext>(options =>
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 {
     // Strong password policy
     options.Password.RequireDigit = true;

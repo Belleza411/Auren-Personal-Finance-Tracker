@@ -120,7 +120,8 @@ namespace Auren.API.Repositories.Implementations
 
 				var user = new ApplicationUser
 				{
-					UserName = request.Email,
+					UserId = Guid.NewGuid(),
+                    UserName = request.Email,
 					Email = request.Email,
 					FirstName = SanitizeInput(request.FirstName)!,
 					LastName = SanitizeInput(request.LastName)!,
