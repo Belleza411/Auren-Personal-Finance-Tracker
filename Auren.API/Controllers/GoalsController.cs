@@ -195,7 +195,7 @@ namespace Auren.API.Controllers
                 var transaction = await _transactionRepository.CreateTransactionAsync(new TransactionDto(
                     $"Transfer to goal: {goal.Name}",
                     amount,
-                    category,
+                    category.Name,
                     TransactionType.Expense,
                     PaymentType.Other
                 ), userId.Value, cancellationToken);
