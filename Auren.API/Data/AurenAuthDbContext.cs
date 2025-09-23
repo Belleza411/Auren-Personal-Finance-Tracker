@@ -1,10 +1,11 @@
 ﻿using Auren.API.Models.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auren.API.Data
 {
-    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser>
+    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : base(options)
         {
@@ -16,7 +17,8 @@ namespace Auren.API.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<ApplicationUser>().HasAlternateKey(u => u.UserId);
+            builder.Entity<ApplicationUser>()
+                .Ignore(u => u.UserId);
 
             builder.Entity<RefreshToken>(entity =>
             {
@@ -38,7 +40,6 @@ namespace Auren.API.Data
                 entity.HasOne(rt => rt.User)
                       .WithMany(u => u.RefreshTokens)
                       .HasForeignKey(rt => rt.UserId)
-                      .HasPrincipalKey(u => u.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasIndex(rt => rt.Token)

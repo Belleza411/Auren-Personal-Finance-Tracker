@@ -2,9 +2,13 @@
 
 namespace Auren.API.Models.Domain
 {
-	public class ApplicationUser : IdentityUser
+	public class ApplicationUser : IdentityUser<Guid>
 	{
-        public Guid UserId { get; set; }
+        public Guid UserId { 
+            get => Id;
+            set => Id = value; 
+        }
+
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? ProfilePictureUrl { get; set; } 
