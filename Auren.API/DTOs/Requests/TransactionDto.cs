@@ -6,7 +6,7 @@ namespace Auren.API.DTOs.Requests
 	public sealed record TransactionDto(
         string Name,
         decimal Amount,
-        Category Category,
+        string Category,
         TransactionType TransactionType,
         PaymentType PaymentType
     );
