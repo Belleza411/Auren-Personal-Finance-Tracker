@@ -31,12 +31,26 @@ namespace Auren.API.Repositories.Implementations
 
             try
 			{
+                var category = await _dbContext.Categories
+                    .FirstOrDefaultAsync(c => c.Name == transactionDto.Category && c.UserId == userId, cancellationToken);
+
+                if (category == null)
+                {
+                    _logger.LogWarning("Category '{CategoryName}' not found for user {UserId}", transactionDto.Category, userId);
+                    throw new ArgumentException("Category not found for the user.");
+                }
+
+                if(transactionDto.TransactionType != category.TransactionType)
+                {
+                    throw new ArgumentException("Transaction type must match the category's transaction type.");
+                }
+
                 var transaction = new Transaction
                 {
                     TransactionId = Guid.NewGuid(),
                     UserId = userId,
-                    CategoryId = transactionDto.Category.CategoryId,
-                    TransactionType = transactionDto.TransactionType,
+                    CategoryId = category.CategoryId,
+                    TransactionType = category.TransactionType,
                     Name = transactionDto.Name,
                     Amount = transactionDto.Amount,
                     PaymentType = transactionDto.PaymentType,
@@ -177,11 +191,26 @@ namespace Auren.API.Repositories.Implementations
                     return null;
                 }
 
+                var category = await _dbContext.Categories
+                    .FirstOrDefaultAsync(c => c.Name == transactionDto.Category && c.UserId == userId, cancellationToken);
+
+                if (category == null)
+                {
+                    _logger.LogWarning("Category '{CategoryName}' not found for user {UserId}", transactionDto.Category, userId);
+                    return null;
+                }
+
+                if(category.TransactionType != transactionDto.TransactionType)
+                {
+                    _logger.LogWarning("Transaction type '{TransactionType}' does not match category's transaction type for user {UserId}", transactionDto.TransactionType, userId);
+                    return null;
+                }
+
                 transaction.Name = transactionDto.Name;
                 transaction.Amount = transactionDto.Amount;
                 transaction.PaymentType = transactionDto.PaymentType;
-                transaction.TransactionType = transactionDto.TransactionType;
-                transaction.CategoryId = transactionDto.Category.CategoryId;
+                transaction.TransactionType = category.TransactionType;
+                transaction.CategoryId = category.CategoryId;
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 _logger.LogInformation("Transaction updated successfully for {UserId} with TransactionId of {TransactionId}. ", userId, transaction.TransactionId);
