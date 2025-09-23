@@ -120,7 +120,6 @@ namespace Auren.API.Repositories.Implementations
 
 				var user = new ApplicationUser
 				{
-					UserId = Guid.NewGuid(),
                     UserName = request.Email,
 					Email = request.Email,
 					FirstName = SanitizeInput(request.FirstName)!,
@@ -174,7 +173,7 @@ namespace Auren.API.Repositories.Implementations
 		{
 			try
 			{
-				if(ValidateInput(request, out var validationErrors))
+				if(!ValidateInput(request, out var validationErrors))
 				{
 					return new AuthResponse
 					{
