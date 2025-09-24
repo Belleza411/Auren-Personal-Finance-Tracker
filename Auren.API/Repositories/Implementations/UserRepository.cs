@@ -131,8 +131,6 @@ namespace Auren.API.Repositories.Implementations
 
 				if(result.Succeeded)
 				{
-					await _tokenRepository.GenerateRefreshTokenAsync(user);
-
                     _logger.LogInformation("User {Email} registered successfully", request.Email);
 
 					await _categoryRepository.SeedDefaultCategoryToUserAsync(user.UserId, cancellationToken);
@@ -194,16 +192,15 @@ namespace Auren.API.Repositories.Implementations
 					};
                 }
 
-				var result = await _signInManager.PasswordSignInAsync(
-					user, request.Password, isPersistent: true, lockoutOnFailure: true);
+				var result = await _signInManager.CheckPasswordSignInAsync(user,
+					request.Password, lockoutOnFailure: true);
 
 				if(result.Succeeded)
 				{
 					user.LastLoginAt = DateTime.UtcNow;
 					await _userManager.UpdateAsync(user);
 
-					await _tokenRepository.GenerateRefreshTokenAsync(user);
-					_logger.LogInformation("User {Email} logged in successfully", request.Email);
+                    _logger.LogInformation("User {Email} credentials validated successfully", request.Email);
 
 					return new AuthResponse
 					{

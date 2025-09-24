@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,31 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Auren.Cookie", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Cookie,
+        Name = "Auren.Session",
+        Description = "Cookie-based authentication using Auren.Session cookie."
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Auren.Cookie"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 builder.Services.AddDbContext<AurenAuthDbContext>(options =>
 {
@@ -62,7 +87,7 @@ builder.Services.AddAuthentication(options =>
 })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
-        options.Cookie.Name = "Auren_Session";
+        options.Cookie.Name = "Auren.Session";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
@@ -76,6 +101,39 @@ builder.Services.AddAuthentication(options =>
         {
             var tokenService = context.HttpContext.RequestServices.GetRequiredService<ITokenRepository>();
             await tokenService.ValidateRefreshTokenAsync(context);
+        };
+
+        options.Events.OnSignedIn = async context =>
+        {
+            var refreshCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddDays(14), // Longer lifetime for refresh token
+                Path = "/",
+                IsEssential = true
+            };
+
+            context.Response.Cookies.Append("Auren.Session.Refresh", "valid", refreshCookieOptions);
+
+            await Task.CompletedTask;
+        };
+
+        options.Events.OnSigningOut = async context =>
+        {
+            var expiredOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddDays(-1), // Expire immediately
+                Path = "/"
+            };
+
+            context.Response.Cookies.Append("Auren.Session.Refresh", "", expiredOptions);
+
+            await Task.CompletedTask;
         };
     });
 
@@ -100,7 +158,6 @@ app.UseHttpsRedirection();
 app.UseSecurityHeaders();
 
 app.UseAuthentication();
-app.UseTokenManagement();
 app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
