@@ -5,7 +5,7 @@ namespace Auren.API.Repositories.Interfaces
 {
 	public interface ICategoryRepository
 	{
-        Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken);
+        Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber);
         Task<Category?> GetCategoryByIdAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
         Task<Category> CreateCategoryAsync(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken);
         Task<Category?> UpdateCategoryAsync(Guid categoryId, Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken);

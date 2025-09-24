@@ -21,7 +21,7 @@ namespace Auren.API.Controllers
 		}
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken, [FromQuery] int? pageSize = 5, [FromQuery] int? pageNumber = 1)
         {
             var userId = GetCurrentUserId();
             if (userId == null)
@@ -31,7 +31,7 @@ namespace Auren.API.Controllers
 
             try
             {
-                var categories = await _categoryRepository.GetCategoriesAsync(userId.Value, cancellationToken);
+                var categories = await _categoryRepository.GetCategoriesAsync(userId.Value, cancellationToken, pageSize, pageNumber);
                 return Ok(categories);
             }
             catch (Exception ex)

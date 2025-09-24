@@ -75,12 +75,18 @@ namespace Auren.API.Repositories.Implementations
             }
         }
 
-		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken)
+		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber)
 		{
 			try
 			{
+                var skip = (pageNumber - 1) * pageSize;
+
 				var category = await _dbContext.Categories
 					.Where(c => c.UserId == userId)
+                    .OrderBy(c => c.CreatedAt)
+                    .Skip(skip ?? 1)
+                    .Take(pageSize ?? 5)
+                    .AsNoTracking()
 					.ToListAsync(cancellationToken);
 
 				if(!category.Any())
