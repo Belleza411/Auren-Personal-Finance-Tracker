@@ -152,7 +152,7 @@ namespace Auren.API.Repositories.Implementations
 
                 var transaction = await _dbContext.Transactions
 					.Where(t => t.UserId == userId)
-                    .OrderBy(t => t.TransactionId)
+                    .OrderBy(t => t.CreatedAt)
                     .Skip(skip ?? 1)
                     .Take(pageSize ?? 5)
                     .AsNoTracking()
