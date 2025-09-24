@@ -8,10 +8,5 @@ namespace Auren.API.Extensions
 		{
 			return applicationBuilder.UseMiddleware<SecurityHeadersMiddleware>();
 		}
-
-        public static IApplicationBuilder UseTokenManagement(this IApplicationBuilder applicationBuilder)
-        {
-            return applicationBuilder.UseMiddleware<TokenManagementMiddleware>();
-        }
     }
 }
