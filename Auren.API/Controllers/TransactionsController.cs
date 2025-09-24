@@ -1,6 +1,7 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Requests;
 using Auren.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,6 +11,7 @@ namespace Auren.API.Controllers
 {
 	[Route("api/transactions")]
 	[ApiController]
+    [Authorize]
 	public class TransactionsController : ControllerBase
 	{
 		private readonly ILogger<TransactionsController> _logger;
@@ -80,14 +82,11 @@ namespace Auren.API.Controllers
 		public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
             var userId = GetCurrentUserId();
+            _logger.LogInformation("Creating transaction for user {UserId}", userId);
             if (userId == null)
             {
+                _logger.LogWarning("Unauthorized attempt to create transaction");
                 return Unauthorized();
-            }
-
-            if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
             }
 
 			try
@@ -174,21 +173,15 @@ namespace Auren.API.Controllers
 
         private Guid? GetCurrentUserId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst("UserId")?.Value;
 
-            if (string.IsNullOrEmpty(userIdClaim))
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                _logger.LogWarning("User ID claim not found in token");
+                _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
                 return null;
             }
 
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                return userId;
-            }
-
-            _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
-            return null;
+            return userId;
         }
     }
 }
