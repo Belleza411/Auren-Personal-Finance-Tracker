@@ -5,7 +5,7 @@ namespace Auren.API.Repositories.Interfaces
 {
 	public interface IGoalRepository
 	{
-        Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken);
+        Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber);
         Task<Goal?> GetGoalByIdAsync(Guid goalId, Guid userId, CancellationToken cancellationToken);
         Task<Goal> CreateGoalAsync(GoalDto goalDto, Guid userId, CancellationToken cancellationToken);
         Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken);

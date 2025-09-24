@@ -17,12 +17,18 @@ namespace Auren.API.Repositories.Implementations
 			_dbContext = dbContext;
 		}
 
-		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken)
+		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber)
 		{
 			try
 			{
+				var skip = (pageNumber - 1) * pageSize;
+
 				var goal = await _dbContext.Goals
 					.Where(g => g.UserId == userId)
+					.OrderBy(g => g.Spent)
+					.Skip(skip ?? 1)
+					.Take(pageSize ?? 3)
+					.AsNoTracking()
 					.ToListAsync(cancellationToken);
 
 				if(!goal.Any())
