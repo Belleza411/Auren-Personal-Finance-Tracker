@@ -1,4 +1,5 @@
 ﻿using Auren.API.Data;
+using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
@@ -144,26 +145,35 @@ namespace Auren.API.Repositories.Implementations
 
         }
 
-		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize = 5, int? pageNumber = 1)
+		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(Guid userId,
+            CancellationToken cancellationToken,
+            TransactionFilter filter,
+            int? pageSize = 5, int? pageNumber = 1)
 		{
 			try
 			{
-                var skip = (pageNumber - 1) * pageSize;
+                var skip = ((pageNumber ?? 1) - 1) * (pageSize ?? 5);
 
-                var transaction = await _dbContext.Transactions
-					.Where(t => t.UserId == userId)
-                    .OrderBy(t => t.CreatedAt)
-                    .Skip(skip ?? 1)
+                var query = _dbContext.Transactions
+                    .Where(t => t.UserId == userId);
+
+                if(HasActiveFilters(filter))
+                {
+                    query = ApplyTransactionFilters(query, filter, userId);
+                }
+
+                var transactions = await query
+                    .OrderByDescending(t => t.TransactionDate)
+                    .Skip(skip)
                     .Take(pageSize ?? 5)
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
 
-                if (!transaction.Any())
-                {
-                    _logger.LogWarning("No transactions found for user {UserId}", userId);
-                }
+                _logger.LogInformation("Retrieved {Count} transactions for user {UserId}",
+                    transactions.Count, userId);
 
-                return transaction;
+                return transactions;
+
             }
 			catch(Exception ex)
 			{
@@ -223,5 +233,63 @@ namespace Auren.API.Repositories.Implementations
                 throw;
             }
 		}
-	}
+
+        private IQueryable<Transaction> ApplyTransactionFilters(IQueryable<Transaction> query, TransactionFilter filter, Guid userId)
+        {
+            if (filter == null) return query;
+
+            if(filter.IsExpense == true)
+                query = query.Where(t => t.TransactionType == TransactionType.Income);
+            
+            if (filter.IsExpense == true)
+                query = query.Where(t => t.TransactionType == TransactionType.Expense);
+
+            if (filter.StartDate.HasValue)
+                query = query.Where(t => t.TransactionDate >= filter.StartDate.Value);
+            
+            
+            if (filter.EndDate.HasValue)
+                query = query.Where(t => t.TransactionDate <= filter.EndDate.Value);
+            
+            if (filter.MinAmount.HasValue)
+                query = query.Where(t => t.Amount >= filter.MinAmount.Value);
+            
+            if (filter.MaxAmount.HasValue)
+                query = query.Where(t => t.Amount <= filter.MaxAmount.Value);          
+
+            if (!string.IsNullOrEmpty(filter.Category))
+            {
+                query = query.Where(t => _dbContext.Categories
+                    .Where(c => c.CategoryId == t.CategoryId
+                    && c.Name.Contains(filter.Category)
+                    && c.UserId == userId).Any()
+                );
+            }
+
+            if(!string.IsNullOrEmpty(filter.PaymentMethod))
+            {
+                if(Enum.TryParse<PaymentType>(filter.PaymentMethod, true, out var paymentType))
+                {
+                    query = query.Where(t => t.PaymentType == paymentType);
+                }
+            }
+
+            return query;
+        }
+
+        private bool HasActiveFilters(TransactionFilter filter)
+        {
+            if (filter == null) return false;
+
+            return filter.IsIncome.HasValue ||
+                   filter.IsExpense.HasValue ||
+                   filter.MinAmount.HasValue ||
+                   filter.MaxAmount.HasValue ||
+                   filter.StartDate.HasValue ||
+                   filter.EndDate.HasValue ||
+                   !string.IsNullOrEmpty(filter.Category) ||
+                   !string.IsNullOrEmpty(filter.PaymentMethod);
+        }
+    }
 }
+

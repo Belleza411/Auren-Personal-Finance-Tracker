@@ -1,4 +1,5 @@
 ﻿using Auren.API.Data;
+using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,10 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken, [FromQuery] int? pageSize = 5, [FromQuery] int? pageNumber = 1)
+		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken,
+            [FromQuery] TransactionFilter transactionFilter,
+            [FromQuery] int? pageSize = 5,
+            [FromQuery] int? pageNumber = 1)
 		{
             var userId = GetCurrentUserId();
             if (userId == null)
@@ -34,7 +38,7 @@ namespace Auren.API.Controllers
 
             try
 			{
-                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken, pageSize, pageNumber);
+                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken, transactionFilter, pageSize, pageNumber);
 
                 return Ok(new
                 {
