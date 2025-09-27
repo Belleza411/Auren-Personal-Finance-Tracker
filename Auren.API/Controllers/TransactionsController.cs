@@ -1,6 +1,7 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.Extensions;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +31,7 @@ namespace Auren.API.Controllers
             [FromQuery] int? pageSize = 5,
             [FromQuery] int? pageNumber = 1)
 		{
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -58,7 +59,7 @@ namespace Auren.API.Controllers
 		[HttpGet("{transactionId:guid}")]
 		public async Task<ActionResult<Transaction>> GetTransactionById([FromRoute] Guid transactionId, CancellationToken cancellationToken)
 		{
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -85,7 +86,7 @@ namespace Auren.API.Controllers
 		[HttpPost]
 		public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             _logger.LogInformation("Creating transaction for user {UserId}", userId);
             if (userId == null)
             {
@@ -114,7 +115,7 @@ namespace Auren.API.Controllers
 		[HttpPut("{transactionId:guid}")]
 		public async Task<ActionResult<Transaction>> UpdateTransaction([FromRoute] Guid transactionId, [FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -151,7 +152,7 @@ namespace Auren.API.Controllers
 		[HttpDelete("{transactionId:guid}")]
 		public async Task<IActionResult> DeleteTransaction([FromRoute] Guid transactionId, CancellationToken cancellationToken)
 		{
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -173,19 +174,6 @@ namespace Auren.API.Controllers
                 _logger.LogError(ex, "Error deleting transaction {TransactionId} for user {UserId}", transactionId, userId);
                 return StatusCode(500, "An error occurred while deleting the transaction.");
             }
-        }
-
-        private Guid? GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst("UserId")?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            {
-                _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
-                return null;
-            }
-
-            return userId;
         }
     }
 }
