@@ -1,4 +1,6 @@
-﻿using Auren.API.DTOs.Requests;
+﻿using Auren.API.DTOs.Filters;
+using Auren.API.DTOs.Requests;
+using Auren.API.Extensions;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -21,9 +23,12 @@ namespace Auren.API.Controllers
 		}
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken, [FromQuery] int? pageSize = 5, [FromQuery] int? pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken,
+            [FromQuery] CategoriesFilter categoriesFilter,
+            [FromQuery] int? pageSize = 5, 
+            [FromQuery] int? pageNumber = 1)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -31,7 +36,7 @@ namespace Auren.API.Controllers
 
             try
             {
-                var categories = await _categoryRepository.GetCategoriesAsync(userId.Value, cancellationToken, pageSize, pageNumber);
+                var categories = await _categoryRepository.GetCategoriesAsync(userId.Value, cancellationToken, categoriesFilter, pageSize, pageNumber);
                 return Ok(categories);
             }
             catch (Exception ex)
@@ -43,7 +48,7 @@ namespace Auren.API.Controllers
         [HttpGet("{categoryId:guid}")]
         public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -67,7 +72,7 @@ namespace Auren.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory([FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -99,7 +104,7 @@ namespace Auren.API.Controllers
         [HttpPut("{categoryId:guid}")]
         public async Task<ActionResult<Category>> UpdateCategory([FromRoute] Guid categoryId, [FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -134,7 +139,7 @@ namespace Auren.API.Controllers
         [HttpDelete("{categoryId:guid}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -158,23 +163,5 @@ namespace Auren.API.Controllers
             }
         }
 
-        private Guid? GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                _logger.LogWarning("User ID claim not found in token");
-                return null;
-            }
-
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                return userId;
-            }
-
-            _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
-            return null;
-        }
     }
 }

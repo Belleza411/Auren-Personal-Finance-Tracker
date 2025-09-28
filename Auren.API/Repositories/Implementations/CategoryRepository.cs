@@ -1,7 +1,9 @@
 ﻿using Auren.API.Data;
+using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Helpers;
 using Auren.API.Models.Domain;
+using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -75,27 +77,35 @@ namespace Auren.API.Repositories.Implementations
             }
         }
 
-		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber)
+		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CancellationToken cancellationToken, CategoriesFilter filter, int? pageSize, int? pageNumber)
 		{
 			try
 			{
-                var skip = (pageNumber - 1) * pageSize;
+                var skip = ((pageNumber ?? 1) - 1) * (pageSize ?? 5);
 
-				var category = await _dbContext.Categories
-					.Where(c => c.UserId == userId)
-                    .OrderBy(c => c.CreatedAt)
-                    .Skip(skip ?? 1)
+                var query = _dbContext.Categories
+                    .Where(c => c.UserId == userId);
+
+                if(HasActiveFilter(filter))
+                {
+                    var filteredQuery = ApplyFilters(query, filter);
+                    
+                    if (filteredQuery is IQueryable<Category> categoryQuery)
+                    {
+                        query = categoryQuery;
+                    }
+                }
+
+                var categories = await query
+                    .Skip(skip)
                     .Take(pageSize ?? 5)
                     .AsNoTracking()
-					.ToListAsync(cancellationToken);
+                    .ToListAsync(cancellationToken);
 
-				if(!category.Any())
-				{
-					_logger.LogWarning("No category found for {UserId}", userId);
-				}
+                _logger.LogInformation("Retrieved {Count} categories for user {UserId}", categories.Count, userId);
 
-				return category;
-			}
+                return categories;
+            }
 			catch(Exception ex)
 			{
                 _logger.LogError(ex, "Failed to retrieve categories for user {UserId}", userId);
@@ -181,6 +191,52 @@ namespace Auren.API.Repositories.Implementations
                 _logger.LogError(ex, "Failed to seed default categories for user {UserId}", userId);
                 throw;
             }
+        }
+
+        private IQueryable<object> ApplyFilters(IQueryable<Category> query, CategoriesFilter filter)
+        {
+            if (filter == null) return query;
+
+            if (filter.IsExpense == true)
+                query = query.Where(t => t.TransactionType == TransactionType.Income);
+
+            if (filter.IsExpense == true)
+                query = query.Where(t => t.TransactionType == TransactionType.Expense);
+
+            if (!string.IsNullOrWhiteSpace(filter.Category))
+            {
+                query = query.Where(c => c.Name.Contains(filter.Category));
+            }
+
+            if(filter.Transactions > 0)
+            {
+                var q = from c in query
+                        join t in _dbContext.Transactions on c.CategoryId equals t.CategoryId
+                        group t by new { c.CategoryId, c.Name } into g
+                        select new
+                        {
+                            CategoryName = g.Key.Name,
+                            TransactionCount = g.Count()
+                        };
+
+                if (filter.Transactions > 0)
+                {
+                    q = q.Where(x => x.TransactionCount >= filter.Transactions);
+                }
+
+                return q.OrderByDescending(x => x.TransactionCount);
+            }
+            return query;
+        }
+
+        private bool HasActiveFilter(CategoriesFilter filter)
+        {
+            if (filter == null) return false;
+
+            return filter.IsExpense.HasValue ||
+                   filter.IsIncome.HasValue ||
+                   !string.IsNullOrWhiteSpace(filter.Category) ||
+                   filter.Transactions > 0;
         }
     }
 }
