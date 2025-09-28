@@ -1,5 +1,6 @@
 ﻿using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.Extensions;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
@@ -31,7 +32,7 @@ namespace Auren.API.Controllers
             [FromQuery] int? pageNumber = 1, 
             [FromQuery] int? pageSize = 3)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -52,7 +53,7 @@ namespace Auren.API.Controllers
         [HttpGet("{goalId:guid}")]
         public async Task<ActionResult<Goal>> GetGoalById([FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -76,7 +77,7 @@ namespace Auren.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Goal>> CreateGoal([FromBody] GoalDto goalDto, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -103,7 +104,7 @@ namespace Auren.API.Controllers
         [HttpPut("{goalId:guid}")]
         public async Task<ActionResult<Goal>> UpdateGoal([FromRoute] Guid goalId, [FromBody] GoalDto goalDto, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -136,7 +137,7 @@ namespace Auren.API.Controllers
         [HttpDelete("{goalId:guid}")]
         public async Task<IActionResult> DeleteGoal([FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -160,7 +161,7 @@ namespace Auren.API.Controllers
         [HttpPut("{goalId:guid}/add-money")]
         public async Task<IActionResult> AddMoneyToGoal([FromBody] decimal amount, [FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
-            var userId = GetCurrentUserId();
+            var userId = User.GetCurrentUserId();
             if (userId == null)
             {
                 return Unauthorized();
@@ -236,25 +237,6 @@ namespace Auren.API.Controllers
                 _logger.LogError(ex, "Failed to add moeny to goal {GoalId} for user {UserId}", goalId, userId);
                 return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
             }
-        }
-
-        private Guid? GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                _logger.LogWarning("User ID claim not found in token");
-                return null;
-            }
-
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                return userId;
-            }
-
-            _logger.LogWarning("Invalid user ID format in claim: {UserIdClaim}", userIdClaim);
-            return null;
         }
     }
 }
