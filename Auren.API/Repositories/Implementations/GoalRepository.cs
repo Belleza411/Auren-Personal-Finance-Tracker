@@ -1,6 +1,8 @@
 ﻿using Auren.API.Data;
+using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
+using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,26 +19,30 @@ namespace Auren.API.Repositories.Implementations
 			_dbContext = dbContext;
 		}
 
-		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber)
+		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, GoalFilter filter, int? pageSize, int? pageNumber)
 		{
 			try
 			{
-				var skip = (pageNumber - 1) * pageSize;
+				var skip = ((pageNumber ?? 1) - 1) * (pageSize ?? 5);
 
-				var goal = await _dbContext.Goals
-					.Where(g => g.UserId == userId)
-					.OrderBy(g => g.Spent)
-					.Skip(skip ?? 1)
-					.Take(pageSize ?? 3)
+				var query = _dbContext.Goals
+					.Where(g => g.UserId == userId);
+
+                if(HasActiveFilters(filter))
+				{
+					query = ApplyFilters(query, filter);
+                }
+
+				var goal = await query
+					.OrderByDescending(g => g.Spent)
+					.Skip(skip)
+					.Take(pageSize ?? 5)
 					.AsNoTracking()
 					.ToListAsync(cancellationToken);
 
-				if(!goal.Any())
-				{
-					_logger.LogWarning("No goals found for user {UserId}", userId);
-                }
+				_logger.LogInformation("Retrieved {Count} goals for user {UserId}", goal.Count, userId);
 
-				return goal;
+                return goal;
             }
 			catch (Exception ex)
 			{
@@ -191,5 +197,44 @@ namespace Auren.API.Repositories.Implementations
 			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goalId, userId);
 			return goal;
         }
-	}
+
+		private IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
+		{
+			if (filter == null)
+				return query;
+			
+			if (filter.IsCompleted.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.Completed);
+            	
+			if (filter.IsOnTrack.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.OnTrack);
+			
+			if (filter.IsOnHold.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.OnHold);
+			
+			if (filter.IsNotStarted.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.NotStarted);
+			
+			if (filter.IsBehindSchedule.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.BehindSchedule);
+			
+			if (filter.IsCancelled.HasValue)
+				query = query.Where(g => g.Status == GoalStatus.Cancelled);
+			
+			return query;
+        }
+
+		private bool HasActiveFilters(GoalFilter filter)
+		{
+			if(filter == null)
+				return false;
+
+			return filter.IsCompleted.HasValue ||
+				filter.IsOnTrack.HasValue ||
+				filter.IsOnHold.HasValue ||
+				filter.IsNotStarted.HasValue ||
+				filter.IsBehindSchedule.HasValue ||
+				filter.IsCancelled.HasValue;
+        }
+    }
 }

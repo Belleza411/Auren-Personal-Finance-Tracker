@@ -1,11 +1,12 @@
-﻿using Auren.API.DTOs.Requests;
+﻿using Auren.API.DTOs.Filters;
+using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
 
 namespace Auren.API.Repositories.Interfaces
 {
 	public interface IGoalRepository
 	{
-        Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, int? pageSize, int? pageNumber);
+        Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, GoalFilter filter, int? pageSize, int? pageNumber);
         Task<Goal?> GetGoalByIdAsync(Guid goalId, Guid userId, CancellationToken cancellationToken);
         Task<Goal> CreateGoalAsync(GoalDto goalDto, Guid userId, CancellationToken cancellationToken);
         Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken);

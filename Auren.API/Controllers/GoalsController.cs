@@ -1,4 +1,5 @@
-﻿using Auren.API.DTOs.Requests;
+﻿using Auren.API.DTOs.Filters;
+using Auren.API.DTOs.Requests;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
@@ -25,7 +26,10 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-        public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 3)
+        public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken,
+            [FromQuery] GoalFilter goalFilter,
+            [FromQuery] int? pageNumber = 1, 
+            [FromQuery] int? pageSize = 3)
         {
             var userId = GetCurrentUserId();
             if (userId == null)
@@ -35,7 +39,7 @@ namespace Auren.API.Controllers
 
             try
             {
-                var goals = await _goalRepository.GetGoalsAsync(userId.Value, cancellationToken, pageSize, pageNumber);
+                var goals = await _goalRepository.GetGoalsAsync(userId.Value, cancellationToken, goalFilter, pageSize, pageNumber);
                 return Ok(goals);
             }
             catch (Exception ex)
