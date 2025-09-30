@@ -46,6 +46,14 @@ namespace Auren.API.Repositories.Implementations
                     throw new ArgumentException("Transaction type must match the category's transaction type.");
                 }
 
+                var currentBalance = await GetBalanceAsync(userId, cancellationToken);
+
+                if(currentBalance < transactionDto.Amount)
+                {
+                    _logger.LogWarning("Insufficient funds for user {UserId} to create transaction of amount {Amount}", userId, transactionDto.Amount);
+                    throw new InvalidOperationException("Insufficient funds for this transaction.");
+                }
+
                 var transaction = new Transaction
                 {
                     TransactionId = Guid.NewGuid(),
