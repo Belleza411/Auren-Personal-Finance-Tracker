@@ -197,7 +197,7 @@ namespace Auren.API.Repositories.Implementations
         {
             if (filter == null) return query;
 
-            if (filter.IsExpense == true)
+            if (filter.IsIncome == true)
                 query = query.Where(t => t.TransactionType == TransactionType.Income);
 
             if (filter.IsExpense == true)

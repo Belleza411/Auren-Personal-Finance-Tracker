@@ -238,18 +238,14 @@ namespace Auren.API.Repositories.Implementations
         {
             if (filter == null) return query;
 
-            if(filter.IsExpense == true)
+            if(filter.IsIncome == true)
                 query = query.Where(t => t.TransactionType == TransactionType.Income);
             
             if (filter.IsExpense == true)
                 query = query.Where(t => t.TransactionType == TransactionType.Expense);
 
-            if (filter.StartDate.HasValue)
-                query = query.Where(t => t.TransactionDate >= filter.StartDate.Value);
-            
-            
-            if (filter.EndDate.HasValue)
-                query = query.Where(t => t.TransactionDate <= filter.EndDate.Value);
+            if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                query = query.Where(t => t.TransactionDate >= filter.StartDate && t.TransactionDate <= filter.EndDate);
             
             if (filter.MinAmount.HasValue)
                 query = query.Where(t => t.Amount >= filter.MinAmount.Value);
