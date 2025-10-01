@@ -78,11 +78,6 @@ namespace Auren.API.Controllers
                 return Unauthorized();
             }
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
                 var createdCategory = await _categoryRepository.CreateCategoryAsync(categoryDto, userId.Value, cancellationToken);

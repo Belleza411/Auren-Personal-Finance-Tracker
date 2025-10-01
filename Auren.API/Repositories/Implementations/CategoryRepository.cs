@@ -22,7 +22,7 @@ namespace Auren.API.Repositories.Implementations
 
 		public async Task<Category> CreateCategoryAsync(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken)
 		{
-			if(categoryDto == null)
+			if(categoryDto == null || string.IsNullOrEmpty(categoryDto.Name))
 			{
                 _logger.LogWarning("TransactionDto or Category is null for user {UserId}", userId);
                 throw new ArgumentException("Transaction data and category are required");
@@ -30,19 +30,33 @@ namespace Auren.API.Repositories.Implementations
 
 			try
 			{
-				var category = new Category {
-					CategoryId = Guid.NewGuid(),
-					UserId = userId,
-					Name = categoryDto.Name,
-					TransactionType = categoryDto.TransactionType,
-					CreatedAt = DateTime.UtcNow
-				};
+                var existingCategory = await _dbContext.Categories
+                    .FirstOrDefaultAsync(c => c.UserId == userId
+                        && c.Name.ToLower() == categoryDto.Name.ToLower()
+                        && c.TransactionType == categoryDto.TransactionType,
+                        cancellationToken);
 
-				await _dbContext.Categories.AddAsync(category, cancellationToken);
+                if (existingCategory != null)
+                {
+                    _logger.LogWarning("Category '{CategoryName}' with type {TransactionType} already exists for user {UserId}",
+                        categoryDto.Name, categoryDto.TransactionType, userId);
+                    throw new InvalidOperationException($"Category '{categoryDto.Name}' already exists.");
+                }
+
+                var category = new Category
+                {
+                    CategoryId = Guid.NewGuid(),
+                    UserId = userId,
+                    Name = categoryDto.Name,
+                    TransactionType = categoryDto.TransactionType,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _dbContext.Categories.AddAsync(category, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogInformation("{Category} with {CategoryId} was created succesfully for {UserId}", category, category.CategoryId, userId);
-				
-				return category;
+                _logger.LogInformation("{Category} with {CategoryId} was created succesfully for {UserId}", category, category.CategoryId, userId);
+
+                return category;
             }
             catch (Exception ex)
             {
