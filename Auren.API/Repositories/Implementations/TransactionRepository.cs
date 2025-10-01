@@ -46,12 +46,22 @@ namespace Auren.API.Repositories.Implementations
                     throw new ArgumentException("Transaction type must match the category's transaction type.");
                 }
 
-                var currentBalance = await GetBalanceAsync(userId, cancellationToken);
 
-                if(currentBalance < transactionDto.Amount)
+                if(transactionDto.TransactionType == TransactionType.Expense)
                 {
-                    _logger.LogWarning("Insufficient funds for user {UserId} to create transaction of amount {Amount}", userId, transactionDto.Amount);
-                    throw new InvalidOperationException("Insufficient funds for this transaction.");
+                    var currentBalance = await GetBalanceAsync(userId, cancellationToken);
+                    
+                    if (currentBalance < transactionDto.Amount)
+                    {
+                        _logger.LogWarning(
+                            "Insufficient funds for user {UserId}. Tried to create expense {Amount} with balance {Balance}",
+                            userId,
+                            transactionDto.Amount,
+                            currentBalance
+                        );
+
+                        throw new InvalidOperationException("Insufficient funds for this transaction.");
+                    }
                 }
 
                 var transaction = new Transaction
@@ -107,29 +117,21 @@ namespace Auren.API.Repositories.Implementations
 
 		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken)
 		{
-			try
-            {
-                var income = await _dbContext.Transactions
-                    .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Income)
-                    .SumAsync(t => t.Amount, cancellationToken);
+            var result = await _dbContext.Transactions
+                .Where(t => t.UserId == userId)
+                .GroupBy(t => t.TransactionType)
+                .Select(g => new
+                {
+                    Type = g.Key,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .ToListAsync(cancellationToken);
 
-                var expense = await _dbContext.Transactions
-                    .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Expense)
-                    .SumAsync(t => t.Amount, cancellationToken);
+            var income = result.FirstOrDefault(r => r.Type == TransactionType.Income)?.Total ?? 0;
+            var expense = result.FirstOrDefault(r => r.Type == TransactionType.Expense)?.Total ?? 0;
 
-                return income - expense;
-            }
-            catch(InvalidOperationException ex)
-            {
-                _logger.LogError(ex, "Failed to calculate balance for {UserId}", userId);
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error while calculating balance for {UserId}", userId);
-                throw;
-            }
-		}
+            return income - expense;
+        }
 
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
 		{
