@@ -5,6 +5,7 @@ using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Auren.API.Repositories.Implementations
 {
@@ -34,7 +35,9 @@ namespace Auren.API.Repositories.Implementations
                 }
 
 				var goal = await query
+					.Where(g => g.UserId == userId)
 					.OrderByDescending(g => g.Spent)
+					.ThenByDescending(g => g.CreatedAt)
 					.Skip(skip)
 					.Take(pageSize ?? 5)
 					.AsNoTracking()
@@ -87,9 +90,10 @@ namespace Auren.API.Repositories.Implementations
 					UserId = userId,
 					Name = goalDto.Name,
 					Description = goalDto.Description,
-					Budget = goalDto.Budget,
+					Spent = goalDto.Spent,
+                    Budget = goalDto.Budget,
 					TargetDate = goalDto.TargetDate,
-					Status = goalDto.Status,
+                    Status = goalDto.Status,
 					CreatedAt = DateTime.UtcNow
 				};
 
