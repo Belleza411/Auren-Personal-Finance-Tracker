@@ -16,7 +16,6 @@ namespace Auren.API.Validators
                 .MaximumLength(255).WithMessage("Goal description must not exceed 255 characters.");
 
             RuleFor(g => g.Spent)
-                .NotEmpty().WithMessage("Goal spent amount is required.")
                 .GreaterThanOrEqualTo(0).WithMessage("Goal spent amount cannot be negative.")
                 .PrecisionScale(2, 12, true);
 
