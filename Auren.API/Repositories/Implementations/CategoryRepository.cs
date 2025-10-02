@@ -30,11 +30,7 @@ namespace Auren.API.Repositories.Implementations
 
 			try
 			{
-                var existingCategory = await _dbContext.Categories
-                    .FirstOrDefaultAsync(c => c.UserId == userId
-                        && c.Name.ToLower() == categoryDto.Name.ToLower()
-                        && c.TransactionType == categoryDto.TransactionType,
-                        cancellationToken);
+                var existingCategory = await GetCategoryByNameAsync(userId, cancellationToken, categoryDto);
 
                 if (existingCategory != null)
                 {
@@ -252,5 +248,26 @@ namespace Auren.API.Repositories.Implementations
                    !string.IsNullOrWhiteSpace(filter.Category) ||
                    filter.Transactions > 0;
         }
-    }
+
+		public async Task<Category?> GetCategoryByNameAsync(Guid userId, CancellationToken cancellationToken, CategoryDto categoryDto)
+		{
+			try
+            {
+                var existingCategory = await _dbContext.Categories
+                    .FirstOrDefaultAsync(c => c.UserId == userId
+                        && c.Name.ToLower() == categoryDto.Name.ToLower()
+                        && c.TransactionType == categoryDto.TransactionType,
+                        cancellationToken);
+
+                if (existingCategory == null) return null;
+
+                return existingCategory;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve category with the name of {CategoryName} for user {UserId}", categoryDto.Name, userId);
+                throw;
+            }
+        }
+	}
 }

@@ -18,12 +18,17 @@ namespace Auren.API.Controllers
 		private readonly ILogger<GoalsController> _logger;
 		private readonly IGoalRepository _goalRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository)
+		public GoalsController(ILogger<GoalsController> logger,
+            IGoalRepository goalRepository,
+            ITransactionRepository transactionRepository,
+            ICategoryRepository categoryRepository)
 		{
 			_logger = logger;
 			_goalRepository = goalRepository;
 			_transactionRepository = transactionRepository;
+			_categoryRepository = categoryRepository;
 		}
 
 		[HttpGet]
@@ -166,7 +171,7 @@ namespace Auren.API.Controllers
             {
                 return Unauthorized();
             }
-
+             
             if(amount < 0)
             {
                 return BadRequest("Amount to add must be greater than 0");
@@ -188,20 +193,21 @@ namespace Auren.API.Controllers
                     return BadRequest("Insufficient Balance");
                 }
 
-                var category = new Category
+                var goalCategory = new CategoryDto("Goal Transfer", TransactionType.Expense);
+
+                var existingCategory = await _categoryRepository.GetCategoryByNameAsync(userId.Value, cancellationToken, goalCategory);
+
+                if (existingCategory == null)
                 {
-                    CategoryId = Guid.NewGuid(),
-                    UserId = userId.Value,
-                    Name = "Goal Transfer",
-                    TransactionType = TransactionType.Expense,
-                    CreatedAt = DateTime.UtcNow,
-                };
+                    existingCategory = await _categoryRepository.CreateCategoryAsync(goalCategory, userId.Value, cancellationToken);
+                    _logger.LogInformation("Created 'Goal Transfer' category for user {UserId}", userId);
+                }
 
                 var transaction = await _transactionRepository.CreateTransactionAsync(new TransactionDto(
                     $"Transfer to goal: {goal.Name}",
                     amount,
-                    category.Name,
-                    TransactionType.Expense,
+                    existingCategory.Name,
+                    existingCategory.TransactionType,
                     PaymentType.Other
                 ), userId.Value, cancellationToken);
 
