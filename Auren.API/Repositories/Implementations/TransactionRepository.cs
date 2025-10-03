@@ -191,6 +191,78 @@ namespace Auren.API.Repositories.Implementations
             return income - expense;
         }
 
+		public async Task<IncomeVsExpenseChartResponse> GetIncomeVsExpenseChartAsync(Guid userId, DateTime startMonth, DateTime endMonth, CancellationToken cancellationToken)
+		{
+			var startDate = new DateTime(startMonth.Year, startMonth.Month, 1);
+            var endDate = new DateTime(endMonth.Year, endMonth.Month, 1).AddMonths(1);
+
+            var query = @"
+                SELECT 
+                    DATEFROMPARTS(YEAR(TransactionDate), MONTH(TransactionDate), 1) AS Month,
+                    TransactionType,
+                    COALESCE(SUM(CAST(Amount AS DECIMAL(18,2))), 0) AS Total
+                FROM Transactions
+                WHERE UserId = @UserId
+                    AND TransactionDate >= @StartDate
+                    AND TransactionDate < @EndDate
+                    AND TransactionType IN (@Income, @Expense)
+                GROUP BY YEAR(TransactionDate), MONTH(TransactionDate), TransactionType
+                ORDER BY YEAR(TransactionDate), MONTH(TransactionDate)";
+
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            var results = await connection.QueryAsync<MonthlyTransactionData>(
+                query,
+                new
+                {
+                    UserId = userId,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Income = (int)TransactionType.Income,
+                    Expense = (int)TransactionType.Expense
+                }
+            );
+
+            foreach (var result in results)
+            {
+                _logger.LogInformation($"Month: {result.Month}, Type: {result.TransactionType}, Total: {result.Total}");
+                _logger.LogInformation($"Month Type: {result.Month.GetType().Name}");
+            }
+
+            var monthlyData = new List<MonthlyDataPoint>();
+            var currentDate = startDate;
+
+            while(currentDate < endDate)
+            {
+                var monthData = results.Where(r =>
+                    r.Month == currentDate);
+
+                var income = monthData
+                    .Where(x => x.TransactionType == TransactionType.Income)
+                    .Sum(x => x.Total);
+
+                var expense = monthData
+                    .Where(x => x.TransactionType == TransactionType.Expense)
+                    .Sum(x => x.Total);
+
+                monthlyData.Add(new MonthlyDataPoint
+                {
+                    Month = currentDate,
+                    Income = income,
+                    Expense = expense
+                });
+
+                currentDate = currentDate.AddMonths(1);
+            }
+
+            return new IncomeVsExpenseChartResponse(
+                DataPoints: monthlyData,
+                TotalIncome: monthlyData.Sum(d => d.Income),
+                TotalExpense: monthlyData.Sum(d => d.Expense)
+            );
+        }
+
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
 		{
 			try
