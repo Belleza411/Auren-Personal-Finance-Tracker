@@ -1,11 +1,14 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.DTOs.Responses;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
+using Dapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -15,12 +18,14 @@ namespace Auren.API.Repositories.Implementations
 	{
 		private readonly ILogger<TransactionRepository> _logger;
 		private readonly AurenDbContext _dbContext;
+        private readonly string _connection;
 
-		public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext)
+        public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-		}
+            _connection = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
+        }
 
 		public async Task<Transaction> CreateTransactionAsync(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
 		{
@@ -113,6 +118,56 @@ namespace Auren.API.Repositories.Implementations
 				_logger.LogError(ex, "Failed to delete transaction for user {UserId} with TransactionId of {TransactionId}", userId, transactionId);
 				return false;
             }
+        }
+
+		public async Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, DateTime month, CancellationToken cancellationToken)
+		{
+			
+            async Task<decimal> GetMonthlyAvg(DateTime date)
+            {
+                int daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+                var startDate = new DateTime(date.Year, date.Month, 1);
+                var endDate = startDate.AddMonths(1);
+
+                var query = @"
+                    SELECT 
+                        SUM(CAST(Amount AS DECIMAL(18,2)))
+                    FROM 
+                        Transactions
+                    WHERE 
+                        UserId = @UserId
+                        AND TransactionType = @TransactionType
+                        AND TransactionDate >= @StartDate
+                        AND TransactionDate < @EndDate";
+
+                await using var connection = new SqlConnection(_connection);
+                await connection.OpenAsync(cancellationToken);
+
+                var total = await connection.ExecuteScalarAsync<decimal?>(query,
+                    new
+                    {
+                        UserId = userId,
+                        TransactionType = (int)TransactionType.Expense,
+                        StartDate = startDate,
+                        EndDate = endDate
+                    },
+                    commandTimeout: 0,
+                    commandType: null
+                ) ?? 0;
+
+                return total / daysInMonth;
+            }
+
+            var currentAvg = await GetMonthlyAvg(month);
+            var lastMonthAvg = await GetMonthlyAvg(month.AddMonths(-1));
+
+            decimal percentageChange = 0;
+            if(lastMonthAvg > 0)
+            {
+                percentageChange = ((currentAvg - lastMonthAvg) / lastMonthAvg) * 100;
+            }
+
+            return new AvgDailySpendingResponse(currentAvg, percentageChange);
         }
 
 		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken)
