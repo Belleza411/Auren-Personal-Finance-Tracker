@@ -18,13 +18,13 @@ namespace Auren.API.Repositories.Implementations
 	{
 		private readonly ILogger<TransactionRepository> _logger;
 		private readonly AurenDbContext _dbContext;
-        private readonly string _connection;
+        private readonly string _connectionString;
 
         public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-            _connection = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
+            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
         }
 
 		public async Task<Transaction> CreateTransactionAsync(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
@@ -121,17 +121,21 @@ namespace Auren.API.Repositories.Implementations
         }
 
 		public async Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, DateTime month, CancellationToken cancellationToken)
-		{
-			
-            async Task<decimal> GetMonthlyAvg(DateTime date)
-            {
-                int daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+		{	
+            async Task<(decimal total, int days)> GetMonthlyData(DateTime date, bool isCurrentMonth)
+            {        
                 var startDate = new DateTime(date.Year, date.Month, 1);
-                var endDate = startDate.AddMonths(1);
+                var endDate = isCurrentMonth 
+                    ? DateTime.Today.AddDays(1) 
+                    : startDate.AddMonths(1);
+
+                int daysToCount = isCurrentMonth
+                    ? DateTime.Today.Day
+                    : DateTime.DaysInMonth(date.Year, date.Month);
 
                 var query = @"
                     SELECT 
-                        SUM(CAST(Amount AS DECIMAL(18,2)))
+                        COALESCE(SUM(CAST(Amount AS DECIMAL(18,2))), 0)
                     FROM 
                         Transactions
                     WHERE 
@@ -140,32 +144,31 @@ namespace Auren.API.Repositories.Implementations
                         AND TransactionDate >= @StartDate
                         AND TransactionDate < @EndDate";
 
-                await using var connection = new SqlConnection(_connection);
+                await using var connection = new SqlConnection(_connectionString);
                 await connection.OpenAsync(cancellationToken);
 
-                var total = await connection.ExecuteScalarAsync<decimal?>(query,
+                var total = await connection.ExecuteScalarAsync<decimal>(query,
                     new
                     {
                         UserId = userId,
                         TransactionType = (int)TransactionType.Expense,
                         StartDate = startDate,
                         EndDate = endDate
-                    },
-                    commandTimeout: 0,
-                    commandType: null
-                ) ?? 0;
+                    }   
+                );
 
-                return total / daysInMonth;
+                return (total, daysToCount);
             }
 
-            var currentAvg = await GetMonthlyAvg(month);
-            var lastMonthAvg = await GetMonthlyAvg(month.AddMonths(-1));
+            var (currentTotal, currentDays) = await GetMonthlyData(month, true);
+            var (lastTotal, lastDays) = await GetMonthlyData(month.AddMonths(-1), false);
 
-            decimal percentageChange = 0;
-            if(lastMonthAvg > 0)
-            {
-                percentageChange = ((currentAvg - lastMonthAvg) / lastMonthAvg) * 100;
-            }
+            var currentAvg = currentDays > 0 ? currentTotal / currentDays : 0;
+            var lastMonthAvg = lastDays > 0 ? lastTotal / lastDays : 0;
+
+            decimal percentageChange = lastMonthAvg > 0
+                ? ((currentAvg - lastMonthAvg) / lastMonthAvg) * 100
+                : 0;
 
             return new AvgDailySpendingResponse(currentAvg, percentageChange);
         }
