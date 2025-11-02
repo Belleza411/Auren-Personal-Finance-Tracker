@@ -1,11 +1,15 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.DTOs.Responses;
 using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Auren.API.Repositories.Implementations
 {
@@ -13,12 +17,14 @@ namespace Auren.API.Repositories.Implementations
 	{
         private readonly ILogger<TransactionRepository> _logger;
         private readonly AurenDbContext _dbContext;
+        private readonly string _connectionString;
 
-		public CategoryRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext)
+        public CategoryRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-		}
+            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
+        }
 
 		public async Task<Category> CreateCategoryAsync(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken)
 		{
@@ -266,6 +272,57 @@ namespace Auren.API.Repositories.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to retrieve category with the name of {CategoryName} for user {UserId}", categoryDto.Name, userId);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var sql = @"
+                   SELECT 
+                        c.Name AS Category,
+                        c.TransactionType,
+                        ISNULL(AVG(t.Amount), 0) AS AverageSpending,
+                        ISNULL(COUNT(t.TransactionId), 0) AS TransactionCount
+                    FROM Categories c
+                    LEFT JOIN Transactions t 
+                        ON c.CategoryId = t.CategoryId 
+                        AND t.UserId = @UserId
+                        AND t.TransactionType = 2
+                    WHERE c.TransactionType = 2
+                    GROUP BY c.Name, c.TransactionType
+                    ORDER BY TransactionCount DESC, AverageSpending DESC;
+                    ";
+
+                await using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync(cancellationToken);
+
+                var result = await connection.QueryAsync<CategoryOverviewResponse>(sql, new
+                {
+                    UserId = userId
+                });
+
+                foreach (var r in result)
+                {
+                    _logger.LogInformation("Category: {Category}", r.Category);
+                    _logger.LogInformation("Type: {Type}", r.TransactionType);
+                    _logger.LogInformation("Average Spending: {AverageSpending}", r.AverageSpending);
+                    _logger.LogInformation("Transactions: {TransactionCount}", r.TransactionCount);
+                }
+
+                if (result == null)
+                {
+                    _logger.LogWarning("Query returned null result for category overview");
+                    return Enumerable.Empty<CategoryOverviewResponse>();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve category overview for user {UserId}", userId);
                 throw;
             }
         }

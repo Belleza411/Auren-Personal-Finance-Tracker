@@ -1,5 +1,6 @@
 ﻿using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.DTOs.Responses;
 using Auren.API.Models.Domain;
 
 namespace Auren.API.Repositories.Interfaces
@@ -13,5 +14,6 @@ namespace Auren.API.Repositories.Interfaces
         Task<bool> DeleteCategoryAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
         Task<List<Category>> SeedDefaultCategoryToUserAsync(Guid userId, CancellationToken cancellationToken);
         Task<Category?> GetCategoryByNameAsync(Guid userId, CancellationToken cancellationToken, CategoryDto categoryDto);
+        Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

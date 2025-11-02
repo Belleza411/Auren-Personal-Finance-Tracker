@@ -11,11 +11,13 @@ namespace Auren.API.Controllers
 	public class DashboardController : ControllerBase
 	{
 		private readonly ITransactionRepository _transactionRepository;
+		private readonly ICategoryRepository _categoryRepository;
 		private readonly ILogger<DashboardController> _logger;
 
-		public DashboardController(ITransactionRepository transactionRepository, ILogger<DashboardController> logger)
+		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ILogger<DashboardController> logger)
 		{
 			_transactionRepository = transactionRepository;
+			_categoryRepository = categoryRepository;
 			_logger = logger;
 		}
 
@@ -69,5 +71,28 @@ namespace Auren.API.Controllers
 				return StatusCode(500, "An error occurred while retrieving income vs expense chart data. Please try again later.");
             }
         }
-	}
+
+		[HttpGet("categories-overview")]
+        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+				var overview = await _categoryRepository.GetCategoryOverviewAsync(userId.Value, cancellationToken);
+                return Ok(overview);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve category overview");
+                return StatusCode(500, new { message = "An error occurred while retrieving category overview", details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in GetOverview endpoint");
+                return StatusCode(500, new { message = "An unexpected error occurred" });
+            }
+        }
+    }
 }
