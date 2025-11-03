@@ -276,41 +276,55 @@ namespace Auren.API.Repositories.Implementations
             }
         }
 
-        public async Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(
+            Guid userId,
+            CancellationToken cancellationToken,
+            CategoryOverviewFilter filter,
+            int? pageSize, int? pageNumber)
         {
+            var offset = (pageNumber - 1) * pageSize;
+
             try
             {
                 var sql = @"
-                   SELECT 
+                    SELECT 
                         c.Name AS Category,
                         c.TransactionType,
                         ISNULL(AVG(t.Amount), 0) AS AverageSpending,
                         ISNULL(COUNT(t.TransactionId), 0) AS TransactionCount
                     FROM Categories c
                     LEFT JOIN Transactions t 
-                        ON c.CategoryId = t.CategoryId 
+                        ON c.CategoryId = t.CategoryId
                         AND t.UserId = @UserId
                         AND t.TransactionType = 2
+                        AND (@MinAmount IS NULL OR t.Amount >= @MinAmount)
+                        AND (@MaxAmount IS NULL OR t.Amount <= @MaxAmount)
                     WHERE c.TransactionType = 2
+                      AND (@Category IS NULL OR c.Name LIKE '%' + @Category + '%')
                     GROUP BY c.Name, c.TransactionType
-                    ORDER BY TransactionCount DESC, AverageSpending DESC;
-                    ";
+                    HAVING 
+                        (@MinTransactionCount IS NULL OR COUNT(t.TransactionId) >= @MinTransactionCount)
+                        AND (@MaxTransactionCount IS NULL OR COUNT(t.TransactionId) <= @MaxTransactionCount)
+                    ORDER BY TransactionCount DESC, AverageSpending DESC
+                    OFFSET @Offset ROWS
+                    FETCH NEXT @PageSize ROWS ONLY;
+                ";
 
                 await using var connection = new SqlConnection(_connectionString);
                 await connection.OpenAsync(cancellationToken);
 
                 var result = await connection.QueryAsync<CategoryOverviewResponse>(sql, new
                 {
-                    UserId = userId
-                });
+                    UserId = userId,
+                    Category = filter.Category,
+                    MinAmount = filter.MinAmount,
+                    MaxAmount = filter.MaxAmount,
+                    MinTransactionCount = filter.MinTransactionCount,
+                    MaxTransactionCount = filter.MinTransactionCount,
+                    Offset = offset,
+                    pageSize = pageSize ?? 5,
 
-                foreach (var r in result)
-                {
-                    _logger.LogInformation("Category: {Category}", r.Category);
-                    _logger.LogInformation("Type: {Type}", r.TransactionType);
-                    _logger.LogInformation("Average Spending: {AverageSpending}", r.AverageSpending);
-                    _logger.LogInformation("Transactions: {TransactionCount}", r.TransactionCount);
-                }
+                });
 
                 if (result == null)
                 {

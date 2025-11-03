@@ -1,4 +1,5 @@
-﻿using Auren.API.DTOs.Responses;
+﻿using Auren.API.DTOs.Filters;
+using Auren.API.DTOs.Responses;
 using Auren.API.Extensions;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -73,14 +74,18 @@ namespace Auren.API.Controllers
         }
 
 		[HttpGet("categories-overview")]
-        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
+			CancellationToken cancellationToken,
+			[FromQuery] CategoryOverviewFilter filter,
+            [FromQuery] int? pageSize = 5,
+            [FromQuery] int? pageNumber = 1)  
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
             try
             {
-				var overview = await _categoryRepository.GetCategoryOverviewAsync(userId.Value, cancellationToken);
+				var overview = await _categoryRepository.GetCategoryOverviewAsync(userId.Value, cancellationToken, filter, pageSize, pageNumber);
                 return Ok(overview);
             }
             catch (InvalidOperationException ex)

@@ -14,6 +14,6 @@ namespace Auren.API.Repositories.Interfaces
         Task<bool> DeleteCategoryAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
         Task<List<Category>> SeedDefaultCategoryToUserAsync(Guid userId, CancellationToken cancellationToken);
         Task<Category?> GetCategoryByNameAsync(Guid userId, CancellationToken cancellationToken, CategoryDto categoryDto);
-        Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(Guid userId, CancellationToken cancellationToken);
+        Task<IEnumerable<CategoryOverviewResponse>> GetCategoryOverviewAsync(Guid userId, CancellationToken cancellationToken, CategoryOverviewFilter filter, int? pageSize, int? pageNumber);
     }
 }
