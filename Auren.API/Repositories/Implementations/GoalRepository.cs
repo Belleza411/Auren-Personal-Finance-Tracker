@@ -1,10 +1,14 @@
 ﻿using Auren.API.Data;
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.DTOs.Responses;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Globalization;
 
 namespace Auren.API.Repositories.Implementations
@@ -13,12 +17,14 @@ namespace Auren.API.Repositories.Implementations
 	{
 		public ILogger<GoalRepository> _logger { get; }
         private readonly AurenDbContext _dbContext;
+        private readonly string _connectionString;
 
-		public GoalRepository(ILogger<GoalRepository> logger, AurenDbContext dbContext)
+        public GoalRepository(ILogger<GoalRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-		}
+            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
+        }
 
 		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, GoalFilter filter, int? pageSize, int? pageNumber)
 		{
@@ -240,5 +246,39 @@ namespace Auren.API.Repositories.Implementations
 				filter.IsBehindSchedule.HasValue ||
 				filter.IsCancelled.HasValue;
         }
-    }
+
+		public async Task<GoalsOverviewResponse> GetGoalsOverviewAsync(Guid userId, CancellationToken cancellationToken)
+		{
+            try
+			{
+				var sql = @"
+					SELECT 
+						SUM(CASE WHEN Status = 1 THEN 1 ELSE 0 END) AS ActiveGoals,
+						SUM(CASE WHEN Status = 2 THEN 1 ELSE 0 END) AS Completed,
+						SUM(CASE WHEN Status = 3 THEN 1 ELSE 0 END) AS OnTrack,
+						SUM(CASE WHEN Status = 4 THEN 1 ELSE 0 END) AS OnHold,
+						SUM(CASE WHEN Status = 5 THEN 1 ELSE 0 END) AS NotStarted,
+						SUM(CASE WHEN Status = 6 THEN 1 ELSE 0 END) AS BehindSchedule,
+						SUM(CASE WHEN Status = 7 THEN 1 ELSE 0 END) AS Cancelled
+					FROM Goals
+					WHERE UserId = @UserId;
+				";
+
+                await using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync(cancellationToken);
+
+				var result = await connection.QueryFirstOrDefaultAsync<GoalsOverviewResponse>(sql, new
+				{
+					UserId = userId
+				});
+
+               return result ?? new GoalsOverviewResponse();
+            }
+			catch(Exception ex)
+			{
+                _logger.LogError(ex, "Failed to retrieve goals overview for user {UserId}", userId);
+                throw;
+            }
+        }
+	}
 }

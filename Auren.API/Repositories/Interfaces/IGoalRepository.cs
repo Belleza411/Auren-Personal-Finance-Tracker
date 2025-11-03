@@ -1,6 +1,8 @@
 ﻿using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
+using Auren.API.DTOs.Responses;
 using Auren.API.Models.Domain;
+using Auren.API.Models.Enums;
 
 namespace Auren.API.Repositories.Interfaces
 {
@@ -12,5 +14,6 @@ namespace Auren.API.Repositories.Interfaces
         Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken);
         Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken);
         Task<Goal?> AddMoneyToGoalAsync(Guid goalId, Guid userId, decimal amount, CancellationToken cancellationToken);
+        Task<GoalsOverviewResponse> GetGoalsOverviewAsync(Guid userId, CancellationToken cancellationToken);
     }
 }
