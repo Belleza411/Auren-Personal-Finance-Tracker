@@ -35,8 +35,6 @@ namespace Auren.API.Repositories.Implementations
 
 			_dbContext.RefreshTokens.RemoveRange(expiredTokens);
 			await _dbContext.SaveChangesAsync();
-
-			_logger.LogInformation("Cleaned up {Count} expired refresh tokens.", expiredTokens.Count);
         }
 
 		public string GenerateAccessTokenAsync(ApplicationUser user)
@@ -67,8 +65,6 @@ namespace Auren.API.Repositories.Implementations
 			await _dbContext.RefreshTokens.AddAsync(refreshToken);
 			await _dbContext.SaveChangesAsync();
 
-            _logger.LogInformation("Generated new refresh token for user {UserId}", user.Id);
-
             return refreshToken;
         }
 
@@ -78,7 +74,6 @@ namespace Auren.API.Repositories.Implementations
 				.Where(rt => rt.UserId == userId && rt.IsActive)
 				.ToListAsync();
 
-
 			foreach (var token in refreshTokens)
 			{
 				token.IsRevoked = true;
@@ -86,12 +81,9 @@ namespace Auren.API.Repositories.Implementations
 				token.ReasonRevoked = "User logged out";
             }
 
-			if(refreshTokens.Any())
-			{
-                await _dbContext.SaveChangesAsync();
-                _logger.LogInformation("Revoked {Count} refresh tokens for user {UserId}",
-					refreshTokens.Count, userId);
-            }
+			if(refreshTokens.Any()) 
+				await _dbContext.SaveChangesAsync();
+            
         }
 
 		public async Task RevokeRefreshTokenAsync(string token, string reason)
@@ -106,9 +98,6 @@ namespace Auren.API.Repositories.Implementations
 				refreshToken.ReasonRevoked = reason;
 
 				await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("Revoked refresh token for user {UserId}: {Reason}",
-                                    refreshToken.UserId, reason);
             }
 		}
 
@@ -127,8 +116,6 @@ namespace Auren.API.Repositories.Implementations
 					var newToken = await GenerateRefreshTokenAsync(user);
 
                     await _dbContext.SaveChangesAsync();
-
-                    _logger.LogInformation("Rotated refresh token for user {UserId}", userId);
                 }
             }
 		}
@@ -141,28 +128,22 @@ namespace Auren.API.Repositories.Implementations
 				
                 var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
 
-                _logger.LogDebug("Validating token for email: {Email}, UserId: {UserId}", email, userIdClaim);
-
                 if (string.IsNullOrEmpty(email) || !Guid.TryParse(userIdClaim, out var userId))
 				{
-                    _logger.LogWarning("Invalid or missing UserId claim");
                     context.RejectPrincipal();
                     return false;
                 }
 
                 if (string.IsNullOrEmpty(email))
                 {
-                    _logger.LogWarning("Missing email claim");
                     context.RejectPrincipal();
                     return false;
                 }
 
                 var user = await _userManager.FindByEmailAsync(email);
-                _logger.LogInformation("Email found: {Userl}", user);
 
 				if(user == null || user.UserId != userId)
 				{
-                    _logger.LogError("User not found {User}", user);
                     context.RejectPrincipal();
                     return false;
                 }
@@ -172,7 +153,6 @@ namespace Auren.API.Repositories.Implementations
 
 				if(!hasValidRefreshToken)
 				{
-                    _logger.LogWarning("No valid refresh token found for user {UserId}", userId);
                     context.RejectPrincipal();
                     return false;
                 }
@@ -182,16 +162,16 @@ namespace Auren.API.Repositories.Implementations
 
                 if(shouldRenew)
 				{
-                    _logger.LogInformation("Renewing access token for user {UserId}", userId);
-
 					var newAccessToken = GenerateAccessTokenAsync(user);
 
 					var identity = (ClaimsIdentity)context.Principal?.Identity!;
 					var existingTokenClaim = identity.FindFirst("AccessToken");
+
 					if (existingTokenClaim != null)
 					{
 						identity.RemoveClaim(existingTokenClaim);
                     }
+
 					identity.AddClaim(new Claim("AccessToken", newAccessToken));
 
 					await RotateRefreshTokenAsync(userId);
@@ -199,15 +179,12 @@ namespace Auren.API.Repositories.Implementations
                     context.Properties.IssuedUtc = DateTimeOffset.UtcNow;
                     context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10);
                     context.ShouldRenew = true;
-
-                    _logger.LogInformation("Successfully renewed tokens for user {UserId}", userId);
                 }
 
                 return true;
             }
 			catch (Exception ex)
 			{
-                _logger.LogError(ex, "Error validating refresh token");
                 context.RejectPrincipal();
                 return false;
             }
