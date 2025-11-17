@@ -6,7 +6,6 @@
          string FirstName,
          string LastName,
          string? ProfilePictureUrl,
-         bool IsGoogleUser,
          DateTime CreatedAt,
          DateTime? LastLoginAt
     );

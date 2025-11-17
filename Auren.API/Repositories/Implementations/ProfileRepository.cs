@@ -92,7 +92,6 @@ namespace Auren.API.Repositories.Implementations
 				user.FirstName,
 				user.LastName,
 				user.ProfilePictureUrl,
-				user.IsGoogleUser,
 				user.CreatedAt,
 				user.LastLoginAt
 			);

@@ -124,7 +124,6 @@ namespace Auren.API.Repositories.Implementations
 					Email = request.Email,
 					FirstName = SanitizeInput(request.FirstName)!,
 					LastName = SanitizeInput(request.LastName)!,
-					IsGoogleUser = false
 				};
 
 				var result = await _userManager.CreateAsync(user, request.Password);
@@ -257,7 +256,6 @@ namespace Auren.API.Repositories.Implementations
                 user.FirstName,
                 user.LastName,
                 user.ProfilePictureUrl,
-                user.IsGoogleUser,
                 user.CreatedAt,
                 user.LastLoginAt
             );
