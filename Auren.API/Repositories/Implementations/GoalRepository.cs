@@ -81,42 +81,46 @@ namespace Auren.API.Repositories.Implementations
 			}
 		}
 
-		public async Task<Goal> CreateGoalAsync(GoalDto goalDto, Guid userId, CancellationToken cancellationToken)
-		{
-			if(goalDto == null)
-			{
-				_logger.LogWarning("GoalDto is null for user {UserId}", userId);
-				throw new ArgumentException("Goal data is required");
-            }
+        public async Task<Goal> CreateGoalAsync(GoalDto goalDto, Guid userId, CancellationToken cancellationToken)
+        {
+            if (goalDto == null)
+                throw new ArgumentException("Goal data is required");
 
-			try
-			{
-				var goal = new Goal {
-					GoalId = Guid.NewGuid(),
-					UserId = userId,
-					Name = goalDto.Name,
-					Description = goalDto.Description,
-					Spent = goalDto.Spent,
-                    Budget = goalDto.Budget,
-					TargetDate = goalDto.TargetDate,
+            try
+            {
+                _logger.LogInformation("Spent: {Spent}, Budget: {Budget}", goalDto.Spent, goalDto.Budget);
+
+                decimal spent = goalDto.Spent;
+                decimal budget = goalDto.Budget;
+
+                var goal = new Goal
+                {
+                    GoalId = Guid.NewGuid(),
+                    UserId = userId,
+                    Name = goalDto.Name,
+                    Description = goalDto.Description,
+                    Spent = spent,
+                    Budget = budget,
+                    TargetDate = goalDto.TargetDate,
                     Status = goalDto.Status,
-					CreatedAt = DateTime.UtcNow
-				};
+                    CompletionPercentage = GetCompletionPercentage(spent, budget),
+                    TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goalDto.TargetDate),
+                    CreatedAt = DateTime.UtcNow
+                };
 
-				await _dbContext.Goals.AddAsync(goal, cancellationToken);
-				await _dbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogInformation("{Goal} with {GoalId} was created succesfully for {UserId}", goal, goal.GoalId, userId);
+                await _dbContext.Goals.AddAsync(goal, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
-				return goal;
+                return goal;
             }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to create goal for user {UserId}", userId);
-				throw;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create goal");
+                throw;
             }
         }
 
-		public async Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken)
+        public async Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken)
 		{
 			if(goalDto == null)
 			{
@@ -143,6 +147,9 @@ namespace Auren.API.Repositories.Implementations
                 goal.Budget = goalDto.Budget;
 				goal.TargetDate = goalDto.TargetDate;
 				goal.Status = goalDto.Status;
+                goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
+                goal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goal.TargetDate);
+
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
 				_logger.LogInformation("{Goal} with {GoalId} was updated succesfully for {UserId}", goal, goal.GoalId, userId);
@@ -200,9 +207,10 @@ namespace Auren.API.Repositories.Implementations
                 return null;
 			}
 
-			goal.Spent += amount;
+			goal.Spent = (goal.Spent ?? 0) + amount;
+            goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
 
-			await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
 			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goalId, userId);
 			return goal;
@@ -280,5 +288,44 @@ namespace Auren.API.Repositories.Implementations
                 throw;
             }
         }
-	}
+
+		private int GetCompletionPercentage(decimal currentAmount, decimal targetAmount)
+		{
+            if (targetAmount <= 0m)
+                return 0;
+
+            decimal percentage = (currentAmount / targetAmount) * 100m;
+
+            int rounded = (int)Math.Round(percentage, MidpointRounding.AwayFromZero);
+            if (rounded < 0) return 0;
+            if (rounded > 100) return 100;
+            return rounded;
+        }
+
+		private string GetTimeRemaining(DateTime startDate, DateTime targetDate)
+        {
+            if (targetDate <= startDate)
+                return "The target date has already passed.";
+
+            TimeSpan difference = targetDate - startDate;
+
+            int totalDays = (int)difference.TotalDays;
+            int months = totalDays / 30;
+            int days = totalDays % 30;
+
+            if (months > 0)
+            {
+                return $"{months} month{(months > 1 ? "s" : "")}";
+            }
+            else if (totalDays >= 1)
+            {
+                return $"{totalDays} day{(totalDays > 1 ? "s" : "")} remaining.";
+            }
+            else
+            {
+                int hours = (int)difference.TotalHours;
+                return $"{hours} hour{(hours > 1 ? "s" : "")} remaining.";
+            }
+        }
+    }
 }
