@@ -99,5 +99,22 @@ namespace Auren.API.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred" });
             }
         }
+
+		[HttpGet("summary")]
+		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(CancellationToken cancellationToken)
+		{
+			var userId = User.GetCurrentUserId();
+			if (userId == null) return Unauthorized();
+			try
+			{
+				var summary = await _transactionRepository.GetDashboardSummaryAsync(userId.Value, cancellationToken);
+				return Ok(summary);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Failed to retrieve dashboard summary for user {UserId}", userId);
+				return StatusCode(500, "An error occurred while retrieving dashboard summary. Please try again later.");
+            }
+        }
     }
 }

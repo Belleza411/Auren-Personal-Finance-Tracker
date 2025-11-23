@@ -16,5 +16,6 @@ namespace Auren.API.Repositories.Interfaces
 		Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken);
 		Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, DateTime month, CancellationToken cancellationToken);
 		Task<IncomeVsExpenseChartResponse> GetIncomeVsExpenseChartAsync(Guid userId, DateTime startMonth, DateTime endMonth, CancellationToken cancellationToken);
+		Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

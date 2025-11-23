@@ -2,6 +2,7 @@
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.DTOs.Responses;
+using Auren.API.Extensions;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Auren.API.Repositories.Implementations
 {
@@ -425,6 +427,86 @@ namespace Auren.API.Repositories.Implementations
                    filter.EndDate.HasValue ||
                    !string.IsNullOrEmpty(filter.Category) ||
                    !string.IsNullOrEmpty(filter.PaymentMethod);
+        }
+
+        public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            var (start, end) = DateTime.Today.GetLastMonthRange();
+
+            var transactions = await _dbContext.Transactions
+                .Where(t => t.UserId == userId && t.TransactionDate >= start)
+                .Select(t => new
+                {
+                    t.Amount,
+                    t.TransactionType,
+                    t.TransactionDate,
+                    IsCurrentMonth = t.TransactionDate >= start
+                })
+                .ToListAsync();
+
+            var currentIncome = transactions
+                .Where(t => t.IsCurrentMonth && t.TransactionType == TransactionType.Income)
+                .Sum(t => t.Amount);
+
+            var currentExpense = transactions
+                .Where(t => t.IsCurrentMonth && t.TransactionType == TransactionType.Expense)
+                .Sum(t => t.Amount);
+
+            var lastMonthIncome = transactions
+                .Where(t => !t.IsCurrentMonth && t.TransactionType == TransactionType.Income)
+                .Sum(t => t.Amount);
+
+            var lastMonthExpense = transactions
+                .Where(t => !t.IsCurrentMonth && t.TransactionType == TransactionType.Expense)
+                .Sum(t => t.Amount);
+
+            var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
+            var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense);
+
+            var currentTotalBalance = await _dbContext.Transactions
+             .Where(t => t.UserId == userId)
+             .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
+
+            var totalBalancePercentageChange = await CalculateBalancePercentageChange(userId);
+
+            return new DashboardSummaryResponse(
+                TotalBalance: new TransactionMetricResponse(
+                    Amount: currentTotalBalance,
+                    PercentageChange: totalBalancePercentageChange
+                ),
+                Income: new TransactionMetricResponse(
+                    Amount: currentIncome,
+                    PercentageChange: incomeChange
+                ),
+                Expense: new TransactionMetricResponse(
+                    Amount: currentExpense,
+                    PercentageChange: expenseChange
+                )
+            );
+        }
+
+        private decimal CalculatePercentageChange(decimal current, decimal previous)
+        {
+            if (previous == 0) return current > 0 ? 100 : 0;
+            return ((current - previous) / previous) * 100;
+        }
+
+        private async Task<decimal> CalculateBalancePercentageChange(Guid userId)
+        {
+            var (start, end) = DateTime.Today.GetLastMonthRange();
+
+            var currentTotalBalance = await _dbContext.Transactions
+              .Where(t => t.UserId == userId)
+              .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
+
+            var lastMonthTotalBalance = await _dbContext.Transactions
+                .Where(t => t.UserId == userId && t.TransactionDate < start)
+                .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
+
+            if (lastMonthTotalBalance == 0)
+                return currentTotalBalance > 0 ? 100 : 0;
+
+            return Math.Round(((currentTotalBalance - lastMonthTotalBalance) / Math.Abs(lastMonthTotalBalance)) * 100, 2);
         }
     }
 }
