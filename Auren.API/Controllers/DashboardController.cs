@@ -49,33 +49,6 @@ namespace Auren.API.Controllers
 			}
 		}
 
-		[HttpGet("income-vs-expense")]
-		public async Task<IActionResult> GetIncomeVsExpenseChart(
-			[FromQuery] DateTime? startMonth,
-			[FromQuery] DateTime? endMonth,
-			CancellationToken cancellationToken)
-		{
-			var userId = User.GetCurrentUserId();
-			if (userId == null) return Unauthorized();
-
-            try
-			{
-				var start = startMonth ?? new DateTime(DateTime.Today.Year, 1, 1);
-				var end = endMonth ?? new DateTime(DateTime.Today.Year, 12, 1);
-
-				if (start > end) return BadRequest("Start month cannot be after end month");
-
-				var result = await _transactionRepository.GetIncomeVsExpenseChartAsync(userId.Value, start, end, cancellationToken);
-
-				return Ok(result);
-            }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to retrieve income vs expense chart data for user {UserId}", userId);
-				return StatusCode(500, "An error occurred while retrieving income vs expense chart data. Please try again later.");
-            }
-        }
-
 		[HttpGet("categories/categories-overview")]
         public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
 			CancellationToken cancellationToken,
