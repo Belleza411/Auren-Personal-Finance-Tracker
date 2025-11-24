@@ -245,32 +245,5 @@ namespace Auren.API.Controllers
                 return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
             }
         }
-
-        [HttpGet("goals-overview")]
-        public async Task<ActionResult<GoalsOverviewResponse>> GetGoalsOverview(CancellationToken cancellationToken)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            try
-            {
-                var overview = await _goalRepository.GetGoalsOverviewAsync(userId.Value, cancellationToken);
-
-                if(overview == null)
-                {
-                    return NotFound(new { Message = "No goal data found for this user." });
-                }
-
-                return Ok(overview);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Failed to get goals overview for {UserId}", userId);
-                return StatusCode(500, "An error occurred while getting the goal overview. Please try again later.");
-            }
-        }
     }
 }

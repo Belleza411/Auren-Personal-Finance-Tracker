@@ -255,40 +255,6 @@ namespace Auren.API.Repositories.Implementations
 				filter.IsCancelled.HasValue;
         }
 
-		public async Task<GoalsOverviewResponse> GetGoalsOverviewAsync(Guid userId, CancellationToken cancellationToken)
-		{
-            try
-			{
-				var sql = @"
-					SELECT 
-						SUM(CASE WHEN Status = 1 THEN 1 ELSE 0 END) AS ActiveGoals,
-						SUM(CASE WHEN Status = 2 THEN 1 ELSE 0 END) AS Completed,
-						SUM(CASE WHEN Status = 3 THEN 1 ELSE 0 END) AS OnTrack,
-						SUM(CASE WHEN Status = 4 THEN 1 ELSE 0 END) AS OnHold,
-						SUM(CASE WHEN Status = 5 THEN 1 ELSE 0 END) AS NotStarted,
-						SUM(CASE WHEN Status = 6 THEN 1 ELSE 0 END) AS BehindSchedule,
-						SUM(CASE WHEN Status = 7 THEN 1 ELSE 0 END) AS Cancelled
-					FROM Goals
-					WHERE UserId = @UserId;
-				";
-
-                await using var connection = new SqlConnection(_connectionString);
-                await connection.OpenAsync(cancellationToken);
-
-				var result = await connection.QueryFirstOrDefaultAsync<GoalsOverviewResponse>(sql, new
-				{
-					UserId = userId
-				});
-
-               return result ?? new GoalsOverviewResponse();
-            }
-			catch(Exception ex)
-			{
-                _logger.LogError(ex, "Failed to retrieve goals overview for user {UserId}", userId);
-                throw;
-            }
-        }
-
 		private int GetCompletionPercentage(decimal currentAmount, decimal targetAmount)
 		{
             if (targetAmount <= 0m)
