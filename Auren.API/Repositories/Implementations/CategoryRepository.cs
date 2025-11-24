@@ -290,8 +290,10 @@ namespace Auren.API.Repositories.Implementations
                     SELECT 
                         c.Name AS Category,
                         c.TransactionType,
-                        ISNULL(AVG(t.Amount), 0) AS AverageSpending,
-                        ISNULL(COUNT(t.TransactionId), 0) AS TransactionCount
+                        ISNULL(SUM(t.Amount), 0) AS TotalSpending,
+                        ROUND(ISNULL(AVG(t.Amount), 0), 2) AS AverageSpending,
+                        ISNULL(COUNT(t.TransactionId), 0) AS TransactionCount,
+                        MAX(t.TransactionDate) AS LastUsed
                     FROM Categories c
                     LEFT JOIN Transactions t 
                         ON c.CategoryId = t.CategoryId
@@ -323,7 +325,6 @@ namespace Auren.API.Repositories.Implementations
                     MaxTransactionCount = filter.MinTransactionCount,
                     Offset = offset,
                     pageSize = pageSize ?? 5,
-
                 });
 
                 if (result == null)
