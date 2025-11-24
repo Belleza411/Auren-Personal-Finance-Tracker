@@ -187,7 +187,7 @@ namespace Auren.API.Controllers
                     return NotFound($"Goal id of {goalId} not found. ");
                 }
 
-                var currentBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
+                var currentBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken, true);
 
                 if (currentBalance < amount)
                 {
@@ -221,7 +221,7 @@ namespace Auren.API.Controllers
                     return StatusCode(500, "Transaction created but goal update failed. ");
                 }
 
-                var newBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken);
+                var newBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken, true);
 
                 _logger.LogInformation("Successfully added {Amount:C} to goal '{GoalName}' ({GoalId}) for user {UserId}. Balance: {OldBalance:C} -> {NewBalance:C}",
                     amount, updatedGoal.Name, goalId, userId, currentBalance, newBalance);

@@ -13,7 +13,7 @@ namespace Auren.API.Repositories.Interfaces
 		Task<Transaction> CreateTransactionAsync(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken);
 		Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken);
 		Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken);
-		Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken);
+		Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken, bool isCurrentMonth);
 		Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, DateTime month, CancellationToken cancellationToken);
 		Task<IncomeVsExpenseChartResponse> GetIncomeVsExpenseChartAsync(Guid userId, DateTime startMonth, DateTime endMonth, CancellationToken cancellationToken);
 		Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken);

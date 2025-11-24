@@ -56,7 +56,7 @@ namespace Auren.API.Repositories.Implementations
 
                 if(transactionDto.TransactionType == TransactionType.Expense)
                 {
-                    var currentBalance = await GetBalanceAsync(userId, cancellationToken);
+                    var currentBalance = await GetBalanceAsync(userId, cancellationToken, true);
                     
                     if (currentBalance < transactionDto.Amount)
                     {
@@ -175,10 +175,16 @@ namespace Auren.API.Repositories.Implementations
             return new AvgDailySpendingResponse(currentAvg, percentageChange);
         }
 
-		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken)
+		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken, bool isCurrentMonth)
 		{
+            var (start, end) = isCurrentMonth
+                ? DateTime.UtcNow.GetCurrentMonthRange()
+                : DateTime.UtcNow.GetLastMonthRange();
+
             var result = await _dbContext.Transactions
-                .Where(t => t.UserId == userId)
+                .Where(t => t.UserId == userId &&
+                            t.TransactionDate >= start &&
+                            t.TransactionDate <= end)
                 .GroupBy(t => t.TransactionType)
                 .Select(g => new
                 {
@@ -431,48 +437,52 @@ namespace Auren.API.Repositories.Implementations
 
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken)
         {
-            var (start, end) = DateTime.Today.GetLastMonthRange();
+            var (firstDayOfLastMonth, lastDayOfLastMonth) = DateTime.Today.GetLastMonthRange();
+            var (firstDayOfCurrentMonth, lastDayOfCurrentMonth) = DateTime.Today.GetCurrentMonthRange();
 
-            var transactions = await _dbContext.Transactions
-                .Where(t => t.UserId == userId && t.TransactionDate >= start)
-                .Select(t => new
+            _logger.LogInformation("Last month: {First} - {Last}", firstDayOfLastMonth, lastDayOfLastMonth);
+
+            var monthlyData = await _dbContext.Transactions
+                .Where(t => t.UserId == userId && t.TransactionDate >= firstDayOfLastMonth)
+                .GroupBy(t => new
                 {
-                    t.Amount,
-                    t.TransactionType,
-                    t.TransactionDate,
-                    IsCurrentMonth = t.TransactionDate >= start
+                    IsCurrentMonth = t.TransactionDate >= firstDayOfCurrentMonth,
+                    t.TransactionType
                 })
-                .ToListAsync();
+                .Select(g => new
+                {
+                    g.Key.IsCurrentMonth,
+                    g.Key.TransactionType,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .ToListAsync(cancellationToken);
 
-            var currentIncome = transactions
-                .Where(t => t.IsCurrentMonth && t.TransactionType == TransactionType.Income)
-                .Sum(t => t.Amount);
+            var currentIncome = monthlyData
+                .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Income)?.Total ?? 0;
 
-            var currentExpense = transactions
-                .Where(t => t.IsCurrentMonth && t.TransactionType == TransactionType.Expense)
-                .Sum(t => t.Amount);
+            var lastMonthIncome = monthlyData
+                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Income)?.Total ?? 0;
 
-            var lastMonthIncome = transactions
-                .Where(t => !t.IsCurrentMonth && t.TransactionType == TransactionType.Income)
-                .Sum(t => t.Amount);
+            var currentExpense = monthlyData
+                .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
-            var lastMonthExpense = transactions
-                .Where(t => !t.IsCurrentMonth && t.TransactionType == TransactionType.Expense)
-                .Sum(t => t.Amount);
+            var lastMonthExpense = monthlyData
+                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
-            var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
-            var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense);
+            _logger.LogInformation("current month expense: {Expense}", currentExpense);
+            _logger.LogInformation("Last month expense: {Expense}", lastMonthExpense);
 
-            var currentTotalBalance = await _dbContext.Transactions
-             .Where(t => t.UserId == userId)
-             .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
+            var currentBalance = await GetBalanceAsync(userId, cancellationToken, true);
+            var lastMonthBalance = await GetBalanceAsync(userId, cancellationToken, false);
 
-            var totalBalancePercentageChange = await CalculateBalancePercentageChange(userId);
+            var balanceChange = CalculatePercentageChange(currentBalance, lastMonthBalance, true);
+            var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome, false);
+            var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense, false);
 
             return new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
-                    Amount: currentTotalBalance,
-                    PercentageChange: totalBalancePercentageChange
+                    Amount: currentBalance,
+                    PercentageChange: balanceChange
                 ),
                 Income: new TransactionMetricResponse(
                     Amount: currentIncome,
@@ -485,28 +495,14 @@ namespace Auren.API.Repositories.Implementations
             );
         }
 
-        private decimal CalculatePercentageChange(decimal current, decimal previous)
+        private decimal CalculatePercentageChange(decimal current, decimal previous, bool isTotalBalance)
         {
             if (previous == 0) return current > 0 ? 100 : 0;
-            return ((current - previous) / previous) * 100;
-        }
+            var change = isTotalBalance
+                ? ((current - previous) / Math.Abs(previous)) * 100
+                : ((current - previous) / previous) * 100;
 
-        private async Task<decimal> CalculateBalancePercentageChange(Guid userId)
-        {
-            var (start, end) = DateTime.Today.GetLastMonthRange();
-
-            var currentTotalBalance = await _dbContext.Transactions
-              .Where(t => t.UserId == userId)
-              .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
-
-            var lastMonthTotalBalance = await _dbContext.Transactions
-                .Where(t => t.UserId == userId && t.TransactionDate < start)
-                .SumAsync(t => t.TransactionType == TransactionType.Income ? t.Amount : -t.Amount);
-
-            if (lastMonthTotalBalance == 0)
-                return currentTotalBalance > 0 ? 100 : 0;
-
-            return Math.Round(((currentTotalBalance - lastMonthTotalBalance) / Math.Abs(lastMonthTotalBalance)) * 100, 2);
+            return Math.Round(change, 2);
         }
     }
 }
