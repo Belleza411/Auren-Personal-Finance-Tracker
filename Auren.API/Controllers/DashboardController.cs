@@ -4,6 +4,7 @@ using Auren.API.Extensions;
 using Auren.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Auren.API.Controllers
 {
@@ -105,6 +106,7 @@ namespace Auren.API.Controllers
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
+
 			try
 			{
 				var summary = await _transactionRepository.GetDashboardSummaryAsync(userId.Value, cancellationToken);
@@ -114,6 +116,24 @@ namespace Auren.API.Controllers
 			{
 				_logger.LogError(ex, "Failed to retrieve dashboard summary for user {UserId}", userId);
 				return StatusCode(500, "An error occurred while retrieving dashboard summary. Please try again later.");
+            }
+        }
+
+		[HttpGet("categories/summary")]
+		public async Task<ActionResult<CategorySummaryResponse>> GetCategoriesSummary(CancellationToken cancellationToken)
+		{
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+				var summary = await _categoryRepository.GetCategoriesSummaryAsync(userId.Value, cancellationToken);
+                return Ok(summary);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve dashboard summary for user {UserId}", userId);
+                return StatusCode(500, "An error occurred while retrieving dashboard summary. Please try again later.");
             }
         }
     }

@@ -340,5 +340,39 @@ namespace Auren.API.Repositories.Implementations
                 throw;
             }
         }
+
+        public async Task<CategorySummaryResponse> GetCategoriesSummaryAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var summary = await _dbContext.Categories
+                    .Where(c => c.UserId == userId)
+                    .Select(c => new
+                    {
+                        c.Name,
+                        TotalCategories = _dbContext.Transactions.Count(t => t.CategoryId == c.CategoryId),
+                        HighestSpending = _dbContext.Transactions
+                            .Where(t => t.CategoryId == c.CategoryId && t.TransactionType == TransactionType.Expense)
+                            .Sum(t => (decimal?)t.Amount) ?? 0
+                    })
+                    .ToListAsync(cancellationToken);
+
+                var mostUsedCategory = summary.OrderByDescending(c => c.TotalCategories)
+                                      .FirstOrDefault()?.Name;
+                var highestSpendingCategory = summary.OrderByDescending(c => c.HighestSpending)
+                                                             .FirstOrDefault()?.Name;
+
+                return new CategorySummaryResponse(
+                    totalCategories: summary.Count,
+                    mostUsedCategory: mostUsedCategory ?? "N/A",
+                    highestSpendingCategory: highestSpendingCategory ?? "N/A"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve categories summary for user {UserId}", userId);
+                throw;
+            }
+        }
 	}
 }
