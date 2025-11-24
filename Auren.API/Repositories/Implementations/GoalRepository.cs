@@ -293,5 +293,30 @@ namespace Auren.API.Repositories.Implementations
                 return $"{hours} hour{(hours > 1 ? "s" : "")} remaining.";
             }
         }
+
+		public async Task<GoalsSummaryResponse> GetGoalsSummaryAsync(Guid userId, CancellationToken cancellationToken)
+		{
+            var activeStatuses = new[]
+			{
+				GoalStatus.OnTrack,
+				GoalStatus.NotStarted,
+				GoalStatus.BehindSchedule
+			};
+
+            var goals = _dbContext.Goals.Where(g => g.UserId == userId);
+
+            var goalsSummary = new
+            {
+                TotalGoals = await goals.CountAsync(),
+                GoalsCompleted = await goals.CountAsync(x => x.Status == GoalStatus.Completed),
+                ActiveGoals = await goals.CountAsync(x => activeStatuses.Contains(x.Status))
+            };
+
+            return new GoalsSummaryResponse(
+				TotalGoals: goalsSummary.TotalGoals,
+				GoalsCompleted: goalsSummary.GoalsCompleted,
+				ActiveGoals: goalsSummary.ActiveGoals
+			);
+        }
     }
 }

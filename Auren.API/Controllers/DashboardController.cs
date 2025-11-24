@@ -14,12 +14,14 @@ namespace Auren.API.Controllers
 	{
 		private readonly ITransactionRepository _transactionRepository;
 		private readonly ICategoryRepository _categoryRepository;
+		private readonly IGoalRepository _goalRepository;
 		private readonly ILogger<DashboardController> _logger;
 
-		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ILogger<DashboardController> logger)
+		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger)
 		{
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
+			_goalRepository = goalRepository;
 			_logger = logger;
 		}
 
@@ -132,8 +134,24 @@ namespace Auren.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve dashboard summary for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while retrieving dashboard summary. Please try again later.");
+                return StatusCode(500, "An error occurred while retrieving category summary. Please try again later.");
+            }
+        }
+
+        [HttpGet("goals/summary")]
+        public async Task<ActionResult<CategorySummaryResponse>> GetGoalsSummary(CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+				var summary = await _goalRepository.GetGoalsSummaryAsync(userId.Value, cancellationToken);
+                return Ok(summary);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while retrieving goals summary. Please try again later.");
             }
         }
     }
