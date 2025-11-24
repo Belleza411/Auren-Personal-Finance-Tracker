@@ -440,8 +440,6 @@ namespace Auren.API.Repositories.Implementations
             var (firstDayOfLastMonth, lastDayOfLastMonth) = DateTime.Today.GetLastMonthRange();
             var (firstDayOfCurrentMonth, lastDayOfCurrentMonth) = DateTime.Today.GetCurrentMonthRange();
 
-            _logger.LogInformation("Last month: {First} - {Last}", firstDayOfLastMonth, lastDayOfLastMonth);
-
             var monthlyData = await _dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= firstDayOfLastMonth)
                 .GroupBy(t => new
@@ -468,9 +466,6 @@ namespace Auren.API.Repositories.Implementations
 
             var lastMonthExpense = monthlyData
                 .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
-
-            _logger.LogInformation("current month expense: {Expense}", currentExpense);
-            _logger.LogInformation("Last month expense: {Expense}", lastMonthExpense);
 
             var currentBalance = await GetBalanceAsync(userId, cancellationToken, true);
             var lastMonthBalance = await GetBalanceAsync(userId, cancellationToken, false);

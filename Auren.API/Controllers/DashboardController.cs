@@ -22,7 +22,7 @@ namespace Auren.API.Controllers
 			_logger = logger;
 		}
 
-		[HttpGet("average-daily-spending")]
+		[HttpGet("transaction/average-daily-spending")]
 		public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending([FromQuery] DateTime? month, CancellationToken cancellationToken)
 		{
 			var userId = User.GetCurrentUserId();
@@ -73,7 +73,7 @@ namespace Auren.API.Controllers
             }
         }
 
-		[HttpGet("categories-overview")]
+		[HttpGet("categories/categories-overview")]
         public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
 			CancellationToken cancellationToken,
 			[FromQuery] CategoryOverviewFilter filter,
