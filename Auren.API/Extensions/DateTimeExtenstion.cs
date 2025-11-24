@@ -10,5 +10,11 @@
 
             return (firstDayOfLastMonth, lastDayOfLastMonth);
         }
+
+        public static (DateTime start, DateTime end) GetCurrentMonthRange(this DateTime date)
+        {
+            var firstDayOfCurrentMonth = new DateTime(date.Year, date.Month, 1);
+            return (firstDayOfCurrentMonth, date);
+        }
     }
 }
