@@ -36,7 +36,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpPost("register")]
-		public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
+		public async Task<IActionResult> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
 			if (!ModelState.IsValid)
 			{

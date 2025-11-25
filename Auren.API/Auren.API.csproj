@@ -24,4 +24,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\profile-images\1731536350836.jpg" />
+  </ItemGroup>
+
 </Project>

@@ -7,6 +7,7 @@ using Auren.API.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Auren.API.Repositories.Implementations
 {
@@ -16,13 +17,19 @@ namespace Auren.API.Repositories.Implementations
 		private readonly AurenAuthDbContext _dbContext;
 		private readonly IWebHostEnvironment _env;
 		private readonly IValidator<ProfileImageUploadRequest> _validator;
+        private readonly IOptions<FileUploadSettings> _fileUploadSettings;
 
-		public ProfileRepository(ILogger<ProfileRepository> logger, AurenAuthDbContext dbContext, IWebHostEnvironment env, IValidator<ProfileImageUploadRequest> validator)
+		public ProfileRepository(ILogger<ProfileRepository> logger,
+			AurenAuthDbContext dbContext,
+			IWebHostEnvironment env,
+			IValidator<ProfileImageUploadRequest> validator,
+			IOptions<FileUploadSettings> fileUploadSettings)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
 			_env = env;
 			_validator = validator;
+			_fileUploadSettings = fileUploadSettings;
 		}
 
 		public async Task<UserResponse?> GetUserProfile(Guid userId, CancellationToken cancellationToken)
@@ -103,40 +110,48 @@ namespace Auren.API.Repositories.Implementations
 			);
 		}
 
-		public async Task<ProfileImageUploadResponse> UploadProfileImageAsync(ProfileImageUploadRequest request, Guid userId, CancellationToken cancellationToken)
+		public async Task<ProfileImageUploadResponse> UploadProfileImageAsync(ProfileImageUploadRequest request, CancellationToken cancellationToken)
 		{
-			var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-			if ((!validationResult.IsValid))
+			try
 			{
-				var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
-				throw new Exception(errors);
-			}
+                var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+                if ((!validationResult.IsValid))
+                {
+                    var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    throw new Exception(errors);
+                }
 
-			var uploadsFolder = Path.Combine(_env.WebRootPath, "profile-images");
-			if (!Directory.Exists(uploadsFolder))
-				Directory.CreateDirectory(uploadsFolder);
+                var uploadsFolder = Path.Combine(_env.ContentRootPath, _fileUploadSettings.Value.ProfileImagesPath);
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
 
-			var extension = Path.GetExtension(request.File.FileName).ToLowerInvariant();
-            
-			var safeName = Path.GetFileNameWithoutExtension(request.Name ?? "");
-            string fileName = string.IsNullOrWhiteSpace(safeName)
-                ? $"{Guid.NewGuid()}{extension}"
-                : $"{safeName}{extension}";
+                var extension = Path.GetExtension(request.File.FileName).ToLowerInvariant();
 
-            var filePath = Path.Combine(uploadsFolder, fileName);
+                var safeName = Path.GetFileNameWithoutExtension(request.Name ?? "");
+                string fileName = string.IsNullOrWhiteSpace(safeName)
+                    ? $"{Guid.NewGuid()}{extension}"
+                    : $"{safeName}{extension}";
 
-			using (var stream = new FileStream(filePath, FileMode.Create))
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.File.CopyToAsync(stream, cancellationToken);
+                }
+
+                return new ProfileImageUploadResponse(
+                    Name: fileName,
+                    Description: request.Description,
+                    Extension: extension,
+                    SizeInBytes: request.File.Length,
+                    Path: $"{_fileUploadSettings.Value.BaseUrl}   {fileName}"
+                );
+            } 
+			catch (Exception ex)
 			{
-				await request.File.CopyToAsync(stream);
-			}
-
-			return new ProfileImageUploadResponse(
-				Name: fileName,
-				Description: request.Description,
-				Extension: extension,
-				SizeInBytes: request.File.Length,
-				Path: $"/profile-images/{fileName}"
-			);
+				_logger.LogError(ex, "Failed to upload profile image for user");
+				throw;
+            }
         }
     }
 }

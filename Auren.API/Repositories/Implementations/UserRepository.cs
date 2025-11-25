@@ -19,19 +19,21 @@ namespace Auren.API.Repositories.Implementations
 		private readonly ILogger<UserRepository> _logger;
 		private readonly ITokenRepository _tokenRepository;
 		private readonly ICategoryRepository _categoryRepository;
+		private readonly IProfileRepository _profileRepository;
 
-		public UserRepository(
-			UserManager<ApplicationUser> userManager,
+		public UserRepository(UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
 			ILogger<UserRepository> logger,
 			ITokenRepository tokenRepository,
-			ICategoryRepository categoryRepository)
+			ICategoryRepository categoryRepository,
+			IProfileRepository profileRepository)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_logger = logger;
 			_tokenRepository = tokenRepository;
 			_categoryRepository = categoryRepository;
+			_profileRepository = profileRepository;
 		}
 
 		public bool ValidateInput(object input, out List<string> errors)
@@ -91,7 +93,7 @@ namespace Auren.API.Repositories.Implementations
 				{
 					return new AuthResponse
 					{
-						Success = false,
+						Success = false,   
 						Message = "Invalid Input",
 						Errors = validationErrors
 					};
@@ -126,15 +128,38 @@ namespace Auren.API.Repositories.Implementations
 					LastName = SanitizeInput(request.LastName)!,
 				};
 
-				var result = await _userManager.CreateAsync(user, request.Password);
+                if (request.ProfileImage != null)
+                {
+                    var uploadRequest = new ProfileImageUploadRequest(
+                        File: request.ProfileImage.File,
+                        Name: Path.GetFileNameWithoutExtension(request.ProfileImage.File.FileName),
+                        Description: string.IsNullOrEmpty(request.ProfileImage.Description)
+                            ? $"{request.FirstName}{request.LastName}"
+                            : request.ProfileImage.Description
+                    );
+
+                    try
+                    {
+                        var uploadResponse = await _profileRepository.UploadProfileImageAsync(uploadRequest, cancellationToken);
+
+                        user.ProfilePictureUrl = uploadResponse.Path;
+                    } 
+					catch(Exception ex)
+					{
+						_logger.LogError(ex, "Profile image upload failed during registration for {Email}", request.Email);
+						return new AuthResponse
+						{
+							Success = false,
+							Message = "Profile image upload failed",
+						};
+                    }
+                }
+
+                var result = await _userManager.CreateAsync(user, request.Password);
 
 				if(result.Succeeded)
 				{
-                    _logger.LogInformation("User {Email} registered successfully", request.Email);
-
 					await _categoryRepository.SeedDefaultCategoryToUserAsync(user.UserId, cancellationToken);
-
-					_logger.LogInformation("Default categories seeded for user {Email}", request.Email);
 
                     return new AuthResponse
 					{

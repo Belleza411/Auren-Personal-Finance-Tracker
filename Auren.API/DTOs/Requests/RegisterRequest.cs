@@ -5,6 +5,7 @@
 		string Password,
 		string ConfirmPassword,
 		string FirstName,
-		string LastName
-	);
+		string LastName,
+		ProfileImageUploadRequest? ProfileImage
+    );
 }
