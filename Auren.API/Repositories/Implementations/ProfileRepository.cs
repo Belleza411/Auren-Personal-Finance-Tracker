@@ -4,6 +4,7 @@ using Auren.API.DTOs.Responses;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
 using Auren.API.Validators;
+using Azure.Core;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -68,7 +69,6 @@ namespace Auren.API.Repositories.Implementations
             try
 			{
                 var user = await _dbContext.Users
-					.AsNoTracking()
 					.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
 				if(user == null)
@@ -77,13 +77,26 @@ namespace Auren.API.Repositories.Implementations
 					return null;
                 }
 
-				user.Email = userDto.Email;
-                user.FirstName = userDto.FirstName!;
-				user.LastName = userDto.LastName!;
-				user.ProfilePictureUrl = userDto.ProfilePictureUrl;
-				user.Currency = userDto.Currency;
+                user.Email = userDto.Email ?? user.Email;
+                user.FirstName = userDto.FirstName ?? user.FirstName;
+				user.LastName = userDto.LastName ?? user.LastName;
+				user.Currency = userDto.Currency ?? user.Currency;
 
-				await _dbContext.SaveChangesAsync(cancellationToken);
+                if (userDto.ProfilePictureUrl?.File != null)
+                {
+                    var uploadRequest = new ProfileImageUploadRequest(
+                        File: userDto.ProfilePictureUrl.File,
+                        Name: Path.GetFileNameWithoutExtension(userDto.ProfilePictureUrl.File.FileName),
+                        Description: string.IsNullOrEmpty(userDto.ProfilePictureUrl.Description)
+                            ? $"{userDto.FirstName}{userDto.LastName}"
+                            : userDto.ProfilePictureUrl.Description
+                    );
+
+                    var uploadResponse = await UploadProfileImageAsync(uploadRequest, cancellationToken);
+                    user.ProfilePictureUrl = uploadResponse.Path ?? user.ProfilePictureUrl;
+                }
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation("User with ID {UserId} successfully updated", userId);
 
@@ -121,7 +134,7 @@ namespace Auren.API.Repositories.Implementations
                     throw new Exception(errors);
                 }
 
-                var uploadsFolder = Path.Combine(_env.ContentRootPath, _fileUploadSettings.Value.ProfileImagesPath);
+                var uploadsFolder = Path.Combine(_env.WebRootPath, _fileUploadSettings.Value.ProfileImagesPath);
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
@@ -144,7 +157,7 @@ namespace Auren.API.Repositories.Implementations
                     Description: request.Description,
                     Extension: extension,
                     SizeInBytes: request.File.Length,
-                    Path: $"{_fileUploadSettings.Value.BaseUrl}   {fileName}"
+                    Path: $"{_fileUploadSettings.Value.BaseUrl}{fileName}"
                 );
             } 
 			catch (Exception ex)

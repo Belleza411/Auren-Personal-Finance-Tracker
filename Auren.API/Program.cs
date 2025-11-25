@@ -149,6 +149,10 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
+builder.Services.Configure<FileUploadSettings>(
+    builder.Configuration.GetSection("FileUpload"));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

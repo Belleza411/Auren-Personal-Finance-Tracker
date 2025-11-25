@@ -48,7 +48,7 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPut("update-user")]
-		public async Task<ActionResult<UserResponse>> UpdateUserProfile([FromBody] UserDto userDto, CancellationToken cancellationToken)
+		public async Task<ActionResult<UserResponse>> UpdateUserProfile([FromForm] UserDto userDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

@@ -4,7 +4,7 @@
          string? Email,
          string? FirstName,
          string? LastName,
-         string? ProfilePictureUrl,
+         ProfileImageUploadRequest? ProfilePictureUrl,
          string? Currency
     );
 }
