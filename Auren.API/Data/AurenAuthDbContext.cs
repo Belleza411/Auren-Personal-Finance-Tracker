@@ -12,6 +12,7 @@ namespace Auren.API.Data
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<ProfileUserImage> ProfileUserImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
