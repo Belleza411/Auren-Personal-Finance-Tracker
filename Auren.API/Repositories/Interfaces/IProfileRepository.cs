@@ -8,6 +8,6 @@ namespace Auren.API.Repositories.Interfaces
 	{
 		Task<UserResponse?> GetUserProfile(Guid userId, CancellationToken cancellationToken);
 		Task<UserResponse?> UpdateUserProfile(Guid userId, UserDto userDto, CancellationToken cancellationToken);
-
+		Task<ProfileImageUploadResponse> UploadProfileImageAsync(ProfileImageUploadRequest request, Guid userId, CancellationToken cancellationToken);
     }
 }
