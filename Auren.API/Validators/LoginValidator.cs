@@ -13,8 +13,7 @@ namespace Auren.API.Validators
 
             RuleFor(l => l.Password)
                 .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(4).WithMessage("Password must be at least 4 characters long.")
-                .MaximumLength(8).WithMessage("Password must not exceed 8 characters.");
+                .MinimumLength(8).WithMessage("Password must be at least 8 characters long.");
         }
 	}
 }

@@ -78,7 +78,7 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPost("login")]
-		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
+		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 		{
 			if(!ModelState.IsValid)
 			{
@@ -90,7 +90,7 @@ namespace Auren.API.Controllers
                 });
 			}
 
-			var result = await _userRepository.LoginAsync(request);
+			var result = await _userRepository.LoginAsync(request, cancellationToken);
 
 			if(result.Success && result.User != null)
 			{

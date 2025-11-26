@@ -7,7 +7,6 @@ namespace Auren.API.Repositories.Interfaces
 	public interface IUserRepository
 	{
 		Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken);
-		Task<AuthResponse> LoginAsync(LoginRequest request);
-        bool ValidateInput(object input, out List<string> errors);
+		Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken);
     }
 }

@@ -6,6 +6,7 @@ using Auren.API.Repositories.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.ComponentModel.DataAnnotations;
 using System.Net.NetworkInformation;
@@ -41,55 +42,6 @@ namespace Auren.API.Repositories.Implementations
 			_profileRepository = profileRepository;
 			_registerValidator = registerValidator;
 			_loginValidator = loginValidator;
-		}
-
-		public bool ValidateInput(object input, out List<string> errors)
-		{
-			errors = new List<string>();
-			var validationContext = new ValidationContext(input);
-			var validationResults = new List<ValidationResult>();
-
-			bool isValid = Validator.TryValidateObject(input, validationContext, validationResults, true);
-
-			if (!isValid) errors.AddRange(validationResults.Select(vr => vr.ErrorMessage ?? "Validation error"));
-
-			if (input is RegisterRequest registerRequest)
-			{
-				if (!IsValidEmail(registerRequest.Email))
-				{
-					errors.Add("Invalid email format. ");
-					isValid = true;
-				}
-
-				if (registerRequest.Password.Length < 8)
-				{
-					errors.Add("Password must be at least 8 characters long");
-					isValid = false;
-				}
-			}
-			else if (input is LoginRequest loginRequest)
-			{
-				if (!IsValidEmail(loginRequest.Email))
-				{
-					errors.Add("Invalid email format. ");
-					isValid = false;
-				}
-			}
-
-			return isValid;
-		}
-
-		private static bool IsValidEmail(string email)
-		{
-			try
-			{
-				var addr = new System.Net.Mail.MailAddress(email);
-				return addr.Address == email;
-			}
-			catch
-			{
-				return false;
-			}
 		}
 
 		public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
@@ -182,80 +134,55 @@ namespace Auren.API.Repositories.Implementations
             }
         }
 
-		public async Task<AuthResponse> LoginAsync(LoginRequest request)
+		public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
 		{
 			try
 			{
-				if(!ValidateInput(request, out var validationErrors))
-				{
-					return new AuthResponse
-					{
-						Success = false,
-						Message = "Invalid Input",
-						Errors = validationErrors
-					};
+				var validationResult = await _loginValidator.ValidateAsync(request, cancellationToken);
+                if (!validationResult.IsValid)
+                {
+                    return new AuthResponse
+                    {
+                        Success = false,
+                        Message = "Invalid Input",
+                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                    };
                 }
 
-				var user = await _userManager.FindByEmailAsync(request.Email);
+                var user = await _userManager.FindByEmailAsync(request.Email);
 				if(user == null)
 				{
-					return new AuthResponse
-					{
-						Success = false,
-						Message = "Invalid credentials",
-						Errors = new List<string> { "Invalid email or password" }
-					};
+                    _logger.LogWarning("Login attempt for non-existent user: {Email}", request.Email);
+                    return CreateErrorResponse(
+						"Invalid Input",
+                        validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
                 }
 
-				var result = await _signInManager.CheckPasswordSignInAsync(user,
-					request.Password, lockoutOnFailure: true);
+				var result = await _signInManager.CheckPasswordSignInAsync(
+					user,
+					request.Password, 
+					lockoutOnFailure: true
+				);
 
 				if(result.Succeeded)
 				{
-					user.LastLoginAt = DateTime.UtcNow;
-					await _userManager.UpdateAsync(user);
-
-                    _logger.LogInformation("User {Email} credentials validated successfully", request.Email);
-
-					return new AuthResponse
-					{
-						Success = true,
-						Message = "Login successful",
-						User = MapToUserResponse(user)
-					};
+					return await HandleSuccessfulLoginAsync(user, request.Email);
                 }
-				else if(result.IsLockedOut)
+				
+				if(result.IsLockedOut)
 				{
-                    _logger.LogWarning("User {Email} account is locked out", request.Email);
-                    return new AuthResponse
-                    {
-                        Success = false,
-                        Message = "Account locked",
-                        Errors = new List<string> { "Account is temporarily locked due to too many failed attempts" }
-                    };
-                }
-				else
-				{
-                    _logger.LogWarning("Failed login attempt for {Email}", request.Email);
-                    return new AuthResponse
-                    {
-                        Success = false,
-                        Message = "Invalid credentials",
-                        Errors = new List<string> { "Invalid email or password" }
-                    };
-                }
+					return await HandleLockedOutAccountAsync(user, request.Email);
+				}
+
+
+				return await HandleFailedLoginAsync(user, request.Email);
             }
 			catch (Exception ex)
 			{
-                _logger.LogError(ex, "Error during user login");
-                return new AuthResponse
-                {
-                    Success = false,
-                    Message = "An error occurred during login",
-                    Errors = new List<string> { "Login failed. Please try again." }
-                };
+                _logger.LogError(ex, "Unexpected error during login for email: {Email}", request.Email);
+                return CreateErrorResponse("Login error", "Login failed. Please try again later.");
             }
-
         }
 
 		private static string? SanitizeInput(string? input)
@@ -318,6 +245,75 @@ namespace Auren.API.Repositories.Implementations
             {
                 _logger.LogWarning(ex, "Failed to seed default categories for user {UserId}", userId);
             }
+        }
+    
+		private static AuthResponse CreateErrorResponse(string message, params string[] errors)
+		{
+			return new AuthResponse
+			{
+				Success = false,
+				Message = message,
+				Errors = errors.ToList()
+			};
+        }
+		
+		private async Task<AuthResponse> HandleSuccessfulLoginAsync(ApplicationUser user, string email)
+		{
+			try
+			{
+				user.LastLoginAt = DateTime.UtcNow;
+				await _userManager.UpdateAsync(user);
+				
+                _logger.LogInformation("Successful login for user: {Email}", email);
+
+                return new AuthResponse
+				{
+					Success = true,
+					Message = "Login successful",
+					User = MapToUserResponse(user)
+				};
+
+            }
+            catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error updating user login timestamp for {Email}", email);
+				return new AuthResponse
+				{
+					Success = true,
+					Message = "Login successful, but failed to update last login time",
+					User = MapToUserResponse(user)
+				};
+            }
+		}
+	
+		private async Task<AuthResponse> HandleLockedOutAccountAsync(ApplicationUser user, string email)
+		{
+			var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
+			var remainingTime = lockoutEnd?.Subtract(DateTimeOffset.UtcNow);
+
+            _logger.LogWarning(
+				"Login attempt for locked out user: {Email}. Lockout ends at: {LockoutEnd}",
+				email,
+				lockoutEnd
+			);
+
+            var errorMessage = remainingTime.HasValue && remainingTime.Value.TotalMinutes > 0
+				? $"Account is temporarily locked due to multiple failed login attempts. Please try again in {Math.Ceiling(remainingTime.Value.TotalMinutes)} minutes."
+				: "Account is temporarily locked due to multiple failed login attempts";
+
+			return CreateErrorResponse("Account Locked", errorMessage);
+        }
+        private async Task<AuthResponse> HandleFailedLoginAsync(ApplicationUser user, string email)
+        {
+            var failedAttempts = await _userManager.GetAccessFailedCountAsync(user);
+
+            _logger.LogWarning(
+                "Failed login attempt for user: {Email}. Failed attempts: {FailedAttempts}",
+                email,
+                failedAttempts
+            );
+
+            return CreateErrorResponse("Invalid credentials", "Invalid email or password");
         }
     }
 }
