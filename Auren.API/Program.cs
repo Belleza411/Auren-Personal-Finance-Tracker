@@ -151,7 +151,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
-builder.Services.AddScoped<ITransactionService, TransactionServices>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 builder.Services.Configure<FileUploadSettings>(
     builder.Configuration.GetSection("FileUpload"));

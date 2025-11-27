@@ -19,13 +19,11 @@ namespace Auren.API.Controllers
 	public class TransactionsController : ControllerBase
 	{
 		private readonly ILogger<TransactionsController> _logger;
-		private readonly ITransactionRepository _transactionRepository;
         private readonly ITransactionService _transactionService;
 
-		public TransactionsController(ILogger<TransactionsController> logger, ITransactionRepository transactionRepository, ITransactionService transactionService)
+		public TransactionsController(ILogger<TransactionsController> logger, ITransactionService transactionService)
 		{
 			_logger = logger;
-			_transactionRepository = transactionRepository;
 			_transactionService = transactionService;
 		}
 
@@ -81,7 +79,12 @@ namespace Auren.API.Controllers
 
             var createdTransaction = await _transactionService.CreateTransaction(transactionDto, userId.Value, cancellationToken);
 
-            return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction);
+            if(!createdTransaction.IsSuccess)
+            {
+                return BadRequest(createdTransaction.Error);
+            }
+
+            return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction.Value);
         }
 
 		[HttpPut("{transactionId:guid}")]
@@ -94,12 +97,12 @@ namespace Auren.API.Controllers
 			{
                 var updatedTransaction = await _transactionService.UpdateTransaction(transactionId, userId.Value, transactionDto, cancellationToken);
 
+                if(!updatedTransaction.IsSuccess)
+                {
+                    return BadRequest(updatedTransaction.Error);
+                }
+
                 return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);   
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid transaction data provided for update of transaction {TransactionId} for user {UserId}", transactionId, userId);
-                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

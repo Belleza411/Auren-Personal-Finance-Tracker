@@ -6,20 +6,21 @@ using Auren.API.Helpers.Result;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Implementations;
+using Auren.API.Repositories.Interfaces;
 using Auren.API.Services.Interfaces;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auren.API.Services.Implementations
 {
-	public class TransactionServices : ITransactionService
+	public class TransactionService : ITransactionService
 	{
-        private readonly ILogger<TransactionServices> _logger;
+        private readonly ILogger<TransactionService> _logger;
         private readonly IValidator<TransactionDto> _validator;
-        private readonly TransactionRepository _transactionRepository;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly AurenDbContext _dbContext;
 
-		public TransactionServices(ILogger<TransactionServices> logger, IValidator<TransactionDto> validator, TransactionRepository transactionRepository, AurenDbContext dbContext)
+		public TransactionService(ILogger<TransactionService> logger, IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, AurenDbContext dbContext)
 		{
 			_logger = logger;
 			_validator = validator;
@@ -86,7 +87,7 @@ namespace Auren.API.Services.Implementations
             };
 
             await _transactionRepository.CreateTransactionAsync(transaction, userId, cancellationToken);
-            return Result.Success(transaction);
+            return Result.Success<Transaction>(transaction);
         }
 
         public async Task<Result<bool>> DeleteTransaction(Guid transactionId, Guid userId, CancellationToken cancellationToken)

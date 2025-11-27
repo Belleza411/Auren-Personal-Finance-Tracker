@@ -21,16 +21,12 @@ namespace Auren.API.Repositories.Implementations
 	public class TransactionRepository : ITransactionRepository
 	{
 		private readonly ILogger<TransactionRepository> _logger;
-        private readonly IValidator<TransactionDto> _validator;
 		private readonly AurenDbContext _dbContext;
-        private readonly string _connectionString;
 
-		public TransactionRepository(ILogger<TransactionRepository> logger, IValidator<TransactionDto> validator, AurenDbContext dbContext, string connectionString)
+		public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext)
 		{
 			_logger = logger;
-			_validator = validator;
 			_dbContext = dbContext;
-			_connectionString = connectionString;
 		}
 
 		public async Task<Transaction> CreateTransactionAsync(Transaction transaction, Guid userId, CancellationToken cancellationToken)
@@ -149,6 +145,7 @@ namespace Auren.API.Repositories.Implementations
 
 		public async Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, Transaction transaction, CancellationToken cancellationToken)
 		{
+            _dbContext.Transactions.Update(transaction);
             await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Transaction updated successfully for {UserId} with TransactionId of {TransactionId}. ", userId, transaction.TransactionId);
 
