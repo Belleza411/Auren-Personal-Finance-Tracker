@@ -164,9 +164,11 @@ namespace Auren.API.Services.Implementations
             transaction.TransactionType = category.TransactionType;
             transaction.CategoryId = category.CategoryId;
 
-            await _transactionRepository.UpdateTransactionAsync(transactionId, userId, transaction, cancellationToken);
+            var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transactionId, userId, transaction, cancellationToken);
 
-            return Result.Success(transaction);
+            return updatedTransaction != null
+                ? Result.Success<Transaction>(updatedTransaction)
+                : Result.Failure<Transaction>(Error.UpdateFailed("Failed to update transaction. "));
         }
 
         public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, CancellationToken cancellationToken)
