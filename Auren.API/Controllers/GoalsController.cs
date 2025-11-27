@@ -5,6 +5,7 @@ using Auren.API.Extensions;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Interfaces;
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,16 +21,19 @@ namespace Auren.API.Controllers
 		private readonly IGoalRepository _goalRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ITransactionService _transactionService;
 
 		public GoalsController(ILogger<GoalsController> logger,
             IGoalRepository goalRepository,
             ITransactionRepository transactionRepository,
-            ICategoryRepository categoryRepository)
+            ICategoryRepository categoryRepository,
+            ITransactionService transactionService)
 		{
 			_logger = logger;
 			_goalRepository = goalRepository;
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
+			_transactionService = transactionService;
 		}
 
 		[HttpGet]
@@ -204,7 +208,7 @@ namespace Auren.API.Controllers
                     _logger.LogInformation("Created 'Goal Transfer' category for user {UserId}", userId);
                 }
 
-                var transaction = await _transactionRepository.CreateTransactionAsync(new TransactionDto(
+                var transaction = await _transactionService.CreateTransaction(new TransactionDto(
                     $"Transfer to goal: {goal.Name}",
                     amount,
                     existingCategory.Name,
