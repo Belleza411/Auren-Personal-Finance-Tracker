@@ -3,6 +3,7 @@ using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Extensions;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,40 +19,34 @@ namespace Auren.API.Controllers
 	{
 		private readonly ILogger<TransactionsController> _logger;
 		private readonly ITransactionRepository _transactionRepository;
+        private readonly ITransactionService _transactionService;
 
-		public TransactionsController(ILogger<TransactionsController> logger, ITransactionRepository transactionRepository)
+		public TransactionsController(ILogger<TransactionsController> logger, ITransactionRepository transactionRepository, ITransactionService transactionService)
 		{
 			_logger = logger;
 			_transactionRepository = transactionRepository;
+			_transactionService = transactionService;
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(CancellationToken cancellationToken,
+		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(
             [FromQuery] TransactionFilter transactionFilter,
-            [FromQuery] int? pageSize = 5,
-            [FromQuery] int? pageNumber = 1)
+            [FromQuery] int pageSize = 5,
+            [FromQuery] int pageNumber = 1,
+            CancellationToken cancellationToken = default)
 		{
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             try
 			{
-                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, cancellationToken, transactionFilter, pageSize, pageNumber);
+                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, transactionFilter, pageSize, pageNumber, cancellationToken);
 
-                return Ok(new
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize,
-                    TotalTransaction = transactions.Count(),
-                    Transaction = transactions
-                });
+                return Ok(transactions);
             }
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Failed to retrieve transactions for user {UserId}", userId);
+                _logger.LogError(ex, "Failed to retrieved transactions for {UserId}", userId);
 				return StatusCode(500, "An error occurred while retrieving transactions. Please try again later.");
             }
         }
@@ -60,25 +55,19 @@ namespace Auren.API.Controllers
 		public async Task<ActionResult<Transaction>> GetTransactionById([FromRoute] Guid transactionId, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             try
 			{
                 var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId.Value, cancellationToken);
 
-                if (transaction == null)
-                {
-                    return NotFound($"Transaction with ID {transactionId} not found.");
-                }
-
-                return Ok(transaction);
+                return transaction != null ? Ok(transaction) : NotFound("Transaction not found.");
             } 
 			catch (Exception ex)
 			{
-                _logger.LogError(ex, "Error retrieving transaction {TransactionId} for user {UserId}", transactionId, userId);
+                _logger.LogError(ex,
+                    "Error retrieving transaction {TransactionId} for user {UserId}",
+                    transactionId, userId);
                 return StatusCode(500, "An error occurred while retrieving the transaction.");
             }
         }
@@ -87,55 +76,24 @@ namespace Auren.API.Controllers
 		public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
-            _logger.LogInformation("Creating transaction for user {UserId}", userId);
-            if (userId == null)
-            {
-                _logger.LogWarning("Unauthorized attempt to create transaction");
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
-			try
-			{
-                var createdTransaction = await _transactionRepository.CreateTransactionAsync(transactionDto, userId.Value, cancellationToken);
+            var createdTransaction = await _transactionService.CreateTransactionAsync(transactionDto, userId.Value, cancellationToken);
 
-                return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.TransactionId }, createdTransaction);
-            }
-			catch (ArgumentException ex)
-			{
-                _logger.LogWarning(ex, "Invalid transaction data provided for user {UserId}", userId);
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating transaction for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while creating the transaction.");
-            }
+            return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction);
         }
 
 		[HttpPut("{transactionId:guid}")]
 		public async Task<ActionResult<Transaction>> UpdateTransaction([FromRoute] Guid transactionId, [FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-            }
+            if (userId == null) return Unauthorized();
 
 			try
 			{
                 var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transactionId, userId.Value, transactionDto, cancellationToken);
 
-				if(updatedTransaction == null)
-				{
-					return NotFound($"Transaction with ID {transactionId} not found.");
-				}
-
-                return Ok(updatedTransaction);
+                return updatedTransaction != null ? Ok(updatedTransaction) : NotFound($"Transaction with ID {transactionId} not found.");   
             }
             catch (ArgumentException ex)
             {
@@ -150,24 +108,16 @@ namespace Auren.API.Controllers
         }
 
 		[HttpDelete("{transactionId:guid}")]
-		public async Task<IActionResult> DeleteTransaction([FromRoute] Guid transactionId, CancellationToken cancellationToken)
+		public async Task<IActionResult> DeleteTransaction([FromRoute] Guid transactionId, CancellationToken cancellationToken)  
 		{
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             try
 			{
                 var success = await _transactionRepository.DeleteTransactionAsync(transactionId, userId.Value, cancellationToken);
 
-                if (!success)
-                {
-                    return NotFound($"Transaction with ID {transactionId} not found.");
-                }
-
-                return NoContent();
+                return success ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
             }
             catch (Exception ex)
             {

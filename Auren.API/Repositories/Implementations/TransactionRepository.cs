@@ -7,6 +7,7 @@ using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
 using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -19,81 +20,23 @@ namespace Auren.API.Repositories.Implementations
 	public class TransactionRepository : ITransactionRepository
 	{
 		private readonly ILogger<TransactionRepository> _logger;
+        private readonly IValidator<TransactionDto> _validator;
 		private readonly AurenDbContext _dbContext;
         private readonly string _connectionString;
 
-        public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
+		public TransactionRepository(ILogger<TransactionRepository> logger, IValidator<TransactionDto> validator, AurenDbContext dbContext, string connectionString)
 		{
 			_logger = logger;
+			_validator = validator;
 			_dbContext = dbContext;
-            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
-        }
+			_connectionString = connectionString;
+		}
 
-		public async Task<Transaction> CreateTransactionAsync(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
+		public async Task<Transaction> CreateTransactionAsync(Transaction transaction, Guid userId, CancellationToken cancellationToken)
 		{
-			if(transactionDto?.Category == null)
-			{
-                _logger.LogWarning("TransactionDto or Category is null for user {UserId}", userId);
-                throw new ArgumentException("Transaction data and category are required");
-            }
-
-            try
-			{
-                var category = await _dbContext.Categories
-                    .FirstOrDefaultAsync(c => c.Name == transactionDto.Category && c.UserId == userId, cancellationToken);
-
-                if (category == null)
-                {
-                    _logger.LogWarning("Category '{CategoryName}' not found for user {UserId}", transactionDto.Category, userId);
-                    throw new ArgumentException("Category not found for the user.");
-                }
-
-                if(transactionDto.TransactionType != category.TransactionType)
-                {
-                    throw new ArgumentException("Transaction type must match the category's transaction type.");
-                }
-
-
-                if(transactionDto.TransactionType == TransactionType.Expense)
-                {
-                    var currentBalance = await GetBalanceAsync(userId, cancellationToken, true);
-                    
-                    if (currentBalance < transactionDto.Amount)
-                    {
-                        _logger.LogWarning(
-                            "Insufficient funds for user {UserId}. Tried to create expense {Amount} with balance {Balance}",
-                            userId,
-                            transactionDto.Amount,
-                            currentBalance
-                        );
-
-                        throw new InvalidOperationException("Insufficient funds for this transaction.");
-                    }
-                }
-
-                var transaction = new Transaction
-                {
-                    TransactionId = Guid.NewGuid(),
-                    UserId = userId,
-                    CategoryId = category.CategoryId,
-                    TransactionType = category.TransactionType,
-                    Name = transactionDto.Name,
-                    Amount = transactionDto.Amount,
-                    PaymentType = transactionDto.PaymentType,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _dbContext.Transactions.AddAsync(transaction, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogInformation("Transaction created successfully for {UserId} with TransactionId of {TransactionId}. ", userId, transaction.TransactionId);
-
-                return transaction;
-            }
-			catch (Exception ex)
-			{
-                _logger.LogError(ex, "Failed to create transaction for user {UserId}", userId);
-                throw;
-            }
+            await _dbContext.Transactions.AddAsync(transaction, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return transaction;     
         }
 
 		public async Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
@@ -103,15 +46,10 @@ namespace Auren.API.Repositories.Implementations
                 var transaction = await _dbContext.Transactions
 					.FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
 
-                if (transaction == null)
-                {
-                    _logger.LogWarning("Transaction with ID {TransactionId} not found for user {UserId}", transactionId, userId);
-                    return false;
-                }
+                if (transaction == null) return false;
 
                 _dbContext.Transactions.Remove(transaction);
                 await _dbContext.SaveChangesAsync(cancellationToken);
-                _logger.LogInformation("Transaction deleted successfully for {UserId} with TransactionId of {TransactionId}. ", userId, transaction.TransactionId);
 
                 return true;
             }
@@ -203,15 +141,9 @@ namespace Auren.API.Repositories.Implementations
 		{
 			try
 			{
-                var transaction = await _dbContext.Transactions
+                return await _dbContext.Transactions
+                    .AsNoTracking()
 					.FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
-
-                if (transaction == null)
-                {
-                    _logger.LogWarning("Transaction with ID {TransactionId} not found for user {UserId}", transactionId, userId);
-                }
-
-                return transaction;
             } 
 			catch(Exception ex)
 			{
@@ -221,41 +153,30 @@ namespace Auren.API.Repositories.Implementations
 
         }
 
-		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(Guid userId,
-            CancellationToken cancellationToken,
+		public async Task<IEnumerable<Transaction>> GetTransactionsAsync(
+            Guid userId,
             TransactionFilter filter,
-            int? pageSize = 5, int? pageNumber = 1)
+            int pageSize = 5, int pageNumber = 1,
+            CancellationToken cancellationToken = default)
 		{
-			try
-			{
-                var skip = ((pageNumber ?? 1) - 1) * (pageSize ?? 5);
+            var skip = (pageNumber - 1) * pageSize;
 
-                var query = _dbContext.Transactions
-                    .Where(t => t.UserId == userId);
+            var query = _dbContext.Transactions
+                .Where(t => t.UserId == userId);
 
-                if(HasActiveFilters(filter))
-                {
-                    query = ApplyTransactionFilters(query, filter, userId);
-                }
-
-                var transactions = await query
-                    .OrderByDescending(t => t.TransactionDate)
-                    .Skip(skip)
-                    .Take(pageSize ?? 5)
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken);
-
-                _logger.LogInformation("Retrieved {Count} transactions for user {UserId}",
-                    transactions.Count, userId);
-
-                return transactions;
-
+            if(HasActiveFilters(filter))
+            {
+                query = ApplyTransactionFilters(query, filter, userId);
             }
-			catch(Exception ex)
-			{
-                _logger.LogError(ex, "Failed to retrieve transactions for user {UserId}", userId);
-                throw;
-            }
+
+            var transactions = await query
+                .OrderByDescending(t => t.TransactionDate)
+                .Skip(skip)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            return transactions;
         }
 
 		public async Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken)

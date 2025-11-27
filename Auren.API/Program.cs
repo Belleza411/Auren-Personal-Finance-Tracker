@@ -4,6 +4,8 @@ using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Implementations;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Implementations;
+using Auren.API.Services.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -148,6 +150,8 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+
+builder.Services.AddScoped<ITransactionService, TransactionServices>();
 
 builder.Services.Configure<FileUploadSettings>(
     builder.Configuration.GetSection("FileUpload"));
