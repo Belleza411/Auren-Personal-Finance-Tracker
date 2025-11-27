@@ -60,7 +60,7 @@ namespace Auren.API.Controllers
 			{
                 var transaction = await _transactionService.GetTransactionById(transactionId, userId.Value, cancellationToken);
 
-                return transaction != null ? Ok(transaction.Value) : NotFound(transaction?.Error);
+                return transaction.IsSuccess ? Ok(transaction.Value) : NotFound(transaction?.Error);
             } 
 			catch (Exception ex)
 			{

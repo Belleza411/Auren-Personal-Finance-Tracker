@@ -33,14 +33,14 @@ namespace Auren.API.Services.Implementations
             if (transactionDto == null)
             {
                 _logger.LogWarning("Transaction is null for user {UserId}", userId);
-                return Result.Failure<Transaction>(new Error("INVALID_INPUT", new[] { "All transaction data is required." }));
+                return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
             }
 
             var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
 			if(!validationResult.IsValid)
 			{
-				var errors = validationResult.Errors.Select(e => e.ErrorMessage);
-				return Result.Failure<Transaction>(new Error("VALIDATION_FAILED", errors));
+				var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
+				return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
             var category = await _dbContext.Categories
@@ -126,14 +126,14 @@ namespace Auren.API.Services.Implementations
             if (transactionDto == null)
             {
                 _logger.LogWarning("Transaction is null for user {UserId}", userId);
-                return Result.Failure<Transaction>(new Error("INVALID_INPUT", new[] { "All transaction data is required." }));
+                return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
             }
 
             var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
             if (!validationResult.IsValid)
             {
-                var errors = validationResult.Errors.Select(e => e.ErrorMessage);
-                return Result.Failure<Transaction>(new Error("VALIDATION_FAILED", errors));
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
+                return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
             var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId, cancellationToken);

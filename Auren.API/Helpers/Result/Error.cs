@@ -15,6 +15,8 @@
         public static Error NotFound(params string[] messages) => new Error("NOT_FOUND", messages);
         public static Error TypeMismatch(params string[] messages) => new Error("TYPE_MISMATCH", messages);
         public static Error NotEnoughBalance(params string[] messages) => new Error("NOT_ENOUGH_BALANCE", messages);
+        public static Error ValidationFailed(params string[] messages) => new Error("VALIDATION_FAILED", messages);
+        public static Error InvalidInput(params string[] messages) => new Error("INVALID_INPUT", messages);
     }
 
     public class ResultWithError
