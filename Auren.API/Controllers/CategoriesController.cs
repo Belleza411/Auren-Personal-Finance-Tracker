@@ -1,8 +1,10 @@
 ﻿using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Extensions;
+using Auren.API.Helpers.Result;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -15,29 +17,28 @@ namespace Auren.API.Controllers
 	{
 		private readonly ILogger<CategoriesController> _logger;
 		private readonly ICategoryRepository _categoryRepository;
+        private readonly ICategoryService _categoryService;
 
-		public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository categoryRepository)
+		public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository categoryRepository, ICategoryService categoryService)
 		{
 			_logger = logger;
 			_categoryRepository = categoryRepository;
+			_categoryService = categoryService;
 		}
 
-        [HttpGet]
+		[HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken,
             [FromQuery] CategoriesFilter categoriesFilter,
-            [FromQuery] int? pageSize = 5, 
-            [FromQuery] int? pageNumber = 1)
+            [FromQuery] int pageSize = 5, 
+            [FromQuery] int pageNumber = 1)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             try
             {
-                var categories = await _categoryRepository.GetCategoriesAsync(userId.Value, cancellationToken, categoriesFilter, pageSize, pageNumber);
-                return Ok(categories);
+                var categories = await _categoryService.GetCategories(userId.Value, categoriesFilter, pageSize, pageNumber, cancellationToken);
+                return Ok(categories.Value);
             }
             catch (Exception ex)
             {
@@ -49,18 +50,17 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
+
             try
             {
-                var category = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId.Value, cancellationToken);
-                if (category == null)
+                var category =  await _categoryService.GetCategoryById(categoryId, userId.Value, cancellationToken);
+                if (category.Error.Code == ErrorType.NotFound)
                 {
-                    return NotFound($"Category id of {categoryId} not found. ");
+                    return NotFound(category.Error);
                 }
-                return Ok(category);
+
+                return Ok(category.Value);
             }
             catch (Exception ex)
             {
@@ -73,21 +73,20 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Category>> CreateCategory([FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
+           
 
             try
             {
-                var createdCategory = await _categoryRepository.CreateCategoryAsync(categoryDto, userId.Value, cancellationToken);
-                
-                return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.CategoryId }, createdCategory);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid category data provided for user {UserId}", userId);
-                return BadRequest(ex.Message);
+                var createdCategory = await _categoryService.CreateCategory(categoryDto, userId.Value, cancellationToken);
+
+                if(!createdCategory.IsSuccess)
+                {
+                    _logger.LogWarning("Category creation failed for user {UserId}: {Errors}", userId, string.Join(", ", createdCategory.Error));
+                    return BadRequest(createdCategory.Error);
+                }
+
+                return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.CategoryId }, createdCategory.Value);
             }
             catch (Exception ex)
             {
@@ -100,19 +99,11 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Category>> UpdateCategory([FromRoute] Guid categoryId, [FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (userId == null) return Unauthorized();
 
             try
             {
-                var updatedCategory = await _categoryRepository.UpdateCategoryAsync(categoryId, userId.Value, categoryDto, cancellationToken);
+                var updatedCategory = await _categoryService.UpdateCategory(categoryId, userId.Value, categoryDto, cancellationToken);
                 if (updatedCategory == null)
                 {
                     return NotFound($"Category with ID {categoryId} not found.");
@@ -142,14 +133,9 @@ namespace Auren.API.Controllers
 
             try
             {
-                var deleted = await _categoryRepository.DeleteCategoryAsync(categoryId, userId.Value, cancellationToken);
+                var deleted = await _categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);
 
-                if (!deleted)
-                {
-                    return NotFound($"Category with ID {categoryId} not found.");
-                }
-
-                return NoContent();
+                return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
             }
             catch (Exception ex)
             {

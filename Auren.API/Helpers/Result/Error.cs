@@ -17,6 +17,12 @@
         public static Error NotEnoughBalance(params string[] messages) => new Error(ErrorType.NotEnoughBalance, messages);
         public static Error ValidationFailed(params string[] messages) => new Error(ErrorType.ValidationFailed, messages);
         public static Error InvalidInput(params string[] messages) => new Error(ErrorType.InvalidInput, messages);
+        public static Error UpdateFailed(params string[] messages) => new Error(ErrorType.UpdateFailed, messages);
+
+        public static class CategoryError
+        {
+                public static Error AlreadyExists(params string[] messages) => new Error(ErrorType.CategoryAlreadyExists, messages);
+        }
     }
       
     public class ResultWithError

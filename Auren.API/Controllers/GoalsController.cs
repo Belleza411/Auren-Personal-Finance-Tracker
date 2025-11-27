@@ -2,6 +2,7 @@
 using Auren.API.DTOs.Requests;
 using Auren.API.DTOs.Responses;
 using Auren.API.Extensions;
+using Auren.API.Helpers.Result;
 using Auren.API.Models.Domain;
 using Auren.API.Models.Enums;
 using Auren.API.Repositories.Interfaces;
@@ -22,18 +23,16 @@ namespace Auren.API.Controllers
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITransactionService _transactionService;
+        private readonly ICategoryService _categoryService;
 
-		public GoalsController(ILogger<GoalsController> logger,
-            IGoalRepository goalRepository,
-            ITransactionRepository transactionRepository,
-            ICategoryRepository categoryRepository,
-            ITransactionService transactionService)
+		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ITransactionService transactionService, ICategoryService categoryService)
 		{
 			_logger = logger;
 			_goalRepository = goalRepository;
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
 			_transactionService = transactionService;
+			_categoryService = categoryService;
 		}
 
 		[HttpGet]
@@ -200,22 +199,30 @@ namespace Auren.API.Controllers
 
                 var goalCategory = new CategoryDto("Goal Transfer", TransactionType.Expense);
 
-                var existingCategory = await _categoryRepository.GetCategoryByNameAsync(userId.Value, cancellationToken, goalCategory);
+                var existingCategory = await _categoryService.GetCategoryByName(userId.Value, goalCategory, cancellationToken);
 
                 if (existingCategory == null)
                 {
-                    existingCategory = await _categoryRepository.CreateCategoryAsync(goalCategory, userId.Value, cancellationToken);
-                    _logger.LogInformation("Created 'Goal Transfer' category for user {UserId}", userId);
+                    var createdCategoryResult = await _categoryService.CreateCategory(goalCategory, userId.Value, cancellationToken);
+                    if (!createdCategoryResult.IsSuccess || createdCategoryResult.Value == null)
+                    {
+                        return StatusCode(500, "Failed to create category for goal transfer.");
+                    }
+                    existingCategory = Result.Success<Category?>(createdCategoryResult.Value);
+                }
+
+                if (existingCategory?.Value == null)
+                {
+                    return StatusCode(500, "Category for goal transfer is missing.");
                 }
 
                 var transaction = await _transactionService.CreateTransaction(new TransactionDto(
                     $"Transfer to goal: {goal.Name}",
                     amount,
-                    existingCategory.Name,
-                    existingCategory.TransactionType,
+                    existingCategory.Value.Name,
+                    existingCategory.Value.TransactionType,
                     PaymentType.Other
                 ), userId.Value, cancellationToken);
-
 
                 var updatedGoal = await _goalRepository.AddMoneyToGoalAsync(goalId, userId.Value, amount, cancellationToken);
 

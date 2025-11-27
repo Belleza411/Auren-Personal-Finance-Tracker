@@ -18,14 +18,16 @@ namespace Auren.API.Controllers
 		private readonly IGoalRepository _goalRepository;
 		private readonly ILogger<DashboardController> _logger;
 		private readonly ITransactionService _transactionService;
+		private readonly ICategoryService _categoryService;
 
-		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService)
+		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService)
 		{
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
 			_goalRepository = goalRepository;
 			_logger = logger;
 			_transactionService = transactionService;
+			_categoryService = categoryService;
 		}
 
 		[HttpGet("transaction/average-daily-spending")]
@@ -54,21 +56,17 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
 			CancellationToken cancellationToken,
 			[FromQuery] CategoryOverviewFilter filter,
-            [FromQuery] int? pageSize = 5,
-            [FromQuery] int? pageNumber = 1)  
+            [FromQuery] int pageSize = 5,
+            [FromQuery] int pageNumber = 1)  
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
             try
             {
-				var overview = await _categoryRepository.GetCategoryOverviewAsync(userId.Value, cancellationToken, filter, pageSize, pageNumber);
+				var overview = await _categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber, 
+					cancellationToken);
                 return Ok(overview);
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, "Failed to retrieve category overview");
-                return StatusCode(500, new { message = "An error occurred while retrieving category overview", details = ex.Message });
             }
             catch (Exception ex)
             {
@@ -103,8 +101,8 @@ namespace Auren.API.Controllers
 
             try
             {
-				var summary = await _categoryRepository.GetCategoriesSummaryAsync(userId.Value, cancellationToken);
-                return Ok(summary);
+				var summary = await _categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
+                return Ok(summary.Value);
             }
             catch (Exception ex)
             {

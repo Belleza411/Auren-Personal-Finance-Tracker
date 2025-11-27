@@ -3,6 +3,7 @@ using Auren.API.DTOs.Responses;
 using Auren.API.Helpers;
 using Auren.API.Models.Domain;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,15 +25,9 @@ namespace Auren.API.Repositories.Implementations
 		private readonly IProfileRepository _profileRepository;
         private readonly IValidator<RegisterRequest> _registerValidator;
         private readonly IValidator<LoginRequest> _loginValidator;
+		private readonly ICategoryService _categoryService;
 
-		public UserRepository(UserManager<ApplicationUser> userManager,
-			SignInManager<ApplicationUser> signInManager,
-			ILogger<UserRepository> logger,
-			ITokenRepository tokenRepository,
-			ICategoryRepository categoryRepository,
-			IProfileRepository profileRepository,
-			IValidator<RegisterRequest> registerValidator,
-			IValidator<LoginRequest> loginValidator)
+		public UserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<UserRepository> logger, ITokenRepository tokenRepository, ICategoryRepository categoryRepository, IProfileRepository profileRepository, IValidator<RegisterRequest> registerValidator, IValidator<LoginRequest> loginValidator, ICategoryService categoryService)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
@@ -42,6 +37,7 @@ namespace Auren.API.Repositories.Implementations
 			_profileRepository = profileRepository;
 			_registerValidator = registerValidator;
 			_loginValidator = loginValidator;
+			_categoryService = categoryService;
 		}
 
 		public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
@@ -239,7 +235,7 @@ namespace Auren.API.Repositories.Implementations
         {
             try
             {
-                await _categoryRepository.SeedDefaultCategoryToUserAsync(userId, cancellationToken);
+                await _categoryService.SeedDefaultCategoryToUser(userId, cancellationToken);
             }
             catch (Exception ex)
             {
