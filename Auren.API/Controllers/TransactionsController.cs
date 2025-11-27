@@ -2,6 +2,7 @@
 using Auren.API.DTOs.Filters;
 using Auren.API.DTOs.Requests;
 using Auren.API.Extensions;
+using Auren.API.Helpers.Result;
 using Auren.API.Repositories.Interfaces;
 using Auren.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -40,9 +41,9 @@ namespace Auren.API.Controllers
 
             try
 			{
-                var transactions = await _transactionRepository.GetTransactionsAsync(userId.Value, transactionFilter, pageSize, pageNumber, cancellationToken);
+                var transactions = await _transactionService.GetAllTransactions(userId.Value, transactionFilter, pageSize, pageNumber, cancellationToken);
 
-                return Ok(transactions);
+                return Ok(transactions.Value);
             }
 			catch (Exception ex)
 			{
@@ -59,9 +60,9 @@ namespace Auren.API.Controllers
 
             try
 			{
-                var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId.Value, cancellationToken);
+                var transaction = await _transactionService.GetTransactionById(transactionId, userId.Value, cancellationToken);
 
-                return transaction != null ? Ok(transaction) : NotFound("Transaction not found.");
+                return transaction != null ? Ok(transaction.Value) : NotFound(transaction?.Error);
             } 
 			catch (Exception ex)
 			{
@@ -78,7 +79,7 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var createdTransaction = await _transactionService.CreateTransactionAsync(transactionDto, userId.Value, cancellationToken);
+            var createdTransaction = await _transactionService.CreateTransaction(transactionDto, userId.Value, cancellationToken);
 
             return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction);
         }
@@ -91,9 +92,9 @@ namespace Auren.API.Controllers
 
 			try
 			{
-                var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transactionId, userId.Value, transactionDto, cancellationToken);
+                var updatedTransaction = await _transactionService.UpdateTransaction(transactionId, userId.Value, transactionDto, cancellationToken);
 
-                return updatedTransaction != null ? Ok(updatedTransaction) : NotFound($"Transaction with ID {transactionId} not found.");   
+                return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);   
             }
             catch (ArgumentException ex)
             {
@@ -115,9 +116,9 @@ namespace Auren.API.Controllers
 
             try
 			{
-                var success = await _transactionRepository.DeleteTransactionAsync(transactionId, userId.Value, cancellationToken);
+                var success = await _transactionService.DeleteTransaction(transactionId, userId.Value, cancellationToken);
 
-                return success ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
+                return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
             }
             catch (Exception ex)
             {

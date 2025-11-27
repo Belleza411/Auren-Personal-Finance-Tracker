@@ -2,6 +2,7 @@
 using Auren.API.DTOs.Responses;
 using Auren.API.Extensions;
 using Auren.API.Repositories.Interfaces;
+using Auren.API.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -16,13 +17,15 @@ namespace Auren.API.Controllers
 		private readonly ICategoryRepository _categoryRepository;
 		private readonly IGoalRepository _goalRepository;
 		private readonly ILogger<DashboardController> _logger;
+		private readonly ITransactionService _transactionService;
 
-		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger)
+		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService)
 		{
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
 			_goalRepository = goalRepository;
 			_logger = logger;
+			_transactionService = transactionService;
 		}
 
 		[HttpGet("transaction/average-daily-spending")]
@@ -33,13 +36,11 @@ namespace Auren.API.Controllers
 
 			try
 			{
-				var targetMonth = month ?? DateTime.Today;
-
-				var avgSpending = await _transactionRepository.GetAvgDailySpendingAsync(userId.Value, targetMonth, cancellationToken);
+				var avgSpending = await _transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
 
 				return Ok(new AvgDailySpendingResponse(
-					Math.Round(avgSpending.avgSpending, 2),
-					Math.Round(avgSpending.pecentageChange, 2)
+					Math.Round(avgSpending.Value.avgSpending, 2),
+					Math.Round(avgSpending.Value.pecentageChange, 2)
 				));
 			}
 			catch (Exception ex)
