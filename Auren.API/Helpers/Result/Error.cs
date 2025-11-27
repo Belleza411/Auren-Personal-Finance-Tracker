@@ -2,23 +2,23 @@
 {
 	public class Error
 	{
-        public string Code { get; }
+        public ErrorType Code { get; }
         public List<string> Messages { get; }
 
-        public Error(string code, IEnumerable<string>? messages = null)
+        public Error(ErrorType code, IEnumerable<string>? messages = null)
         {
-            Code = code ?? string.Empty;
+            Code = code;
             Messages = messages?.ToList() ?? new List<string>();
         }
 
-        public static Error None => new Error(string.Empty, Enumerable.Empty<string>());
-        public static Error NotFound(params string[] messages) => new Error("NOT_FOUND", messages);
-        public static Error TypeMismatch(params string[] messages) => new Error("TYPE_MISMATCH", messages);
-        public static Error NotEnoughBalance(params string[] messages) => new Error("NOT_ENOUGH_BALANCE", messages);
-        public static Error ValidationFailed(params string[] messages) => new Error("VALIDATION_FAILED", messages);
-        public static Error InvalidInput(params string[] messages) => new Error("INVALID_INPUT", messages);
+        public static Error None => new Error(ErrorType.None, Enumerable.Empty<string>());
+        public static Error NotFound(params string[] messages) => new Error(ErrorType.NotFound, messages);
+        public static Error TypeMismatch(params string[] messages) => new Error(ErrorType.TypeMismatch, messages);
+        public static Error NotEnoughBalance(params string[] messages) => new Error(ErrorType.NotEnoughBalance, messages);
+        public static Error ValidationFailed(params string[] messages) => new Error(ErrorType.ValidationFailed, messages);
+        public static Error InvalidInput(params string[] messages) => new Error(ErrorType.InvalidInput, messages);
     }
-
+      
     public class ResultWithError
     {
         public bool IsSuccess { get; }
@@ -36,7 +36,5 @@
 
         public static ResultWithError Success() => new ResultWithError(true, Error.None);
         public static ResultWithError Failure(Error error) => new ResultWithError(false, error);
-        public static ResultWithError Failure(string code, params string[] messages) =>
-            new ResultWithError(false, new Error(code, messages));
     }
 }

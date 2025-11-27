@@ -16,13 +16,9 @@
 
         public static Result Success() => new Result(true, Error.None);
         public static Result Failure(Error error) => new Result(false, error);
-        public static Result Failure(string code, params string[] messages) =>
-            new Result(false, new Error(code, messages));
 
         public static Result<T> Success<T>(T value) => new Result<T>(value, true, Error.None);
         public static Result<T> Failure<T>(Error error) => new Result<T>(default!, false, error);
-        public static Result<T> Failure<T>(string code, params string[] messages) =>
-            new Result<T>(default!, false, new Error(code, messages));
     }
 
     public class Result<T> : Result
