@@ -138,7 +138,6 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-
             try
             {
                 var deleted = await _categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);

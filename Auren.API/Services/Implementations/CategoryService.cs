@@ -27,9 +27,7 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<Category>> CreateCategory(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken)
 		{
             if (categoryDto == null)
-            {
                 return Result.Failure<Category>(Error.InvalidInput("All fields are required"));
-            }
 
             var validationResult = await _validator.ValidateAsync(categoryDto, cancellationToken); 
             if(!validationResult.IsValid)
@@ -41,9 +39,7 @@ namespace Auren.API.Services.Implementations
             var existingCategory = await _categoryRepository.GetCategoryByNameAsync(userId, categoryDto, cancellationToken);
             
             if(existingCategory != null)
-            {
                 return Result.Failure<Category>(Error.CategoryError.AlreadyExists($"Category with the name of {categoryDto.Name} already exists"));
-            }
 
             var category = new Category
             {
@@ -64,12 +60,14 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<bool>> DeleteCategory(Guid categoryId, Guid userId, CancellationToken cancellationToken)
         {
             var existingCategory = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
+
             if(existingCategory == null)
-            {
                 return Result.Failure<bool>(Error.NotFound($"Category with id {categoryId} not found"));
-            }
-            await _categoryRepository.DeleteCategoryAsync(existingCategory, userId, cancellationToken);
-            return Result.Success(true);
+
+            var categoryToDelete = await _categoryRepository.DeleteCategoryAsync(existingCategory, userId, cancellationToken);
+            return categoryToDelete 
+                ? Result.Success(true) 
+                : Result.Failure<bool>(Error.DeleteFailed("Failed to delete category."));
         }
 
         public async Task<Result<IEnumerable<Category>>> GetCategories(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
@@ -80,9 +78,7 @@ namespace Auren.API.Services.Implementations
             var category = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
             
             if(category == null)
-            {
                 return Result.Failure<Category?>(Error.NotFound($"Category with id {categoryId} not found"));
-            }
 
             return Result.Success<Category?>(category);
         }
@@ -90,9 +86,7 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<Category>> UpdateCategory(Guid categoryId, Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             if (categoryDto == null)
-            {
                 return Result.Failure<Category>(Error.InvalidInput("All fields are required"));
-            }
 
             var validationResult = await _validator.ValidateAsync(categoryDto, cancellationToken);
             if(!validationResult.IsValid)
@@ -103,9 +97,7 @@ namespace Auren.API.Services.Implementations
 
             var existingCategory = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
             if(existingCategory == null)
-            {
                 return Result.Failure<Category>(Error.NotFound($"Category with id {categoryId} not found"));
-            }
 
             existingCategory.Name = categoryDto.Name;
             existingCategory.TransactionType = categoryDto.TransactionType;
@@ -145,10 +137,8 @@ namespace Auren.API.Services.Implementations
            int pageSize = 5,
            int pageNumber = 1,
            CancellationToken cancellationToken = default)
-        {
-            var categoryOverviews = await _categoryRepository.GetCategoryOverviewAsync(userId, filter, pageSize, pageNumber, cancellationToken);
-            return Result.Success<IEnumerable<CategoryOverviewResponse>>(categoryOverviews);
-        }
+            => Result.Success<IEnumerable<CategoryOverviewResponse>>(await _categoryRepository.GetCategoryOverviewAsync(userId, filter, pageSize, pageNumber, cancellationToken));
+        
 
         public async Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken)
             => Result.Success<CategorySummaryResponse>(await _categoryRepository.GetCategoriesSummaryAsync(userId, cancellationToken));

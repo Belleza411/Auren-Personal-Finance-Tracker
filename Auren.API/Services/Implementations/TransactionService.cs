@@ -18,24 +18,23 @@ namespace Auren.API.Services.Implementations
         private readonly ILogger<TransactionService> _logger;
         private readonly IValidator<TransactionDto> _validator;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly AurenDbContext _dbContext;
 
-		public TransactionService(ILogger<TransactionService> logger, IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, AurenDbContext dbContext)
+		public TransactionService(ILogger<TransactionService> logger, IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, AurenDbContext dbContext)
 		{
 			_logger = logger;
 			_validator = validator;
 			_transactionRepository = transactionRepository;
+			_categoryRepository = categoryRepository;
 			_dbContext = dbContext;
 		}
 
 		public async Task<Result<Transaction>> CreateTransaction(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
 		{
             if (transactionDto == null)
-            {
-                _logger.LogWarning("Transaction is null for user {UserId}", userId);
                 return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
-            }
-
+            
             var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
 			if(!validationResult.IsValid)
 			{
@@ -43,19 +42,18 @@ namespace Auren.API.Services.Implementations
 				return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
-            var category = await _dbContext.Categories
-                    .FirstOrDefaultAsync(c => c.Name == transactionDto.Category && c.UserId == userId, cancellationToken);
+            var category = await _categoryRepository.GetCategoryByNameAsync(
+                userId,
+                new CategoryDto(transactionDto.Category, transactionDto.TransactionType),
+                cancellationToken
+            );
 
-            if (category == null)
-            {
-                _logger.LogWarning("Category '{CategoryName}' not found for user {UserId}", transactionDto.Category, userId);
+            if (category == null)    
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));
-            }
 
             if (transactionDto.TransactionType != category.TransactionType)
-            {
                 return Result.Failure<Transaction>(Error.TypeMismatch("Transaction type does not match category type."));
-            }
+            
 
             if (transactionDto.TransactionType == TransactionType.Expense)
             {
@@ -102,10 +100,8 @@ namespace Auren.API.Services.Implementations
         }
 
         public async Task<Result<AvgDailySpendingResponse>> GetAvgDailySpending(Guid userId, CancellationToken cancellationToken)
-        {
-            var avgDailySpending = await _transactionRepository.GetAvgDailySpendingAsync(userId, cancellationToken);
-            return Result.Success(avgDailySpending);
-        }
+            => Result.Success(await _transactionRepository.GetAvgDailySpendingAsync(userId, cancellationToken));
+        
         public async Task<Result<decimal>> GetBalance(Guid userId, CancellationToken cancellationToken, bool isCurrentMonth)
             => Result.Success(await _transactionRepository.GetBalanceAsync(userId, cancellationToken, isCurrentMonth));
 
@@ -126,10 +122,8 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<Transaction>> UpdateTransaction(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken)
         {
             if (transactionDto == null)
-            {
-                _logger.LogWarning("Transaction is null for user {UserId}", userId);
                 return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
-            }
+            
 
             var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
             if (!validationResult.IsValid)
@@ -141,24 +135,20 @@ namespace Auren.API.Services.Implementations
             var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId, cancellationToken);
 
             if (transaction == null)
-            {
-                _logger.LogWarning("Transaction '{TransactionId}' not found for user {UserId}", transactionId, userId);
                 return Result.Failure<Transaction>(Error.NotFound("Transaction not found. "));
-            }
 
-            var category = await _dbContext.Categories
-                    .FirstOrDefaultAsync(c => c.Name == transactionDto.Category && c.UserId == userId, cancellationToken);
+            var category = await _categoryRepository.GetCategoryByNameAsync(
+                userId,
+                new CategoryDto(transactionDto.Category, transactionDto.TransactionType),
+                cancellationToken
+            );
 
             if (category == null)
-            {
-                _logger.LogWarning("Category '{CategoryName}' not found for user {UserId}", transactionDto.Category, userId);
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));
-            }
+            
 
             if (transactionDto.TransactionType != category.TransactionType)
-            {
                 return Result.Failure<Transaction>(Error.TypeMismatch("Transaction type does not match category type."));
-            }
             
             transaction.Name = transactionDto.Name;
             transaction.Amount = transactionDto.Amount;

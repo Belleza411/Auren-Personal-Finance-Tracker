@@ -39,9 +39,7 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<Goal>> CreateGoal(GoalDto goalDto, Guid userId, CancellationToken cancellationToken)
 		{
 			if(goalDto == null)
-			{
 				return Result.Failure<Goal>(Error.InvalidInput("All fields are required."));
-            }
 			
 			var validationResult = await _validator.ValidateAsync(goalDto, cancellationToken);
 			if(!validationResult.IsValid)
@@ -78,10 +76,7 @@ namespace Auren.API.Services.Implementations
         public async Task<Result<Goal>> UpdateGoal(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken)
         {
             if(goalDto == null)
-
-            {
                 return Result.Failure<Goal>(Error.InvalidInput("All fields are required."));
-            }
 
             var validationResult = await _validator.ValidateAsync(goalDto, cancellationToken);
             if (!validationResult.IsValid)
@@ -93,9 +88,7 @@ namespace Auren.API.Services.Implementations
             var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
 
             if(existingGoal == null)
-            {
                 return Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."));
-            }
 
             existingGoal.GoalId = goalId;
             existingGoal.UserId = userId;
@@ -119,9 +112,7 @@ namespace Auren.API.Services.Implementations
         {
             var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
             if (existingGoal == null)
-            {
                 return Result.Failure<bool>(Error.NotFound($"Goal with id of {goalId} not found. "));
-            }
 
             var deletedGoal = await _goalRepository.DeleteGoalAsync(goalId, userId, cancellationToken);
 
