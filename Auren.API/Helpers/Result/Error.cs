@@ -18,6 +18,7 @@
         public static Error ValidationFailed(params string[] messages) => new Error(ErrorType.ValidationFailed, messages);
         public static Error InvalidInput(params string[] messages) => new Error(ErrorType.InvalidInput, messages);
         public static Error UpdateFailed(params string[] messages) => new Error(ErrorType.UpdateFailed, messages);
+        public static Error CreateFailed(params string[] messages) => new Error(ErrorType.CreateFailed, messages);
 
         public static class CategoryError
         {

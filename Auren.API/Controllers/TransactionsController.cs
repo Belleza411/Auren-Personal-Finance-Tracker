@@ -7,6 +7,7 @@ using Auren.API.Repositories.Interfaces;
 using Auren.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Transactions;
@@ -79,9 +80,21 @@ namespace Auren.API.Controllers
 
             var createdTransaction = await _transactionService.CreateTransaction(transactionDto, userId.Value, cancellationToken);
 
-            if(!createdTransaction.IsSuccess)
+            if (!createdTransaction.IsSuccess)
             {
-                return BadRequest(createdTransaction.Error);
+                return createdTransaction.Error.Code switch
+                {
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                        or ErrorType.TypeMismatch
+                        or ErrorType.NotEnoughBalance
+                            => BadRequest(createdTransaction.Error),
+            
+                    ErrorType.NotFound => NotFound(createdTransaction.Error),
+                    ErrorType.CreateFailed => StatusCode(500, createdTransaction.Error),
+                   
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
 
             return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction.Value);
@@ -97,9 +110,20 @@ namespace Auren.API.Controllers
 			{
                 var updatedTransaction = await _transactionService.UpdateTransaction(transactionId, userId.Value, transactionDto, cancellationToken);
 
-                if(!updatedTransaction.IsSuccess)
+                if (!updatedTransaction.IsSuccess)
                 {
-                    return BadRequest(updatedTransaction.Error);
+                    return updatedTransaction.Error.Code switch
+                    {
+                        ErrorType.InvalidInput
+                            or ErrorType.ValidationFailed
+                            or ErrorType.TypeMismatch 
+                                => BadRequest(updatedTransaction.Error),
+
+                        ErrorType.NotFound => NotFound(updatedTransaction.Error),
+                        ErrorType.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
                 }
 
                 return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);   

@@ -9,6 +9,7 @@
 		ValidationFailed = 5,
 		InvalidInput = 6,
 		CategoryAlreadyExists = 7,
-		UpdateFailed = 8
+		UpdateFailed = 8,
+		CreateFailed = 9
     }
 }

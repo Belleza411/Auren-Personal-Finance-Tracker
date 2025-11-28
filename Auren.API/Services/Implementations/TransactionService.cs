@@ -86,8 +86,10 @@ namespace Auren.API.Services.Implementations
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _transactionRepository.CreateTransactionAsync(transaction, userId, cancellationToken);
-            return Result.Success<Transaction>(transaction);
+            var createdTransaction = await _transactionRepository.CreateTransactionAsync(transaction, userId, cancellationToken);
+            return createdTransaction != null 
+                ? Result.Success<Transaction>(transaction)
+                : Result.Failure<Transaction>(Error.CreateFailed("Failed to create transaction. "));
         }
 
         public async Task<Result<bool>> DeleteTransaction(Guid transactionId, Guid userId, CancellationToken cancellationToken)
