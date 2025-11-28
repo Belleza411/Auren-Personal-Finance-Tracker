@@ -56,7 +56,9 @@ namespace Auren.API.Services.Implementations
 
             var createdCategory = await _categoryRepository.CreateCategoryAsync(category, userId, cancellationToken);
 
-            return Result.Success(createdCategory);
+            return createdCategory == null 
+                ? Result.Failure<Category>(Error.CreateFailed("Failed to create category.")) 
+                : Result.Success(createdCategory);
         }
 
         public async Task<Result<bool>> DeleteCategory(Guid categoryId, Guid userId, CancellationToken cancellationToken)
@@ -71,7 +73,7 @@ namespace Auren.API.Services.Implementations
         }
 
         public async Task<Result<IEnumerable<Category>>> GetCategories(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
-            => Result.Success<IEnumerable<Category>>(await _categoryRepository.GetCategoriesAsync(userId, filter, pageSize, pageNumber, cancellationToken));
+            => Result.Success(await _categoryRepository.GetCategoriesAsync(userId, filter, pageSize, pageNumber, cancellationToken));
 
         public async Task<Result<Category?>> GetCategoryById(Guid categoryId, Guid userId, CancellationToken cancellationToken)
         {

@@ -46,7 +46,7 @@ namespace Auren.API.Repositories.Implementations
 
 		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
 		{
-            var skip = pageNumber - 1 * (pageSize);
+            var skip = (pageNumber - 1) * pageSize;
 
             var query = _dbContext.Categories
                 .Where(c => c.UserId == userId);

@@ -16,13 +16,11 @@ namespace Auren.API.Controllers
 	public class CategoriesController : ControllerBase
 	{
 		private readonly ILogger<CategoriesController> _logger;
-		private readonly ICategoryRepository _categoryRepository;
         private readonly ICategoryService _categoryService;
 
-		public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository categoryRepository, ICategoryService categoryService)
+		public CategoriesController(ILogger<CategoriesController> logger, ICategoryService categoryService)
 		{
 			_logger = logger;
-			_categoryRepository = categoryRepository;
 			_categoryService = categoryService;
 		}
 
@@ -55,12 +53,8 @@ namespace Auren.API.Controllers
             try
             {
                 var category =  await _categoryService.GetCategoryById(categoryId, userId.Value, cancellationToken);
-                if (category.Error.Code == ErrorType.NotFound)
-                {
-                    return NotFound(category.Error);
-                }
 
-                return Ok(category.Value);
+                return category.IsSuccess ? Ok(category.Value) : NotFound($"Category with ID {categoryId} not found.");
             }
             catch (Exception ex)
             {
@@ -80,10 +74,19 @@ namespace Auren.API.Controllers
             {
                 var createdCategory = await _categoryService.CreateCategory(categoryDto, userId.Value, cancellationToken);
 
-                if(!createdCategory.IsSuccess)
+                if (!createdCategory.IsSuccess)
                 {
-                    _logger.LogWarning("Category creation failed for user {UserId}: {Errors}", userId, string.Join(", ", createdCategory.Error));
-                    return BadRequest(createdCategory.Error);
+                    return createdCategory.Error.Code switch
+                    {
+                        ErrorType.InvalidInput
+                            or ErrorType.ValidationFailed
+                                => BadRequest(createdCategory.Error),
+
+                        ErrorType.CategoryAlreadyExists => Conflict(createdCategory.Error),
+                        ErrorType.CreateFailed => StatusCode(500, createdCategory.Error),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
                 }
 
                 return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.CategoryId }, createdCategory.Value);
@@ -104,16 +107,23 @@ namespace Auren.API.Controllers
             try
             {
                 var updatedCategory = await _categoryService.UpdateCategory(categoryId, userId.Value, categoryDto, cancellationToken);
-                if (updatedCategory == null)
+
+                if (!updatedCategory.IsSuccess)
                 {
-                    return NotFound($"Category with ID {categoryId} not found.");
+                    return updatedCategory.Error.Code switch
+                    {
+                        ErrorType.InvalidInput
+                            or ErrorType.ValidationFailed
+                                => BadRequest(updatedCategory.Error),
+
+                        ErrorType.NotFound => NotFound(updatedCategory.Error),
+                        ErrorType.UpdateFailed => StatusCode(500, updatedCategory.Error),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
                 }
-                return Ok(updatedCategory);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid category data provided for user {UserId}", userId);
-                return BadRequest(ex.Message);
+
+                return Ok(updatedCategory.Value);
             }
             catch (Exception ex)
             {
@@ -126,10 +136,8 @@ namespace Auren.API.Controllers
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
+
 
             try
             {
