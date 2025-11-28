@@ -14,20 +14,20 @@ namespace Auren.API.Controllers
 	public class DashboardController : ControllerBase
 	{
 		private readonly ITransactionRepository _transactionRepository;
-		private readonly ICategoryRepository _categoryRepository;
 		private readonly IGoalRepository _goalRepository;
 		private readonly ILogger<DashboardController> _logger;
 		private readonly ITransactionService _transactionService;
 		private readonly ICategoryService _categoryService;
+		private readonly IGoalService _goalService;
 
-		public DashboardController(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService)
+		public DashboardController(ITransactionRepository transactionRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
 		{
 			_transactionRepository = transactionRepository;
-			_categoryRepository = categoryRepository;
 			_goalRepository = goalRepository;
 			_logger = logger;
 			_transactionService = transactionService;
 			_categoryService = categoryService;
+			_goalService = goalService;
 		}
 
 		[HttpGet("transaction/average-daily-spending")]
@@ -66,7 +66,7 @@ namespace Auren.API.Controllers
             {
 				var overview = await _categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber, 
 					cancellationToken);
-                return Ok(overview);
+                return Ok(overview.Value);
             }
             catch (Exception ex)
             {
@@ -83,8 +83,8 @@ namespace Auren.API.Controllers
 
 			try
 			{
-				var summary = await _transactionRepository.GetDashboardSummaryAsync(userId.Value, cancellationToken);
-				return Ok(summary);
+				var summary = await _transactionService.GetDashboardSummary(userId.Value, cancellationToken);
+                return Ok(summary.Value);
 			}
 			catch (Exception ex)
 			{
@@ -118,8 +118,8 @@ namespace Auren.API.Controllers
 
             try
             {
-				var summary = await _goalRepository.GetGoalsSummaryAsync(userId.Value, cancellationToken);
-                return Ok(summary);
+				var summary = await _goalService.GetGoalsSummary(userId.Value, cancellationToken);
+                return Ok(summary.Value);
             }
             catch (Exception ex)
             {
