@@ -24,8 +24,9 @@ namespace Auren.API.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
+        private readonly IGoalService _goalService;
 
-		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ITransactionService transactionService, ICategoryService categoryService)
+		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
 		{
 			_logger = logger;
 			_goalRepository = goalRepository;
@@ -33,24 +34,22 @@ namespace Auren.API.Controllers
 			_categoryRepository = categoryRepository;
 			_transactionService = transactionService;
 			_categoryService = categoryService;
+			_goalService = goalService;
 		}
 
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken,
             [FromQuery] GoalFilter goalFilter,
-            [FromQuery] int? pageNumber = 1, 
-            [FromQuery] int? pageSize = 3)
+            [FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 3)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             try
             {
-                var goals = await _goalRepository.GetGoalsAsync(userId.Value, cancellationToken, goalFilter, pageSize, pageNumber);
-                return Ok(goals);
+                var goals = await _goalService.GetGoals(userId.Value, goalFilter, pageSize, pageNumber, cancellationToken);
+                return Ok(goals.Value);
             }
             catch (Exception ex)
             {
@@ -63,18 +62,12 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Goal>> GetGoalById([FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
+            
             try
             {
-                var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
-                if (goal == null)
-                {
-                    return NotFound($"Goal id of {goalId} not found. ");
-                }
-                return Ok(goal);
+                var goal = await _goalService.GetGoalById(goalId, userId.Value, cancellationToken);
+                return goal.IsSuccess ? Ok(goal.Value) : NotFound($"Goal id of {goalId} not found. ");
             }
             catch (Exception ex)
             {
@@ -87,21 +80,27 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Goal>> CreateGoal([FromBody] GoalDto goalDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
+            if (userId == null) return Unauthorized();
+            
             try
             {
-                var createdGoal = await _goalRepository.CreateGoalAsync(goalDto, userId.Value, cancellationToken);
+                var createdGoal = await _goalService.CreateGoal(goalDto, userId.Value, cancellationToken);
 
-                return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.GoalId }, createdGoal);
+                if(!createdGoal.IsSuccess)
+                {
+                    return createdGoal.Error.Code switch
+                    {
+                        ErrorType.InvalidInput
+                            or ErrorType.ValidationFailed
+                                => BadRequest(createdGoal.Error),
+
+                        ErrorType.CreateFailed => StatusCode(500, createdGoal.Error),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
+                }
+
+                return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.Value.GoalId }, createdGoal.Value);
             }
             catch (Exception ex)
             {
@@ -114,27 +113,29 @@ namespace Auren.API.Controllers
         public async Task<ActionResult<Goal>> UpdateGoal([FromRoute] Guid goalId, [FromBody] GoalDto goalDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (userId == null) return Unauthorized();
+          
+            
             try
             {
-                var updatedGoal = await _goalRepository.UpdateGoalAsync(goalId, userId.Value, goalDto, cancellationToken);
-                if (updatedGoal == null)
+                var updatedGoal = await _goalService.UpdateGoal(goalId, userId.Value, goalDto, cancellationToken);
+
+                if (!updatedGoal.IsSuccess)
                 {
-                    return NotFound($"Goal id of {goalId} not found. ");
+                    return updatedGoal.Error.Code switch
+                    {
+                        ErrorType.InvalidInput
+                            or ErrorType.ValidationFailed
+                                => BadRequest(updatedGoal.Error),
+
+                        ErrorType.NotFound => NotFound(updatedGoal.Error),
+                        ErrorType.UpdateFailed => StatusCode(500, updatedGoal.Error),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
                 }
-                return Ok(updatedGoal);
-            }
-            catch(ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid goal data provided for user {UserId}", userId);
-                return BadRequest(ex.Message);
+
+                return Ok(updatedGoal.Value);
             }
             catch (Exception ex)
             {
@@ -147,18 +148,13 @@ namespace Auren.API.Controllers
         public async Task<IActionResult> DeleteGoal([FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
+           
             try
             {
-                var deleted = await _goalRepository.DeleteGoalAsync(goalId, userId.Value, cancellationToken);
-                if (!deleted)
-                {
-                    return NotFound($"Goal id of {goalId} not found. ");
-                }
-                return NoContent();
+                var deleted = await _goalService.DeleteGoal(goalId, userId.Value, cancellationToken);
+
+                return deleted.IsSuccess ? NoContent() : NotFound(deleted.Error);
             }
             catch (Exception ex)
             {
@@ -171,83 +167,26 @@ namespace Auren.API.Controllers
         public async Task<IActionResult> AddMoneyToGoal([FromBody] decimal amount, [FromRoute] Guid goalId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-             
-            if(amount < 0)
-            {
-                return BadRequest("Amount to add must be greater than 0");
-            }
-
+            if (userId == null) return Unauthorized();
+            
             try
             {
-                var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId.Value, cancellationToken);
-                
-                if(goal == null)
+              
+                var result = await _goalService.AddMoneyToGoal(goalId, userId.Value, amount, cancellationToken);
+
+                if(!result.IsSuccess)
                 {
-                    return NotFound($"Goal id of {goalId} not found. ");
-                }
-
-                var currentBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken, true);
-
-                if (currentBalance < amount)
-                {
-                    return BadRequest("Insufficient Balance");
-                }
-
-                var goalCategory = new CategoryDto("Goal Transfer", TransactionType.Expense);
-
-                var existingCategory = await _categoryService.GetCategoryByName(userId.Value, goalCategory, cancellationToken);
-
-                if (existingCategory == null)
-                {
-                    var createdCategoryResult = await _categoryService.CreateCategory(goalCategory, userId.Value, cancellationToken);
-                    if (!createdCategoryResult.IsSuccess || createdCategoryResult.Value == null)
+                    return result.Error.Code switch
                     {
-                        return StatusCode(500, "Failed to create category for goal transfer.");
-                    }
-                    existingCategory = Result.Success<Category?>(createdCategoryResult.Value);
+                        ErrorType.AmountMustBePositive => BadRequest(result.Error),
+                        ErrorType.NotEnoughBalance => BadRequest(result.Error),
+                        ErrorType.NotFound => NotFound(result.Error),
+                        ErrorType.UpdateFailed => StatusCode(500, result.Error),
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    };
                 }
 
-                if (existingCategory?.Value == null)
-                {
-                    return StatusCode(500, "Category for goal transfer is missing.");
-                }
-
-                var transaction = await _transactionService.CreateTransaction(new TransactionDto(
-                    $"Transfer to goal: {goal.Name}",
-                    amount,
-                    existingCategory.Value.Name,
-                    existingCategory.Value.TransactionType,
-                    PaymentType.Other
-                ), userId.Value, cancellationToken);
-
-                var updatedGoal = await _goalRepository.AddMoneyToGoalAsync(goalId, userId.Value, amount, cancellationToken);
-
-                if(updatedGoal == null)
-                {
-                    _logger.LogError("Transaction created but failed to update goal {GoalId} for user {UserId}. Manual reconciliation needed.", goalId, userId);
-                    return StatusCode(500, "Transaction created but goal update failed. ");
-                }
-
-                var newBalance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken, true);
-
-                _logger.LogInformation("Successfully added {Amount:C} to goal '{GoalName}' ({GoalId}) for user {UserId}. Balance: {OldBalance:C} -> {NewBalance:C}",
-                    amount, updatedGoal.Name, goalId, userId, currentBalance, newBalance);
-
-                return Ok(new
-                {
-                    Goal = updatedGoal,
-                    Transaction = transaction,
-                    Balance = new
-                    {
-                        Previous = currentBalance,
-                        Current = newBalance,
-                        Difference = newBalance - currentBalance
-                    }
-                });
+                return Ok(result.Value);
 
             }
             catch (Exception ex)

@@ -10,6 +10,8 @@
 		InvalidInput = 6,
 		CategoryAlreadyExists = 7,
 		UpdateFailed = 8,
-		CreateFailed = 9
+		CreateFailed = 9,
+		DeleteFailed = 10,
+		AmountMustBePositive = 11
     }
 }

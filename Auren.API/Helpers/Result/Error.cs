@@ -19,10 +19,16 @@
         public static Error InvalidInput(params string[] messages) => new Error(ErrorType.InvalidInput, messages);
         public static Error UpdateFailed(params string[] messages) => new Error(ErrorType.UpdateFailed, messages);
         public static Error CreateFailed(params string[] messages) => new Error(ErrorType.CreateFailed, messages);
+        public static Error DeleteFailed(params string[] messages) => new Error(ErrorType.DeleteFailed, messages);
 
         public static class CategoryError
         {
-                public static Error AlreadyExists(params string[] messages) => new Error(ErrorType.CategoryAlreadyExists, messages);
+            public static Error AlreadyExists(params string[] messages) => new Error(ErrorType.CategoryAlreadyExists, messages);
+        }
+
+        public static class GoalError
+        {
+            public static Error AmountMustBePositive(params string[] messages) => new Error(ErrorType.AmountMustBePositive, messages);
         }
     }
       

@@ -26,193 +26,76 @@ namespace Auren.API.Repositories.Implementations
             _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
         }
 
-		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, CancellationToken cancellationToken, GoalFilter filter, int? pageSize, int? pageNumber)
+		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, GoalFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
 		{
-			try
+			var skip = (pageNumber - 1) * pageSize;
+
+			var query = _dbContext.Goals
+				.Where(g => g.UserId == userId);
+
+            if(HasActiveFilters(filter))
 			{
-				var skip = ((pageNumber ?? 1) - 1) * (pageSize ?? 5);
-
-				var query = _dbContext.Goals
-					.Where(g => g.UserId == userId);
-
-                if(HasActiveFilters(filter))
-				{
-					query = ApplyFilters(query, filter);
-                }
-
-				var goal = await query
-					.Where(g => g.UserId == userId)
-					.OrderByDescending(g => g.Spent)
-					.ThenByDescending(g => g.CreatedAt)
-					.Skip(skip)
-					.Take(pageSize ?? 5)
-					.AsNoTracking()
-					.ToListAsync(cancellationToken);
-
-				_logger.LogInformation("Retrieved {Count} goals for user {UserId}", goal.Count, userId);
-
-                return goal;
+				query = ApplyFilters(query, filter);
             }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to retrieve goals for user {UserId}", userId);
-				throw;
-            }
+
+			var goal = await query
+				.Where(g => g.UserId == userId)
+				.OrderByDescending(g => g.Spent)
+				.ThenByDescending(g => g.CreatedAt)
+				.Skip(skip)
+				.Take(pageSize)
+				.AsNoTracking()
+				.ToListAsync(cancellationToken);
+
+			_logger.LogInformation("Retrieved {Count} goals for user {UserId}", goal.Count, userId);
+
+            return goal;
         }
 
 		public async Task<Goal?> GetGoalByIdAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
-		{
-			try
-			{
-				var goal = await _dbContext.Goals
-					.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
+			=> await _dbContext.Goals
+				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
 
-				if (goal == null)
-				{
-					_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
-				}
-
-				return goal;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to retrieve goal with id of {GoalId} for user {UserId}", goalId, userId);
-				throw;
-			}
-		}
-
-        public async Task<Goal> CreateGoalAsync(GoalDto goalDto, Guid userId, CancellationToken cancellationToken)
+        public async Task<Goal> CreateGoalAsync(Goal goal, Guid userId, CancellationToken cancellationToken)
         {
-            if (goalDto == null)
-                throw new ArgumentException("Goal data is required");
+            await _dbContext.Goals.AddAsync(goal, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-            try
-            {
-                _logger.LogInformation("Spent: {Spent}, Budget: {Budget}", goalDto.Spent, goalDto.Budget);
-
-                decimal spent = goalDto.Spent;
-                decimal budget = goalDto.Budget;
-
-                var goal = new Goal
-                {
-                    GoalId = Guid.NewGuid(),
-                    UserId = userId,
-                    Name = goalDto.Name,
-                    Description = goalDto.Description,
-                    Spent = spent,
-                    Budget = budget,
-                    TargetDate = goalDto.TargetDate,
-                    Status = goalDto.Status,
-                    CompletionPercentage = GetCompletionPercentage(spent, budget),
-                    TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goalDto.TargetDate),
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _dbContext.Goals.AddAsync(goal, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-
-                return goal;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to create goal");
-                throw;
-            }
+            return goal;
         }
 
-        public async Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, GoalDto goalDto, CancellationToken cancellationToken)
+        public async Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, Goal goal, CancellationToken cancellationToken)
 		{
-			if(goalDto == null)
-			{
-				_logger.LogWarning("GoalDto is null for user {UserId}", userId);
-				throw new ArgumentException("Goal data is required");
-            }
+			_dbContext.Goals.Update(goal);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-			try
-			{
-				var goal = await _dbContext.Goals
-					.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
-
-				if(goal == null)
-				{
-					_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
-					return null;
-                }
-
-				goal.GoalId = goalId;
-				goal.UserId = userId;
-                goal.Name = goalDto.Name;
-				goal.Description = goalDto.Description;
-				goal.Spent = goalDto.Spent;
-                goal.Budget = goalDto.Budget;
-				goal.TargetDate = goalDto.TargetDate;
-				goal.Status = goalDto.Status;
-                goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
-                goal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goal.TargetDate);
-
-
-                await _dbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogInformation("{Goal} with {GoalId} was updated succesfully for {UserId}", goal, goal.GoalId, userId);
-
-				return goal;
-            }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to update goal with id of {GoalId} for user {UserId}", goalId, userId);
-				throw;
-            }
-
+			return goal;     
         }
 
 		public async Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var goal = await _dbContext.Goals
-					.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
-
-				if (goal == null)
-				{
-					_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
-					return false;
-				}
-
-				_dbContext.Goals.Remove(goal);
-				await _dbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogInformation("Goal with id of {GoalId} was deleted succesfully for {UserId}", goalId, userId);
-
-				return true;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to delete goal with id of {GoalId} for user {UserId}", goalId, userId);
-				return false;
-			}
-		}
-
-		public async Task<Goal?> AddMoneyToGoalAsync(Guid goalId, Guid userId, decimal amount, CancellationToken cancellationToken)
-		{
-			if(amount < 0)
-			{
-				_logger.LogWarning("Amount must be greater than zero for user {UserId}", userId);
-				throw new ArgumentException("Amount must be greater than zero");
-            }
-
 			var goal = await _dbContext.Goals
 				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
 
 			if (goal == null)
 			{
 				_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
-                return null;
+				return false;
 			}
 
-			goal.Spent = (goal.Spent ?? 0) + amount;
-            goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
+			_dbContext.Goals.Remove(goal);
+			await _dbContext.SaveChangesAsync(cancellationToken);
+			_logger.LogInformation("Goal with id of {GoalId} was deleted succesfully for {UserId}", goalId, userId);
 
+			return true;
+		}
+
+		public async Task<Goal?> AddMoneyToGoalAsync(Goal goal, Guid userId, decimal amount, CancellationToken cancellationToken)
+		{
+			_dbContext.Goals.Update(goal);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goalId, userId);
+			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goal.GoalId, userId);
 			return goal;
         }
 
@@ -253,45 +136,6 @@ namespace Auren.API.Repositories.Implementations
 				filter.IsNotStarted.HasValue ||
 				filter.IsBehindSchedule.HasValue ||
 				filter.IsCancelled.HasValue;
-        }
-
-		private int GetCompletionPercentage(decimal currentAmount, decimal targetAmount)
-		{
-            if (targetAmount <= 0m)
-                return 0;
-
-            decimal percentage = (currentAmount / targetAmount) * 100m;
-
-            int rounded = (int)Math.Round(percentage, MidpointRounding.AwayFromZero);
-            if (rounded < 0) return 0;
-            if (rounded > 100) return 100;
-            return rounded;
-        }
-
-		private string GetTimeRemaining(DateTime startDate, DateTime targetDate)
-        {
-            if (targetDate <= startDate)
-                return "The target date has already passed.";
-
-            TimeSpan difference = targetDate - startDate;
-
-            int totalDays = (int)difference.TotalDays;
-            int months = totalDays / 30;
-            int days = totalDays % 30;
-
-            if (months > 0)
-            {
-                return $"{months} month{(months > 1 ? "s" : "")}";
-            }
-            else if (totalDays >= 1)
-            {
-                return $"{totalDays} day{(totalDays > 1 ? "s" : "")} remaining.";
-            }
-            else
-            {
-                int hours = (int)difference.TotalHours;
-                return $"{hours} hour{(hours > 1 ? "s" : "")} remaining.";
-            }
         }
 
 		public async Task<GoalsSummaryResponse> GetGoalsSummaryAsync(Guid userId, CancellationToken cancellationToken)
