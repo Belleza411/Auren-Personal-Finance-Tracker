@@ -1,5 +1,6 @@
 ﻿using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
+using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
@@ -18,19 +19,16 @@ namespace Auren.API.Controllers
 	{
 		private readonly ITokenRepository _tokenRepository;
 		private readonly IUserRepository _userRepository;
-		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<AuthController> _logger;
 
 		public AuthController(ITokenRepository tokenRepository,
 			IUserRepository userRepository,
-            SignInManager<ApplicationUser> signInManager,
 			UserManager<ApplicationUser> userManager,
 			ILogger<AuthController> logger)
 		{
 			_tokenRepository = tokenRepository;
 			_userRepository = userRepository;
-            _signInManager = signInManager;
 			_userManager = userManager;
 			_logger = logger;
 		}
@@ -38,16 +36,6 @@ namespace Auren.API.Controllers
 		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(new AuthResponse
-				{
-					Success = false,
-					Message = "Invalid Input",
-                    Errors = ModelState.SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>()).ToList()
-                });
-			}
-
 			var result = await _userRepository.RegisterAsync(request, cancellationToken);
 
 			if(result.Success && result.User != null)
@@ -60,11 +48,11 @@ namespace Auren.API.Controllers
 
 					var claims = new List<Claim>
 					{
-						new Claim(ClaimTypes.Email, user.Email!),
-						new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-						new Claim("UserId", user.UserId.ToString()),
-						new Claim("AccessToken", accessToken),
-						new Claim("RefreshToken", refreshToken.Token)
+						new(ClaimTypes.Email, user.Email!),
+						new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+						new("UserId", user.UserId.ToString()),
+						new("AccessToken", accessToken),
+						new("RefreshToken", refreshToken.Token)
 					};
 
 					await SignInUserAsync(claims);
@@ -80,16 +68,6 @@ namespace Auren.API.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 		{
-			if(!ModelState.IsValid)
-			{
-				return BadRequest(new AuthResponse
-				{
-					Success = false,
-					Message = "Invalid input",
-                    Errors = ModelState.SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>()).ToList()
-                });
-			}
-
 			var result = await _userRepository.LoginAsync(request, cancellationToken);
 
 			if(result.Success && result.User != null)
@@ -102,11 +80,11 @@ namespace Auren.API.Controllers
 					
 					var claims = new List<Claim>
 					{
-						new Claim(ClaimTypes.Email, user.Email!),
-						new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-						new Claim("UserId", user.UserId.ToString()),
-						new Claim("AccessToken", accessToken),
-						new Claim("RefreshToken", refreshToken.Token)
+						new(ClaimTypes.Email, user.Email!),
+						new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+						new("UserId", user.UserId.ToString()),
+						new("AccessToken", accessToken),
+						new("RefreshToken", refreshToken.Token)
 					};
 					
 					await SignInUserAsync(claims);
@@ -124,12 +102,15 @@ namespace Auren.API.Controllers
 		{
 			try
 			{
-				var userIdClaim = User.FindFirst("UserId")?.Value;
-				if(!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+				var userId = User.GetCurrentUserId();
+
+				if (userId == null)
 				{
-					await _tokenRepository.RevokeAllUserRefreshTokensAsync(userId);
-                    _logger.LogInformation("Revoked refresh tokens for user {UserId}", userId);
+					_logger.LogWarning("Logout attempted without a valid user session");
+					return BadRequest("Logout attempted without valid user session");
                 }
+
+                await _tokenRepository.RevokeAllUserRefreshTokensAsync(userId.Value);
 
 				await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
