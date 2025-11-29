@@ -1,7 +1,7 @@
-﻿using Auren.API.DTOs.Requests;
-using Auren.API.DTOs.Responses;
-using Auren.API.Extensions;
-using Auren.API.Repositories.Interfaces;
+﻿using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
+using Auren.Application.Extensions;
+using Auren.Application.Interfaces.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

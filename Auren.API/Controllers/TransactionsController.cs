@@ -1,10 +1,8 @@
-﻿using Auren.API.Data;
-using Auren.API.DTOs.Filters;
-using Auren.API.DTOs.Requests;
-using Auren.API.Extensions;
-using Auren.API.Helpers.Result;
-using Auren.API.Repositories.Interfaces;
-using Auren.API.Services.Interfaces;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.DTOs.Filters;
+using Auren.Application.DTOs.Requests;
+using Auren.Application.Extensions;
+using Auren.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

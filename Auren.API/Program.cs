@@ -1,11 +1,3 @@
-using Auren.API.Data;
-using Auren.API.Extensions;
-using Auren.API.Helpers;
-using Auren.API.Models.Domain;
-using Auren.API.Repositories.Implementations;
-using Auren.API.Repositories.Interfaces;
-using Auren.API.Services.Implementations;
-using Auren.API.Services.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,6 +5,13 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Auren.Application;
+using Auren.API.Extensions;
+using Auren.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Auren.Domain.Entities;
+using Auren.Infrastructure.Persistence;
+using Auren.Application.Interfaces.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,40 +26,10 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Auren.Cookie", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.ApiKey,
-        In = ParameterLocation.Cookie,
-        Name = "Auren.Session",
-        Description = "Cookie-based authentication using Auren.Session cookie."
-    });
+builder.Services.AddSwaggerGen();
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Auren.Cookie"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
-
-builder.Services.AddDbContext<AurenAuthDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AurenAuthDbConnection"));
-});
-builder.Services.AddDbContext<AurenDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AurenDbConnection"));
-});
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -90,7 +59,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-  //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
@@ -98,7 +66,7 @@ builder.Services.AddAuthentication(options =>
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Short access token lifetime
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); 
         options.SlidingExpiration = false;
         options.LoginPath = "/auth/login";
         options.LogoutPath = "/auth/logout";
@@ -117,7 +85,7 @@ builder.Services.AddAuthentication(options =>
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddDays(14), // Longer lifetime for refresh token
+                Expires = DateTimeOffset.UtcNow.AddDays(14), 
                 Path = "/",
                 IsEssential = true
             };
@@ -143,16 +111,6 @@ builder.Services.AddAuthentication(options =>
             await Task.CompletedTask;
         };
     });
-
-builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IGoalRepository, GoalRepository>();
-builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.Configure<FileUploadSettings>(
     builder.Configuration.GetSection("FileUpload"));

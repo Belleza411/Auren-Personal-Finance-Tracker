@@ -1,10 +1,9 @@
-﻿using Auren.API.DTOs.Filters;
-using Auren.API.DTOs.Requests;
-using Auren.API.Extensions;
-using Auren.API.Helpers.Result;
-using Auren.API.Models.Domain;
-using Auren.API.Repositories.Interfaces;
-using Auren.API.Services.Interfaces;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.DTOs.Filters;
+using Auren.Application.DTOs.Requests;
+using Auren.Application.Extensions;
+using Auren.Application.Interfaces.Services;
+using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -25,10 +24,11 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(CancellationToken cancellationToken,
+        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(
             [FromQuery] CategoriesFilter categoriesFilter,
             [FromQuery] int pageSize = 5, 
-            [FromQuery] int pageNumber = 1)
+            [FromQuery] int pageNumber = 1,
+            CancellationToken cancellationToken = default)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

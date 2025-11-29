@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="Auren.API/Auren.API.csproj" />
+  <Project Path="Auren.Application/Auren.Application.csproj" Id="8243c387-3cc0-47f0-99f5-fbe7aec4d04c" />
+  <Project Path="Auren.Domain/Auren.Domain.csproj" Id="c3ed9e68-43c8-4ad5-b444-8354249bd364" />
+  <Project Path="Auren.Infrastructure/Auren.Infrastructure.csproj" Id="18f6a73e-c3b4-4e3d-a73a-162d11071bb6" />
 </Solution>

@@ -1,7 +1,7 @@
-﻿using Auren.API.DTOs.Requests;
-using Auren.API.DTOs.Responses;
-using Auren.API.Models.Domain;
-using Auren.API.Repositories.Interfaces;
+﻿using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
+using Auren.Application.Interfaces.Repositories;
+using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -115,7 +115,7 @@ namespace Auren.API.Controllers
                 }
             }
 
-			await Task.Delay(1000);
+			await Task.Delay(1000, cancellationToken);
 			return BadRequest(result);
 		}
 

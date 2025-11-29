@@ -1,4 +1,5 @@
 ﻿using Auren.API.Middleware;
+using Microsoft.AspNetCore.Builder;
 
 namespace Auren.API.Extensions
 {

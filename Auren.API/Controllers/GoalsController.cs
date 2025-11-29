@@ -1,12 +1,10 @@
-﻿using Auren.API.DTOs.Filters;
-using Auren.API.DTOs.Requests;
-using Auren.API.DTOs.Responses;
-using Auren.API.Extensions;
-using Auren.API.Helpers.Result;
-using Auren.API.Models.Domain;
-using Auren.API.Models.Enums;
-using Auren.API.Repositories.Interfaces;
-using Auren.API.Services.Interfaces;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.DTOs.Filters;
+using Auren.Application.DTOs.Requests;
+using Auren.Application.Extensions;
+using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Interfaces.Services;
+using Auren.Domain.Entities;
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,10 +36,11 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet]
-        public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(CancellationToken cancellationToken,
+        public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(
             [FromQuery] GoalFilter goalFilter,
             [FromQuery] int pageNumber = 1, 
-            [FromQuery] int pageSize = 3)
+            [FromQuery] int pageSize = 3,
+            CancellationToken cancellationToken = default)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

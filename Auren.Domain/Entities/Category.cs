@@ -1,0 +1,13 @@
+﻿using Auren.Domain.Enums;
+
+namespace Auren.Domain.Entities
+{
+	public class Category
+	{
+        public Guid CategoryId { get; set; }
+        public Guid UserId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public TransactionType TransactionType { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+}

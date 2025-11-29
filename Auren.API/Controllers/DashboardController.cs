@@ -1,8 +1,8 @@
-﻿using Auren.API.DTOs.Filters;
-using Auren.API.DTOs.Responses;
-using Auren.API.Extensions;
-using Auren.API.Repositories.Interfaces;
-using Auren.API.Services.Interfaces;
+﻿using Auren.Application.DTOs.Filters;
+using Auren.Application.DTOs.Responses;
+using Auren.Application.Extensions;
+using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -31,7 +31,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpGet("transaction/average-daily-spending")]
-		public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending([FromQuery] DateTime? month, CancellationToken cancellationToken)
+		public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(CancellationToken cancellationToken)
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
@@ -54,10 +54,10 @@ namespace Auren.API.Controllers
 
 		[HttpGet("categories/categories-overview")]
         public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
-			CancellationToken cancellationToken,
 			[FromQuery] CategoryOverviewFilter filter,
             [FromQuery] int pageSize = 5,
-            [FromQuery] int pageNumber = 1)  
+            [FromQuery] int pageNumber = 1,
+            CancellationToken cancellationToken = default)  
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
