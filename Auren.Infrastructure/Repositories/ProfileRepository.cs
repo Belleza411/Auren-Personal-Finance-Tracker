@@ -32,81 +32,27 @@ namespace Auren.Infrastructure.Repositories
 			_fileUploadSettings = fileUploadSettings;
 		}
 
-		public async Task<UserResponse?> GetUserProfile(Guid userId, CancellationToken cancellationToken)
+		public async Task<UserResponse?> GetUserProfileAsync(Guid userId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+			var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
-                if (user == null)
-				{
-					_logger.LogWarning("User with ID {UserId} not found", userId);
-					return null;
-                }
-
-				return MapToUserResponse(user);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Request cancelled while retrieving profile for user {UserId}", userId);
-                throw;
-            }
-            catch (Exception ex)
+            if (user == null)
 			{
-				_logger.LogError(ex, "Failed to retrieve profile for user {UserId}", userId);
-				throw;
+				_logger.LogWarning("User with ID {UserId} not found", userId);
+				return null;
             }
+
+			return MapToUserResponse(user);
         }
 
-		public async Task<UserResponse?> UpdateUserProfile(Guid userId, UserDto userDto, CancellationToken cancellationToken)
+		public async Task<UserResponse?> UpdateUserProfileAsync(Guid userId, ApplicationUser user, CancellationToken cancellationToken)
 		{
-            if (userDto == null)
-            {
-                throw new ArgumentNullException(nameof(userDto));
-            }
+			_dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-            try
-			{
-                var user = await _dbContext.Users
-					.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            _logger.LogInformation("User with ID {UserId} successfully updated", userId);
 
-				if(user == null)
-				{
-					_logger.LogWarning("User with ID {UserId} not found for update", userId);
-					return null;
-                }
-
-                user.Email = userDto.Email ?? user.Email;
-                user.FirstName = userDto.FirstName ?? user.FirstName;
-				user.LastName = userDto.LastName ?? user.LastName;
-				user.Currency = userDto.Currency ?? user.Currency;
-
-                if (userDto.ProfilePictureUrl?.File != null)
-                {
-                    var uploadRequest = new ProfileImageUploadRequest(
-                        File: userDto.ProfilePictureUrl.File,
-                        Name: Path.GetFileNameWithoutExtension(userDto.ProfilePictureUrl.File.FileName),
-                        Description: string.IsNullOrEmpty(userDto.ProfilePictureUrl.Description)
-                            ? $"{userDto.FirstName}{userDto.LastName}"
-                            : userDto.ProfilePictureUrl.Description
-                    );
-
-                    var uploadResponse = await UploadProfileImageAsync(uploadRequest, cancellationToken);
-                    user.ProfilePictureUrl = uploadResponse.Path ?? user.ProfilePictureUrl;
-                }
-
-                await _dbContext.SaveChangesAsync(cancellationToken);
-
-                _logger.LogInformation("User with ID {UserId} successfully updated", userId);
-
-                return MapToUserResponse(user);
-
-            }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to update profile for user {UserId}", userId);
-				throw;
-            }
+            return MapToUserResponse(user);
         }
 
 		private static UserResponse MapToUserResponse(ApplicationUser user)
@@ -161,7 +107,7 @@ namespace Auren.Infrastructure.Repositories
             } 
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Failed to upload profile image for user");
+				_logger.LogError(ex, "Failed to upload profile image for user");  
 				throw;
             }
         }

@@ -1,7 +1,9 @@
-﻿using Auren.Application.DTOs.Requests;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Interfaces.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,32 +15,29 @@ namespace Auren.API.Controllers
 	public class ProfilesController : ControllerBase
 	{
 		private readonly ILogger<ProfilesController> _logger;
-		private readonly IProfileRepository _profileRepository;
-        private readonly ITransactionRepository _transactionRepository;
+		private readonly IProfileService _profileService;
+		private readonly ITransactionService _transactionService;
 
-		public ProfilesController(ILogger<ProfilesController> logger,
-			IProfileRepository profileRepository,
-			ITransactionRepository transactionRepository)
+		public ProfilesController(ILogger<ProfilesController> logger, IProfileService profileService, ITransactionService transactionService)
 		{
 			_logger = logger;
-			_profileRepository = profileRepository;
-			_transactionRepository = transactionRepository;
+			_profileService = profileService;
+			_transactionService = transactionService;
 		}
 
 		[HttpGet("me")]
 		public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken cancellationToken)
 		{
+			var userId = User.GetCurrentUserId();
+
+			if (userId == null) return Unauthorized();
+
 			try
 			{
-				var userId = User.GetCurrentUserId();
 
-				if (userId == null) return Unauthorized();
+				var userProfile = await _profileService.GetUserProfile(userId.Value, cancellationToken);
 
-				var userProfile = await _profileRepository.GetUserProfile(userId.Value, cancellationToken);
-
-				if(userProfile == null) return NotFound("User profile not found.");
-
-				return Ok(userProfile);
+				return userProfile.IsSuccess ? Ok(userProfile.Value) : NotFound(userProfile.Error);
             }
 			catch (Exception ex)
 			{
@@ -55,11 +54,21 @@ namespace Auren.API.Controllers
 
             try
 			{
-				var updateProfile = await _profileRepository.UpdateUserProfile(userId.Value, userDto, cancellationToken);
+				var updateProfile = await _profileService.UpdateUserProfile(userId.Value, userDto, cancellationToken);
 
-				if (updateProfile == null) return NotFound("User profile not found.");
-            
-				return Ok(updateProfile);
+                
+				if(!updateProfile.IsSuccess)
+				{
+					return updateProfile.Error.Code switch
+					{
+						ErrorType.ValidationFailed => BadRequest(updateProfile.Error),
+						ErrorType.NotFound => NotFound(updateProfile.Error),
+						ErrorType.UpdateFailed => StatusCode(500, updateProfile.Error),
+						_ => StatusCode(500, updateProfile.Error)
+					};
+				}
+
+				return Ok(updateProfile.Value);
             }
 			catch (Exception ex)
 			{
@@ -76,9 +85,9 @@ namespace Auren.API.Controllers
 
 			try
 			{
-				var balance = await _transactionRepository.GetBalanceAsync(userId.Value, cancellationToken, true);
+				var balance = await _transactionService.GetBalance(userId.Value, cancellationToken, true);
 
-				return Ok(balance);
+				return Ok(balance.Value);
             }
 			catch (Exception ex)
 			{
