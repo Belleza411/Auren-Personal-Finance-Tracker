@@ -16,29 +16,12 @@ namespace Auren.Infrastructure.Repositories
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
-		private readonly ILogger<UserRepository> _logger;
-		private readonly IProfileRepository _profileRepository;
-        private readonly IValidator<RegisterRequest> _registerValidator;
-        private readonly IValidator<LoginRequest> _loginValidator;
-		private readonly ICategoryRepository _categoryRepository;
 		private readonly AurenAuthDbContext _dbContext;
 
-		public UserRepository(UserManager<ApplicationUser> userManager,
-			SignInManager<ApplicationUser> signInManager,
-			ILogger<UserRepository> logger,
-			IProfileRepository profileRepository,
-			IValidator<RegisterRequest> registerValidator,
-			IValidator<LoginRequest> loginValidator,
-			ICategoryRepository categoryRepository,
-			AurenAuthDbContext dbContext)
+		public UserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AurenAuthDbContext dbContext)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
-			_logger = logger;
-			_profileRepository = profileRepository;
-			_registerValidator = registerValidator;
-			_loginValidator = loginValidator;
-			_categoryRepository = categoryRepository;
 			_dbContext = dbContext;
 		}
 

@@ -16,13 +16,11 @@ namespace Auren.Infrastructure.Repositories
 	{
 		public ILogger<GoalRepository> _logger { get; }
         private readonly AurenDbContext _dbContext;
-        private readonly string _connectionString;
 
-        public GoalRepository(ILogger<GoalRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
+        public GoalRepository(ILogger<GoalRepository> logger, AurenDbContext dbContext)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
         }
 
 		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, GoalFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
