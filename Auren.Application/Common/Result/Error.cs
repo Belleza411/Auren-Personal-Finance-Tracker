@@ -20,6 +20,7 @@
         public static Error UpdateFailed(params string[] messages) => new Error(ErrorType.UpdateFailed, messages);
         public static Error CreateFailed(params string[] messages) => new Error(ErrorType.CreateFailed, messages);
         public static Error DeleteFailed(params string[] messages) => new Error(ErrorType.DeleteFailed, messages);
+        public static Error UploadFailed(params string[] messages) => new Error(ErrorType.UploadFailed, messages);
 
         public static class CategoryError
         {
@@ -29,6 +30,13 @@
         public static class GoalError
         {
             public static Error AmountMustBePositive(params string[] messages) => new Error(ErrorType.AmountMustBePositive, messages);
+        }
+
+        public static class UserError
+        {
+            public static Error EmailAlreadyInUse(params string[] messages) => new Error(ErrorType.EmailAlreadyInUse, messages);
+            public static Error UserLockedOut(params string[] messages) => new Error(ErrorType.UserLockedOut, messages);
+            public static Error LogoutFailed(params string[] messages) => new Error(ErrorType.LogoutFailed, messages);
         }
     }
       

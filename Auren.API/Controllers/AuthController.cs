@@ -1,7 +1,9 @@
-﻿using Auren.Application.DTOs.Requests;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,102 +23,90 @@ namespace Auren.API.Controllers
 		private readonly IUserRepository _userRepository;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<AuthController> _logger;
+		private readonly IUserService _userService;
 
 		public AuthController(ITokenRepository tokenRepository,
 			IUserRepository userRepository,
 			UserManager<ApplicationUser> userManager,
-			ILogger<AuthController> logger)
+			ILogger<AuthController> logger,
+			IUserService userService)
 		{
 			_tokenRepository = tokenRepository;
 			_userRepository = userRepository;
 			_userManager = userManager;
 			_logger = logger;
+			_userService = userService;
 		}
 
 		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _userRepository.RegisterAsync(request, cancellationToken);
+			var result = await _userService.RegisterAsync(request, cancellationToken);
 
-			if(result.Success && result.User != null)
+			if(!result.IsSuccess)
 			{
-				var user = await _userManager.FindByEmailAsync(request.Email);
-				if(user != null)
+				return result.Error.Code switch
 				{
-					var accessToken = _tokenRepository.GenerateAccessTokenAsync(user);
-					var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
-
-					var claims = new List<Claim>
-					{
-						new(ClaimTypes.Email, user.Email!),
-						new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-						new("UserId", user.UserId.ToString()),
-						new("AccessToken", accessToken),
-						new("RefreshToken", refreshToken.Token)
-					};
-
-					await SignInUserAsync(claims);
-
-                    _logger.LogInformation("User {Email} logged in successfully", user.Email);
-                    return Ok(result);
-				}
+					ErrorType.ValidationFailed => BadRequest(result.Error),
+					ErrorType.EmailAlreadyInUse => Conflict(result.Error),
+					ErrorType.UpdateFailed => StatusCode(500, result.Error),
+					ErrorType.CreateFailed => StatusCode(500, result.Error),
+                    _ => StatusCode(500, result.Error)
+				};
             }
 
-			return result.Success ? Ok(result) : BadRequest(result);
+			return Ok(result.Value);
         }
 
 		[HttpPost("login")]
 		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _userRepository.LoginAsync(request, cancellationToken);
+			var result = await _userService.LoginAsync(request, cancellationToken);
 
-			if(result.Success && result.User != null)
-			{
-				var user = await _userManager.FindByEmailAsync(request.Email);
-				if(user != null)
-				{
-					var accessToken = _tokenRepository.GenerateAccessTokenAsync(user);
-					var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
-					
-					var claims = new List<Claim>
-					{
-						new(ClaimTypes.Email, user.Email!),
-						new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-						new("UserId", user.UserId.ToString()),
-						new("AccessToken", accessToken),
-						new("RefreshToken", refreshToken.Token)
-					};
-					
-					await SignInUserAsync(claims);
-					_logger.LogInformation("User {Email} logged in successfully", user.Email);
-					return Ok(result);
-                }
+            if (!result.IsSuccess)
+            {
+                return result.Error.Code switch
+                {
+                    ErrorType.ValidationFailed => BadRequest(result.Error),
+					ErrorType.UserLockedOut => StatusCode(429, result.Error),
+					ErrorType.InvalidInput => BadRequest(result.Error),
+                    _ => StatusCode(500, result.Error)
+                };
             }
 
-			await Task.Delay(1000, cancellationToken);
-			return BadRequest(result);
+            await Task.Delay(1000, cancellationToken);
+			return Ok(result.Value);
 		}
 
 		[HttpPost("logout")]
-		public async Task<IActionResult> Logout()
+		public async Task<IActionResult> Logout(CancellationToken cancellationToken)
 		{
+			var userId = User.GetCurrentUserId();
+
+			if (userId == null)
+			{
+				_logger.LogWarning("Logout attempted without a valid user session");
+				return BadRequest("Logout attempted without valid user session");
+            }
+
 			try
 			{
-				var userId = User.GetCurrentUserId();
-
-				if (userId == null)
-				{
-					_logger.LogWarning("Logout attempted without a valid user session");
-					return BadRequest("Logout attempted without valid user session");
-                }
 
                 await _tokenRepository.RevokeAllUserRefreshTokensAsync(userId.Value);
 
-				await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+				var logoutResult  = await _userService.LogoutAsync(cancellationToken);
 
-				_logger.LogInformation("User logged out successfully");
+				if (!logoutResult.IsSuccess)
+				{
+					return logoutResult.Error.Code switch
+					{
+						ErrorType.LogoutFailed => BadRequest(logoutResult.Error),
+						ErrorType.InvalidInput => BadRequest(logoutResult.Error),
+						_ => StatusCode(500, logoutResult.Error)
+					};
+                }
 
-				return Ok(new
+                return Ok(new
 				{
 					Success = true,
 					Message = "Logged out successfully"

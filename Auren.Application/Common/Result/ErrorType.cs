@@ -12,6 +12,10 @@
 		UpdateFailed = 8,
 		CreateFailed = 9,
 		DeleteFailed = 10,
-		AmountMustBePositive = 11
+		AmountMustBePositive = 11,
+		EmailAlreadyInUse = 12,
+		UploadFailed = 13,
+		UserLockedOut = 14,
+		LogoutFailed = 15
     }
 }
