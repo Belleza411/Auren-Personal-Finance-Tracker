@@ -20,20 +20,14 @@ namespace Auren.API.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly ITokenRepository _tokenRepository;
-		private readonly IUserRepository _userRepository;
-		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<AuthController> _logger;
 		private readonly IUserService _userService;
 
 		public AuthController(ITokenRepository tokenRepository,
-			IUserRepository userRepository,
-			UserManager<ApplicationUser> userManager,
 			ILogger<AuthController> logger,
 			IUserService userService)
 		{
 			_tokenRepository = tokenRepository;
-			_userRepository = userRepository;
-			_userManager = userManager;
 			_logger = logger;
 			_userService = userService;
 		}
@@ -117,22 +111,6 @@ namespace Auren.API.Controllers
                 _logger.LogError(ex, "Error during logout");
                 return BadRequest(new { Success = false, Message = "Logout failed" });
             }
-        }
-
-        private async Task SignInUserAsync(List<Claim> claims)
-        {
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
-                IssuedUtc = DateTimeOffset.UtcNow
-            };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
         }
     }
 }
