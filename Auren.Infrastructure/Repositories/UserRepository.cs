@@ -3,8 +3,10 @@ using Auren.Application.DTOs.Responses;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
+using Auren.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Auren.Infrastructure.Repositories
@@ -20,8 +22,9 @@ namespace Auren.Infrastructure.Repositories
         private readonly IValidator<RegisterRequest> _registerValidator;
         private readonly IValidator<LoginRequest> _loginValidator;
 		private readonly ICategoryService _categoryService;
+		private readonly AurenAuthDbContext _dbContext;
 
-		public UserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<UserRepository> logger, ITokenRepository tokenRepository, ICategoryRepository categoryRepository, IProfileRepository profileRepository, IValidator<RegisterRequest> registerValidator, IValidator<LoginRequest> loginValidator, ICategoryService categoryService)
+		public UserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<UserRepository> logger, ITokenRepository tokenRepository, ICategoryRepository categoryRepository, IProfileRepository profileRepository, IValidator<RegisterRequest> registerValidator, IValidator<LoginRequest> loginValidator, ICategoryService categoryService, AurenAuthDbContext dbContext)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
@@ -32,7 +35,11 @@ namespace Auren.Infrastructure.Repositories
 			_registerValidator = registerValidator;
 			_loginValidator = loginValidator;
 			_categoryService = categoryService;
+			_dbContext = dbContext;
 		}
+
+		public async Task<ApplicationUser?> GetUserById(Guid userId, CancellationToken cancellationToken)
+			=> await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
 		public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
 		{
