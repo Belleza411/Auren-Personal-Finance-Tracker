@@ -102,7 +102,7 @@ namespace Auren.Application.Services
             existingGoal.CompletionPercentage = GetCompletionPercentage(existingGoal.Spent ?? 0, existingGoal.Budget);
             existingGoal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, existingGoal.TargetDate);
 
-            var updatedGoal = await _goalRepository.UpdateGoalAsync(goalId, userId, existingGoal, cancellationToken);
+            var updatedGoal = await _goalRepository.UpdateGoalAsync(existingGoal, cancellationToken);
 
             return updatedGoal == null
                 ? Result.Failure<Goal>(Error.UpdateFailed("Failed to update goal."))
@@ -176,7 +176,7 @@ namespace Auren.Application.Services
             existingGoal.Spent = (existingGoal.Spent ?? 0) + amount;
             existingGoal.CompletionPercentage = GetCompletionPercentage(existingGoal.Spent ?? 0, existingGoal.Budget);
 
-            var goalWithAddedMoney = await _goalRepository.AddMoneyToGoalAsync(existingGoal, cancellationToken);
+            var goalWithAddedMoney = await _goalRepository.UpdateGoalAsync(existingGoal, cancellationToken);
 
             return goalWithAddedMoney == null
                 ? Result.Failure<Goal>(Error.UpdateFailed("Failed to add money to goal."))

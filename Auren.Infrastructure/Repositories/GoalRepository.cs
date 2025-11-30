@@ -63,7 +63,7 @@ namespace Auren.Infrastructure.Repositories
             return goal;
         }
 
-        public async Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, Goal goal, CancellationToken cancellationToken)
+        public async Task<Goal?> UpdateGoalAsync(Goal goal, CancellationToken cancellationToken)
 		{
 			_dbContext.Goals.Update(goal);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -88,13 +88,6 @@ namespace Auren.Infrastructure.Repositories
 
 			return true;
 		}
-
-		public async Task<Goal?> AddMoneyToGoalAsync(Goal goal, CancellationToken cancellationToken)
-		{
-			_dbContext.Goals.Update(goal);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-			return goal;
-        }
 
 		private IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
 		{
