@@ -3,6 +3,7 @@ using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Auren.Application.Services
 {
-	public class UserService
+	public class UserService : IUserService
 	{
 		private readonly IUserRepository _userRepository;
 		private readonly IValidator<RegisterRequest> _registerValidator;
@@ -30,7 +31,14 @@ namespace Auren.Application.Services
         private readonly ITokenRepository _tokenRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public UserService(IUserRepository userRepository, IValidator<RegisterRequest> registerValidator, IValidator<LoginRequest> loginValidator, IProfileRepository profileRepository, ICategoryRepository categoryRepository, ILogger<UserService> logger, ITokenRepository tokenRepository, IHttpContextAccessor httpContextAccessor)
+		public UserService(IUserRepository userRepository,
+            IValidator<RegisterRequest> registerValidator,
+            IValidator<LoginRequest> loginValidator,
+            IProfileRepository profileRepository,
+            ICategoryRepository categoryRepository,
+            ILogger<UserService> logger,
+            ITokenRepository tokenRepository,
+            IHttpContextAccessor httpContextAccessor)
 		{
 			_userRepository = userRepository;
 			_registerValidator = registerValidator;
@@ -287,7 +295,8 @@ namespace Auren.Application.Services
                 new AuthenticationProperties
                 {
                     IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(14)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(14),
+                    IssuedUtc = DateTimeOffset.UtcNow
                 });
 
             return Result.Success<AuthResponse>(new AuthResponse

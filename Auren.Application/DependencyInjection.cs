@@ -18,6 +18,8 @@ namespace Auren.Application
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IGoalService, GoalService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IUserService, UserService>();
             return services;
         }
     }
