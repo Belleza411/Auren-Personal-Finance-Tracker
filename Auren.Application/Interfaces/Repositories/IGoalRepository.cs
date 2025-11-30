@@ -11,7 +11,7 @@ namespace Auren.Application.Interfaces.Repositories
         Task<Goal> CreateGoalAsync(Goal goal, Guid userId, CancellationToken cancellationToken);
         Task<Goal?> UpdateGoalAsync(Guid goalId, Guid userId, Goal goal, CancellationToken cancellationToken);
         Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken);
-        Task<Goal?> AddMoneyToGoalAsync(Goal goal, Guid userId, decimal amount, CancellationToken cancellationToken);
+        Task<Goal?> AddMoneyToGoalAsync(Goal goal, CancellationToken cancellationToken);
         Task<GoalsSummaryResponse> GetGoalsSummaryAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

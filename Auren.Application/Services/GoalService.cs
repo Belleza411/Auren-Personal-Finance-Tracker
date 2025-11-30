@@ -168,12 +168,15 @@ namespace Auren.Application.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _transactionRepository.CreateTransactionAsync(newGoalTransaction, userId, cancellationToken);
+            var transactionResult = await _transactionRepository.CreateTransactionAsync(newGoalTransaction, userId, cancellationToken);
+
+            if(transactionResult == null) 
+                return Result.Failure<Goal>(Error.CreateFailed("Failed to create transaction for adding money to goal."));
 
             existingGoal.Spent = (existingGoal.Spent ?? 0) + amount;
             existingGoal.CompletionPercentage = GetCompletionPercentage(existingGoal.Spent ?? 0, existingGoal.Budget);
 
-            var goalWithAddedMoney = await _goalRepository.AddMoneyToGoalAsync(existingGoal, userId, amount, cancellationToken);
+            var goalWithAddedMoney = await _goalRepository.AddMoneyToGoalAsync(existingGoal, cancellationToken);
 
             return goalWithAddedMoney == null
                 ? Result.Failure<Goal>(Error.UpdateFailed("Failed to add money to goal."))

@@ -89,12 +89,10 @@ namespace Auren.Infrastructure.Repositories
 			return true;
 		}
 
-		public async Task<Goal?> AddMoneyToGoalAsync(Goal goal, Guid userId, decimal amount, CancellationToken cancellationToken)
+		public async Task<Goal?> AddMoneyToGoalAsync(Goal goal, CancellationToken cancellationToken)
 		{
 			_dbContext.Goals.Update(goal);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-			_logger.LogInformation("Added {Amount} to goal with id of {GoalId} for user {UserId}", amount, goal.GoalId, userId);
 			return goal;
         }
 
