@@ -137,9 +137,10 @@ namespace Auren.Application.Services
                     .FindFirst("UserId")?.Value;
 
                 if (userId == null)
-                    return Result.Failure<bool>(Error.InvalidInput("No active session."));
+                    return Result.Failure<bool>(Error.InvalidInput("No active session or invalid user id"));
 
-                await _tokenRepository.RevokeAllUserRefreshTokensAsync(Guid.Parse(userId));
+                if(!string.IsNullOrEmpty(userId) && !Guid.TryParse(userId, out var parsedUserId))
+                    await _tokenRepository.RevokeAllUserRefreshTokensAsync(parsedUserId);
 
                 await _httpContextAccessor.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -185,7 +186,7 @@ namespace Auren.Application.Services
 
                 return (true, uploadResponse.Path, null);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return (false, null, "Failed to upload profile image.");
             }
@@ -283,8 +284,10 @@ namespace Auren.Application.Services
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new("UserId", user.UserId.ToString()),
-                new("AccessToken", accessToken),
-                new("RefreshToken", refreshToken.Token)
+                new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                new("UserId", user.UserId.ToString()),
+                new("FirstName", user.FirstName),
+                new("LastName", user.LastName)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -295,8 +298,9 @@ namespace Auren.Application.Services
                 new AuthenticationProperties
                 {
                     IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(14),
-                    IssuedUtc = DateTimeOffset.UtcNow
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                    IssuedUtc = DateTimeOffset.UtcNow,
+                    AllowRefresh = true
                 });
 
             return Result.Success<AuthResponse>(new AuthResponse

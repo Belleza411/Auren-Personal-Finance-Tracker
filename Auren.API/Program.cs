@@ -66,12 +66,24 @@ builder.Services.AddAuthentication(options =>
         options.Cookie.Name = "Auren.Session";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SameSite = SameSiteMode.None;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(10); 
-        options.SlidingExpiration = false;
+        options.SlidingExpiration = true;
         options.LoginPath = "/auth/login";
         options.LogoutPath = "/auth/logout";
         options.AccessDeniedPath = "/auth/access-denied";
+
+        options.Events.OnRedirectToLogin = context => 
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized; 
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
 
         options.Events.OnValidatePrincipal = async context =>
         {
