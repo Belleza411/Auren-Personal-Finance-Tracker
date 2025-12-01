@@ -127,7 +127,7 @@ namespace Auren.Application.Services
 			if (amount < 0)
 				return Result.Failure<Goal>(Error.GoalError.AmountMustBePositive("Amount must be a positive value."));
 
-			var currentBalance = await _transactionRepository.GetBalanceAsync(userId, cancellationToken, true);
+			var currentBalance = await _transactionRepository.GetBalanceAsync(userId, cancellationToken, BalancePeriod.AllTime);
 
 			if (currentBalance < amount)
 				return Result.Failure<Goal>(Error.NotEnoughBalance($"{amount} is not enough balance. "));

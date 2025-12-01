@@ -6,6 +6,7 @@ using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Domain.Entities;
+using Auren.Domain.Enums;
 
 namespace Auren.Application.Interfaces.Services
 {
@@ -14,7 +15,7 @@ namespace Auren.Application.Interfaces.Services
         Task<Result<Transaction>> CreateTransaction(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken);
         Task<Result<bool>> DeleteTransaction(Guid transactionId, Guid userId, CancellationToken cancellationToken);
         Task<Result<AvgDailySpendingResponse>> GetAvgDailySpending(Guid userId, CancellationToken cancellationToken);
-        Task<Result<decimal>> GetBalance(Guid userId, CancellationToken cancellationToken, bool isCurrentMonth);
+        Task<Result<decimal>> GetBalance(Guid userId, CancellationToken cancellationToken, BalancePeriod balancePeriod);
         Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken);
         Task<Result<IEnumerable<Transaction>>> GetAllTransactions(Guid userId, TransactionFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default);
         Task<Result<Transaction>> UpdateTransaction(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken);

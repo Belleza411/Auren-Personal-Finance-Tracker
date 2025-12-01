@@ -4,6 +4,7 @@ using Auren.Application.DTOs.Responses.User;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
+using Auren.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -85,7 +86,7 @@ namespace Auren.API.Controllers
 
 			try
 			{
-				var balance = await _transactionService.GetBalance(userId.Value, cancellationToken, true);
+				var balance = await _transactionService.GetBalance(userId.Value, cancellationToken, BalancePeriod.AllTime);
 
 				return Ok(balance.Value);
             }
