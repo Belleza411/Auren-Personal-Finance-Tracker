@@ -101,6 +101,7 @@ namespace Auren.API.Controllers
             }
             catch (Exception ex)
             {
+				_logger.LogError(ex, "An error occured while retrieving category summary");
                 return StatusCode(500, "An error occurred while retrieving category summary. Please try again later.");
             }
         }
@@ -118,6 +119,7 @@ namespace Auren.API.Controllers
             }
             catch (Exception ex)
             {
+				_logger.LogError(ex, "An error occured while retrieving goals summary");
                 return StatusCode(500, "An error occurred while retrieving goals summary. Please try again later.");
             }
         }

@@ -86,7 +86,7 @@ namespace Auren.API.Controllers
 
 			try
 			{
-				var balance = await _transactionService.GetBalance(userId.Value, cancellationToken, BalancePeriod.AllTime);
+				var balance = await _transactionService.GetBalance(userId.Value, BalancePeriod.AllTime, cancellationToken);
 
 				return Ok(balance.Value);
             }

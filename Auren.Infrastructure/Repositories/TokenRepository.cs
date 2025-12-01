@@ -184,7 +184,7 @@ namespace Auren.Infrastructure.Repositories
 
                 return true;
             }
-			catch (Exception ex)
+			catch (Exception)
 			{
                 context.RejectPrincipal();
                 return false;

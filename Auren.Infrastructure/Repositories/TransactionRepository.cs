@@ -85,7 +85,7 @@ namespace Auren.Infrastructure.Repositories
             return new AvgDailySpendingResponse(currentAvg, percentageChange);
         }
 
-		public async Task<decimal> GetBalanceAsync(Guid userId, CancellationToken cancellationToken, BalancePeriod balancePeriod)
+		public async Task<decimal> GetBalanceAsync(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
 		{
             var currentMonthRange = DateTime.UtcNow.GetCurrentMonthRange();
             var lastMonthRange = DateTime.UtcNow.GetLastMonthRange();
@@ -204,7 +204,7 @@ namespace Auren.Infrastructure.Repositories
             return query;
         }
 
-        private bool HasActiveFilters(TransactionFilter filter)
+        private static bool HasActiveFilters(TransactionFilter filter)
         {
             if (filter == null) return false;
 
@@ -252,8 +252,8 @@ namespace Auren.Infrastructure.Repositories
 
             
 
-            var currentBalance = await GetBalanceAsync(userId, cancellationToken, BalancePeriod.AllTime);
-            var lastMonthBalance = await GetBalanceAsync(userId, cancellationToken, BalancePeriod.LastMonth);
+            var currentBalance = await GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
+            var lastMonthBalance = await GetBalanceAsync(userId, BalancePeriod.LastMonth, cancellationToken);
 
             var balanceChange = CalculatePercentageChange(currentBalance, lastMonthBalance, true);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome, false);

@@ -54,7 +54,7 @@ namespace Auren.Application.Services
 
             if (transactionDto.TransactionType == TransactionType.Expense)
             {
-                var currentBalance = await _transactionRepository.GetBalanceAsync(userId, cancellationToken, BalancePeriod.AllTime);
+                var currentBalance = await _transactionRepository.GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
 
                 if (currentBalance < transactionDto.Amount)
                 {
@@ -99,8 +99,8 @@ namespace Auren.Application.Services
         public async Task<Result<AvgDailySpendingResponse>> GetAvgDailySpending(Guid userId, CancellationToken cancellationToken)
             => Result.Success(await _transactionRepository.GetAvgDailySpendingAsync(userId, cancellationToken));
         
-        public async Task<Result<decimal>> GetBalance(Guid userId, CancellationToken cancellationToken, BalancePeriod balancePeriod)
-            => Result.Success(await _transactionRepository.GetBalanceAsync(userId, cancellationToken, balancePeriod));
+        public async Task<Result<decimal>> GetBalance(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
+            => Result.Success(await _transactionRepository.GetBalanceAsync(userId, balancePeriod, cancellationToken));
 
         public async Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {

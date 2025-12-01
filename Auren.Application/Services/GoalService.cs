@@ -127,7 +127,7 @@ namespace Auren.Application.Services
 			if (amount < 0)
 				return Result.Failure<Goal>(Error.GoalError.AmountMustBePositive("Amount must be a positive value."));
 
-			var currentBalance = await _transactionRepository.GetBalanceAsync(userId, cancellationToken, BalancePeriod.AllTime);
+			var currentBalance = await _transactionRepository.GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
 
 			if (currentBalance < amount)
 				return Result.Failure<Goal>(Error.NotEnoughBalance($"{amount} is not enough balance. "));
@@ -186,7 +186,7 @@ namespace Auren.Application.Services
 		public async Task<Result<GoalsSummaryResponse>> GetGoalsSummary(Guid userId, CancellationToken cancellationToken)
 			=> Result.Success(await _goalRepository.GetGoalsSummaryAsync(userId, cancellationToken));
 
-		private int GetCompletionPercentage(decimal currentAmount, decimal targetAmount)
+		private static int GetCompletionPercentage(decimal currentAmount, decimal targetAmount)
 		{
 			if (targetAmount <= 0m)
 				return 0;
@@ -199,7 +199,7 @@ namespace Auren.Application.Services
 			return rounded;
 		}
 
-		private string GetTimeRemaining(DateTime startDate, DateTime targetDate)
+		private static string GetTimeRemaining(DateTime startDate, DateTime targetDate)
 		{
 			if (targetDate <= startDate)
 				return "The target date has already passed.";
@@ -208,7 +208,6 @@ namespace Auren.Application.Services
 
 			int totalDays = (int)difference.TotalDays;
 			int months = totalDays / 30;
-			int days = totalDays % 30;
 
 			if (months > 0)
 			{
