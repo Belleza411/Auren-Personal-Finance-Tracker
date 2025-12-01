@@ -17,21 +17,11 @@ namespace Auren.API.Controllers
 	public class GoalsController : ControllerBase
 	{
 		private readonly ILogger<GoalsController> _logger;
-		private readonly IGoalRepository _goalRepository;
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly ITransactionService _transactionService;
-        private readonly ICategoryService _categoryService;
         private readonly IGoalService _goalService;
 
-		public GoalsController(ILogger<GoalsController> logger, IGoalRepository goalRepository, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
+		public GoalsController(ILogger<GoalsController> logger, IGoalService goalService)
 		{
 			_logger = logger;
-			_goalRepository = goalRepository;
-			_transactionRepository = transactionRepository;
-			_categoryRepository = categoryRepository;
-			_transactionService = transactionService;
-			_categoryService = categoryService;
 			_goalService = goalService;
 		}
 
