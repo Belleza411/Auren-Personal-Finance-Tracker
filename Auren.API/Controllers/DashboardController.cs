@@ -13,17 +13,13 @@ namespace Auren.API.Controllers
 	[ApiController]
 	public class DashboardController : ControllerBase
 	{
-		private readonly ITransactionRepository _transactionRepository;
-		private readonly IGoalRepository _goalRepository;
 		private readonly ILogger<DashboardController> _logger;
 		private readonly ITransactionService _transactionService;
 		private readonly ICategoryService _categoryService;
 		private readonly IGoalService _goalService;
 
-		public DashboardController(ITransactionRepository transactionRepository, IGoalRepository goalRepository, ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
+		public DashboardController(ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
 		{
-			_transactionRepository = transactionRepository;
-			_goalRepository = goalRepository;
 			_logger = logger;
 			_transactionService = transactionService;
 			_categoryService = categoryService;
@@ -40,10 +36,7 @@ namespace Auren.API.Controllers
 			{
 				var avgSpending = await _transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
 
-				return Ok(new AvgDailySpendingResponse(
-					Math.Round(avgSpending.Value.avgSpending, 2),
-					Math.Round(avgSpending.Value.pecentageChange, 2)
-				));
+				return Ok(avgSpending.Value);
 			}
 			catch (Exception ex)
 			{

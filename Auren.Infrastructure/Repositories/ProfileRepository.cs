@@ -3,11 +3,14 @@ using Auren.Application.DTOs.Responses;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace Auren.Infrastructure.Repositories
 {
@@ -15,21 +18,15 @@ namespace Auren.Infrastructure.Repositories
 	{
 		private readonly ILogger<ProfileRepository> _logger;
 		private readonly AurenAuthDbContext _dbContext;
-		private readonly IWebHostEnvironment _env;
 		private readonly IValidator<ProfileImageUploadRequest> _validator;
-        private readonly IOptions<FileUploadSettings> _fileUploadSettings;
+		private readonly Cloudinary _cloudinary;
 
-		public ProfileRepository(ILogger<ProfileRepository> logger,
-			AurenAuthDbContext dbContext,
-			IWebHostEnvironment env,
-			IValidator<ProfileImageUploadRequest> validator,
-			IOptions<FileUploadSettings> fileUploadSettings)
+		public ProfileRepository(ILogger<ProfileRepository> logger, AurenAuthDbContext dbContext, IValidator<ProfileImageUploadRequest> validator, Cloudinary cloudinary)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-			_env = env;
 			_validator = validator;
-			_fileUploadSettings = fileUploadSettings;
+			_cloudinary = cloudinary;
 		}
 
 		public async Task<UserResponse?> GetUserProfileAsync(Guid userId, CancellationToken cancellationToken)
@@ -79,10 +76,6 @@ namespace Auren.Infrastructure.Repositories
                     throw new Exception(errors);
                 }
 
-                var uploadsFolder = Path.Combine(_env.WebRootPath, _fileUploadSettings.Value.ProfileImagesPath);
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
                 var extension = Path.GetExtension(request.File.FileName).ToLowerInvariant();
 
                 var safeName = Path.GetFileNameWithoutExtension(request.Name ?? "");
@@ -90,19 +83,27 @@ namespace Auren.Infrastructure.Repositories
                     ? $"{Guid.NewGuid()}{extension}"
                     : $"{safeName}{extension}";
 
-                var filePath = Path.Combine(uploadsFolder, fileName);
+				using var stream = request.File.OpenReadStream();
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await request.File.CopyToAsync(stream, cancellationToken);
-                }
+				var uploadParams = new ImageUploadParams
+				{
+					File = new FileDescription(fileName, stream),
+					PublicId = Path.GetFileNameWithoutExtension(fileName),
+					Folder = "profile-images",
+					Overwrite = true,
+				};
+
+				var uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
+
+				if(uploadResult == null || uploadResult.StatusCode != HttpStatusCode.OK)
+					throw new Exception("Clooudinary upload failed");
 
                 return new ProfileImageUploadResponse(
                     Name: fileName,
                     Description: request.Description,
                     Extension: extension,
                     SizeInBytes: request.File.Length,
-                    Path: $"{_fileUploadSettings.Value.BaseUrl}{fileName}"
+                    Path: uploadResult.SecureUrl.ToString()
                 );
             } 
 			catch (Exception ex)

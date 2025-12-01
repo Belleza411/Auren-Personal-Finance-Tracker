@@ -30,6 +30,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCloudinary(builder.Configuration);
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -111,10 +112,6 @@ builder.Services.AddAuthentication(options =>
             await Task.CompletedTask;
         };
     });
-
-builder.Services.Configure<FileUploadSettings>(
-    builder.Configuration.GetSection("FileUpload"));
-
 
 var app = builder.Build();
 
