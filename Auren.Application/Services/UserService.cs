@@ -279,13 +279,13 @@ namespace Auren.Application.Services
             var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
 
             var claims = new List<Claim>
-        {
-            new(ClaimTypes.Email, user.Email!),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new("UserId", user.UserId.ToString()),
-            new("AccessToken", accessToken),
-            new("RefreshToken", refreshToken.Token)
-        };
+            {
+                new(ClaimTypes.Email, user.Email!),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new("UserId", user.UserId.ToString()),
+                new("AccessToken", accessToken),
+                new("RefreshToken", refreshToken.Token)
+            };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
