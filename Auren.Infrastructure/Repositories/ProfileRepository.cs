@@ -97,7 +97,7 @@ namespace Auren.Infrastructure.Repositories
 				var uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
 
 				if(uploadResult == null || uploadResult.StatusCode != HttpStatusCode.OK)
-					throw new Exception("Clooudinary upload failed");
+					throw new Exception("Cloudinary upload failed");
 
                 return new ProfileImageUploadResponse(
                     Name: fileName,

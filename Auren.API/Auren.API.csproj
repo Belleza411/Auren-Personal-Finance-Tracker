@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Auren.Infrastructure\Auren.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\profile-images\" />
+  </ItemGroup>
+
 </Project>
