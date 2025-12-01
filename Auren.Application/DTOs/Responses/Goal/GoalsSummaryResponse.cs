@@ -1,4 +1,4 @@
-﻿namespace Auren.Application.DTOs.Responses
+﻿namespace Auren.Application.DTOs.Responses.Goal
 {
 	public sealed record GoalsSummaryResponse(
 		int TotalGoals,

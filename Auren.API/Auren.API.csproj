@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\profile-images\1731536350836.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Auren.Application\Auren.Application.csproj" />
     <ProjectReference Include="..\Auren.Infrastructure\Auren.Infrastructure.csproj" />
   </ItemGroup>

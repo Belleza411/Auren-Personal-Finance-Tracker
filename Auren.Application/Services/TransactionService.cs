@@ -2,6 +2,7 @@
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
+using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;

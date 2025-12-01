@@ -1,6 +1,5 @@
 ﻿using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
-using Auren.Application.DTOs.Responses;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Auren.Application.DTOs.Responses.Category;
 
 namespace Auren.Infrastructure.Repositories
 {

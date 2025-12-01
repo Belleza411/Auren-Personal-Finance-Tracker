@@ -1,7 +1,7 @@
 ﻿
 
 using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Responses;
+using Auren.Application.DTOs.Responses.Goal;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;

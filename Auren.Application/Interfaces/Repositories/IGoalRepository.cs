@@ -1,5 +1,5 @@
 ﻿using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Responses;
+using Auren.Application.DTOs.Responses.Goal;
 using Auren.Domain.Entities;
 
 namespace Auren.Application.Interfaces.Repositories

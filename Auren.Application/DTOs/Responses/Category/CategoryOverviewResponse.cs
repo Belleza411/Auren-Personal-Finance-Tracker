@@ -1,6 +1,6 @@
 ﻿using Auren.Domain.Enums;
 
-namespace Auren.Application.DTOs.Responses
+namespace Auren.Application.DTOs.Responses.Category
 {
     public sealed record CategoryOverviewResponse(
 		string Category,

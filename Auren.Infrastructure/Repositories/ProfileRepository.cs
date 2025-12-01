@@ -1,5 +1,6 @@
 ﻿using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
+using Auren.Application.DTOs.Responses.User;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
