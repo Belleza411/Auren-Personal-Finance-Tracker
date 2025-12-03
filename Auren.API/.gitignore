@@ -12,8 +12,8 @@ wwwroot/profile-images
 .env
 
 # App settings
-appsettings*.json
-appsettings*.*json
+appsettings.json
+appsettings.*.json
 
 # User-specific files
 *.rsuser
