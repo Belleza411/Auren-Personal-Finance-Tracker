@@ -22,5 +22,6 @@ namespace Auren.Application.Interfaces.Services
            int pageNumber = 1,
            CancellationToken cancellationToken = default);
         Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken);
+        Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken);
     }
 }

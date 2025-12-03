@@ -8,6 +8,7 @@ using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 
 namespace Auren.Application.Services
 {
@@ -16,15 +17,17 @@ namespace Auren.Application.Services
         private readonly ILogger<CategoryService> _logger;
         private readonly IValidator<CategoryDto> _validator;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
-		public CategoryService(ILogger<CategoryService> logger, IValidator<CategoryDto> validator, ICategoryRepository categoryRepository)
+		public CategoryService(ILogger<CategoryService> logger, IValidator<CategoryDto> validator, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
 		{
 			_logger = logger;
 			_validator = validator;
 			_categoryRepository = categoryRepository;
+			_transactionRepository = transactionRepository;
 		}
 
-        public async Task<Result<Category>> CreateCategory(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken)
+		public async Task<Result<Category>> CreateCategory(CategoryDto categoryDto, Guid userId, CancellationToken cancellationToken)
 		{
             if (categoryDto == null)
                 return Result.Failure<Category>(Error.InvalidInput("All fields are required"));
@@ -142,6 +145,40 @@ namespace Auren.Application.Services
 
         public async Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken)
             => Result.Success<CategorySummaryResponse>(await _categoryRepository.GetCategoriesSummaryAsync(userId, cancellationToken));
+
+        public async Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken)
+        {
+            var transactionExpenses = new TransactionFilter { IsExpense = true };
+            var expenses = await _transactionRepository.GetTransactionsAsync(
+                userId, transactionExpenses, 5, 1, cancellationToken);
+
+            var categories = await _categoryRepository.GetCategoriesAsync(userId, null!, int.MaxValue, 1, cancellationToken);
+
+            var categoryLookup = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+
+            var totalAmount = expenses.Sum(e => e.Amount);
+            var chartData = expenses
+                .GroupBy(e => e.CategoryId)
+                .Select(g =>
+                {
+                    var categoryName = categoryLookup.TryGetValue(g.Key, out var name)
+                        ? name
+                        : "Unknown";
+
+                    return new ExpenseCategoryChartResponse(
+                        Category: categoryName,
+                        Amount: g.Sum(t => t.Amount),
+                        Percentage: totalAmount == 0 ? 0 :
+                            Math.Round((g.Sum(t => t.Amount) / totalAmount) * 100, 2)
+                    );
+                })
+                .OrderByDescending(c => c.Amount)
+                .ToList();
+                
+
+
+            return Result.Success<IEnumerable<ExpenseCategoryChartResponse>>(chartData);
+        }
     }
 }
    

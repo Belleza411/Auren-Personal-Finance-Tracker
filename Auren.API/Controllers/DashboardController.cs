@@ -123,5 +123,23 @@ namespace Auren.API.Controllers
                 return StatusCode(500, "An error occurred while retrieving goals summary. Please try again later.");
             }
         }
+
+		[HttpGet("categories-expense")]
+		public async Task<ActionResult<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseByCategoryChart(CancellationToken cancellationToken)
+		{
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+                var chart = await _categoryService.GetExpenseCategoryChart(userId.Value, cancellationToken);
+                return Ok(chart.Value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occured while retrieving chart");
+                return StatusCode(500, "An error occurred while retrieving chart. Please try again later.");
+            }
+        }
     }
 }
