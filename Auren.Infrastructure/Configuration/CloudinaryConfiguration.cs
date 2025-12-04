@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auren.Domain.Entities
+namespace Auren.Infrastructure.Configuration
 {
-	public class CloudinaryConfig
+	public class CloudinaryConfiguration
 	{
         public string CloudName { get; set; } = null!;
         public string ApiKey { get; set; } = null!;

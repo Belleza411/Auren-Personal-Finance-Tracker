@@ -7,12 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Auren.Application;
 using Auren.API.Extensions;
-using Auren.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
 using Auren.Application.Interfaces.Repositories;
 using Auren.API.Middleware;
+using Auren.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +26,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddCloudinary(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddProblemDetails(configure =>
 {

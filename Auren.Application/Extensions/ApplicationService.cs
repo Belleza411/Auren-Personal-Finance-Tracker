@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Auren.Application
 {
-	public static class DependencyInjection
+	public static class ApplicationService
 	{
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+            services.AddValidatorsFromAssembly(typeof(ApplicationService).Assembly);
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IGoalService, GoalService>();
             services.AddScoped<ITransactionService, TransactionService>();

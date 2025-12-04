@@ -1,6 +1,6 @@
 ﻿using Auren.Domain.Enums;
 
-namespace Auren.Application.Common
+namespace Auren.Application.Constants
 {
 	public static class CategorySeeder
 	{

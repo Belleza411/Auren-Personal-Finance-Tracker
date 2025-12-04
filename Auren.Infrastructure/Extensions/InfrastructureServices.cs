@@ -1,17 +1,18 @@
 ﻿using Auren.Application.Interfaces.Repositories;
-using Auren.Domain.Entities;
+using Auren.Infrastructure.Configuration;
 using Auren.Infrastructure.Persistence;
 using Auren.Infrastructure.Repositories;
 using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using CloudinaryConfiguration = Auren.Infrastructure.Configuration.CloudinaryConfiguration;
 
-namespace Auren.Infrastructure
+namespace Auren.Infrastructure.Extensions
 {
-    public static class DependencyInjection
+    public static class InfrastructureServices
     {
-        public static IServiceCollection AddInfrastructure(
+        public static IServiceCollection AddInfrastructureServices(
             this IServiceCollection services,
             IConfiguration config)
         {
@@ -28,15 +29,10 @@ namespace Auren.Infrastructure
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<ITokenRepository, TokenRepository>();
 
-            return services;
-        }
+            var cloudinarySection = config.GetSection("Cloudinary");
+            services.Configure<CloudinaryConfiguration>(cloudinarySection);
 
-        public static IServiceCollection AddCloudinary(this IServiceCollection services, IConfiguration configuration)
-        {
-            var cloudinarySection = configuration.GetSection("Cloudinary");
-            services.Configure<CloudinaryConfig>(cloudinarySection);
-
-            var cloudinaryOptions = cloudinarySection.Get<CloudinaryConfig>()
+            var cloudinaryOptions = cloudinarySection.Get<CloudinaryConfiguration>()
             ?? throw new InvalidOperationException("Cloudinary configuration is missing.");
 
             var cloudName = cloudinaryOptions.CloudName ??
@@ -51,7 +47,7 @@ namespace Auren.Infrastructure
             cloudinary.Api.Secure = true;
 
             services.AddSingleton(cloudinary);
-            
+
             return services;
         }
     }  
