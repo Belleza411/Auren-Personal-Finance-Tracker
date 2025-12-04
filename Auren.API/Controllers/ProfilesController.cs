@@ -8,12 +8,14 @@ using Auren.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Auren.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class ProfilesController(IProfileService profileService, ITransactionService transactionService) : ControllerBase
+    [EnableRateLimiting("fixed")]
+    public class ProfilesController(IProfileService profileService, ITransactionService transactionService) : ControllerBase
 	{
 		[HttpGet("me")]
 		public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken cancellationToken)

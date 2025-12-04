@@ -8,13 +8,15 @@ using Auren.Domain.Entities;
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace Auren.API.Controllers
 {
 	[Route("api/goals")]
 	[ApiController]
-	public class GoalsController(IGoalService goalService) : ControllerBase
+    [EnableRateLimiting("fixed")]
+    public class GoalsController(IGoalService goalService) : ControllerBase
 	{
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(

@@ -13,6 +13,8 @@ using Auren.Infrastructure.Persistence;
 using Auren.Application.Interfaces.Repositories;
 using Auren.API.Middleware;
 using Auren.Infrastructure.Extensions;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -131,6 +133,36 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 10;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var userId = context.User.FindFirst("UserId")?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            userId = context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: userId,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,               
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            });
+    });
+
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -147,6 +179,8 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 using (var scope = app.Services.CreateScope())
 {

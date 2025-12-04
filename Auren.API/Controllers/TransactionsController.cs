@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using System.Transactions;
 
@@ -14,8 +15,8 @@ namespace Auren.API.Controllers
 {
 	[Route("api/transactions")]
 	[ApiController]
-    [Authorize]
-	public class TransactionsController(ITransactionService transactionService) : ControllerBase
+    [EnableRateLimiting("fixed")]
+    public class TransactionsController(ITransactionService transactionService) : ControllerBase
 	{
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(

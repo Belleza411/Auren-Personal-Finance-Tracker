@@ -7,13 +7,14 @@ using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Threading;
 
 namespace Auren.API.Controllers
 {
 	[Route("api/dashboard")]
 	[ApiController]
-	public class DashboardController(
+    public class DashboardController(
          ITransactionService transactionService,
 		 ICategoryService categoryService,
 		 IGoalService goalService
