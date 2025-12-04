@@ -15,17 +15,8 @@ namespace Auren.API.Controllers
 	[Route("api/transactions")]
 	[ApiController]
     [Authorize]
-	public class TransactionsController : ControllerBase
+	public class TransactionsController(ITransactionService transactionService) : ControllerBase
 	{
-		private readonly ILogger<TransactionsController> _logger;
-        private readonly ITransactionService _transactionService;
-
-		public TransactionsController(ILogger<TransactionsController> logger, ITransactionService transactionService)
-		{
-			_logger = logger;
-			_transactionService = transactionService;
-		}
-
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(
             [FromQuery] TransactionFilter transactionFilter,
@@ -36,17 +27,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-			{
-                var transactions = await _transactionService.GetAllTransactions(userId.Value, transactionFilter, pageSize, pageNumber, cancellationToken);
+            var transactions = await transactionService.GetAllTransactions(userId.Value, transactionFilter, pageSize, pageNumber, cancellationToken);
 
-                return Ok(transactions.Value);
-            }
-			catch (Exception ex)
-			{
-                _logger.LogError(ex, "Failed to retrieved transactions for {UserId}", userId);
-				return StatusCode(500, "An error occurred while retrieving transactions. Please try again later.");
-            }
+            return Ok(transactions.Value);        
         }
 
 		[HttpGet("{transactionId:guid}")]
@@ -55,19 +38,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-			{
-                var transaction = await _transactionService.GetTransactionById(transactionId, userId.Value, cancellationToken);
+            var transaction = await transactionService.GetTransactionById(transactionId, userId.Value, cancellationToken);
 
-                return transaction.IsSuccess ? Ok(transaction.Value) : NotFound(transaction?.Error);
-            } 
-			catch (Exception ex)
-			{
-                _logger.LogError(ex,
-                    "Error retrieving transaction {TransactionId} for user {UserId}",
-                    transactionId, userId);
-                return StatusCode(500, "An error occurred while retrieving the transaction.");
-            }
+            return transaction.IsSuccess ? Ok(transaction.Value) : NotFound(transaction?.Error);
         }
 
 		[HttpPost]
@@ -76,7 +49,7 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var createdTransaction = await _transactionService.CreateTransaction(transactionDto, userId.Value, cancellationToken);
+            var createdTransaction = await transactionService.CreateTransaction(transactionDto, userId.Value, cancellationToken);
 
             if (!createdTransaction.IsSuccess)
             {
@@ -104,33 +77,25 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-			try
-			{
-                var updatedTransaction = await _transactionService.UpdateTransaction(transactionId, userId.Value, transactionDto, cancellationToken);
+            var updatedTransaction = await transactionService.UpdateTransaction(transactionId, userId.Value, transactionDto, cancellationToken);
 
-                if (!updatedTransaction.IsSuccess)
-                {
-                    return updatedTransaction.Error.Code switch
-                    {
-                        ErrorType.InvalidInput
-                            or ErrorType.ValidationFailed
-                            or ErrorType.TypeMismatch 
-                                => BadRequest(updatedTransaction.Error),
-
-                        ErrorType.NotFound => NotFound(updatedTransaction.Error),
-                        ErrorType.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
-
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);   
-            }
-            catch (Exception ex)
+            if (!updatedTransaction.IsSuccess)
             {
-                _logger.LogError(ex, "Error updating transaction {TransactionId} for user {UserId}", transactionId, userId);
-                return StatusCode(500, "An error occurred while updating the transaction.");
+                return updatedTransaction.Error.Code switch
+                {
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                        or ErrorType.TypeMismatch 
+                            => BadRequest(updatedTransaction.Error),
+
+                    ErrorType.NotFound => NotFound(updatedTransaction.Error),
+                    ErrorType.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
+
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
+
+            return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);  
         }
 
 		[HttpDelete("{transactionId:guid}")]
@@ -139,17 +104,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-			{
-                var success = await _transactionService.DeleteTransaction(transactionId, userId.Value, cancellationToken);
+            var success = await transactionService.DeleteTransaction(transactionId, userId.Value, cancellationToken);
 
-                return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting transaction {TransactionId} for user {UserId}", transactionId, userId);
-                return StatusCode(500, "An error occurred while deleting the transaction.");
-            }
+            return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
         }
     }
 }

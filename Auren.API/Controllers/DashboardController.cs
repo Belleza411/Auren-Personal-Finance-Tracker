@@ -13,20 +13,12 @@ namespace Auren.API.Controllers
 {
 	[Route("api/dashboard")]
 	[ApiController]
-	public class DashboardController : ControllerBase
+	public class DashboardController(
+         ITransactionService transactionService,
+		 ICategoryService categoryService,
+		 IGoalService goalService
+        ) : ControllerBase
 	{
-		private readonly ILogger<DashboardController> _logger;
-		private readonly ITransactionService _transactionService;
-		private readonly ICategoryService _categoryService;
-		private readonly IGoalService _goalService;
-
-		public DashboardController(ILogger<DashboardController> logger, ITransactionService transactionService, ICategoryService categoryService, IGoalService goalService)
-		{
-			_logger = logger;
-			_transactionService = transactionService;
-			_categoryService = categoryService;
-			_goalService = goalService;
-		}
 
 		[HttpGet("transaction/average-daily-spending")]
 		public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(CancellationToken cancellationToken)
@@ -34,17 +26,9 @@ namespace Auren.API.Controllers
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			try
-			{
-				var avgSpending = await _transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
+			var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
 
-				return Ok(avgSpending.Value);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to retrieve avg daily spending for user {UserId}", userId);
-				return StatusCode(500, "An error occurred while retrieving avg daily spending. Please try again later.");
-			}
+			return Ok(avgSpending.Value);
 		}
 
 		[HttpGet("categories/categories-overview")]
@@ -57,17 +41,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-				var overview = await _categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber, 
-					cancellationToken);
-                return Ok(overview.Value);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error in GetOverview endpoint");
-                return StatusCode(500, new { message = "An unexpected error occurred" });
-            }
+			var overview = await categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber, 
+				cancellationToken);
+            return Ok(overview.Value);       
         }
 
 		[HttpGet("summary")]
@@ -76,16 +52,8 @@ namespace Auren.API.Controllers
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			try
-			{
-				var summary = await _transactionService.GetDashboardSummary(userId.Value, cancellationToken);
-                return Ok(summary.Value);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Failed to retrieve dashboard summary for user {UserId}", userId);
-				return StatusCode(500, "An error occurred while retrieving dashboard summary. Please try again later.");
-            }
+			var summary = await transactionService.GetDashboardSummary(userId.Value, cancellationToken);
+            return Ok(summary.Value);
         }
 
 		[HttpGet("categories/summary")]
@@ -94,16 +62,8 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-				var summary = await _categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
-                return Ok(summary.Value);
-            }
-            catch (Exception ex)
-            {
-				_logger.LogError(ex, "An error occured while retrieving category summary");
-                return StatusCode(500, "An error occurred while retrieving category summary. Please try again later.");
-            }
+			var summary = await categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
+            return Ok(summary.Value);
         }
 
         [HttpGet("goals/summary")]
@@ -112,16 +72,8 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-				var summary = await _goalService.GetGoalsSummary(userId.Value, cancellationToken);
-                return Ok(summary.Value);
-            }
-            catch (Exception ex)
-            {
-				_logger.LogError(ex, "An error occured while retrieving goals summary");
-                return StatusCode(500, "An error occurred while retrieving goals summary. Please try again later.");
-            }
+			var summary = await goalService.GetGoalsSummary(userId.Value, cancellationToken);
+            return Ok(summary.Value);
         }
 
 		[HttpGet("categories-expense")]
@@ -129,17 +81,9 @@ namespace Auren.API.Controllers
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
-
-            try
-            {
-                var chart = await _categoryService.GetExpenseCategoryChart(userId.Value, cancellationToken);
-                return Ok(chart.Value);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occured while retrieving chart");
-                return StatusCode(500, "An error occurred while retrieving chart. Please try again later.");
-            }
+       
+            var chart = await categoryService.GetExpenseCategoryChart(userId.Value, cancellationToken);
+            return Ok(chart.Value);
         }
     }
 }

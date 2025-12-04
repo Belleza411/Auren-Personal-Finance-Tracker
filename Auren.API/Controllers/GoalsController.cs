@@ -14,17 +14,8 @@ namespace Auren.API.Controllers
 {
 	[Route("api/goals")]
 	[ApiController]
-	public class GoalsController : ControllerBase
+	public class GoalsController(IGoalService goalService) : ControllerBase
 	{
-		private readonly ILogger<GoalsController> _logger;
-        private readonly IGoalService _goalService;
-
-		public GoalsController(ILogger<GoalsController> logger, IGoalService goalService)
-		{
-			_logger = logger;
-			_goalService = goalService;
-		}
-
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<Goal>>> GetAllGoals(
             [FromQuery] GoalFilter goalFilter,
@@ -34,17 +25,9 @@ namespace Auren.API.Controllers
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
-
-            try
-            {
-                var goals = await _goalService.GetGoals(userId.Value, goalFilter, pageSize, pageNumber, cancellationToken);
-                return Ok(goals.Value);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to retrieve goals for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while retrieving goals. Please try again later.");
-            }
+  
+            var goals = await goalService.GetGoals(userId.Value, goalFilter, pageSize, pageNumber, cancellationToken);
+            return Ok(goals.Value);
         }
 
         [HttpGet("{goalId:guid}")]
@@ -53,16 +36,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
             
-            try
-            {
-                var goal = await _goalService.GetGoalById(goalId, userId.Value, cancellationToken);
-                return goal.IsSuccess ? Ok(goal.Value) : NotFound($"Goal id of {goalId} not found. ");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to retrieve goal {GoalId} for user {UserId}", goalId, userId);
-                return StatusCode(500, "An error occurred while retrieving the goal. Please try again later.");
-            }
+            var goal = await goalService.GetGoalById(goalId, userId.Value, cancellationToken);
+            return goal.IsSuccess ? Ok(goal.Value) : NotFound($"Goal id of {goalId} not found. ");
+            
         }
 
         [HttpPost]
@@ -70,32 +46,24 @@ namespace Auren.API.Controllers
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
-            
-            try
-            {
-                var createdGoal = await _goalService.CreateGoal(goalDto, userId.Value, cancellationToken);
+             
+            var createdGoal = await goalService.CreateGoal(goalDto, userId.Value, cancellationToken);
 
-                if(!createdGoal.IsSuccess)
+            if(!createdGoal.IsSuccess)
+            {
+                return createdGoal.Error.Code switch
                 {
-                    return createdGoal.Error.Code switch
-                    {
-                        ErrorType.InvalidInput
-                            or ErrorType.ValidationFailed
-                                => BadRequest(createdGoal.Error),
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                            => BadRequest(createdGoal.Error),
 
-                        ErrorType.CreateFailed => StatusCode(500, createdGoal.Error),
+                    ErrorType.CreateFailed => StatusCode(500, createdGoal.Error),
 
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.Value.GoalId }, createdGoal.Value);
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to create goal for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while creating the goal. Please try again later.");
-            }
+
+            return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.Value.GoalId }, createdGoal.Value);
         }
 
         [HttpPut("{goalId:guid}")]
@@ -104,33 +72,24 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
           
-            
-            try
-            {
-                var updatedGoal = await _goalService.UpdateGoal(goalId, userId.Value, goalDto, cancellationToken);
+            var updatedGoal = await goalService.UpdateGoal(goalId, userId.Value, goalDto, cancellationToken);
 
-                if (!updatedGoal.IsSuccess)
+            if (!updatedGoal.IsSuccess)
+            {
+                return updatedGoal.Error.Code switch
                 {
-                    return updatedGoal.Error.Code switch
-                    {
-                        ErrorType.InvalidInput
-                            or ErrorType.ValidationFailed
-                                => BadRequest(updatedGoal.Error),
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                            => BadRequest(updatedGoal.Error),
 
-                        ErrorType.NotFound => NotFound(updatedGoal.Error),
-                        ErrorType.UpdateFailed => StatusCode(500, updatedGoal.Error),
+                    ErrorType.NotFound => NotFound(updatedGoal.Error),
+                    ErrorType.UpdateFailed => StatusCode(500, updatedGoal.Error),
 
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return Ok(updatedGoal.Value);
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to update goal {GoalId} for user {UserId}", goalId, userId);
-                return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
-            }
+
+            return Ok(updatedGoal.Value);          
         }
 
         [HttpDelete("{goalId:guid}")]
@@ -139,17 +98,10 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
            
-            try
-            {
-                var deleted = await _goalService.DeleteGoal(goalId, userId.Value, cancellationToken);
+            var deleted = await goalService.DeleteGoal(goalId, userId.Value, cancellationToken);
 
-                return deleted.IsSuccess ? NoContent() : NotFound(deleted.Error);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete goal {GoalId} for user {UserId}", goalId, userId);
-                return StatusCode(500, "An error occurred while deleting the goal. Please try again later.");
-            }
+            return deleted.IsSuccess ? NoContent() : NotFound(deleted.Error);
+           
         }
 
         [HttpPut("{goalId:guid}/add-money")]
@@ -157,32 +109,22 @@ namespace Auren.API.Controllers
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
-            
-            try
-            {
-              
-                var result = await _goalService.AddMoneyToGoal(goalId, userId.Value, amount, cancellationToken);
+ 
+            var result = await goalService.AddMoneyToGoal(goalId, userId.Value, amount, cancellationToken);
 
-                if(!result.IsSuccess)
+            if(!result.IsSuccess)
+            {
+                return result.Error.Code switch
                 {
-                    return result.Error.Code switch
-                    {
-                        ErrorType.AmountMustBePositive => BadRequest(result.Error),
-                        ErrorType.NotEnoughBalance => BadRequest(result.Error),
-                        ErrorType.NotFound => NotFound(result.Error),
-                        ErrorType.UpdateFailed => StatusCode(500, result.Error),
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return Ok(result.Value);
-
+                    ErrorType.AmountMustBePositive => BadRequest(result.Error),
+                    ErrorType.NotEnoughBalance => BadRequest(result.Error),
+                    ErrorType.NotFound => NotFound(result.Error),
+                    ErrorType.UpdateFailed => StatusCode(500, result.Error),
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to add moeny to goal {GoalId} for user {UserId}", goalId, userId);
-                return StatusCode(500, "An error occurred while updating the goal. Please try again later.");
-            }
+
+            return Ok(result.Value);
         }
     }
 }

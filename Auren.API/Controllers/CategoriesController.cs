@@ -12,17 +12,8 @@ namespace Auren.API.Controllers
 {
 	[Route("api/categories")]
 	[ApiController]
-	public class CategoriesController : ControllerBase
+	public class CategoriesController(ICategoryService categoryService) : ControllerBase
 	{
-		private readonly ILogger<CategoriesController> _logger;
-        private readonly ICategoryService _categoryService;
-
-		public CategoriesController(ILogger<CategoriesController> logger, ICategoryService categoryService)
-		{
-			_logger = logger;
-			_categoryService = categoryService;
-		}
-
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(
             [FromQuery] CategoriesFilter categoriesFilter,
@@ -33,16 +24,8 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-                var categories = await _categoryService.GetCategories(userId.Value, categoriesFilter, pageSize, pageNumber, cancellationToken);
-                return Ok(categories.Value);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to retrieve categories for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while retrieving categories. Please try again later.");
-            }
+            var categories = await categoryService.GetCategories(userId.Value, categoriesFilter, pageSize, pageNumber, cancellationToken);
+            return Ok(categories.Value);
         }
         [HttpGet("{categoryId:guid}")]
         public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
@@ -50,17 +33,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-                var category =  await _categoryService.GetCategoryById(categoryId, userId.Value, cancellationToken);
+            var category =  await categoryService.GetCategoryById(categoryId, userId.Value, cancellationToken);
 
-                return category.IsSuccess ? Ok(category.Value) : NotFound($"Category with ID {categoryId} not found.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to retrieve category {CategoryId} for user {UserId}", categoryId, userId);
-                return StatusCode(500, "An error occurred while retrieving the category. Please try again later.");
-            }
+            return category.IsSuccess ? Ok(category.Value) : NotFound($"Category with ID {categoryId} not found.");
         }
 
         [HttpPost]
@@ -68,34 +43,25 @@ namespace Auren.API.Controllers
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
-           
 
-            try
+            var createdCategory = await categoryService.CreateCategory(categoryDto, userId.Value, cancellationToken);
+
+            if (!createdCategory.IsSuccess)
             {
-                var createdCategory = await _categoryService.CreateCategory(categoryDto, userId.Value, cancellationToken);
-
-                if (!createdCategory.IsSuccess)
+                return createdCategory.Error.Code switch
                 {
-                    return createdCategory.Error.Code switch
-                    {
-                        ErrorType.InvalidInput
-                            or ErrorType.ValidationFailed
-                                => BadRequest(createdCategory.Error),
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                            => BadRequest(createdCategory.Error),
 
-                        ErrorType.CategoryAlreadyExists => Conflict(createdCategory.Error),
-                        ErrorType.CreateFailed => StatusCode(500, createdCategory.Error),
+                    ErrorType.CategoryAlreadyExists => Conflict(createdCategory.Error),
+                    ErrorType.CreateFailed => StatusCode(500, createdCategory.Error),
 
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.CategoryId }, createdCategory.Value);
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to create category for user {UserId}", userId);
-                return StatusCode(500, "An error occurred while creating the category. Please try again later.");
-            }
+
+            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.CategoryId }, createdCategory.Value);
         }
 
         [HttpPut("{categoryId:guid}")]
@@ -104,32 +70,24 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-                var updatedCategory = await _categoryService.UpdateCategory(categoryId, userId.Value, categoryDto, cancellationToken);
+            var updatedCategory = await categoryService.UpdateCategory(categoryId, userId.Value, categoryDto, cancellationToken);
 
-                if (!updatedCategory.IsSuccess)
+            if (!updatedCategory.IsSuccess)
+            {
+                return updatedCategory.Error.Code switch
                 {
-                    return updatedCategory.Error.Code switch
-                    {
-                        ErrorType.InvalidInput
-                            or ErrorType.ValidationFailed
-                                => BadRequest(updatedCategory.Error),
+                    ErrorType.InvalidInput
+                        or ErrorType.ValidationFailed
+                            => BadRequest(updatedCategory.Error),
 
-                        ErrorType.NotFound => NotFound(updatedCategory.Error),
-                        ErrorType.UpdateFailed => StatusCode(500, updatedCategory.Error),
+                    ErrorType.NotFound => NotFound(updatedCategory.Error),
+                    ErrorType.UpdateFailed => StatusCode(500, updatedCategory.Error),
 
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return Ok(updatedCategory.Value);
+                    _ => StatusCode(500, "An unexpected error occurred.")
+                };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to update category {CategoryId} for user {UserId}", categoryId, userId);
-                return StatusCode(500, "An error occurred while updating the category. Please try again later.");
-            }
+
+            return Ok(updatedCategory.Value);
         }
 
         [HttpDelete("{categoryId:guid}")]
@@ -138,18 +96,9 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            try
-            {
-                var deleted = await _categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);
+            var deleted = await categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);
 
-                return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete category {CategoryId} for user {UserId}", categoryId, userId);
-                return StatusCode(500, "An error occurred while deleting the category. Please try again later.");
-            }
+            return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
         }
-
     }
 }

@@ -17,25 +17,13 @@ namespace Auren.API.Controllers
 {
 	[Route("api/auth")]
 	[ApiController]
-	public class AuthController : ControllerBase
+	public class AuthController(ITokenRepository tokenRepository, IUserService userService) : ControllerBase
 	{
-		private readonly ITokenRepository _tokenRepository;
-		private readonly ILogger<AuthController> _logger;
-		private readonly IUserService _userService;
-
-		public AuthController(ITokenRepository tokenRepository,
-			ILogger<AuthController> logger,
-			IUserService userService)
-		{
-			_tokenRepository = tokenRepository;
-			_logger = logger;
-			_userService = userService;
-		}
 
 		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _userService.RegisterAsync(request, cancellationToken);
+			var result = await userService.RegisterAsync(request, cancellationToken);
 
 			if(!result.IsSuccess)
 			{
@@ -55,7 +43,7 @@ namespace Auren.API.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _userService.LoginAsync(request, cancellationToken);
+			var result = await userService.LoginAsync(request, cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -79,38 +67,28 @@ namespace Auren.API.Controllers
 
 			if (userId == null)
 			{
-				_logger.LogWarning("Logout attempted without a valid user session");
 				return BadRequest("Logout attempted without valid user session");
             }
 
-			try
+            await tokenRepository.RevokeAllUserRefreshTokensAsync(userId.Value);
+
+			var logoutResult  = await userService.LogoutAsync(cancellationToken);
+
+			if (!logoutResult.IsSuccess)
 			{
-
-                await _tokenRepository.RevokeAllUserRefreshTokensAsync(userId.Value);
-
-				var logoutResult  = await _userService.LogoutAsync(cancellationToken);
-
-				if (!logoutResult.IsSuccess)
+				return logoutResult.Error.Code switch
 				{
-					return logoutResult.Error.Code switch
-					{
-						ErrorType.LogoutFailed => BadRequest(logoutResult.Error),
-						ErrorType.InvalidInput => BadRequest(logoutResult.Error),
-						_ => StatusCode(500, logoutResult.Error)
-					};
-                }
+					ErrorType.LogoutFailed => BadRequest(logoutResult.Error),
+					ErrorType.InvalidInput => BadRequest(logoutResult.Error),
+					_ => StatusCode(500, logoutResult.Error)
+				};
+            }
 
-                return Ok(new
-				{
-					Success = true,
-					Message = "Logged out successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during logout");
-                return BadRequest(new { Success = false, Message = "Logout failed" });
-            }
+            return Ok(new
+			{
+				Success = true,
+				Message = "Logged out successfully"
+            });
         }
     }
 }
