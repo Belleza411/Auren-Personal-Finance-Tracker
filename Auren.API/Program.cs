@@ -12,10 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
 using Auren.Application.Interfaces.Repositories;
+using Auren.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -23,7 +22,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.DateTime;
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -31,6 +29,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCloudinary(builder.Configuration);
+
+builder.Services.AddProblemDetails(configure =>
+{
+    configure.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+    };
+});
+builder.Services.AddExceptionHandler<GlobalExceptionMiddleware>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -137,6 +144,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseSecurityHeaders();
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
