@@ -15,14 +15,18 @@ using Auren.API.Middleware;
 using Auren.Infrastructure.Extensions;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.DateFormatString = "MMMM dd, yyyy";
-    options.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.DateTime;
-});
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.DateFormatString = "MMMM dd, yyyy";
+            options.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.DateTime;
+            options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        });
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
