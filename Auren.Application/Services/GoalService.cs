@@ -27,14 +27,29 @@ namespace Auren.Application.Services
 		}
 
 		public async Task<Result<IEnumerable<Goal>>> GetGoals(Guid userId, GoalFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
-			=> Result.Success(await _goalRepository.GetGoalsAsync(userId, filter, pageSize, pageNumber, cancellationToken));
+        {
+			var goals = await _goalRepository.GetGoalsAsync(userId, filter, pageSize, pageNumber, cancellationToken);
 
+			foreach (var goal in goals)
+			{
+                goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
+                goal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goal.TargetDate);
+            }
+
+			return Result.Success<IEnumerable<Goal>>(goals);
+        }
+			
 		public async Task<Result<Goal>> GetGoalById(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
 			var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
-			return goal == null
-				? Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."))
-				: Result.Success(goal);
+
+			if (goal == null)
+				return Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."));
+
+            goal.CompletionPercentage = GetCompletionPercentage(goal.Spent ?? 0, goal.Budget);
+            goal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, goal.TargetDate);
+
+            return Result.Success<Goal>(goal);
 		}
 
 		public async Task<Result<Goal>> CreateGoal(GoalDto goalDto, Guid userId, CancellationToken cancellationToken)
