@@ -55,11 +55,11 @@ namespace Auren.API.Controllers
             {
                 return createdGoal.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
                             => BadRequest(createdGoal.Error),
 
-                    ErrorType.CreateFailed => StatusCode(500, createdGoal.Error),
+                    ErrorTypes.CreateFailed => StatusCode(500, createdGoal.Error),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };
@@ -80,12 +80,12 @@ namespace Auren.API.Controllers
             {
                 return updatedGoal.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
                             => BadRequest(updatedGoal.Error),
 
-                    ErrorType.NotFound => NotFound(updatedGoal.Error),
-                    ErrorType.UpdateFailed => StatusCode(500, updatedGoal.Error),
+                    ErrorTypes.NotFound => NotFound(updatedGoal.Error),
+                    ErrorTypes.UpdateFailed => StatusCode(500, updatedGoal.Error),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };
@@ -118,10 +118,10 @@ namespace Auren.API.Controllers
             {
                 return result.Error.Code switch
                 {
-                    ErrorType.AmountMustBePositive => BadRequest(result.Error),
-                    ErrorType.NotEnoughBalance => BadRequest(result.Error),
-                    ErrorType.NotFound => NotFound(result.Error),
-                    ErrorType.UpdateFailed => StatusCode(500, result.Error),
+                    ErrorTypes.AmountMustBePositive => BadRequest(result.Error),
+                    ErrorTypes.NotEnoughBalance => BadRequest(result.Error),
+                    ErrorTypes.NotFound => NotFound(result.Error),
+                    ErrorTypes.UpdateFailed => StatusCode(500, result.Error),
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };
             }

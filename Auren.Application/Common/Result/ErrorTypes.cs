@@ -1,6 +1,6 @@
 ﻿namespace Auren.Application.Common.Result
 {
-	public enum ErrorType
+	public enum ErrorTypes
 	{
 		None = 1,
 		NotFound = 2,

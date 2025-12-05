@@ -52,12 +52,12 @@ namespace Auren.API.Controllers
             {
                 return createdCategory.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
                             => BadRequest(createdCategory.Error),
 
-                    ErrorType.CategoryAlreadyExists => Conflict(createdCategory.Error),
-                    ErrorType.CreateFailed => StatusCode(500, createdCategory.Error),
+                    ErrorTypes.CategoryAlreadyExists => Conflict(createdCategory.Error),
+                    ErrorTypes.CreateFailed => StatusCode(500, createdCategory.Error),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };
@@ -78,12 +78,12 @@ namespace Auren.API.Controllers
             {
                 return updatedCategory.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
                             => BadRequest(updatedCategory.Error),
 
-                    ErrorType.NotFound => NotFound(updatedCategory.Error),
-                    ErrorType.UpdateFailed => StatusCode(500, updatedCategory.Error),
+                    ErrorTypes.NotFound => NotFound(updatedCategory.Error),
+                    ErrorTypes.UpdateFailed => StatusCode(500, updatedCategory.Error),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };

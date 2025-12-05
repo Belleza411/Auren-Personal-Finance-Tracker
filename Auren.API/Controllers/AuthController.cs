@@ -29,10 +29,10 @@ namespace Auren.API.Controllers
 			{
 				return result.Error.Code switch
 				{
-					ErrorType.ValidationFailed => BadRequest(result.Error),
-					ErrorType.EmailAlreadyInUse => Conflict(result.Error),
-					ErrorType.UpdateFailed => StatusCode(500, result.Error),
-					ErrorType.CreateFailed => StatusCode(500, result.Error),
+					ErrorTypes.ValidationFailed => BadRequest(result.Error),
+					ErrorTypes.EmailAlreadyInUse => Conflict(result.Error),
+					ErrorTypes.UpdateFailed => StatusCode(500, result.Error),
+					ErrorTypes.CreateFailed => StatusCode(500, result.Error),
                     _ => StatusCode(500, result.Error)
 				};
             }
@@ -49,9 +49,9 @@ namespace Auren.API.Controllers
             {
                 return result.Error.Code switch
                 {
-                    ErrorType.ValidationFailed => BadRequest(result.Error),
-					ErrorType.UserLockedOut => StatusCode(429, result.Error),
-					ErrorType.InvalidInput => BadRequest(result.Error),
+                    ErrorTypes.ValidationFailed => BadRequest(result.Error),
+					ErrorTypes.UserLockedOut => StatusCode(429, result.Error),
+					ErrorTypes.InvalidInput => BadRequest(result.Error),
                     _ => StatusCode(500, result.Error)
                 };
             }
@@ -78,8 +78,8 @@ namespace Auren.API.Controllers
 			{
 				return logoutResult.Error.Code switch
 				{
-					ErrorType.LogoutFailed => BadRequest(logoutResult.Error),
-					ErrorType.InvalidInput => BadRequest(logoutResult.Error),
+					ErrorTypes.LogoutFailed => BadRequest(logoutResult.Error),
+					ErrorTypes.InvalidInput => BadRequest(logoutResult.Error),
 					_ => StatusCode(500, logoutResult.Error)
 				};
             }

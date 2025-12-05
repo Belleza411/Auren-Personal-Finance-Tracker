@@ -56,14 +56,14 @@ namespace Auren.API.Controllers
             {
                 return createdTransaction.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
-                        or ErrorType.TypeMismatch
-                        or ErrorType.NotEnoughBalance
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
+                        or ErrorTypes.TypeMismatch
+                        or ErrorTypes.NotEnoughBalance
                             => BadRequest(createdTransaction.Error),
             
-                    ErrorType.NotFound => NotFound(createdTransaction.Error),
-                    ErrorType.CreateFailed => StatusCode(500, createdTransaction.Error),
+                    ErrorTypes.NotFound => NotFound(createdTransaction.Error),
+                    ErrorTypes.CreateFailed => StatusCode(500, createdTransaction.Error),
                    
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };
@@ -84,13 +84,13 @@ namespace Auren.API.Controllers
             {
                 return updatedTransaction.Error.Code switch
                 {
-                    ErrorType.InvalidInput
-                        or ErrorType.ValidationFailed
-                        or ErrorType.TypeMismatch 
+                    ErrorTypes.InvalidInput
+                        or ErrorTypes.ValidationFailed
+                        or ErrorTypes.TypeMismatch 
                             => BadRequest(updatedTransaction.Error),
 
-                    ErrorType.NotFound => NotFound(updatedTransaction.Error),
-                    ErrorType.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
+                    ErrorTypes.NotFound => NotFound(updatedTransaction.Error),
+                    ErrorTypes.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
                 };

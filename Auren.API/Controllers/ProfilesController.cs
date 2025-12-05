@@ -42,9 +42,9 @@ namespace Auren.API.Controllers
 			{
 				return updateProfile.Error.Code switch
 				{
-					ErrorType.ValidationFailed => BadRequest(updateProfile.Error),
-					ErrorType.NotFound => NotFound(updateProfile.Error),
-					ErrorType.UpdateFailed => StatusCode(500, updateProfile.Error),
+					ErrorTypes.ValidationFailed => BadRequest(updateProfile.Error),
+					ErrorTypes.NotFound => NotFound(updateProfile.Error),
+					ErrorTypes.UpdateFailed => StatusCode(500, updateProfile.Error),
 					_ => StatusCode(500, updateProfile.Error)
 				};
 			}
