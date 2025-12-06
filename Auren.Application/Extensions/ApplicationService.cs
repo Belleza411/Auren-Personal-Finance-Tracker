@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Interfaces.Services;
 using Auren.Application.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,14 @@ namespace Auren.Application
 {
 	public static class ApplicationService
 	{
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static void AddApplicationServices(this WebApplicationBuilder builder)
         {
-            services.AddValidatorsFromAssembly(typeof(ApplicationService).Assembly);
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IGoalService, GoalService>();
-            services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<IProfileService, ProfileService>();
-            services.AddScoped<IUserService, UserService>();
-            return services;
+            builder.Services.AddValidatorsFromAssembly(typeof(ApplicationService).Assembly);
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IGoalService, GoalService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IUserService, UserService>();
         }
     }
 }

@@ -20,9 +20,9 @@ using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddApplicationServices();
-builder.AddPresentationServices();
+builder.AddInfrastructureServices(builder.Configuration);
+builder.AddApplicationServices();
+builder.AddPresentationServices(); 
 
 var app = builder.Build();
 
