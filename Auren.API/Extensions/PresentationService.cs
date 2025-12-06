@@ -1,13 +1,5 @@
 ﻿using Auren.API.Middleware;
-using Auren.Application.Interfaces.Repositories;
-using Auren.Domain.Entities;
-using Auren.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json.Converters;
-using System.Runtime.CompilerServices;
-using System.Threading.RateLimiting;
 
 namespace Auren.API.Extensions
 {

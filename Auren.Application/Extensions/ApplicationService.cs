@@ -3,13 +3,8 @@ using Auren.Application.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Auren.Application
+namespace Auren.Application.Extensions
 {
 	public static class ApplicationService
 	{

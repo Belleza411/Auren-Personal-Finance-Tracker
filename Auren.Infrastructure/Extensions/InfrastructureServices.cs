@@ -1,6 +1,5 @@
 ﻿using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
-using Auren.Infrastructure.Configuration;
 using Auren.Infrastructure.Persistence;
 using Auren.Infrastructure.Repositories;
 using CloudinaryDotNet;

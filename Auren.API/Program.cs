@@ -1,22 +1,7 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Auren.Application;
 using Auren.API.Extensions;
-using Microsoft.Extensions.Configuration;
-using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
-using Auren.Application.Interfaces.Repositories;
-using Auren.API.Middleware;
 using Auren.Infrastructure.Extensions;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json.Converters;
+using Auren.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
