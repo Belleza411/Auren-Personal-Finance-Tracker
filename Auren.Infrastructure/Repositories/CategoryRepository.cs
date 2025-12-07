@@ -15,13 +15,11 @@ namespace Auren.Infrastructure.Repositories
 {
 	public class CategoryRepository : ICategoryRepository
 	{
-        private readonly ILogger<CategoryRepository> _logger;
         private readonly AurenDbContext _dbContext;
         private readonly string _connectionString;
 
-        public CategoryRepository(ILogger<CategoryRepository> logger, AurenDbContext dbContext, IConfiguration configuration)
+        public CategoryRepository(AurenDbContext dbContext, IConfiguration configuration)
 		{
-			_logger = logger;
 			_dbContext = dbContext;
             _connectionString = configuration.GetConnectionString("AurenDbConnection")
 								?? throw new ArgumentNullException("Connection not found");
