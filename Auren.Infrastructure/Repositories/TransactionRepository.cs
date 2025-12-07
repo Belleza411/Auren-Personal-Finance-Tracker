@@ -218,16 +218,25 @@ namespace Auren.Infrastructure.Repositories
                    !string.IsNullOrEmpty(filter.PaymentMethod);
         }
 
-        public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
-            var (firstDayOfLastMonth, lastDayOfLastMonth) = DateTime.Today.GetLastMonthRange();
-            var (firstDayOfCurrentMonth, lastDayOfCurrentMonth) = DateTime.Today.GetCurrentMonthRange();
+            var (startDate, endDate) = timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today) 
+            };
+
 
             var monthlyData = await _dbContext.Transactions
-                .Where(t => t.UserId == userId && t.TransactionDate >= firstDayOfLastMonth)
+                .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
                 .GroupBy(t => new
                 {
-                    IsCurrentMonth = t.TransactionDate >= firstDayOfCurrentMonth,
+                    IsCurrentMonth = t.TransactionDate >= startDate,
                     t.TransactionType
                 })
                 .Select(g => new
@@ -248,9 +257,7 @@ namespace Auren.Infrastructure.Repositories
                 .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
             var lastMonthExpense = monthlyData
-                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
-
-            
+                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;   
 
             var currentBalance = await GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
             var lastMonthBalance = await GetBalanceAsync(userId, BalancePeriod.LastMonth, cancellationToken);

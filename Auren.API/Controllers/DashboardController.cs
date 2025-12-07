@@ -5,6 +5,7 @@ using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
+using Auren.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -48,12 +49,12 @@ namespace Auren.API.Controllers
         }
 
 		[HttpGet("summary")]
-		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(CancellationToken cancellationToken)
+		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary([FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			var summary = await transactionService.GetDashboardSummary(userId.Value, cancellationToken);
+			var summary = await transactionService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
             return Ok(summary.Value);
         }
 

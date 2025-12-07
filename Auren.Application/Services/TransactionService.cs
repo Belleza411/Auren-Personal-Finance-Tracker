@@ -160,7 +160,7 @@ namespace Auren.Application.Services
                 : Result.Failure<Transaction>(Error.UpdateFailed("Failed to update transaction. "));
         }
 
-        public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, CancellationToken cancellationToken)
-            => Result.Success(await _transactionRepository.GetDashboardSummaryAsync(userId, cancellationToken));
+        public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
+            => Result.Success(await _transactionRepository.GetDashboardSummaryAsync(userId, timePeriod, cancellationToken));
     }
 }

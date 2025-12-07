@@ -17,6 +17,6 @@ namespace Auren.Application.Interfaces.Repositories
 		Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken);
 		Task<decimal> GetBalanceAsync(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken);
 		Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, CancellationToken cancellationToken);
-		Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, CancellationToken cancellationToken);
+		Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken);
     }
 }
