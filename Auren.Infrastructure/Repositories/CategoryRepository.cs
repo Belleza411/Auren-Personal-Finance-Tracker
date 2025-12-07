@@ -184,13 +184,13 @@ namespace Auren.Infrastructure.Repositories
             var result = await connection.QueryAsync<CategoryOverviewResponse>(sql, new
             {
                 UserId = userId,
-                Category = filter.Category,
-                MinAmount = filter.MinAmount,
-                MaxAmount = filter.MaxAmount,
-                MinTransactionCount = filter.MinTransactionCount,
-                MaxTransactionCount = filter.MaxTransactionCount,
+				filter.Category,
+                filter.MinAmount,
+                filter.MaxAmount,
+                filter.MinTransactionCount,
+                filter.MaxTransactionCount,
                 Offset = offset,
-                pageSize = pageSize,
+                pageSize,
             });
 
             return result;
