@@ -4,8 +4,8 @@ namespace Auren.Application.Constants
 {
 	public static class CategorySeeder
 	{
-		public static readonly List<(string Name, TransactionType transactionType)> DefaultCategories = new()
-		{
+		public static readonly List<(string Name, TransactionType transactionType)> DefaultCategories =
+		[
 			("Food", TransactionType.Expense),
 			("Rent", TransactionType.Expense),
 			("Utilities", TransactionType.Expense),
@@ -22,6 +22,6 @@ namespace Auren.Application.Constants
 			("Bussiness", TransactionType.Expense),
 			("Shopping", TransactionType.Expense),
             ("Other Income", TransactionType.Income)
-        };
+        ];
 	}
 }

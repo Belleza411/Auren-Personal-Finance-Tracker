@@ -29,6 +29,7 @@ namespace Auren.API.Controllers
             var categories = await categoryService.GetCategories(userId.Value, categoriesFilter, pageSize, pageNumber, cancellationToken);
             return Ok(categories.Value);
         }
+
         [HttpGet("{categoryId:guid}")]
         public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {

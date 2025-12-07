@@ -49,7 +49,9 @@ namespace Auren.API.Controllers
         }
 
 		[HttpGet("summary")]
-		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary([FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
+		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
+            [FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth, 
+            CancellationToken cancellationToken = default)
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();

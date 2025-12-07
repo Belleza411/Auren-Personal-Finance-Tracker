@@ -37,8 +37,7 @@ namespace Auren.API.Controllers
 
 			var updateProfile = await profileService.UpdateUserProfile(userId.Value, userDto, cancellationToken);
 
-             
-			if(!updateProfile.IsSuccess)
+ 			if(!updateProfile.IsSuccess)
 			{
 				return updateProfile.Error.Code switch
 				{

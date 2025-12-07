@@ -11,7 +11,7 @@
             Messages = messages?.ToList() ?? new List<string>();
         }
 
-        public static Error None => new Error(ErrorTypes.None, Enumerable.Empty<string>());
+        public static Error None => new Error(ErrorTypes.None, []);
         public static Error NotFound(params string[] messages) => new(ErrorTypes.NotFound, messages);
         public static Error TypeMismatch(params string[] messages) => new(ErrorTypes.TypeMismatch, messages);
         public static Error NotEnoughBalance(params string[] messages) => new(ErrorTypes.NotEnoughBalance, messages);

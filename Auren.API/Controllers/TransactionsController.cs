@@ -73,7 +73,10 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPut("{transactionId:guid}")]
-		public async Task<ActionResult<Transaction>> UpdateTransaction([FromRoute] Guid transactionId, [FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
+		public async Task<ActionResult<Transaction>> UpdateTransaction(
+            [FromRoute] Guid transactionId, 
+            [FromBody] TransactionDto transactionDto, 
+            CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

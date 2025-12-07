@@ -40,7 +40,6 @@ namespace Auren.API.Controllers
             
             var goal = await goalService.GetGoalById(goalId, userId.Value, cancellationToken);
             return goal.IsSuccess ? Ok(goal.Value) : NotFound($"Goal id of {goalId} not found. ");
-            
         }
 
         [HttpPost]
