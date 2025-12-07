@@ -35,11 +35,8 @@ namespace Auren.Infrastructure.Repositories
 			var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user == null)
-			{
-				_logger.LogWarning("User with ID {UserId} not found", userId);
 				return null;
-            }
-
+            
 			return MapToUserResponse(user);
         }
 
@@ -47,8 +44,6 @@ namespace Auren.Infrastructure.Repositories
 		{
 			_dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("User with ID {UserId} successfully updated", userId);
 
             return MapToUserResponse(user);
         }

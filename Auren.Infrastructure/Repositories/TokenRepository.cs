@@ -10,32 +10,19 @@ using System.Security.Cryptography;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class TokenRepository : ITokenRepository
+	public class TokenRepository(
+		AurenAuthDbContext dbContext,
+		UserManager<ApplicationUser> userManager) 
+		: ITokenRepository
 	{
-		private readonly AurenAuthDbContext _dbContext;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-		private readonly ILogger<TokenRepository> _logger;
-
-		public TokenRepository(AurenAuthDbContext dbContext,
-			UserManager<ApplicationUser> userManager,
-			SignInManager<ApplicationUser> signInManager,
-			ILogger<TokenRepository> logger)
-		{
-			_dbContext = dbContext;
-			_userManager = userManager;
-			_signInManager = signInManager;
-			_logger = logger;
-		}
-
 		public async Task CleanupExpiredTokensAsync()
 		{
-			var expiredTokens = await _dbContext.RefreshTokens
+			var expiredTokens = await dbContext.RefreshTokens
 				.Where(rt => rt.ExpiryDate < DateTime.UtcNow)
 				.ToListAsync();
 
-			_dbContext.RefreshTokens.RemoveRange(expiredTokens);
-			await _dbContext.SaveChangesAsync();
+			dbContext.RefreshTokens.RemoveRange(expiredTokens);
+			await dbContext.SaveChangesAsync();
         }
 
 		public string GenerateAccessTokenAsync(ApplicationUser user)
@@ -51,7 +38,7 @@ namespace Auren.Infrastructure.Repositories
 		{
 			await RevokeAllUserRefreshTokensAsync(user.UserId);
 
-            var tokenBytes = new byte[32];
+            var tokenBytes = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(tokenBytes);
             var token = Convert.ToBase64String(tokenBytes);
@@ -63,15 +50,15 @@ namespace Auren.Infrastructure.Repositories
 				UserId = user.UserId
             };
 
-			await _dbContext.RefreshTokens.AddAsync(refreshToken);
-			await _dbContext.SaveChangesAsync();
+			await dbContext.RefreshTokens.AddAsync(refreshToken);
+			await dbContext.SaveChangesAsync();
 
             return refreshToken;
         }
 
 		public async Task RevokeAllUserRefreshTokensAsync(Guid userId)
 		{
-			var refreshTokens = await _dbContext.RefreshTokens
+			var refreshTokens = await dbContext.RefreshTokens
 				.Where(rt => rt.UserId == userId && rt.IsActive)
 				.ToListAsync();
 
@@ -82,14 +69,13 @@ namespace Auren.Infrastructure.Repositories
 				token.ReasonRevoked = "User logged out";
             }
 
-			if(refreshTokens.Any()) 
-				await _dbContext.SaveChangesAsync();
-            
+			if(refreshTokens.Count != 0) 
+				await dbContext.SaveChangesAsync();
         }
 
 		public async Task RevokeRefreshTokenAsync(string token, string reason)
 		{
-			var refreshToken = await _dbContext.RefreshTokens
+			var refreshToken = await dbContext.RefreshTokens
 				.FirstOrDefaultAsync(rt => rt.Token == token);
 
 			if(refreshToken != null && refreshToken.IsActive)
@@ -98,25 +84,25 @@ namespace Auren.Infrastructure.Repositories
 				refreshToken.RevokedAt = DateTime.UtcNow;
 				refreshToken.ReasonRevoked = reason;
 
-				await _dbContext.SaveChangesAsync();
+				await dbContext.SaveChangesAsync();
             }
 		}
 
 		public async Task RotateRefreshTokenAsync(Guid userId)
 		{
-			var currentToken = await _dbContext.RefreshTokens
+			var currentToken = await dbContext.RefreshTokens
 				.FirstOrDefaultAsync(rt => rt.UserId == userId && rt.IsActive);
 
 			if (currentToken != null)
 			{
-				var user = await _userManager.Users
+				var user = await userManager.Users
 					.FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (user != null)
 				{
 					var newToken = await GenerateRefreshTokenAsync(user);
 
-                    await _dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                 }
             }
 		}
@@ -141,7 +127,7 @@ namespace Auren.Infrastructure.Repositories
                     return false;
                 }
 
-                var user = await _userManager.FindByEmailAsync(email);
+                var user = await userManager.FindByEmailAsync(email);
 
 				if(user == null || user.UserId != userId)
 				{
@@ -149,7 +135,7 @@ namespace Auren.Infrastructure.Repositories
                     return false;
                 }
 
-				var hasValidRefreshToken = await _dbContext.RefreshTokens
+				var hasValidRefreshToken = await dbContext.RefreshTokens
 					.AnyAsync(rt => rt.UserId == userId && rt.IsActive);
 
 				if(!hasValidRefreshToken)

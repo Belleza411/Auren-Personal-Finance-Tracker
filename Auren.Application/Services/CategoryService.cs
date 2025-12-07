@@ -14,14 +14,12 @@ namespace Auren.Application.Services
 {
 	public class CategoryService : ICategoryService
 	{
-        private readonly ILogger<CategoryService> _logger;
         private readonly IValidator<CategoryDto> _validator;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITransactionRepository _transactionRepository;
 
-		public CategoryService(ILogger<CategoryService> logger, IValidator<CategoryDto> validator, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
+		public CategoryService(IValidator<CategoryDto> validator, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
 		{
-			_logger = logger;
 			_validator = validator;
 			_categoryRepository = categoryRepository;
 			_transactionRepository = transactionRepository;
@@ -53,7 +51,7 @@ namespace Auren.Application.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdCategory = await _categoryRepository.CreateCategoryAsync(category, userId, cancellationToken);
+            var createdCategory = await _categoryRepository.CreateCategoryAsync(category, cancellationToken);
 
             return createdCategory == null 
                 ? Result.Failure<Category>(Error.CreateFailed("Failed to create category.")) 
@@ -67,7 +65,7 @@ namespace Auren.Application.Services
             if(existingCategory == null)
                 return Result.Failure<bool>(Error.NotFound($"Category with id {categoryId} not found"));
 
-            var categoryToDelete = await _categoryRepository.DeleteCategoryAsync(existingCategory, userId, cancellationToken);
+            var categoryToDelete = await _categoryRepository.DeleteCategoryAsync(existingCategory, cancellationToken);
             return categoryToDelete 
                 ? Result.Success(true) 
                 : Result.Failure<bool>(Error.DeleteFailed("Failed to delete category."));
@@ -105,7 +103,7 @@ namespace Auren.Application.Services
             existingCategory.Name = categoryDto.Name;
             existingCategory.TransactionType = categoryDto.TransactionType;
 
-            var updatedCategory = await _categoryRepository.UpdateCategoryAsync(userId, existingCategory, cancellationToken);
+            var updatedCategory = await _categoryRepository.UpdateCategoryAsync(existingCategory, cancellationToken);
 
             return updatedCategory == null 
                 ? Result.Failure<Category>(Error.UpdateFailed("Failed to update category. ")) 
@@ -123,7 +121,7 @@ namespace Auren.Application.Services
                 CreatedAt = DateTime.UtcNow
             }).ToList();
 
-            return Result.Success<List<Category>>(await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, userId, cancellationToken));
+            return Result.Success<List<Category>>(await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, cancellationToken));
         }
 
         public async Task<Result<Category?>> GetCategoryByName(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)

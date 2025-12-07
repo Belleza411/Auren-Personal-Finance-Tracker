@@ -12,29 +12,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class GoalRepository : IGoalRepository
+	public class GoalRepository(AurenDbContext dbContext) : IGoalRepository
 	{
-		public ILogger<GoalRepository> _logger { get; }
-        private readonly AurenDbContext _dbContext;
-
-        public GoalRepository(ILogger<GoalRepository> logger, AurenDbContext dbContext)
-		{
-			_logger = logger;
-			_dbContext = dbContext;
-        }
-
-		public async Task<IEnumerable<Goal>> GetGoalsAsync(Guid userId, GoalFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
+		public async Task<IEnumerable<Goal>> GetGoalsAsync(
+			Guid userId, GoalFilter filter,
+			int pageSize = 5, int pageNumber = 1,
+			CancellationToken cancellationToken = default)
 		{
 			var skip = (pageNumber - 1) * pageSize;
 
-			var query = _dbContext.Goals
+			var query = dbContext.Goals
 				.Where(g => g.UserId == userId);
 
             if(HasActiveFilters(filter))
-			{
 				query = ApplyFilters(query, filter);
-            }
-
+            
 			var goal = await query
 				.Where(g => g.UserId == userId)
 				.OrderByDescending(g => g.Spent)
@@ -44,50 +36,43 @@ namespace Auren.Infrastructure.Repositories
 				.AsNoTracking()
 				.ToListAsync(cancellationToken);
 
-			_logger.LogInformation("Retrieved {Count} goals for user {UserId}", goal.Count, userId);
-
             return goal;
         }
 
 		public async Task<Goal?> GetGoalByIdAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
-			=> await _dbContext.Goals
+			=> await dbContext.Goals
 				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
 
         public async Task<Goal> CreateGoalAsync(Goal goal, Guid userId, CancellationToken cancellationToken)
         {
-            await _dbContext.Goals.AddAsync(goal, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.Goals.AddAsync(goal, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             return goal;
         }
 
         public async Task<Goal?> UpdateGoalAsync(Goal goal, CancellationToken cancellationToken)
 		{
-			_dbContext.Goals.Update(goal);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+			dbContext.Goals.Update(goal);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
 			return goal;     
         }
 
 		public async Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
-			var goal = await _dbContext.Goals
+			var goal = await dbContext.Goals
 				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
 
-			if (goal == null)
-			{
-				_logger.LogWarning("Goal with id of {GoalId} not found for {UserId}", goalId, userId);
-				return false;
-			}
+			if (goal == null) return false;
 
-			_dbContext.Goals.Remove(goal);
-			await _dbContext.SaveChangesAsync(cancellationToken);
-			_logger.LogInformation("Goal with id of {GoalId} was deleted succesfully for {UserId}", goalId, userId);
+			dbContext.Goals.Remove(goal);
+			await dbContext.SaveChangesAsync(cancellationToken);
 
 			return true;
 		}
 
-		private IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
+		private static IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
 		{
 			if (filter == null)
 				return query;
@@ -113,7 +98,7 @@ namespace Auren.Infrastructure.Repositories
 			return query;
         }
 
-		private bool HasActiveFilters(GoalFilter filter)
+		private static bool HasActiveFilters(GoalFilter filter)
 		{
 			if(filter == null)
 				return false;
@@ -135,13 +120,13 @@ namespace Auren.Infrastructure.Repositories
 				GoalStatus.BehindSchedule
 			};
 
-            var goals = _dbContext.Goals.Where(g => g.UserId == userId);
+            var goals = dbContext.Goals.Where(g => g.UserId == userId);
 
             var goalsSummary = new
             {
-                TotalGoals = await goals.CountAsync(),
-                GoalsCompleted = await goals.CountAsync(x => x.Status == GoalStatus.Completed),
-                ActiveGoals = await goals.CountAsync(x => activeStatuses.Contains(x.Status))
+                TotalGoals = await goals.CountAsync(cancellationToken),
+                GoalsCompleted = await goals.CountAsync(x => x.Status == GoalStatus.Completed, cancellationToken),
+                ActiveGoals = await goals.CountAsync(x => activeStatuses.Contains(x.Status), cancellationToken)
             };
 
             return new GoalsSummaryResponse(

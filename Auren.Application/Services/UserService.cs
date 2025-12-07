@@ -77,7 +77,6 @@ namespace Auren.Application.Services
                     request.ProfileImage,
                     request.FirstName,
                     request.LastName,
-                    request.Email,
                     cancellationToken
                 );
 
@@ -163,7 +162,6 @@ namespace Auren.Application.Services
             ProfileImageUploadRequest profileImage,
             string firstName,
             string lastName,
-            string email,
             CancellationToken cancellationToken)
         {
             try
@@ -205,7 +203,7 @@ namespace Auren.Application.Services
 
             try
             {
-                await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, userId, cancellationToken);
+                await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -271,14 +269,11 @@ namespace Auren.Application.Services
             {
                 Success = false,
                 Message = message,
-                Errors = errors.ToList()
-            };
+                Errors = [.. errors]
+			};
         }
         private async Task<Result<AuthResponse>> SignUserInAsync(ApplicationUser user, string? message)
         {
-            var accessToken = _tokenRepository.GenerateAccessTokenAsync(user);
-            var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
-
             var claims = new List<Claim>
             {
                 new(ClaimTypes.Email, user.Email!),

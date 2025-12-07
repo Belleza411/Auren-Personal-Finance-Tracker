@@ -167,7 +167,7 @@ namespace Auren.Application.Services
 					CreatedAt = DateTime.UtcNow
 				};
 
-				existingCategory = await _categoryRepository.CreateCategoryAsync(newCategory, userId, cancellationToken);
+				existingCategory = await _categoryRepository.CreateCategoryAsync(newCategory, cancellationToken);
 			}
 
 			var newGoalTransaction = new Transaction

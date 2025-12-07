@@ -13,33 +13,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class TransactionRepository : ITransactionRepository
+	public class TransactionRepository(AurenDbContext dbContext) : ITransactionRepository
 	{
-		private readonly ILogger<TransactionRepository> _logger;
-		private readonly AurenDbContext _dbContext;
-
-		public TransactionRepository(ILogger<TransactionRepository> logger, AurenDbContext dbContext)
-		{
-			_logger = logger;
-			_dbContext = dbContext;
-		}
 
 		public async Task<Transaction> CreateTransactionAsync(Transaction transaction, Guid userId, CancellationToken cancellationToken)
 		{
-            await _dbContext.Transactions.AddAsync(transaction, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.Transactions.AddAsync(transaction, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
             return transaction;     
         }
 
 		public async Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
 		{
-            var transaction = await _dbContext.Transactions
-				.FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
+            var transaction = await GetTransactionByIdAsync(transactionId, userId, cancellationToken);
 
             if (transaction == null) return false;
 
-            _dbContext.Transactions.Remove(transaction);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            dbContext.Transactions.Remove(transaction);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             return true;
         }
@@ -49,14 +40,14 @@ namespace Auren.Infrastructure.Repositories
             var (firstDayOfLastMonth, lastDayOfLastMonth) = DateTime.Today.GetLastMonthRange();
             var (firstDayOfCurrentMonth, lastDayOfCurrentMonth) = DateTime.Today.GetCurrentMonthRange();
 
-            var targetTotal = await _dbContext.Transactions
-             .Where(t => t.UserId == userId
-                         && t.TransactionType == TransactionType.Expense
-                         && t.TransactionDate >= firstDayOfCurrentMonth
-                         && t.TransactionDate <= lastDayOfCurrentMonth)
-             .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
+            var targetTotal = await dbContext.Transactions
+                 .Where(t => t.UserId == userId
+                             && t.TransactionType == TransactionType.Expense
+                             && t.TransactionDate >= firstDayOfCurrentMonth
+                             && t.TransactionDate <= lastDayOfCurrentMonth)
+                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
-            var prevTotal = await _dbContext.Transactions
+            var prevTotal = await dbContext.Transactions
                 .Where(t => t.UserId == userId
                             && t.TransactionType == TransactionType.Expense
                             && t.TransactionDate >= firstDayOfLastMonth
@@ -90,7 +81,7 @@ namespace Auren.Infrastructure.Repositories
             var currentMonthRange = DateTime.UtcNow.GetCurrentMonthRange();
             var lastMonthRange = DateTime.UtcNow.GetLastMonthRange();
 
-            var query = _dbContext.Transactions
+            var query = dbContext.Transactions
                 .Where(t => t.UserId == userId);
 
             switch (balancePeriod)
@@ -128,7 +119,7 @@ namespace Auren.Infrastructure.Repositories
         }
 
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken) 
-            => await _dbContext.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
+            => await dbContext.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
 
         public async Task<IEnumerable<Transaction>> GetTransactionsAsync(
             Guid userId,
@@ -138,7 +129,7 @@ namespace Auren.Infrastructure.Repositories
 		{
             var skip = (pageNumber - 1) * pageSize;
 
-            var query = _dbContext.Transactions
+            var query = dbContext.Transactions
                 .Where(t => t.UserId == userId);
 
             if(HasActiveFilters(filter))
@@ -158,9 +149,8 @@ namespace Auren.Infrastructure.Repositories
 
 		public async Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, Transaction transaction, CancellationToken cancellationToken)
 		{
-            _dbContext.Transactions.Update(transaction);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Transaction updated successfully for {UserId} with TransactionId of {TransactionId}. ", userId, transaction.TransactionId);
+            dbContext.Transactions.Update(transaction);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             return transaction;
 		}
@@ -186,7 +176,7 @@ namespace Auren.Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(filter.Category))
             {
-                query = query.Where(t => _dbContext.Categories
+                query = query.Where(t => dbContext.Categories
                     .Where(c => c.CategoryId == t.CategoryId
                     && c.Name.Contains(filter.Category)
                     && c.UserId == userId).Any()
@@ -232,7 +222,7 @@ namespace Auren.Infrastructure.Repositories
             };
 
 
-            var monthlyData = await _dbContext.Transactions
+            var monthlyData = await dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
                 .GroupBy(t => new
                 {

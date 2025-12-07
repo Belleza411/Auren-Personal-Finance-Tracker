@@ -25,7 +25,7 @@ namespace Auren.Infrastructure.Repositories
 								?? throw new ArgumentNullException("Connection not found");
         }
 
-		public async Task<Category> CreateCategoryAsync(Category category, Guid userId, CancellationToken cancellationToken)
+		public async Task<Category> CreateCategoryAsync(Category category, CancellationToken cancellationToken)
 		{
             await _dbContext.Categories.AddAsync(category, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -33,7 +33,7 @@ namespace Auren.Infrastructure.Repositories
             return category;
         }
 
-		public async Task<bool> DeleteCategoryAsync(Category category, Guid userId, CancellationToken cancellationToken)
+		public async Task<bool> DeleteCategoryAsync(Category category, CancellationToken cancellationToken)
 		{
             _dbContext.Categories.Remove(category);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -71,14 +71,14 @@ namespace Auren.Infrastructure.Repositories
             => await _dbContext.Categories
                 .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId, cancellationToken);
 
-		public async Task<Category?> UpdateCategoryAsync(Guid userId, Category category, CancellationToken cancellationToken)
+		public async Task<Category?> UpdateCategoryAsync(Category category, CancellationToken cancellationToken)
 		{
             _dbContext.Categories.Update(category);
             await _dbContext.SaveChangesAsync(cancellationToken);
 			return category;			
         }
 
-        public async Task<List<Category>> SeedDefaultCategoryToUserAsync(List<Category> categories, Guid userId, CancellationToken cancellationToken)
+        public async Task<List<Category>> SeedDefaultCategoryToUserAsync(List<Category> categories, CancellationToken cancellationToken)
         {
             _dbContext.Categories.AddRange(categories);
             await _dbContext.SaveChangesAsync(cancellationToken);

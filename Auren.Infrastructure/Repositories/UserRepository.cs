@@ -45,6 +45,5 @@ namespace Auren.Infrastructure.Repositories
 
 		public async Task<int> GetAccessFailedCountAsync(ApplicationUser user)
 			=> await _userManager.GetAccessFailedCountAsync(user);
-
     }
 }
