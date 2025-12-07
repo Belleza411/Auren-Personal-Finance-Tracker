@@ -23,7 +23,8 @@ namespace Auren.Infrastructure.Repositories
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-            _connectionString = configuration.GetConnectionString("AurenDbConnection") ?? throw new ArgumentNullException("Connection string not found.");
+            _connectionString = configuration.GetConnectionString("AurenDbConnection")
+								?? throw new ArgumentNullException("Connection not found");
         }
 
 		public async Task<Category> CreateCategoryAsync(Category category, Guid userId, CancellationToken cancellationToken)
@@ -38,7 +39,6 @@ namespace Auren.Infrastructure.Repositories
 		{
             _dbContext.Categories.Remove(category);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Category with id of {CategoryId} was successfully deleted for {UserId}", category.CategoryId, userId);
 
             return true;
         }
@@ -66,8 +66,6 @@ namespace Auren.Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Retrieved {Count} categories for user {UserId}", categories.Count, userId);
-
             return categories;           
 		}
 
@@ -79,8 +77,6 @@ namespace Auren.Infrastructure.Repositories
 		{
             _dbContext.Categories.Update(category);
             await _dbContext.SaveChangesAsync(cancellationToken);
-			_logger.LogInformation("Category with id of {CategoryId} for {UserId} was successfull updated. ", category.CategoryId, userId);
-
 			return category;			
         }
 
@@ -128,7 +124,7 @@ namespace Auren.Infrastructure.Repositories
             return query;
         }
 
-        private bool HasActiveFilter(CategoriesFilter filter)
+        private static bool HasActiveFilter(CategoriesFilter filter)
         {
             if (filter == null) return false;
 
@@ -140,7 +136,7 @@ namespace Auren.Infrastructure.Repositories
 
 		public async Task<Category?> GetCategoryByNameAsync(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
             =>  await _dbContext.Categories.FirstOrDefaultAsync(c => c.UserId == userId
-                    && c.Name.ToLower() == categoryDto.Name.ToLower()
+                    && c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)
                     && c.TransactionType == categoryDto.TransactionType,
                     cancellationToken);
 
