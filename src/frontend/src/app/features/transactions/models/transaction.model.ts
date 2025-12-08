@@ -41,10 +41,16 @@ enum PaymentType {
     other = 4
 }
 
+interface AvgDailySpending {
+    avgSpending: number;
+    percentageChange: number;
+}
+
 export type {
     Transaction,
     NewTransaction,
     TransactionFilter,
     TransactionType,
-    PaymentType
+    PaymentType,
+    AvgDailySpending
 }

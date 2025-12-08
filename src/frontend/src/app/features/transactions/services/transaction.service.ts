@@ -1,8 +1,9 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { NewTransaction, Transaction, TransactionFilter } from '../models/transaction.model';
-import { apiUrl } from '../../../../environments/environment';
-import { Observable} from 'rxjs';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable} from 'rxjs';
+
+import { AvgDailySpending, NewTransaction, Transaction, TransactionFilter } from '../models/transaction.model';
+import { apiUrl } from '../../../../environments/environment';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
 @Injectable({
@@ -36,5 +37,9 @@ export class TransactionService {
 
 	deleteTransaction(id: string): Observable<void> {
 		return this.http.delete<void>(`${this.baseUrl}/${id}`);
+	}
+
+	getAvgDailySpending(): Observable<AvgDailySpending> {
+		return this.http.get<AvgDailySpending>(`${this.baseUrl}/average-daily-spending`);
 	}
 }
