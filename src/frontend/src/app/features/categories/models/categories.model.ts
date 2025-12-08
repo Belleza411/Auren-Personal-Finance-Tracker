@@ -15,7 +15,7 @@ interface CategoryFilter {
     category: string;
 }
 
-interface CreateCategory {
+interface NewCategory {
     name: string;
     transactionType: TransactionType;
 }
@@ -23,5 +23,5 @@ interface CreateCategory {
 export type {
     Category,
     CategoryFilter,
-    CreateCategory
+    NewCategory
 }

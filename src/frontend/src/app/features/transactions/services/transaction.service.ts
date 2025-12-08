@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { CreateTransaction, Transaction, TransactionFilter } from '../models/transaction.model';
+import { NewTransaction, Transaction, TransactionFilter } from '../models/transaction.model';
 import { apiUrl } from '../../../../environments/environment';
 import { Observable} from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -33,11 +33,11 @@ export class TransactionService {
 		return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
 	}
 
-	createTransaction(data: CreateTransaction): Observable<Transaction> {
+	createTransaction(data: NewTransaction): Observable<Transaction> {
 		return this.http.post<Transaction>(this.baseUrl, data);
 	}
 
-	updateTransaction(id: string, data: Partial<CreateTransaction>): Observable<Transaction> {
+	updateTransaction(id: string, data: Partial<NewTransaction>): Observable<Transaction> {
 		return this.http.put<Transaction>(`${this.baseUrl}/${id}`, data);
 	}
 

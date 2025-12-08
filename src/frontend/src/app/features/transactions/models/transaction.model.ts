@@ -7,10 +7,10 @@ interface Transaction {
     amount: number
     paymentType: PaymentType;
     transactionDate: Date;
-    createAt: Date;
+    createdAt: Date;
 }
 
-interface CreateTransaction {
+interface NewTransaction {
     name: string;
     amount: number;
     category: string;
@@ -43,7 +43,7 @@ enum PaymentType {
 
 export type {
     Transaction,
-    CreateTransaction,
+    NewTransaction,
     TransactionFilter,
     TransactionType,
     PaymentType

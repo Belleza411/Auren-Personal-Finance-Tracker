@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Category, CategoryFilter, CreateCategory } from "../models/categories.model";
+import { Category, CategoryFilter, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -33,11 +33,11 @@ export class CategoryService {
         return this.http.get<Category>(`${this.baseUrl}/${id}`);
     }
 
-    createCategory(data: CreateCategory): Observable<Category> {
+    createCategory(data: NewCategory): Observable<Category> {
         return this.http.post<Category>(this.baseUrl, data);
     }
 
-    updateCategory(id: string, data: Partial<CreateCategory>): Observable<Category> {
+    updateCategory(id: string, data: Partial<NewCategory>): Observable<Category> {
         return this.http.put<Category>(`${this.baseUrl}/${id}`, data);
     }
 
