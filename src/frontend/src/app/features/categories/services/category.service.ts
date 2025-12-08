@@ -3,6 +3,7 @@ import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Category, CategoryFilter, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
+import { createHttpParams } from "../../../shared/utils/http-params.util";
 
 @Injectable({
   providedIn: 'root',
@@ -12,19 +13,11 @@ export class CategoryService {
     private http = inject(HttpClient);
 
     getAllCategories(
-        filters: Partial<CategoryFilter>,
+        filters: Partial<CategoryFilter> = {},
         pageSize: number = 5,
         pageNumber: number = 1
     ): Observable<Category> {
-        let params = new HttpParams()
-            .set('pageNumber', pageNumber.toString())
-            .set('pageSize', pageSize.toString());  
-    
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                params = params.set(key, value.toString());
-            }
-        });
+        const params = createHttpParams(filters, pageSize, pageNumber);
 
         return this.http.get<Category>(this.baseUrl, { params });
     }

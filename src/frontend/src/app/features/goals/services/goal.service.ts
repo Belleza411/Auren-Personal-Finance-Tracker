@@ -3,6 +3,7 @@ import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Goal, GoalFilter, NewGoal } from "../models/goals.model";
+import { createHttpParams } from "../../../shared/utils/http-params.util";
 
 @Injectable({
   providedIn: 'root',
@@ -12,19 +13,11 @@ export class GoalService {
     private http = inject(HttpClient);
 
     getAllGoals(
-        filters: GoalFilter, 
+        filters: Partial<GoalFilter> = {}, 
         pageNumber: number = 1, 
         pageSize: number = 5
     ): Observable<Goal> {
-        let params = new HttpParams()
-            .set('pageNumber', pageNumber.toString())
-            .set('pageSize', pageSize.toString());  
-    
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                params = params.set(key, value.toString());
-            }
-        });
+        const params = createHttpParams(filters, pageSize, pageNumber);
 
         return this.http.get<Goal>(apiUrl, { params });
     }

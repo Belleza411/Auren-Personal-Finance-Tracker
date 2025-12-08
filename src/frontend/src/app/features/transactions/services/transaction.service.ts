@@ -3,6 +3,7 @@ import { NewTransaction, Transaction, TransactionFilter } from '../models/transa
 import { apiUrl } from '../../../../environments/environment';
 import { Observable} from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { createHttpParams } from '../../../shared/utils/http-params.util';
 
 @Injectable({
   providedIn: 'root',
@@ -12,20 +13,12 @@ export class TransactionService {
 	private http = inject(HttpClient);
 
 	getAllTransactions(
-		filters: Partial<TransactionFilter>,
+		filters: Partial<TransactionFilter> = {},
 		pageSize: number = 5,
 		pageNumber: number = 1
 	) : Observable<Transaction[]> {
-		let params = new HttpParams()
-			.set('pageNumber', pageNumber.toString())
-			.set('pageSize', pageSize.toString());  
-	
-		Object.entries(filters).forEach(([key, value]) => {
-			if (value !== undefined && value !== null) {
-				params = params.set(key, value.toString());
-			}
-		});
-
+		const params = createHttpParams(filters, pageSize, pageNumber);
+		
 		return this.http.get<Transaction[]>(this.baseUrl, { params });
 	}
 
