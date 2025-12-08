@@ -27,4 +27,14 @@ export class TransactionComponent implements OnInit {
         complete: () => this.isLoading.set(false)
       })
   }
+
+  deleteTransaction(id: string) {
+    this.transactionService.deleteTransaction(id)
+      .subscribe({
+        next: () => this.transactions.update(transaction =>
+          transaction.filter(t => t.transactionId !== id)
+        ),
+        error: err => console.error(err)
+      })
+  }
 }
