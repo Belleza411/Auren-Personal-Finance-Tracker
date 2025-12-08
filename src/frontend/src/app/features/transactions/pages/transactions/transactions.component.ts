@@ -16,7 +16,7 @@ export class TransactionComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   transactions = signal<Transaction[]>([]);
-  avgDailySpending = signal<AvgDailySpending | null>(null);
+  avgDailySpending = signal<number>(0);
   isLoading = signal(false);
   error = signal<string | null>(null);
   
@@ -39,7 +39,7 @@ export class TransactionComponent implements OnInit {
       .subscribe({
         next: ({ transactions, avgDailySpending }) => {
           this.transactions.set(transactions);
-          this.avgDailySpending.set(avgDailySpending);
+          this.avgDailySpending.set(avgDailySpending.avgSpending);
         },
         error: err => {
           console.error("Failed to load data: ", err);
@@ -67,7 +67,7 @@ export class TransactionComponent implements OnInit {
     this.transactionSer.getAvgDailySpending()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: data => this.avgDailySpending.set(data),
+        next: data => this.avgDailySpending.set(data.avgSpending),
         error: err => console.error('Failed to reload average spending:', err)
       })
   }
