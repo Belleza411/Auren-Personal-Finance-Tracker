@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -111,6 +112,17 @@ namespace Auren.API.Controllers
             var success = await transactionService.DeleteTransaction(transactionId, userId.Value, cancellationToken);
 
             return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
+        }
+
+        [HttpGet("average-daily-spending")]
+        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
+
+            return Ok(avgSpending.Value);
         }
     }
 }

@@ -21,18 +21,6 @@ namespace Auren.API.Controllers
 		 IGoalService goalService
         ) : ControllerBase
 	{
-
-		[HttpGet("transaction/average-daily-spending")]
-		public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(CancellationToken cancellationToken)
-		{
-			var userId = User.GetCurrentUserId();
-			if (userId == null) return Unauthorized();
-
-			var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
-
-			return Ok(avgSpending.Value);
-		}
-
 		[HttpGet("categories/categories-overview")]
         public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
 			[FromQuery] CategoryOverviewFilter filter,
