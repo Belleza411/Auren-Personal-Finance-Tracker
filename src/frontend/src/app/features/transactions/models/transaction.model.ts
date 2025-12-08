@@ -1,4 +1,4 @@
-export interface Transaction {
+interface Transaction {
     transactionId: string;
     userId: string;
     categoryId: string;
@@ -10,7 +10,7 @@ export interface Transaction {
     createAt: Date;
 }
 
-export interface CreateTransaction {
+interface CreateTransaction {
     name: string;
     amount: number;
     category: string;
@@ -18,7 +18,7 @@ export interface CreateTransaction {
     paymentType: PaymentType;
 }
 
-export interface TransactionFilter {
+interface TransactionFilter {
     isIncome: boolean;
     isExpense: boolean;
     minAmount: number;
@@ -29,14 +29,22 @@ export interface TransactionFilter {
     paymentMethod: string;
 }
 
-export enum TransactionType {
+enum TransactionType {
     Income = 1,
     Expense = 2
 }
 
-export enum PaymentType {
+enum PaymentType {
     Cash = 1,
     CreditCard = 2,
     BankTransfer = 3,
     Other = 4
+}
+
+export type {
+    Transaction,
+    CreateTransaction,
+    TransactionFilter,
+    TransactionType,
+    PaymentType
 }
