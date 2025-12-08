@@ -37,11 +37,11 @@ export class TransactionService {
 		return this.http.post<Transaction>(this.baseUrl, data);
 	}
 
-	updateTransaction(id: string, data: Partial<CreateTransaction>): Observable<any> {
+	updateTransaction(id: string, data: Partial<CreateTransaction>): Observable<Transaction> {
 		return this.http.put<Transaction>(`${this.baseUrl}/${id}`, data);
 	}
 
-	deleteTransaction(id: string): Observable<any> {
-		return this.http.delete(`${this.baseUrl}/${id}`);
+	deleteTransaction(id: string): Observable<void> {
+		return this.http.delete<void>(`${this.baseUrl}/${id}`);
 	}
 }
