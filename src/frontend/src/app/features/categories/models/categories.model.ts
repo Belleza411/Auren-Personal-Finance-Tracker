@@ -5,7 +5,7 @@ interface Category {
     userId: string;
     name: string;
     transactionType: TransactionType
-    createdAt: Date;
+    createdAt: Date | string;
 }
 
 interface CategoryFilter {

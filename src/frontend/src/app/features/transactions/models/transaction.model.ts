@@ -6,8 +6,8 @@ interface Transaction {
     name: string;
     amount: number
     paymentType: PaymentType;
-    transactionDate: Date;
-    createdAt: Date;
+    transactionDate: Date | string;
+    createdAt: Date | string;
 }
 
 interface NewTransaction {
@@ -23,8 +23,8 @@ interface TransactionFilter {
     isExpense: boolean;
     minAmount: number;
     maxAmount: number;
-    endDate: Date;
-    startDate: Date;
+    endDate: Date | string;
+    startDate: Date | string;
     category: string;
     paymentMethod: string;
 }

@@ -8,8 +8,8 @@ interface Goal {
     goalStatus: GoalStatus,
     completionPercentage: number | null;
     timeRemaining: string | null;
-    createdAt: Date;
-    targetDate: Date;
+    createdAt: Date | string;
+    targetDate: Date | string;
 }
 
 interface NewGoal {
@@ -18,7 +18,7 @@ interface NewGoal {
     spent: number;
     budget: number;
     status: GoalStatus;
-    targetDate: Date;
+    targetDate: Date | string;
 }
 
 interface GoalFilter {
