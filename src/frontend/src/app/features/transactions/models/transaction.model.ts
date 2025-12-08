@@ -10,15 +10,23 @@ export interface Transaction {
     createAt: Date;
 }
 
+export interface CreateTransaction {
+    name: string;
+    amount: number;
+    category: string;
+    transactionType: TransactionType;
+    paymentType: PaymentType;
+}
+
 export interface TransactionFilter {
-    isIncome: boolean | null;
-    isExpense: boolean | null;
-    minAmount: number | null;
-    maxAmount: number | null;
-    endDate: Date | null;
-    startDate: Date | null;
-    category: string | null;
-    paymentMethod: string | null;
+    isIncome: boolean;
+    isExpense: boolean;
+    minAmount: number;
+    maxAmount: number;
+    endDate: Date;
+    startDate: Date;
+    category: string;
+    paymentMethod: string;
 }
 
 export enum TransactionType {
@@ -32,12 +40,3 @@ export enum PaymentType {
     BankTransfer = 3,
     Other = 4
 }
-
-// public bool? IsIncome { get; set; }
-// public bool? IsExpense { get; set; }
-// public decimal? MinAmount { get; set; }
-// public decimal? MaxAmount { get; set; }
-// public DateTime? EndDate { get; set; }
-// public DateTime? StartDate { get; set; }
-// public string? Category { get; set; }
-// public string? PaymentMethod { get; set; }
