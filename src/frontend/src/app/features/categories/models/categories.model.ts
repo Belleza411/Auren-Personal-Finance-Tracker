@@ -8,6 +8,20 @@ interface Category {
     createdAt: Date;
 }
 
+interface CategoryFilter {
+    isIncome: boolean;
+    isExpense: boolean;
+    transactions: number;
+    category: string;
+}
+
+interface CreateCategory {
+    name: string;
+    transactionType: TransactionType;
+}
+
 export type {
-    Category
+    Category,
+    CategoryFilter,
+    CreateCategory
 }
