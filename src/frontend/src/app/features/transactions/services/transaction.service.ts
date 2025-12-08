@@ -16,21 +16,21 @@ export class TransactionService {
     pageSize: number = 5,
     pageNumber: number = 1
   ) : Observable<Transaction[]> {
-      let params = new HttpParams()
-        .set('pageNumber', pageNumber.toString())
-        .set('pageSize', pageSize.toString());
-    
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params = params.set(key, value.toString());
-        }
-      });
+    let params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());  
+  
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params = params.set(key, value.toString());
+      }
+    });
 
-      return this.http.get<Transaction[]>(this.baseUrl, { params });
+    return this.http.get<Transaction[]>(this.baseUrl, { params });
   }
 
   getTransactionById(id: string): Observable<Transaction> {
-      return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
+    return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
   }
 
   createTransaction(data: CreateTransaction): Observable<Transaction> {
