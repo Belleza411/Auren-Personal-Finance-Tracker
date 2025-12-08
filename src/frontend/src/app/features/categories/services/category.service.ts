@@ -17,13 +17,13 @@ export class CategoryService {
         pageNumber: number = 1
     ): Observable<Category> {
         let params = new HttpParams()
-        .set('pageNumber', pageNumber.toString())
-        .set('pageSize', pageSize.toString());  
+            .set('pageNumber', pageNumber.toString())
+            .set('pageSize', pageSize.toString());  
     
         Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            params = params.set(key, value.toString());
-        }
+            if (value !== undefined && value !== null) {
+                params = params.set(key, value.toString());
+            }
         });
 
         return this.http.get<Category>(this.baseUrl, { params });
