@@ -8,40 +8,40 @@ import { HttpClient, HttpParams } from '@angular/common/http';
   providedIn: 'root',
 })
 export class TransactionService {
-  private readonly baseUrl = `${apiUrl}/api/transactions`;
-  private http = inject(HttpClient);
+	private readonly baseUrl = `${apiUrl}/api/transactions`;
+	private http = inject(HttpClient);
 
-  getAllTransactions(
-    filters: Partial<TransactionFilter>,
-    pageSize: number = 5,
-    pageNumber: number = 1
-  ) : Observable<Transaction[]> {
-    let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString());  
-  
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params = params.set(key, value.toString());
-      }
-    });
+	getAllTransactions(
+		filters: Partial<TransactionFilter>,
+		pageSize: number = 5,
+		pageNumber: number = 1
+	) : Observable<Transaction[]> {
+		let params = new HttpParams()
+		.set('pageNumber', pageNumber.toString())
+		.set('pageSize', pageSize.toString());  
+	
+		Object.entries(filters).forEach(([key, value]) => {
+		if (value !== undefined && value !== null) {
+			params = params.set(key, value.toString());
+		}
+		});
 
-    return this.http.get<Transaction[]>(this.baseUrl, { params });
-  }
+		return this.http.get<Transaction[]>(this.baseUrl, { params });
+	}
 
-  getTransactionById(id: string): Observable<Transaction> {
-    return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
-  }
+	getTransactionById(id: string): Observable<Transaction> {
+		return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
+	}
 
-  createTransaction(data: CreateTransaction): Observable<Transaction> {
-    return this.http.post<Transaction>(this.baseUrl, data);
-  }
+	createTransaction(data: CreateTransaction): Observable<Transaction> {
+		return this.http.post<Transaction>(this.baseUrl, data);
+	}
 
-  updateTransaction(id: string, data: Partial<CreateTransaction>): Observable<any> {
-    return this.http.put<Transaction>(`${this.baseUrl}/${id}`, data);
-  }
+	updateTransaction(id: string, data: Partial<CreateTransaction>): Observable<any> {
+		return this.http.put<Transaction>(`${this.baseUrl}/${id}`, data);
+	}
 
-  deleteTransaction(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
-  }
+	deleteTransaction(id: string): Observable<any> {
+		return this.http.delete(`${this.baseUrl}/${id}`);
+	}
 }
