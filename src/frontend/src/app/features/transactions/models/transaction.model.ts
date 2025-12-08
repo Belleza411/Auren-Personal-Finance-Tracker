@@ -30,15 +30,15 @@ interface TransactionFilter {
 }
 
 enum TransactionType {
-    Income = 1,
-    Expense = 2
+    income = 1,
+    expense = 2
 }
 
 enum PaymentType {
-    Cash = 1,
-    CreditCard = 2,
-    BankTransfer = 3,
-    Other = 4
+    cash = 1,
+    creditCard = 2,
+    bankTransfer = 3,
+    other = 4
 }
 
 export type {
