@@ -12,6 +12,24 @@ interface Goal {
     targetDate: Date;
 }
 
+interface NewGoal {
+    name: string;
+    description: string;
+    spent: number;
+    budget: number;
+    status: GoalStatus;
+    targetDate: Date;
+}
+
+interface GoalFilter {
+    isCompleted: boolean;
+    isOnTracker: boolean;
+    isOnHold: boolean;
+    isNotStarted: boolean;
+    isBehindSchedule: boolean;
+    isCancelled: boolean;
+}
+
 enum GoalStatus {
     completed = 1,
     onTrack = 2,
@@ -23,5 +41,7 @@ enum GoalStatus {
 
 export type {
     Goal,
-    GoalStatus
+    GoalStatus,
+    GoalFilter,
+    NewGoal
 }
