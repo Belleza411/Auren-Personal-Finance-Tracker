@@ -98,7 +98,7 @@ namespace Auren.Application.Services
                 : Result.Failure<bool>(Error.NotFound("Transaction not found. "));
         }
         
-        public async Task<Result<decimal>> GetBalance(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
+        public async Task<Result<BalanceSummaryResponse>> GetBalance(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
         {
             var (startDate, endDate) = timePeriod switch
             {
@@ -112,7 +112,7 @@ namespace Auren.Application.Services
             };
 
             var balance = await _transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
-            return Result.Success<decimal>(balance.Balance);
+            return Result.Success<BalanceSummaryResponse>(balance);
         }
             
 
