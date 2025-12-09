@@ -56,7 +56,7 @@ namespace Auren.Application.Services
 
             if (transactionDto.TransactionType == TransactionType.Expense)
             {
-                var currentBalance = await _transactionRepository.GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
+                var currentBalance = await _transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
 
                 if (currentBalance < transactionDto.Amount)
                 {
@@ -98,8 +98,23 @@ namespace Auren.Application.Services
                 : Result.Failure<bool>(Error.NotFound("Transaction not found. "));
         }
         
-        public async Task<Result<decimal>> GetBalance(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
-            => Result.Success(await _transactionRepository.GetBalanceAsync(userId, balancePeriod, cancellationToken));
+        public async Task<Result<decimal>> GetBalance(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
+        {
+            var (startDate, endDate) = timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+
+            var balance = await _transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
+            return Result.Success<decimal>(balance);
+        }
+            
 
         public async Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {

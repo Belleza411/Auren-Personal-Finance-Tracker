@@ -34,44 +34,21 @@ namespace Auren.Infrastructure.Repositories
             return true;
         }
 
-		public async Task<decimal> GetBalanceAsync(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
+		public async Task<decimal> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
 		{
-            var currentMonthRange = DateTime.UtcNow.GetCurrentMonthRange();
-            var lastMonthRange = DateTime.UtcNow.GetLastMonthRange();
+            var income = await dbContext.Transactions
+                .Where(t => t.UserId == userId &&
+                            t.TransactionType == TransactionType.Income &&
+                            t.TransactionDate >= start &&
+                            t.TransactionDate <= end)
+                .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
-            var query = dbContext.Transactions
-                .Where(t => t.UserId == userId);
-
-            switch (balancePeriod)
-            {
-                case BalancePeriod.CurrentMonth:
-                    query = query.Where(t =>
-                        t.TransactionDate >= currentMonthRange.start &&
-                        t.TransactionDate <= currentMonthRange.end);
-                    break;
-
-                case BalancePeriod.LastMonth:
-                    query = query.Where(t =>
-                        t.TransactionDate >= lastMonthRange.start &&
-                        t.TransactionDate <= lastMonthRange.end);
-                    break;
-
-                case BalancePeriod.AllTime:
-                default:
-                    break;
-            }
-
-            var grouped = await query
-                .GroupBy(t => t.TransactionType)
-                .Select(g => new
-                {
-                    Type = g.Key,
-                    Total = g.Sum(t => t.Amount)
-                })
-                .ToListAsync(cancellationToken);
-
-            var income = grouped.FirstOrDefault(r => r.Type == TransactionType.Income)?.Total ?? 0;
-            var expense = grouped.FirstOrDefault(r => r.Type == TransactionType.Expense)?.Total ?? 0;
+            var expense = await dbContext.Transactions
+                .Where(t => t.UserId == userId &&
+                            t.TransactionType == TransactionType.Expense &&
+                            t.TransactionDate >= start &&
+                            t.TransactionDate <= end)
+                .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
             return income - expense;
         }
@@ -207,8 +184,8 @@ namespace Auren.Infrastructure.Repositories
             var lastMonthExpense = monthlyData
                 .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;   
 
-            var currentBalance = await GetBalanceAsync(userId, BalancePeriod.AllTime, cancellationToken);
-            var lastMonthBalance = await GetBalanceAsync(userId, BalancePeriod.LastMonth, cancellationToken);
+            var currentBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
+            var lastMonthBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
 
             var balanceChange = CalculatePercentageChange(currentBalance, lastMonthBalance, true);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome, false);

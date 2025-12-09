@@ -57,7 +57,7 @@ namespace Auren.API.Controllers
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			var balance = await transactionService.GetBalance(userId.Value, BalancePeriod.AllTime, cancellationToken);
+			var balance = await transactionService.GetBalance(userId.Value, TimePeriod.AllTime, cancellationToken);
 
 			return Ok(balance.Value);
         }
