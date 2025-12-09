@@ -116,7 +116,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("average-daily-spending")]
-        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(TimePeriod? timePeriod, CancellationToken cancellationToken)
+        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -124,6 +124,17 @@ namespace Auren.API.Controllers
             var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, timePeriod ?? TimePeriod.AllTime, cancellationToken);
 
             return Ok(avgSpending.Value);
+        }
+
+        [HttpGet("balance")]
+        public async Task<ActionResult<BalanceSummaryResponse>> GetUserBalance([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var balance = await transactionService.GetBalance(userId.Value, timePeriod ?? TimePeriod.AllTime, cancellationToken);
+
+            return Ok(balance.Value);
         }
     }
 }

@@ -51,15 +51,6 @@ namespace Auren.API.Controllers
 			return Ok(updateProfile.Value);
         }
 
-		[HttpGet("user-balance")]
-		public async Task<ActionResult<decimal>> GetUserBalance(CancellationToken cancellationToken)
-		{
-			var userId = User.GetCurrentUserId();
-			if (userId == null) return Unauthorized();
-
-			var balance = await transactionService.GetBalance(userId.Value, TimePeriod.AllTime, cancellationToken);
-
-			return Ok(balance.Value);
-        }
+		
     }
 }
