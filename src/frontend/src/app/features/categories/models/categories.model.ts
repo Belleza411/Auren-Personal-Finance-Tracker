@@ -1,4 +1,4 @@
-import { TransactionType } from "../../transactions/models/transaction.model";
+  import { TransactionType } from "../../transactions/models/transaction.model";
 
 interface Category {
     categoryId: string;
@@ -20,8 +20,25 @@ interface NewCategory {
     transactionType: TransactionType;
 }
 
+interface CategoryOverview {
+    category: string;
+    transactionType: TransactionType;
+    totalSpending: number;
+    averageSpending: number;
+    transactionCount: number;
+    lastUsed: Date | string;
+}
+
+interface CategorySummary {
+    totalCategories: number;
+    mostUsedCategory: string;
+    highestSpendingCategory: string;
+}
+
 export type {
     Category,
     CategoryFilter,
-    NewCategory
+    NewCategory,
+    CategoryOverview,
+    CategorySummary
 }

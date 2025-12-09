@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Category, CategoryFilter, NewCategory } from "../models/categories.model";
+import { Category, CategoryFilter, CategoryOverview, CategorySummary, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
 import { createHttpParams } from "../../../shared/utils/http-params.util";
 
@@ -13,13 +13,13 @@ export class CategoryService {
     private http = inject(HttpClient);
 
     getAllCategories(
-        filters: Partial<CategoryFilter> = {},
+        filters?: Partial<CategoryFilter>,
         pageSize: number = 5,
         pageNumber: number = 1
-    ): Observable<Category> {
+    ): Observable<Category[]> {
         const params = createHttpParams(filters, pageSize, pageNumber);
 
-        return this.http.get<Category>(this.baseUrl, { params });
+        return this.http.get<Category[]>(this.baseUrl, { params });
     }
 
     getCategoryById(id: string): Observable<Category> {
@@ -36,5 +36,18 @@ export class CategoryService {
 
     deleteCategory(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    }
+
+    getCategoriesOverview(filters?: Partial<CategoryFilter>,
+        pageSize: number = 5,
+        pageNumber: number = 1
+    ): Observable<CategoryOverview[]> {
+        const params = createHttpParams(filters, pageSize, pageNumber);
+
+        return this.http.get<CategoryOverview[]>(`${this.baseUrl}/overview`, { params });
+    }
+
+    getCategorySummary(): Observable<CategorySummary> {
+        return this.http.get<CategorySummary>(`${this.baseUrl}/summary`);
     }
 } 
