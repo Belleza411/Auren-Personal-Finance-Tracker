@@ -59,7 +59,7 @@ export class TransactionComponent implements OnInit {
             .subscribe({
                 next: () => {
                     this.transactions.update(list => list.filter(t => t.transactionId !== id)),
-                    this.reloadBalanceAndAvg();
+                    this.loadData()
                 },
                 error: err => {
                     console.error('Failed to delete transaction:', err);
@@ -67,22 +67,6 @@ export class TransactionComponent implements OnInit {
                 }
             })
     }
-
-    private reloadBalanceAndAvg() {
-        forkJoin({
-            avgSpending: this.transactionSer.getAvgDailySpending(),
-            balance: this.transactionSer.getBalance()
-        })
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe({
-                next: ({ avgSpending, balance }) => {
-                    this.avgDailySpending.set(avgSpending);
-                    this.income.set(balance.income);
-                    this.expense.set(balance.expense);
-                },
-                error: err => console.error('Failed to reload balance:', err)
-            });
-        }
 
     retry() {
         this.loadData();
