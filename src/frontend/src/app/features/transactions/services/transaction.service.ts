@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable} from 'rxjs';
 
-import { AvgDailySpending, NewTransaction, Transaction, TransactionFilter } from '../models/transaction.model';
+import { BalanceSummary, NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../models/transaction.model';
 import { apiUrl } from '../../../../environments/environment';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
@@ -14,7 +14,7 @@ export class TransactionService {
 	private http = inject(HttpClient);
 
 	getAllTransactions(
-		filters: Partial<TransactionFilter> = {},
+		filters?: Partial<TransactionFilter>,
 		pageSize: number = 5,
 		pageNumber: number = 1
 	) : Observable<Transaction[]> {
@@ -39,7 +39,17 @@ export class TransactionService {
 		return this.http.delete<void>(`${this.baseUrl}/${id}`);
 	}
 
-	getAvgDailySpending(): Observable<AvgDailySpending> {
-		return this.http.get<AvgDailySpending>(`${this.baseUrl}/average-daily-spending`);
+	getAvgDailySpending(timePeriod?: TimePeriod): Observable<number> {
+		const filters = timePeriod !== undefined ? { timePeriod } : {};
+		const params = createHttpParams(filters);
+
+		return this.http.get<number>(`${this.baseUrl}/average-daily-spending`, { params });
+	}
+
+	getBalance(timePeriod?: TimePeriod): Observable<BalanceSummary> {
+		const filters = timePeriod !== undefined ? { timePeriod } : {};
+		const params = createHttpParams(filters);
+
+		return this.http.get<BalanceSummary>(`${this.baseUrl}/balance`, { params });
 	}
 }

@@ -30,20 +30,30 @@ interface TransactionFilter {
 }
 
 enum TransactionType {
-    income = 1,
-    expense = 2
+    Income = 1,
+    Expense = 2
 }
 
 enum PaymentType {
-    cash = 1,
-    creditCard = 2,
-    bankTransfer = 3,
-    other = 4
+    Cash = 1,
+    CreditCard = 2,
+    BankTransfer = 3,
+    Other = 4
 }
 
-interface AvgDailySpending {
-    avgSpending: number;
-    percentageChange: number;
+enum TimePeriod {
+    AllTime = 1,
+    ThisMonth = 2,
+    LastMonth = 3,
+    Last3Months = 4,
+    Last6Months = 5,
+    ThisYear = 6
+}
+
+interface BalanceSummary {
+    income: number;
+    expense: number;
+    balance: number;
 }
 
 export type {
@@ -52,5 +62,6 @@ export type {
     TransactionFilter,
     TransactionType,
     PaymentType,
-    AvgDailySpending
+    TimePeriod,
+    BalanceSummary
 }
