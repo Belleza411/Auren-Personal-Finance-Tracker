@@ -144,7 +144,7 @@ namespace Auren.Application.Services
 
 			var currentBalance = await _transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
 
-			if (currentBalance < amount)
+			if (currentBalance.Balance < amount)
 				return Result.Failure<Goal>(Error.NotEnoughBalance($"{amount} is not enough balance. "));
 
 			var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);

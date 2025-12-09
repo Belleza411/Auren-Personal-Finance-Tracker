@@ -58,7 +58,7 @@ namespace Auren.Application.Services
             {
                 var currentBalance = await _transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
 
-                if (currentBalance < transactionDto.Amount)
+                if (currentBalance.Balance < transactionDto.Amount)
                 {
                     _logger.LogWarning(
                         "Insufficient funds for user {UserId}. Tried to create expense {Amount} with balance {Balance}",
@@ -112,7 +112,7 @@ namespace Auren.Application.Services
             };
 
             var balance = await _transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
-            return Result.Success<decimal>(balance);
+            return Result.Success<decimal>(balance.Balance);
         }
             
 

@@ -9,6 +9,7 @@ using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 
 
 namespace Auren.Infrastructure.Repositories
@@ -34,7 +35,7 @@ namespace Auren.Infrastructure.Repositories
             return true;
         }
 
-		public async Task<decimal> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
+		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
 		{
             var income = await dbContext.Transactions
                 .Where(t => t.UserId == userId &&
@@ -50,7 +51,11 @@ namespace Auren.Infrastructure.Repositories
                             t.TransactionDate <= end)
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
-            return income - expense;
+            return new BalanceSummaryResponse(
+                Income: income,
+                Expense: expense,
+                Balance: income - expense
+            );
         }
 
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken) 
@@ -187,13 +192,13 @@ namespace Auren.Infrastructure.Repositories
             var currentBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
             var lastMonthBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
 
-            var balanceChange = CalculatePercentageChange(currentBalance, lastMonthBalance, true);
+            var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance, true);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome, false);
             var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense, false);
 
             return new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
-                    Amount: currentBalance,
+                    Amount: currentBalance.Balance,
                     PercentageChange: balanceChange
                 ),
                 Income: new TransactionMetricResponse(
