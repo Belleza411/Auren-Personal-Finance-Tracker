@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
@@ -102,6 +103,31 @@ namespace Auren.API.Controllers
             var deleted = await categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);
 
             return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
+        }
+
+        [HttpGet("overview")]
+        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
+            [FromQuery] CategoryOverviewFilter filter,
+            [FromQuery] int pageSize = 5,
+            [FromQuery] int pageNumber = 1,
+            CancellationToken cancellationToken = default)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var overview = await categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber,
+                cancellationToken);
+            return Ok(overview.Value);
+        }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<CategorySummaryResponse>> GetCategoriesSummary(CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var summary = await categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
+            return Ok(summary.Value);
         }
     }
 }

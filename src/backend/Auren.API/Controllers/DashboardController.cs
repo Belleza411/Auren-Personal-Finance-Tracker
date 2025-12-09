@@ -21,21 +21,6 @@ namespace Auren.API.Controllers
 		 IGoalService goalService
         ) : ControllerBase
 	{
-		[HttpGet("categories/categories-overview")]
-        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
-			[FromQuery] CategoryOverviewFilter filter,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] int pageNumber = 1,
-            CancellationToken cancellationToken = default)  
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-			var overview = await categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber, 
-				cancellationToken);
-            return Ok(overview.Value);       
-        }
-
 		[HttpGet("summary")]
 		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
             [FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth, 
@@ -45,16 +30,6 @@ namespace Auren.API.Controllers
 			if (userId == null) return Unauthorized();
 
 			var summary = await transactionService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
-            return Ok(summary.Value);
-        }
-
-		[HttpGet("categories/summary")]
-		public async Task<ActionResult<CategorySummaryResponse>> GetCategoriesSummary(CancellationToken cancellationToken)
-		{
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-			var summary = await categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
             return Ok(summary.Value);
         }
 
