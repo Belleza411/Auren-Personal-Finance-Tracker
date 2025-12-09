@@ -4,6 +4,7 @@ using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Services;
+using Auren.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -115,12 +116,12 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("average-daily-spending")]
-        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(CancellationToken cancellationToken)
+        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending(TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, cancellationToken);
+            var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, timePeriod ?? TimePeriod.AllTime, cancellationToken);
 
             return Ok(avgSpending.Value);
         }

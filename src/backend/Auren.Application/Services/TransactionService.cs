@@ -3,11 +3,13 @@ using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Transaction;
+using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Auren.Application.Services
@@ -95,9 +97,6 @@ namespace Auren.Application.Services
                 ? Result.Success(true)
                 : Result.Failure<bool>(Error.NotFound("Transaction not found. "));
         }
-
-        public async Task<Result<AvgDailySpendingResponse>> GetAvgDailySpending(Guid userId, CancellationToken cancellationToken)
-            => Result.Success(await _transactionRepository.GetAvgDailySpendingAsync(userId, cancellationToken));
         
         public async Task<Result<decimal>> GetBalance(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
             => Result.Success(await _transactionRepository.GetBalanceAsync(userId, balancePeriod, cancellationToken));
@@ -162,5 +161,34 @@ namespace Auren.Application.Services
 
         public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
             => Result.Success(await _transactionRepository.GetDashboardSummaryAsync(userId, timePeriod, cancellationToken));
+
+        public async Task<Result<decimal>> GetAvgDailySpending(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
+        {
+            var (startDate, endDate) = timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+
+            var expenses = await _transactionRepository.GetExpensesAsync(userId, startDate, endDate, cancellationToken);
+
+            if (expenses is null)
+                return Result.Success(0m);
+
+            var totalSpending = expenses.Sum(e => e.Amount);
+            var totalDays = (endDate - startDate).TotalDays + 1;
+
+            if (totalDays <= 0)
+                return Result.Success(0m);
+
+            var avg = totalSpending / (decimal)totalDays;
+
+            return Result.Success(avg);
+        }
     }
 }

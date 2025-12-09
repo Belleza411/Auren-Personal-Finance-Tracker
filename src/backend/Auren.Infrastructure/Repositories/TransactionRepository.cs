@@ -15,7 +15,6 @@ namespace Auren.Infrastructure.Repositories
 {
 	public class TransactionRepository(AurenDbContext dbContext) : ITransactionRepository
 	{
-
 		public async Task<Transaction> CreateTransactionAsync(Transaction transaction, Guid userId, CancellationToken cancellationToken)
 		{
             await dbContext.Transactions.AddAsync(transaction, cancellationToken);
@@ -33,47 +32,6 @@ namespace Auren.Infrastructure.Repositories
             await dbContext.SaveChangesAsync(cancellationToken);
 
             return true;
-        }
-
-		public async Task<AvgDailySpendingResponse> GetAvgDailySpendingAsync(Guid userId, CancellationToken cancellationToken)
-		{
-            var (firstDayOfLastMonth, lastDayOfLastMonth) = DateTime.Today.GetLastMonthRange();
-            var (firstDayOfCurrentMonth, lastDayOfCurrentMonth) = DateTime.Today.GetCurrentMonthRange();
-
-            var targetTotal = await dbContext.Transactions
-                 .Where(t => t.UserId == userId
-                             && t.TransactionType == TransactionType.Expense
-                             && t.TransactionDate >= firstDayOfCurrentMonth
-                             && t.TransactionDate <= lastDayOfCurrentMonth)
-                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
-
-            var prevTotal = await dbContext.Transactions
-                .Where(t => t.UserId == userId
-                            && t.TransactionType == TransactionType.Expense
-                            && t.TransactionDate >= firstDayOfLastMonth
-                            && t.TransactionDate <= lastDayOfLastMonth)
-                .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
-
-            var daysInTarget = DateTime.DaysInMonth(firstDayOfCurrentMonth.Year, firstDayOfCurrentMonth.Month);
-            var daysInPrev = DateTime.DaysInMonth(firstDayOfLastMonth.Year, firstDayOfLastMonth.Month);
-
-            var currentAvg = daysInTarget > 0 ? targetTotal / daysInTarget : 0m;
-            var lastMonthAvg = daysInPrev > 0 ? prevTotal / daysInPrev : 0m;
-
-            decimal percentageChange;
-            if (lastMonthAvg == 0m)
-            {
-                percentageChange = currentAvg > 0m ? 100m : 0m;
-            }
-            else
-            {
-                percentageChange = ((currentAvg - lastMonthAvg) / lastMonthAvg) * 100m;
-            }
-
-            var roundedAvg = Math.Round(currentAvg, 2);
-            var roundedChange = Math.Round(percentageChange, 2);
-
-            return new AvgDailySpendingResponse(currentAvg, percentageChange);
         }
 
 		public async Task<decimal> GetBalanceAsync(Guid userId, BalancePeriod balancePeriod, CancellationToken cancellationToken)
@@ -280,6 +238,18 @@ namespace Auren.Infrastructure.Repositories
                 : ((current - previous) / previous) * 100;
 
             return Math.Round(change, 2);
+        }
+
+        public async Task<IEnumerable<Transaction>> GetExpensesAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
+        {
+            var expenses = await dbContext.Transactions
+                .Where(t => t.UserId == userId 
+                    && t.TransactionDate >= start 
+                    && t.TransactionDate <= end)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            return expenses;
         }
     }
 }
