@@ -61,7 +61,7 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpPost("logout")]
-		public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+		public async Task<ActionResult<AuthResponse>> Logout(CancellationToken cancellationToken)
 		{
 			var userId = User.GetCurrentUserId();
 
@@ -84,11 +84,11 @@ namespace Auren.API.Controllers
 				};
             }
 
-            return Ok(new
+            return Ok(new AuthResponse
 			{
 				Success = true,
 				Message = "Logged out successfully"
-            });
+			});
         }
     }
 }
