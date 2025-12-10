@@ -1,12 +1,11 @@
 interface User {
     userId: string;
+    email: string;
     firstName: string;
     lastName: string;
     profilePictureUrl: string | null;
     createdAt: Date;
     lastLoginAt: Date | null;
-    currency: string | null;
-    refreshTokens: RefreshToken[]
 }
 
 interface RefreshToken {
@@ -23,7 +22,36 @@ interface RefreshToken {
     user: User;
 }
 
+interface AuthResponse {
+    success: boolean;
+    message: string;
+    user: User | null;
+    errors: string[] | null
+}
+
+interface Register {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName: string;
+    lastName: string;
+    profileImage?: ProfileImageUpload;
+}
+
+interface ProfileImageUpload {
+    name: string | null;
+    description: string | null;
+}
+
+interface Login {
+    email: string;
+    password: string;
+}
+
 export type {
     User,
-    RefreshToken
+    RefreshToken,
+    AuthResponse,
+    Register,
+    Login
 }
