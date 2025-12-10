@@ -21,7 +21,7 @@ namespace Auren.API.Controllers
 	{
 
 		[HttpPost("register")]
-		public async Task<IActionResult> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
+		public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
 			var result = await userService.RegisterAsync(request, cancellationToken);
 
