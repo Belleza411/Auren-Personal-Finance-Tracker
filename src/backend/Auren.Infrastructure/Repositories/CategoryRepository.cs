@@ -210,9 +210,9 @@ namespace Auren.Infrastructure.Repositories
                                                             .FirstOrDefault()?.Name;
 
             return new CategorySummaryResponse(
-                totalCategories: summary.Count,
-                mostUsedCategory: mostUsedCategory ?? "N/A",
-                highestSpendingCategory: highestSpendingCategory ?? "N/A"
+                TotalCategories: summary.Count,
+                MostUsedCategory: mostUsedCategory ?? "N/A",
+                HighestSpendingCategory: highestSpendingCategory ?? "N/A"
             ); 
         }
 	}
