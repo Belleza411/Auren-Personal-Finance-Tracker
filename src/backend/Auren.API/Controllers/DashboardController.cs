@@ -33,16 +33,6 @@ namespace Auren.API.Controllers
             return Ok(summary.Value);
         }
 
-        [HttpGet("goals/summary")]
-        public async Task<ActionResult<CategorySummaryResponse>> GetGoalsSummary(CancellationToken cancellationToken)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-			var summary = await goalService.GetGoalsSummary(userId.Value, cancellationToken);
-            return Ok(summary.Value);
-        }
-
 		[HttpGet("categories-expense")]
 		public async Task<ActionResult<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseByCategoryChart(CancellationToken cancellationToken)
 		{

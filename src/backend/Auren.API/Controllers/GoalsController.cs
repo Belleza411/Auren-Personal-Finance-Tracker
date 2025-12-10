@@ -1,6 +1,8 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses.Category;
+using Auren.Application.DTOs.Responses.Goal;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
@@ -125,7 +127,18 @@ namespace Auren.API.Controllers
                 };
             }
 
+
             return Ok(result.Value);
+        }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<GoalsSummaryResponse>> GetGoalsSummary(CancellationToken cancellationToken)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var summary = await goalService.GetGoalsSummary(userId.Value, cancellationToken);
+            return Ok(summary.Value);
         }
     }
 }
