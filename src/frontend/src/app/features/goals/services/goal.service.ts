@@ -2,7 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { Goal, GoalFilter, NewGoal } from "../models/goals.model";
+import { Goal, GoalFilter, GoalsSummary, NewGoal } from "../models/goals.model";
 import { createHttpParams } from "../../../shared/utils/http-params.util";
 
 @Injectable({
@@ -13,13 +13,13 @@ export class GoalService {
     private http = inject(HttpClient);
 
     getAllGoals(
-        filters: Partial<GoalFilter> = {}, 
+        filters?: Partial<GoalFilter>, 
         pageNumber: number = 1, 
         pageSize: number = 5
-    ): Observable<Goal> {
+    ): Observable<Goal[]> {
         const params = createHttpParams(filters, pageSize, pageNumber);
 
-        return this.http.get<Goal>(apiUrl, { params });
+        return this.http.get<Goal[]>(apiUrl, { params });
     }
 
     getGoalById(id: string): Observable<Goal> {
@@ -36,5 +36,13 @@ export class GoalService {
 
     deleteGoal(id: string): Observable<void> {
         return this.http.delete<void>(`${apiUrl}/${id}`);
+    }
+
+    getGoalsSummary(): Observable<GoalsSummary> {
+        return this.http.get<GoalsSummary>(`${this.baseUrl}/summary`);
+    }
+
+    addMoneyToGoal(amount: number, id: string): Observable<any> {
+        return this.http.put<any>(`${this.baseUrl}/${id}/add-money`, amount);
     }
 }

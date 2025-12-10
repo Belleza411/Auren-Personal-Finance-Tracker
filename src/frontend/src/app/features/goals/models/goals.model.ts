@@ -31,17 +31,24 @@ interface GoalFilter {
 }
 
 enum GoalStatus {
-    completed = 1,
-    onTrack = 2,
-    onHold = 3,
-    notStarted = 4,
-    behindSchedule = 5,
-    cancelled = 6
+    Completed = 1,
+    OnTrack = 2,
+    OnHold = 3,
+    NotStarted = 4,
+    BehindSchedule = 5,
+    Cancelled = 6
+}
+
+interface GoalsSummary {
+    totalGoals: number;
+    goalsCompleted: number;
+    activeGoals: number;
 }
 
 export type {
     Goal,
     GoalStatus,
     GoalFilter,
-    NewGoal
+    NewGoal,
+    GoalsSummary
 }
