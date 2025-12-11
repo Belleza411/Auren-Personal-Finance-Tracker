@@ -35,10 +35,11 @@ interface Register {
     confirmPassword: string;
     firstName: string;
     lastName: string;
-    profileImage?: ProfileImageUpload;
+    profileImage?: ProfileImageUpload | null;
 }
 
 interface ProfileImageUpload {
+    file: File | null;
     name: string | null;
     description: string | null;
 }

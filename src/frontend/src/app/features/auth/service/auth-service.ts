@@ -12,8 +12,8 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${apiUrl}/api/auth`;
 
-  register(request: Register, file?: File): Observable<AuthResponse> {
-    const formData = this.buildRegistrationFormData(request, file);
+  register(request: Register): Observable<AuthResponse> {
+    const formData = this.buildRegistrationFormData(request);
 
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, formData);
   }
@@ -26,25 +26,17 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {});
   }
 
-  private buildRegistrationFormData(request: Register, file?: File): FormData {
+  private buildRegistrationFormData(request: Register): FormData {
     const formData = new FormData();
 
-    formData.append('Email', request.email);
-    formData.append('Password', request.password);
-    formData.append('ConfirmPassword', request.confirmPassword);
-    formData.append('FirstName', request.firstName);
-    formData.append('LastName', request.lastName);
-
-    if (file) {
-      formData.append('ProfileImage.File', file);
+    for (const key of ['email','password','confirmPassword','firstName','lastName'] as const) {
+      formData.append(key, request[key]);
     }
 
-    if (request.profileImage?.name) {
-      formData.append('ProfileImage.Name', request.profileImage.name);
-    }
-
-    if (request.profileImage?.description) {
-      formData.append('ProfileImage.Description', request.profileImage.description);
+    if (request.profileImage && request.profileImage.file) {
+      formData.append('profileImage.file', request.profileImage.file);
+      formData.append('profileImage.name', request.profileImage.description ?? '');
+      formData.append('profileImage.description', request.profileImage.description ?? '');
     }
 
     return formData;
