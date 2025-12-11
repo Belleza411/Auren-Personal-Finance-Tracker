@@ -1,0 +1,59 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    margin: 0 5rem;
+}
+
+:host h1 {
+    font-size: 2.5rem;
+}
+
+:host .no-account {
+    margin: 2rem 0;
+    color: #718096;
+}
+
+:host .no-account a,
+:host form .forgot-password a {
+    color: #1C4532;
+    text-decoration: underline;
+}
+
+:host form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+}
+
+:host form p {
+    display: flex;
+    flex-direction: column;
+}
+
+:host form p label {
+    color: #718096;
+    margin-bottom: 0.5rem;
+}
+
+:host form p input {
+    padding: 1rem 10rem 1rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #CBD5E0;
+}
+
+:host form .forgot-password {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    font-weight: 600;
+}
+
+:host form button {
+    font-weight: bold;
+    background-color: #1C4532;
+    color: #fff;
+    border: none;
+    padding: 1rem 0;
+    border-radius: 10px;
+    font-size: 1.1rem;
+}

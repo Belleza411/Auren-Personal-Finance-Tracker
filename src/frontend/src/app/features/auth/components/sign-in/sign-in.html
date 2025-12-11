@@ -1,0 +1,30 @@
+<h1>Sign In</h1>
+<p class="no-account">Don't have an account?
+    <a routerLink="/auth/sign-up">Create Now</a>
+</p>
+<form (submit)="onSubmit($event)">
+    <p>
+        <label for="email">Email</label>
+        <input 
+            type="email" 
+            placeholder="example@gmail.com"
+            [field]="loginForm.email">
+    </p>
+    <p>
+        <label for="password">Password</label>
+        <input 
+            type="password"
+            placeholder="&@^ncq2"
+            [field]="loginForm.password">
+    </p>
+    <div class="forgot-password">
+        <a routerLink="/auth/forgot-password">Forgot Password?</a>
+    </div>
+    <button 
+        type="submit"
+        [disabled]="isLoading() || loginForm().invalid"
+    >
+        {{ isLoading() ? 'Signing in' : 'Sign In'}}
+    </button>
+</form>
+
