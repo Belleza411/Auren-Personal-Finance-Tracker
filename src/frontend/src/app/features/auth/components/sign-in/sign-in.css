@@ -68,3 +68,16 @@
     border-radius: 10px;
     font-size: 1.1rem;
 }
+
+:host form button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6; 
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

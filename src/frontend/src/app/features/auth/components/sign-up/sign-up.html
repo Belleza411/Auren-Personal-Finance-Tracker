@@ -105,6 +105,12 @@
         type="submit"
         [disabled]="isLoading() || registerForm().invalid()"
     >
-        {{ isLoading() ? 'Signing up' : 'Sign Up' }}
+        @if(isLoading()) {
+            <span class="material-symbols-outlined spinning">
+                progress_activity
+            </span>
+        } @else {
+            Sign Up
+        }
     </button>
 </form>
