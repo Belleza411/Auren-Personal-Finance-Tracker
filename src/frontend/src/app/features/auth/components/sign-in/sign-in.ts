@@ -1,5 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
-import { form, required, email, submit, minLength, Field } from '@angular/forms/signals'
+import { Component, computed, inject, signal } from '@angular/core';
+import { form, required, email, submit, minLength, Field, FieldState } from '@angular/forms/signals'
 import { AuthService } from '../../service/auth-service';
 import { Router, RouterLink } from '@angular/router';
 
@@ -18,12 +18,12 @@ export class SignInFormComponent {
   isLoading = signal(false);
   error = signal<string | null>(null);
 
-  loginModel = signal<Login>({
+  protected loginModel = signal<Login>({
     email: '',
     password: ''
   });
 
-  loginForm = form(this.loginModel, schema => {
+  protected loginForm = form(this.loginModel, schema => {
     required(schema.email, { message: "Email is required "}),
     email(schema.email, { message: "Enter a valid email"}),
 
@@ -55,4 +55,17 @@ export class SignInFormComponent {
         })
     })
   }
+
+  protected fieldErrors = {
+    email: this.createErrorSignal(() => this.loginForm.email()),
+    password: this.createErrorSignal(() => this.loginForm.password())
+  }
+
+  private createErrorSignal(field: () => FieldState<string>) {
+    return computed(() => this.setShowError(field()));
+  };
+
+  private setShowError(field: FieldState<string>) {
+    return field.invalid() && field.touched();
+  };
 }

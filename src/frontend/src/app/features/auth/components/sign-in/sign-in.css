@@ -41,6 +41,17 @@
     border: 1px solid #CBD5E0;
 }
 
+:host form p input.error {
+    border: 1px solid red;
+}
+
+:host form p .error-list {
+    color: red;
+    list-style-type: none;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
 :host form .forgot-password {
     display: flex;
     align-items: flex-end;

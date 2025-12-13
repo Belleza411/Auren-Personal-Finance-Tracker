@@ -8,14 +8,30 @@
         <input 
             type="email" 
             placeholder="example@gmail.com"
+            [class.error]="fieldErrors.email()"
             [field]="loginForm.email">
+        @if(fieldErrors.email()) {
+            <ul class="error-list">
+                @for (error of loginForm.email().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     </p>
     <p>
         <label for="password">Password</label>
         <input 
             type="password"
             placeholder="&@^ncq2"
+            [class.error]="fieldErrors.password()"
             [field]="loginForm.password">
+        @if(fieldErrors.password()) {
+            <ul class="error-list">
+                @for (error of loginForm.password().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     </p>
     <div class="forgot-password">
         <a routerLink="/auth/forgot-password">Forgot Password?</a>
