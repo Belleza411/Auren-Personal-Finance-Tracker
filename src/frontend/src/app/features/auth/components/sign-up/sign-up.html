@@ -90,7 +90,7 @@
         <input 
             type="password"
             placeholder="&@^ncq2"
-            [class]="fieldErrors.confirmPassword()"
+            [class.error]="fieldErrors.confirmPassword()"
             [field]="registerForm.confirmPassword">
         @if(fieldErrors.confirmPassword()) {
             <ul class="error-list">
