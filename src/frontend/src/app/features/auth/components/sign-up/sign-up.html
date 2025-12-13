@@ -1,0 +1,110 @@
+<h1>Sign Up</h1>
+<p class="no-account">Already have an account?
+    <a routerLink="/auth/sign-in">Sign In</a>
+</p>
+<form (submit)="onSubmit($event)">
+    <div class="upload-profile">
+        <div class="profile-image-wrapper">
+            <div class="profile-image">
+                <img
+                    [src]="profilePreview() || 'assets/default-profile.png'"
+                    alt="Profile"
+                />
+            </div>
+            <div class="upload-icon" (click)="fileInput.click()">
+                <span class="material-symbols-outlined">
+                    upload
+                </span>
+            </div>
+            <input 
+                #fileInput
+                id="file-input"
+                type="file"
+                (change)="onFileSelect($event)">
+        </div>
+    </div>
+    <div class="name">
+        <p>
+            <label for="first-name">First Name</label>
+            <input 
+                type="text"
+                placeholder="John"
+                [class.error]="fieldErrors.firstName()"
+                [field]="registerForm.firstName">
+            @if(fieldErrors.firstName()) {
+                <ul class="error-list">
+                    @for (error of registerForm.firstName().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </p>
+        <p>
+            <label for="last-name">Last Name</label>
+            <input 
+                type="text"
+                placeholder="Doe"
+                [class.error]="fieldErrors.lastName()"
+                [field]="registerForm.lastName">
+            @if(fieldErrors.lastName()) {
+                <ul class="error-list">
+                    @for (error of registerForm.lastName().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </p>
+    </div>
+    <p>
+        <label for="email">Email</label>
+        <input 
+            type="email" 
+            placeholder="example@gmail.com"
+            [class.error]="fieldErrors.email()"
+            [field]="registerForm.email">
+        @if(fieldErrors.email()) {
+            <ul class="error-list">
+                @for (error of registerForm.email().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="password">Password</label>
+        <input 
+            type="password"
+            placeholder="&@^ncq2"
+            [class.error]="fieldErrors.password()"
+            [field]="registerForm.password">
+        @if(fieldErrors.password()) {
+            <ul class="error-list">
+                @for (error of registerForm.password().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="confirm-password">Confirm Password</label>
+        <input 
+            type="password"
+            placeholder="&@^ncq2"
+            [class]="fieldErrors.confirmPassword()"
+            [field]="registerForm.confirmPassword">
+        @if(fieldErrors.confirmPassword()) {
+            <ul class="error-list">
+                @for (error of registerForm.confirmPassword().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    
+    <button 
+        type="submit"
+        [disabled]="isLoading() || registerForm().invalid()"
+    >
+        {{ isLoading() ? 'Signing up' : 'Sign Up' }}
+    </button>
+</form>
