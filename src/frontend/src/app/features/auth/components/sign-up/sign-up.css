@@ -76,32 +76,57 @@
     display: none;
 }
 
-
 :host form .name {
     display: flex;
     gap: 1rem;
 }
 
+:host form .field,
 :host form p {
     display: flex;
     flex-direction: column;
 }
 
+:host form .field label,
 :host form p label {
     color: #718096;
     margin-bottom: 0.5rem;
 }
 
+:host form .field .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+:host form .field .password-wrapper input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+
+:host form .field .password-wrapper .toggle-icon {
+    position: absolute;
+    right: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    font-size: 1.2em;
+}
+
+:host form .field input,
 :host form p input {
     padding: 1rem 10rem 1rem 0.5rem;
     border-radius: 10px;
     border: 1px solid #CBD5E0;
+    width: 100%;
 }
 
+:host form .field input.error,
 :host form p input.error {
     border: 1px solid red;
 }
 
+:host form .field .error-list,
 :host form p .error-list {
     color: red;
     list-style-type: none;

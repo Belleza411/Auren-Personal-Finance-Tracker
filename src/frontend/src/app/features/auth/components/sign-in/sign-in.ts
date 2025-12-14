@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { form, required, email, submit, minLength, Field, FieldState } from '@angular/forms/signals'
 import { AuthService } from '../../service/auth-service';
 import { Router, RouterLink } from '@angular/router';
 
 import { Login } from '../../models/user.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sign-in',
@@ -14,9 +15,11 @@ import { Login } from '../../models/user.model';
 export class SignInFormComponent {
   private readonly authSer = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   protected loginModel = signal<Login>({
     email: '',
@@ -41,6 +44,7 @@ export class SignInFormComponent {
       const credentials = this.loginModel()
       
       this.authSer.login(credentials)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
             console.log(response);
@@ -68,4 +72,8 @@ export class SignInFormComponent {
   private setShowError(field: FieldState<string>) {
     return field.invalid() && field.touched();
   };
+  
+  protected togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
 }

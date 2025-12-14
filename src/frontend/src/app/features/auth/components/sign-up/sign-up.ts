@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../service/auth-service';
 import { Register } from '../../models/user.model';
 import { email, Field, FieldState, form, minLength, required, submit, validate } from '@angular/forms/signals';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sign-up',
@@ -14,6 +15,7 @@ import { email, Field, FieldState, form, minLength, required, submit, validate }
 export class SignUpFormComponent {
   private readonly authSer = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = signal(false);
   error = signal<string | null>(null);
@@ -88,20 +90,21 @@ export class SignUpFormComponent {
       this.isLoading.set(true);
       this.error.set(null);
 
-      const credentials = this.registerModel();
-      console.log(credentials);
-      
+      const credentials = this.registerModel();    
 
       this.authSer.register(credentials)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
             console.log(response);
+            this.profilePreview.set(null);
+            this.selectedFile.set(null);
             this.router.navigate(['/auth/sign-in']);
             this.isLoading.set(false)
           },
           error: err => {
             console.error('Registration failed: ', err);
-            this.error.set('Login failed. Please try again.');
+            this.error.set(err?.error?.message || 'Registration failed. Please try again.');
             this.isLoading.set(false);
           }
         })
@@ -123,4 +126,12 @@ export class SignUpFormComponent {
   private setShowError(field: FieldState<string>) {
     return field.invalid() && field.touched();
   };
+
+  protected togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  protected toggleConfirmPassword(): void {
+    this.showConfirmPassword.update(v => !v);
+  }
 }

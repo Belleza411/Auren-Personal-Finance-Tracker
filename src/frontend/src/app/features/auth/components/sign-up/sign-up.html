@@ -55,7 +55,7 @@
             }
         </p>
     </div>
-    <p>
+    <div class="field">
         <label for="email">Email</label>
         <input 
             type="email" 
@@ -69,14 +69,32 @@
                 }
             </ul>
         }
-    </p>
-    <p>
+    </div>
+    <div class="field">
         <label for="password">Password</label>
-        <input 
-            type="password"
-            placeholder="&@^ncq2"
-            [class.error]="fieldErrors.password()"
-            [field]="registerForm.password">
+        <div class="password-wrapper">
+            @if (showPassword()) {
+                <input
+                    type="text"
+                    placeholder="&@^ncq2"
+                    [class.error]="fieldErrors.password()"
+                    [field]="registerForm.password"
+                />
+            } @else {
+                <input
+                    type="password"
+                    placeholder="&@^ncq2"
+                    [class.error]="fieldErrors.password()"
+                    [field]="registerForm.password"
+                />
+            }
+            <span
+                class="material-symbols-outlined toggle-icon"
+                (click)="togglePassword()"
+                >
+                {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
+        </div>
         @if(fieldErrors.password()) {
             <ul class="error-list">
                 @for (error of registerForm.password().errors(); track error.kind) {
@@ -84,14 +102,32 @@
                 }
             </ul>
         }
-    </p>
-    <p>
+    </div>
+    <div class="field">
         <label for="confirm-password">Confirm Password</label>
-        <input 
-            type="password"
-            placeholder="&@^ncq2"
-            [class.error]="fieldErrors.confirmPassword()"
-            [field]="registerForm.confirmPassword">
+        <div class="password-wrapper">
+            @if (showConfirmPassword()) {
+                <input
+                    type="text"
+                    placeholder="&@^ncq2"
+                    [class.error]="fieldErrors.confirmPassword()"
+                    [field]="registerForm.confirmPassword"
+                />
+            } @else {
+                <input
+                    type="password"
+                    placeholder="&@^ncq2"
+                    [class.error]="fieldErrors.confirmPassword()"
+                    [field]="registerForm.confirmPassword"
+                />
+            }
+            <span
+                class="material-symbols-outlined toggle-icon"
+                (click)="toggleConfirmPassword()"
+            >
+                {{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
+        </div>
         @if(fieldErrors.confirmPassword()) {
             <ul class="error-list">
                 @for (error of registerForm.confirmPassword().errors(); track error.kind) {
@@ -99,8 +135,7 @@
                 }
             </ul>
         }
-    </p>
-    
+    </div> 
     <button 
         type="submit"
         [disabled]="isLoading() || registerForm().invalid()"
