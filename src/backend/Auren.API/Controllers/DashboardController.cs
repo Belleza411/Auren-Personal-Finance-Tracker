@@ -17,8 +17,7 @@ namespace Auren.API.Controllers
 	[ApiController]
     public class DashboardController(
          ITransactionService transactionService,
-		 ICategoryService categoryService,
-		 IGoalService goalService
+		 ICategoryService categoryService
         ) : ControllerBase
 	{
 		[HttpGet("summary")]
