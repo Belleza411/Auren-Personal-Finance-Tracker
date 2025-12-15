@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthLayout } from './features/auth/layout/auth-layout/auth-layout';
+import { DashboardComponent } from './features/dashboard/component/dashboard/dashboard';
 
 export const routes: Routes = [
     {
@@ -14,6 +15,10 @@ export const routes: Routes = [
     },
     {
         path: '**',
-        redirectTo: 'sign-in'
+        redirectTo: '/auth/sign-in'
+    },
+    {
+        path: 'dashboard',
+        component: DashboardComponent
     }
 ];
