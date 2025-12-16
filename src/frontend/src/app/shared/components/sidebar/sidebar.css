@@ -49,6 +49,7 @@
     align-items: center;
     color: #324054;
     font-size: 0.95rem;
+    cursor: pointer;
 }
 
 :host div button span {
