@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthLayout } from './core/layout/auth-layout/auth-layout';
-import { DashboardComponent } from './features/dashboard/component/dashboard/dashboard';
-import { MainLayoutComponent } from './core/layout/main-layout/main-layout';
+import { MainLayout } from './core/layout/main-layout/main-layout';
 
 export const routes: Routes = [
     {
@@ -16,7 +15,7 @@ export const routes: Routes = [
     },
     {
         path: '',
-        component: MainLayoutComponent,
+        component: MainLayout,
         loadChildren: (() => import('./core/routes/main-route').then(m => m.mainRoutes))
     }
 ];
