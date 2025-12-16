@@ -1,0 +1,90 @@
+:host {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border: 1px solid red;
+    padding: 1.5rem 1rem 1.5rem 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+:host h3 {
+    margin-bottom: 2rem;
+}
+
+:host ul {
+    list-style-type: none;
+}
+
+:host ul li {
+    margin-bottom: 1.5rem;
+}
+
+:host ul li {
+    display: flex;
+    align-items: center;
+}
+
+:host ul li span {
+    font-size: 1.3rem;
+}
+
+:host ul li a {
+    text-decoration: none;
+    color: #324054;
+    font-size: 0.95rem;
+    margin-left: 1.3rem;
+}
+
+:host div {
+    margin-top: auto;
+}
+
+:host div button {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    color: #324054;
+    font-size: 0.95rem;
+}
+
+:host div button span {
+    margin-right: 1.2rem;
+    font-size: 1.3rem;
+}
+
+:host div .profile-wrapper {
+    margin-top: 1rem;
+    margin-left: -0.1rem;
+    display: flex;
+}
+
+:host div .profile-wrapper img {
+    border-radius: 100%;
+    width: 35px;
+    height: 35px;
+    border: 1px solid gray;
+}
+
+:host div .profile-wrapper .profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0.5rem;
+    margin-top: 0;
+}
+
+:host div .profile-wrapper .profile-info .name {
+    color: #324054;
+    font-size: 0.9rem;
+}
+
+:host div .profile-wrapper .profile-info .email {
+    color: #71839B;
+    font-size: 0.75rem;
+}
