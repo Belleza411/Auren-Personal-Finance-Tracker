@@ -1,1 +1,24 @@
-<p>dashboard works!</p>
+<header>
+    <p class="welcome">Welcome, Aevan!</p>
+    <p class="message">It is the best time to manage your finances</p>
+</header>
+<div class="dashboard-summaries">
+    <app-summary-card
+        title="Total Balance"
+        icon="attach_money"
+        [amount]="2000.00"
+        [percentage]="12.1"
+    />
+    <app-summary-card
+        title="Income"
+        icon="trending_up"
+        [amount]="2500.00"
+        [percentage]="6.3"
+    />
+    <app-summary-card
+        title="Expense"
+        icon="trending_down"
+        [amount]="500.00"
+        [percentage]="2.4"
+    />
+</div>

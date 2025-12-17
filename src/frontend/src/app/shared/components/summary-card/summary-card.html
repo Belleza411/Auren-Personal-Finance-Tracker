@@ -1,0 +1,16 @@
+<div class="header">
+    <p>{{ title() }}</p>
+    <span class="material-symbols-outlined">
+        {{ icon() }}
+    </span>
+</div>
+<p class="amount">{{ amount() | currency }}</p>
+<div class="per-change_last-month">
+    <p class="change">
+        <span class="material-symbols-outlined">
+            {{ isPositive() ? 'arrow_upward' : 'arrow_downward' }}
+        </span>
+        <span class="percentage">{{ percentage() }}%</span>
+    </p>
+    <p class="last-month">vs last month</p>
+</div>

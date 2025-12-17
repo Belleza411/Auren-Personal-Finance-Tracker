@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    flex-direction: column;
+}
+
+:host header .welcome {
+    font-size: 1.3rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.05rem;
+}
+
+:host header .message {
+    color: #999999;
+    font-size: 0.9rem;
+}
+
+:host .dashboard-summaries {
+    display: flex;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 1rem;
+}

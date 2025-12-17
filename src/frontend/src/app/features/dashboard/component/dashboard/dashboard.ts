@@ -5,10 +5,11 @@ import { DashboardSummary, ExpenseCategoryChart } from '../../models/dashboard.m
 import { Transaction } from '../../../transactions/models/transaction.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
+import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [SummaryCard],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
