@@ -21,4 +21,32 @@
         [amount]="500.00"
         [percentage]="2.4"
     />
+    <app-summary-card
+        title="Expense"
+        icon="trending_down"
+        [amount]="500.00"
+        [percentage]="2.4"
+    />
+</div>
+<div class="income-expense">
+    <div class="graph">
+        <p>Income vs Expense</p>
+        <!-- Graph -->
+    </div>
+    <div class="chart">
+        <p>Expense By Categories</p>
+        <!-- Chart -->
+    </div>
+</div>
+<div class="transaction-goal">
+    <div class="recent-transaction">
+        <div class="header">
+            <p>Recent Transaction</p>
+            <a routerLink="/transactions">View More</a>
+        </div>
+        <ul></ul>
+    </div>
+    <div class="current-goals">
+        <p>Current Goal</p>
+    </div>
 </div>

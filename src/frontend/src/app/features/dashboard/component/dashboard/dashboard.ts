@@ -6,10 +6,11 @@ import { Transaction } from '../../../transactions/models/transaction.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard],
+  imports: [SummaryCard, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

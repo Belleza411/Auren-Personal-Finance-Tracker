@@ -1,6 +1,7 @@
 :host {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
 }
 
 :host header .welcome {
@@ -17,6 +18,93 @@
 :host .dashboard-summaries {
     display: flex;
     align-items: center;
-    margin-top: 1.5rem;
     gap: 1rem;
 }
+
+:host .income-expense {
+    display: flex;
+    gap: 1rem;
+}
+
+:host .income-expense .graph,
+:host .income-expense .chart {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border: 1px solid #c5c5c5;
+    border-radius: 14px;
+    display: flex;
+    padding: 1.1rem 1.2rem;
+    box-shadow: 0px 16px 16px -8px rgba(12, 12, 13, 0.1), 0px 4px 4px -4px rgba(12, 12, 13, 0.05);
+}
+
+:host .income-expense .graph {
+    width: 51rem;
+}
+
+:host .income-expense .chart {
+    width: 30rem;
+}
+
+:host .income-expense .graph p {
+    font-size: 1.05rem;
+}
+
+:host .transaction-goal {
+    display: flex;
+    gap: 1rem;
+}
+
+:host .transaction-goal .recent-transaction,
+:host .transaction-goal .current-goals {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border: 1px solid #c5c5c5;
+    border-radius: 14px;
+    display: flex;
+    padding: 1.1rem 1.2rem;
+    box-shadow: 0px 16px 16px -8px rgba(12, 12, 13, 0.1), 0px 4px 4px -4px rgba(12, 12, 13, 0.05);
+}
+
+:host .transaction-goal .recent-transaction {
+    width: 51rem;
+}
+
+:host .transaction-goal .current-goals {
+    width: 30rem;
+}
+
+:host .transaction-goal .recent-transaction .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+:host .transaction-goal .recent-transaction .header p {
+    font-size: 1.05rem;
+}
+
+:host .transaction-goal .current-goals {
+    font-size: 1.05rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
