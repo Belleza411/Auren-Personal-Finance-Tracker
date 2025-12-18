@@ -1,0 +1,58 @@
+<h2>All Transaction</h2>
+<table>
+    <thead>
+        <tr>
+            <th>
+                <input type="checkbox">
+            </th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Transaction</th>
+            <th>Payment Method</th>
+            <th>Amount</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(t of transactions(); track t.transactionId) {
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>
+                    <p>{{ t.transactionDate }}</p>
+                </td>
+                <td>
+                    <p>{{ TransactionTypeMap[t.transactionType] }}</p>
+                </td>
+                <td>
+                    <p>{{ t.categoryId }}</p>
+                </td>
+                <td>
+                    <p>{{ t.name }}</p>
+                </td>
+                <td>
+                    <p>{{ PaymentTypeMap[t.paymentType] }}</p>
+                </td>
+                <td>
+                    <p>{{ t.amount }}</p>
+                </td>
+                <td>
+                    <div class="buttons">
+                        <button>
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                        <button>
+                            <span class="material-symbols-outlined">
+                                edit
+                            </span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

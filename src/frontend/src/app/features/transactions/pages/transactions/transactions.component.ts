@@ -4,10 +4,11 @@ import { finalize, forkJoin } from 'rxjs';
 
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../models/transaction.model';
+import { TransactionTable } from "../../components/transaction-table/transaction-table";
 
 @Component({
   selector: 'app-transaction',
-  imports: [],
+  imports: [TransactionTable],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
