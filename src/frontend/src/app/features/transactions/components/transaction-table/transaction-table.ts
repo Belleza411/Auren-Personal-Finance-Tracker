@@ -93,7 +93,7 @@ export class TransactionTable {
     {
       categoryId: '1',
       userId: '1',
-      name: 'Freelance Payment',
+      name: 'Salary',
       transactionType: 1,
       createdAt: "June 1, 2025"
     }
