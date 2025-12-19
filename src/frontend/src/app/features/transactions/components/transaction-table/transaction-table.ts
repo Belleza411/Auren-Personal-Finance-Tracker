@@ -1,10 +1,12 @@
-import { Component, computed, input, signal } from '@angular/core';
-import { PaymentTypeMap, Transaction, TransactionType, TransactionTypeMap } from '../../models/transaction.model';
+import { Component, computed, input } from '@angular/core';
+import { Transaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
+import { CurrencyPipe } from '@angular/common';
+import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [],
+  imports: [CurrencyPipe],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
 })
