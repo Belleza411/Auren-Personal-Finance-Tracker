@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
-import { RouterLink } from "@angular/router";
+import { RouterLink, RouterOutlet } from "@angular/router";
 
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../models/transaction.model';
@@ -13,7 +13,7 @@ import { CategoryService } from '../../../categories/services/category.service';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, RouterLink, SummaryCard, CurrencyPipe],
+  imports: [TransactionTable, RouterLink, SummaryCard, CurrencyPipe, RouterOutlet],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })

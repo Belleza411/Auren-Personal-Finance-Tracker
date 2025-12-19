@@ -3,10 +3,11 @@ import { Transaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
 })
