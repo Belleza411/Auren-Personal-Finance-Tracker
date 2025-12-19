@@ -5,10 +5,11 @@ import { finalize, forkJoin } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable],
+  imports: [TransactionTable, RouterLink],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })

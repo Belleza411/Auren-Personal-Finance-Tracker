@@ -1,0 +1,44 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+:host header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+:host header .header {
+    display: flex;
+    flex-direction: column;
+}
+
+:host header .header h2 {
+    font-weight: 500;
+}
+
+:host header .header p {
+    color: #999999;
+    font-size: 0.9rem;
+    margin-left: 0.2rem;
+}
+
+:host header a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: #1C4532;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 200;
+}
+
+:host header a span {
+    font-size: 1.3rem;
+    margin-left: 0.5rem;
+}
