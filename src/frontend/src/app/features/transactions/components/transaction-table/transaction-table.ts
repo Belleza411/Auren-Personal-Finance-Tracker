@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { Transaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
@@ -13,6 +13,12 @@ import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-
 export class TransactionTable {
   transactions = input.required<Transaction[]>();
   categories = input.required<Category[]>();
+
+  delete = output<string>();
+  
+  onDelete(id: string) {
+    this.delete.emit(id);
+  }
 
   protected TransactionTypeMap = TransactionTypeMap;
   protected PaymentTypeMap = PaymentTypeMap;

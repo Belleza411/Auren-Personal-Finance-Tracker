@@ -48,4 +48,8 @@
         <p class="amount">{{ avgDailySpending() | currency }}</p>
     </app-summary-card>
 </div>
-<app-transaction-table [transactions]="transactions()" [categories]="categories()"/>
+<app-transaction-table 
+    [transactions]="transactions()" 
+    [categories]="categories()"
+    (delete)="deleteTransaction($event)"
+/>

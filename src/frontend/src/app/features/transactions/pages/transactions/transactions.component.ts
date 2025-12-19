@@ -36,70 +36,70 @@ export class TransactionComponent implements OnInit {
             createdAt: "June 1, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '2',
             userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.00,
+            categoryId: '2',
+            transactionType: 2,
+            name: 'Groceries',
+            amount: 100.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 2, 2025",
+            createdAt: "June 2, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '3',
             userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.00,
+            categoryId: '3',
+            transactionType: 2,
+            name: 'Health Insurance',
+            amount: 55.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 10, 2025",
+            createdAt: "June 10, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '4',
             userId: '1',
-            categoryId: '1',
+            categoryId: '4',
             transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.00,
+            name: 'Gas',
+            amount: 50.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 5, 2025",
+            createdAt: "June 5, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '5',
             userId: '1',
             categoryId: '1',
             transactionType: 1,
             name: 'Freelance Payment',
-            amount: 2000.00,
+            amount: 1000.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 11, 2025",
+            createdAt: "June 11, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '6',
             userId: '1',
             categoryId: '1',
             transactionType: 1,
             name: 'Freelance Payment',
-            amount: 2000.00,
+            amount: 1000.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 15, 2025",
+            createdAt: "June 15, 2025"
         },
         {
-            transactionId: '1',
+            transactionId: '7',
             userId: '1',
             categoryId: '1',
             transactionType: 1,
             name: 'Freelance Payment',
-            amount: 2000.00,
+            amount: 400.00,
             paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
+            transactionDate: "June 20, 2025",
+            createdAt: "June 20, 2025"
         }
     ]);
     categories = signal<Category[]>([
