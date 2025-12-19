@@ -1,15 +1,17 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
+import { RouterLink } from "@angular/router";
 
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
-import { RouterLink } from "@angular/router";
+import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, RouterLink],
+  imports: [TransactionTable, RouterLink, SummaryCard, CurrencyPipe],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
@@ -18,9 +20,10 @@ export class TransactionComponent implements OnInit {
     private destroyRef = inject(DestroyRef);
 
     transactions = signal<Transaction[]>([]);
-    avgDailySpending = signal<number>(0);
-    income = signal<number>(0);
-    expense = signal<number>(0);
+    avgDailySpending = signal<number>(500);
+    totalBalance = signal<number>(2500);
+    income = signal<number>(2000);
+    expense = signal<number>(500);
     isLoading = signal(false);
     error = signal<string | null>(null);
     
@@ -45,6 +48,7 @@ export class TransactionComponent implements OnInit {
                 next: ({ transactions, avgDailySpending, balance }) => {
                     this.transactions.set(transactions);
                     this.avgDailySpending.set(avgDailySpending);
+                    this.totalBalance.set(balance.balance);
                     this.income.set(balance.income);
                     this.expense.set(balance.expense);
                 },

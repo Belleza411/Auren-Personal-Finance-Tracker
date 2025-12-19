@@ -42,3 +42,24 @@
     font-size: 1.3rem;
     margin-left: 0.5rem;
 }
+
+:host .transaction-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+:host .transaction-summary .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4.1rem;
+}
+
+:host .transaction-summary .header p {
+    font-size: 1.05rem;
+}
+
+:host .transaction-summary .amount {
+    font-size: 1.7rem;
+}
