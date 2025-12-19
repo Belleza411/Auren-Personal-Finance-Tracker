@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { DashboardComponent } from "../../features/dashboard/component/dashboard/dashboard";
 import { TransactionComponent } from "../../features/transactions/pages/transactions/transactions.component";
+import { EditTransaction } from "../../features/transactions/components/edit-transaction/edit-transaction";
 
 export const mainRoutes: Routes = [
     {
@@ -9,6 +10,12 @@ export const mainRoutes: Routes = [
     },
     {
         path: 'transactions',
-        component: TransactionComponent
+        component: TransactionComponent,
+        children: [
+            {
+                path: ':id/edit',
+                component: EditTransaction
+            }
+        ]
     }
 ]
