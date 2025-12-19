@@ -8,6 +8,8 @@ import { Transaction } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { CurrencyPipe } from '@angular/common';
+import { Category } from '../../../categories/models/categories.model';
+import { CategoryService } from '../../../categories/services/category.service';
 
 @Component({
   selector: 'app-transaction',
@@ -17,9 +19,98 @@ import { CurrencyPipe } from '@angular/common';
 })
 export class TransactionComponent implements OnInit {
     private transactionSer = inject(TransactionService);
+    private categorySer = inject(CategoryService);
     private destroyRef = inject(DestroyRef);
 
-    transactions = signal<Transaction[]>([]);
+    transactions = signal<Transaction[]>(
+    [
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.00,
+            paymentType: 3,
+            transactionDate: "June 1, 2025",
+            createdAt: "June 1, 2025"
+        }
+    ]);
+    categories = signal<Category[]>([
+        {
+            categoryId: '1',
+            userId: '1',
+            name: 'Salary',
+            transactionType: 1,
+            createdAt: "June 1, 2025"
+        }
+    ]);
     avgDailySpending = signal<number>(500);
     totalBalance = signal<number>(2500);
     income = signal<number>(2000);
@@ -38,19 +129,21 @@ export class TransactionComponent implements OnInit {
         forkJoin({
             transactions: this.transactionSer.getAllTransactions(),
             avgDailySpending: this.transactionSer.getAvgDailySpending(),
-            balance: this.transactionSer.getBalance()
+            balance: this.transactionSer.getBalance(),
+            categories: this.categorySer.getAllCategories()
         })
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 finalize(() => this.isLoading.set(false))
             )
             .subscribe({
-                next: ({ transactions, avgDailySpending, balance }) => {
+                next: ({ transactions, avgDailySpending, balance, categories }) => {
                     this.transactions.set(transactions);
                     this.avgDailySpending.set(avgDailySpending);
                     this.totalBalance.set(balance.balance);
                     this.income.set(balance.income);
                     this.expense.set(balance.expense);
+                    this.categories.set(categories)
                 },
                 error: err => {
                     console.error("Failed to load data: ", err);
