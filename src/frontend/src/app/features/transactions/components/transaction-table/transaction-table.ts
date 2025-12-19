@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { PaymentTypeMap, Transaction, TransactionType, TransactionTypeMap } from '../../models/transaction.model';
+import { Category } from '../../../categories/models/categories.model';
 
 @Component({
   selector: 'app-transaction-table',
@@ -88,6 +89,22 @@ export class TransactionTable {
     }
   ]);
 
+  categories =signal<Category[]>([
+    {
+      categoryId: '1',
+      userId: '1',
+      name: 'Freelance Payment',
+      transactionType: 1,
+      createdAt: "June 1, 2025"
+    }
+  ])
+
   protected TransactionTypeMap = TransactionTypeMap;
   protected PaymentTypeMap = PaymentTypeMap;
+  protected categoryMap = computed(() => {
+    return new Map(
+      this.categories().map(c => [c.categoryId, c.name])
+    );
+  });
+
 }

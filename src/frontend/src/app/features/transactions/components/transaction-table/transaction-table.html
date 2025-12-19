@@ -27,7 +27,7 @@
                     <p>{{ TransactionTypeMap[t.transactionType] }}</p>
                 </td>
                 <td>
-                    <p>{{ t.categoryId }}</p>
+                    <p>{{ categoryMap().get(t.categoryId) ?? 'Unknown' }}</p>
                 </td>
                 <td>
                     <p>{{ t.name }}</p>

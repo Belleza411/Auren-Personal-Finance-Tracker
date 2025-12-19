@@ -1,4 +1,4 @@
-  import { TransactionType } from "../../transactions/models/transaction.model";
+import { TransactionType } from "../../transactions/models/transaction.model";
 
 interface Category {
     categoryId: string;
