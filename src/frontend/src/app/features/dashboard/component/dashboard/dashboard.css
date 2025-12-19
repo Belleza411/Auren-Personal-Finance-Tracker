@@ -88,22 +88,48 @@
     font-size: 1.05rem;
 }
 
+:host .dashboard-summaries .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
 
+:host .dashboard-summaries .header p {
+    font-size: 1.05rem;
+}
 
+:host .dashboard-summaries .amount {
+    font-size: 1.7rem;
+}
 
+:host .dashboard-summaries .per-change_last-month {
+    display: flex;
+    margin-top: 0.6rem;
+    align-items: flex-end;
+}
 
+:host .dashboard-summaries .per-change_last-month .change {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5rem;
+    background: rgba(52, 199, 89, 0.48);
+    padding: 0.3rem 0.4rem;
+    border-radius: 10px;
+}
 
+:host .dashboard-summaries .per-change_last-month .change span {
+    font-size: 0.9rem;
+    color: #004712;;
+}
 
+:host .dashboard-summaries .per-change_last-month .change .percentage {
+    font-size: 0.7rem;
+    margin-left: 0.2rem;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+:host .dashboard-summaries .per-change_last-month .last-month {
+    font-size: 0.75rem;
+    letter-spacing: 0.02rem;
+    margin-bottom: 0.1rem;
+}
