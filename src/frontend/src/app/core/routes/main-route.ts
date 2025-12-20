@@ -14,7 +14,8 @@ export const mainRoutes: Routes = [
         children: [
             {
                 path: ':id/edit',
-                component: EditTransaction
+                component: TransactionComponent,
+                data: { openEditModal: true }
             }
         ]
     }

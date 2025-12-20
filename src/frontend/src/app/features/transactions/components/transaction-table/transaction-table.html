@@ -45,7 +45,7 @@
                                 delete
                             </span>
                         </button>
-                        <button [routerLink]="[t.transactionId, 'edit']">
+                        <button (click)="onEditClick(t.transactionId)">
                             <span class="material-symbols-outlined">
                                 edit
                             </span>
