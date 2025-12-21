@@ -1,15 +1,17 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
-import { RouterLink, RouterOutlet } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from "@angular/router";
+import { MatDialog } from '@angular/material/dialog';
 
 import { TransactionService } from '../../services/transaction.service';
-import { Transaction } from '../../models/transaction.model';
+import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { CurrencyPipe } from '@angular/common';
 import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
+import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 
 @Component({
   selector: 'app-transaction',
@@ -21,6 +23,9 @@ export class TransactionComponent implements OnInit {
     private transactionSer = inject(TransactionService);
     private categorySer = inject(CategoryService);
     private destroyRef = inject(DestroyRef);
+    private router = inject(Router);
+    private route = inject(ActivatedRoute);
+    private dialog = inject(MatDialog);
 
     transactions = signal<Transaction[]>(
     [
@@ -111,6 +116,7 @@ export class TransactionComponent implements OnInit {
             createdAt: "June 1, 2025"
         }
     ]);
+
     avgDailySpending = signal<number>(500);
     totalBalance = signal<number>(2500);
     income = signal<number>(2000);
@@ -120,6 +126,21 @@ export class TransactionComponent implements OnInit {
     
     ngOnInit(): void {
         this.loadData();
+
+        this.route.params
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(params => {
+                console.log('Route params:', params);
+                const transactionId = params['id'];
+                const shouldOpenModal = this.route.snapshot.data['openEditModal'];
+                
+                console.log('Transaction ID:', transactionId);
+                console.log('Should open modal:', shouldOpenModal);
+                
+                if (transactionId && shouldOpenModal) {
+                    this.openEditModalById(transactionId);
+                }
+            });
     }  
 
     private loadData() {
@@ -167,7 +188,47 @@ export class TransactionComponent implements OnInit {
             })
     }
 
-    retry() {
-        this.loadData();
+    openEditModalById(id: string): void {
+        console.log("Opening modal for ID: ", id);
+        const transaction = this.transactions().find(t => t.transactionId === id);
+
+        if (transaction) {
+            this.openEditModal(transaction);
+        } else {
+            console.error('Transaction not found');
+            this.router.navigate(['/transactions']);
+        }
+    }
+
+    openEditModal(transaction: Transaction): void {
+        const dialogRef = this.dialog.open<EditTransaction, Transaction, NewTransaction>(
+            EditTransaction,
+            {
+                width: '500px',
+                data: transaction,
+                disableClose: false
+            }
+        );
+
+        dialogRef.afterClosed()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((result: NewTransaction | undefined) => {
+                this.router.navigate(['/transactions']);
+
+                if(result) {
+                    this.transactionSer.updateTransaction(transaction.transactionId, result)
+                        .subscribe({
+                            next: data => {
+                                console.log('Updated: ', data);
+                                this.loadData();
+                            },
+                            error: err => console.error(err)
+                        })
+                }
+            })
+    }
+
+    onEditFromTable(transactionId: string): void {
+        this.router.navigate(['/transactions', transactionId, 'edit']);
     }
 }
