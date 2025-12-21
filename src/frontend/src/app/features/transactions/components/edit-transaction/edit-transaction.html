@@ -20,7 +20,7 @@
         <label for="category">Category</label>
         <select (change)="onCategoryChange($event)" [field]="transactionForm.category">
             @for(category of categories(); track category.categoryId) {
-                <option [value]="category.name">
+                <option [value]="category.categoryId">
                     {{ category.name }}
                 </option>
             }
@@ -37,5 +37,4 @@
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
         />
-
 </form>
