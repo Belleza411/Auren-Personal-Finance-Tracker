@@ -1,0 +1,14 @@
+:host {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+:host .close-btn {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    border: 1px solid red;
+    cursor: pointer;
+}

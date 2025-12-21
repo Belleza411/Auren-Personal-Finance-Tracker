@@ -1,0 +1,11 @@
+<p>
+  <label>{{ label() }}</label>
+
+  <select [field]="field()">
+    @for (key of stringKeys; track key) {
+      <option [value]="key">
+        {{ getLabel(key) }}
+      </option>
+    }
+  </select>
+</p>
