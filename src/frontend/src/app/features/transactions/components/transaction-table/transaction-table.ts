@@ -16,8 +16,6 @@ import { TransactionService } from '../../services/transaction.service';
   styleUrl: './transaction-table.css',
 })
 export class TransactionTable {
-
-  
   transactions = input.required<Transaction[]>();
   categories = input.required<Category[]>();
   

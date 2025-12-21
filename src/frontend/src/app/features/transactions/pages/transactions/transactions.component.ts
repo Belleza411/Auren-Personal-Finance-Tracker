@@ -130,12 +130,8 @@ export class TransactionComponent implements OnInit {
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
-                console.log('Route params:', params);
                 const transactionId = params['id'];
                 const shouldOpenModal = this.route.snapshot.data['openEditModal'];
-                
-                console.log('Transaction ID:', transactionId);
-                console.log('Should open modal:', shouldOpenModal);
                 
                 if (transactionId && shouldOpenModal) {
                     this.openEditModalById(transactionId);
