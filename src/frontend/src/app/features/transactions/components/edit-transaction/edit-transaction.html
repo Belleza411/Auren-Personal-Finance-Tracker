@@ -18,7 +18,7 @@
     </p>
     <p>
         <label for="category">Category</label>
-        <select (change)="onCategoryChange($event)" [field]="transactionForm.category">
+        <select [field]="transactionForm.category">
             @for(category of categories(); track category.categoryId) {
                 <option [value]="category.categoryId">
                     {{ category.name }}
@@ -37,4 +37,5 @@
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
         />
+    <button type="submit">Update</button>
 </form>

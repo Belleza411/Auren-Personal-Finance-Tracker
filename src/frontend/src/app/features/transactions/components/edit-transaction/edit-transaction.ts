@@ -46,8 +46,6 @@ export class EditTransaction implements OnInit {
   ]);
   
   isLoading = signal(false);
-
-  selectedCategory = signal<string>('');
   TransactionTypeMap = TransactionTypeMap;
   PaymentTypeMap = PaymentTypeMap;
 
@@ -97,12 +95,8 @@ export class EditTransaction implements OnInit {
         transactionType: formValue.transactionType,
         paymentType: formValue.paymentType
       };
+
       this.dialogRef.close(updatedDto);
     }
-  }
-
-  onCategoryChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    console.log('Selected color:', value);
   }
 }
