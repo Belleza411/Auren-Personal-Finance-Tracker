@@ -205,7 +205,13 @@ export class TransactionComponent implements OnInit {
             NewTransaction>
         (EditTransaction,
             {
-                width: '500px',
+                width: '30rem',
+                height: '100%',
+                position: {
+                    top: '0',
+                    bottom: '0',
+                    right: '0'
+                },
                 data: transaction,
                 disableClose: false
             }

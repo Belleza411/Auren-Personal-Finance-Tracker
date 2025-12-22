@@ -20,5 +20,4 @@ export class EnumSelect<T extends number> {
   getLabel(key: string): string {
     return this.map()[Number(key) as T];
   }
-
 }
