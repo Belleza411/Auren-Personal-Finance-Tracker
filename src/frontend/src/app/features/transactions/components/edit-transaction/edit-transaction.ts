@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { NewTransaction, PaymentType, Transaction, TransactionType } from '../../models/transaction.model';
+import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
 import { DialogRef } from '@angular/cdk/dialog';
 import { Field, form  } from '@angular/forms/signals';

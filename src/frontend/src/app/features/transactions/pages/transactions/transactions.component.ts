@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, forkJoin } from 'rxjs';
+import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
@@ -185,20 +185,25 @@ export class TransactionComponent implements OnInit {
     }
 
     openEditModalById(id: string): void {
-        console.log("Opening modal for ID: ", id);
-        const transaction = this.transactions().find(t => t.transactionId === id);
+        const transaction = this.transactions()
+            .find(t => t.transactionId === id);
 
-        if (transaction) {
-            this.openEditModal(transaction);
-        } else {
+        if (!transaction) {
             console.error('Transaction not found');
             this.router.navigate(['/transactions']);
+            return;
         }
+
+        this.openEditModal(transaction);
     }
 
+
     openEditModal(transaction: Transaction): void {
-        const dialogRef = this.dialog.open<EditTransaction, Transaction, NewTransaction>(
+        const dialogRef = this.dialog.open<
             EditTransaction,
+            Transaction,
+            NewTransaction>
+        (EditTransaction,
             {
                 width: '500px',
                 data: transaction,
@@ -207,21 +212,28 @@ export class TransactionComponent implements OnInit {
         );
 
         dialogRef.afterClosed()
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((result: NewTransaction | undefined) => {
-                this.router.navigate(['/transactions']);
-
-                if(result) {
-                    this.transactionSer.updateTransaction(transaction.transactionId, result)
-                        .subscribe({
-                            next: data => {
-                                console.log('Updated: ', data);
-                                this.loadData();
-                            },
-                            error: err => console.error(err)
-                        })
-                }
-            })
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                tap(() => this.router.navigate(['/transactions'])),
+                filter((result): result is NewTransaction => !!result),
+                switchMap(result =>
+                    this.transactionSer.updateTransaction(
+                        transaction.transactionId,
+                        result
+                    )             
+                )
+            )
+            .subscribe({
+                next: updated => {
+                    console.log('Updated:', updated);
+                    this.loadData();
+                    this.router.navigate(['/transactions']);
+            },
+                error: err => {
+                    console.error('Update failed', err);
+            }
+        });
+    
     }
 
     onEditFromTable(transactionId: string): void {

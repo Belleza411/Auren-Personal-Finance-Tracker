@@ -1,13 +1,8 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, output } from '@angular/core';
-import { NewTransaction, Transaction } from '../../models/transaction.model';
+import { Component, computed, input, output } from '@angular/core';
+import { Transaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { EditTransaction } from '../edit-transaction/edit-transaction';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-transaction-table',
