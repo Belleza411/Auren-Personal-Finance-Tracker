@@ -14,7 +14,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin: 2rem 0;
 }
 
 :host form p {
@@ -28,6 +27,18 @@
     padding: 0.8rem 0 0.8rem 0.7rem;
     border-radius: 10px;
     border: 1px solid #CBD5E0;
+}
+
+:host form p .error-list {
+    color: red;
+    list-style-type: none;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+}
+
+:host form p input.error,
+:host form p select.error {
+    border: 1px solid red;
 }
 
 :host form button {

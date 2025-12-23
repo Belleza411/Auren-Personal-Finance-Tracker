@@ -8,34 +8,71 @@
         <label for="name">Name</label>
         <input 
             type="text"
-            [field]="transactionForm.name">
+            [field]="transactionForm.name"
+            [class.error]="fieldErrors.name()">
+        @if(fieldErrors.name()) {
+            <ul class="error-list">
+                @for(error of transactionForm.name().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     </p>
     <p>
         <label for="amount">Amount</label>
         <input 
             type="number"
-            [field]="transactionForm.amount">
+            [field]="transactionForm.amount"
+            [class.error]="fieldErrors.amount()">
+        @if(fieldErrors.amount()) {
+            <ul class="error-list">
+                @for(error of transactionForm.amount().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     </p>
     <p>
         <label for="category">Category</label>
-        <select [field]="transactionForm.category">
+        <select [field]="transactionForm.category" [class.error]="fieldErrors.category()">
             @for(category of categories(); track category.categoryId) {
                 <option [value]="category.categoryId">
                     {{ category.name }}
                 </option>
             }
         </select>
+        @if(fieldErrors.category()) {
+            <ul class="error-list">
+                @for(error of transactionForm.category().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     </p>
     <app-enum-select
         label="Transaction Type"
         [map]="TransactionTypeMap"
         [field]="transactionForm.transactionType"
     />
+    @if(fieldErrors.transactionType()) {
+        <ul class="error-list">
+            @for(error of transactionForm.transactionType().errors(); track error.kind) {
+                <li>{{ error.message }}</li>
+            }
+        </ul>
+    }
 
     <app-enum-select
         label="Payment Type"
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
     />
+    @if(fieldErrors.paymentType()) {
+            <ul class="error-list">
+                @for(error of transactionForm.paymentType().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
     <button type="submit">{{ isEdit() ? "Update" : "Create" }}</button>
 </form>
