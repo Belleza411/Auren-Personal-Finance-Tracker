@@ -28,7 +28,6 @@ export class TransactionForm {
     effect(() => {
       this.modelSignal.set(this.model());
     });
-    console.log('isEdit value:', this.isEdit); 
   }
 
   onSave(): void {

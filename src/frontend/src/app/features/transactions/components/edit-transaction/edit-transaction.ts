@@ -71,8 +71,6 @@ export class EditTransaction implements OnInit {
   })
 
   onSave(data: NewTransaction): void {
-    console.log(data);
-    
     this.dialogRef.close(data);
   }
 }

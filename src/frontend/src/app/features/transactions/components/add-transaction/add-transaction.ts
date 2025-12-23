@@ -59,7 +59,6 @@ export class AddTransaction {
   });
 
   onSave(data: NewTransaction) {
-    console.log(data);
     this.dialogRef.close(data);
   }
 }
