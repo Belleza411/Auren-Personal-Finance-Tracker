@@ -16,7 +16,7 @@ import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-
   styleUrl: './edit-transaction.css',
 })
 export class EditTransaction implements OnInit {
-  protected readonly data: Transaction = inject(MAT_DIALOG_DATA);
+  protected readonly data: Transaction | null = inject(MAT_DIALOG_DATA);
   private readonly categorySer = inject(CategoryService);
   protected dialogRef = inject(DialogRef<NewTransaction>);
   private destroyRef = inject(DestroyRef);
@@ -50,18 +50,15 @@ export class EditTransaction implements OnInit {
   PaymentTypeMap = PaymentTypeMap;
 
   ngOnInit(): void {
-    if (!this.data) {
-      this.dialogRef.close();
-      return;
+    if(this.data) {
+      this.transactionModel.set({
+        name: this.data.name,
+        amount: this.data.amount,
+        category: this.data.categoryId,
+        transactionType: this.data.transactionType,
+        paymentType: this.data.paymentType
+      });
     }
-
-    this.transactionModel.set({
-      name: this.data.name,
-      amount: this.data.amount,
-      category: this.data.categoryId,
-      transactionType: this.data.transactionType,
-      paymentType: this.data.paymentType
-    });
 
     this.categorySer.getAllCategories()
       .pipe(takeUntilDestroyed(this.destroyRef))

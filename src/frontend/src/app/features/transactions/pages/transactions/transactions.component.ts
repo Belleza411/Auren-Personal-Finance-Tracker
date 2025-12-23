@@ -15,7 +15,7 @@ import { EditTransaction } from '../../components/edit-transaction/edit-transact
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, RouterLink, SummaryCard, CurrencyPipe, RouterOutlet],
+  imports: [TransactionTable, SummaryCard, CurrencyPipe, RouterOutlet],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
@@ -131,10 +131,13 @@ export class TransactionComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
                 const transactionId = params['id'];
-                const shouldOpenModal = this.route.snapshot.data['openEditModal'];
+                const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
+                const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
                 
-                if (transactionId && shouldOpenModal) {
+                if (transactionId && shouldOpenEditModal) {
                     this.openEditModalById(transactionId);
+                } else if (shouldOpenAddModal) {
+                    this.openAddModal();
                 }
             });
     }  
@@ -197,6 +200,41 @@ export class TransactionComponent implements OnInit {
         this.openEditModal(transaction);
     }
 
+    openAddModal(): void {
+        const dialogRef = this.dialog.open<
+            EditTransaction,
+            null,
+            NewTransaction
+        >(EditTransaction, {
+            width: '30rem',
+            height: '100%',
+            position: {
+            top: '0',
+            bottom: '0',
+            right: '0'
+            },
+            data: null
+        });
+
+        dialogRef.afterClosed()
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                tap(() => this.router.navigate(['transactions'])),
+                filter((result): result is NewTransaction => !!result),
+                switchMap(result => this.transactionSer.createTransaction(result))
+            )
+            .subscribe({
+            next: () => {
+                this.loadData();
+                this.router.navigate(['/transactions']);
+            },
+            error: err => {
+                console.error('Create failed', err);
+            }
+            });
+        }
+
+
 
     openEditModal(transaction: Transaction): void {
         const dialogRef = this.dialog.open<
@@ -245,4 +283,9 @@ export class TransactionComponent implements OnInit {
     onEditFromTable(transactionId: string): void {
         this.router.navigate(['/transactions', transactionId, 'edit']);
     }
+
+    onAddTransaction(): void {
+        this.router.navigate(['/transactions', 'create']);
+    }
+
 }
