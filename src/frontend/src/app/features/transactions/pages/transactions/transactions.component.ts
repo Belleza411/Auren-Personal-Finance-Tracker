@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
-import { ActivatedRoute, Router, RouterLink, RouterOutlet } from "@angular/router";
+import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
 import { TransactionService } from '../../services/transaction.service';

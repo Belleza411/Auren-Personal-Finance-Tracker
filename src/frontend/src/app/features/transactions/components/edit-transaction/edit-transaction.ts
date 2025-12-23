@@ -2,12 +2,9 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
 import { DialogRef } from '@angular/cdk/dialog';
-import { Field, form  } from '@angular/forms/signals';
 import { CategoryService } from '../../../categories/services/category.service';
 import { Category } from '../../../categories/models/categories.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EnumSelect } from "../../../../shared/components/enum-select/enum-select";
-import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
 import { TransactionForm } from "../transaction-form/transaction-form";
 
 @Component({
