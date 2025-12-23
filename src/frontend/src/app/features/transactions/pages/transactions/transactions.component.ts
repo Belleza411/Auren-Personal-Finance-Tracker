@@ -12,6 +12,7 @@ import { CurrencyPipe } from '@angular/common';
 import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
+import { AddTransaction } from '../../components/add-transaction/add-transaction';
 
 @Component({
   selector: 'app-transaction',
@@ -202,16 +203,16 @@ export class TransactionComponent implements OnInit {
 
     openAddModal(): void {
         const dialogRef = this.dialog.open<
-            EditTransaction,
+            AddTransaction,
             null,
             NewTransaction
-        >(EditTransaction, {
+        >(AddTransaction, {
             width: '30rem',
             height: '100%',
             position: {
-            top: '0',
-            bottom: '0',
-            right: '0'
+                top: '0',
+                bottom: '0',
+                right: '0'
             },
             data: null
         });
@@ -224,13 +225,13 @@ export class TransactionComponent implements OnInit {
                 switchMap(result => this.transactionSer.createTransaction(result))
             )
             .subscribe({
-            next: () => {
-                this.loadData();
-                this.router.navigate(['/transactions']);
-            },
-            error: err => {
-                console.error('Create failed', err);
-            }
+                next: () => {
+                    this.loadData();
+                    this.router.navigate(['/transactions']);
+                },
+                error: err => {
+                    console.error('Create failed', err);
+                }
             });
         }
 

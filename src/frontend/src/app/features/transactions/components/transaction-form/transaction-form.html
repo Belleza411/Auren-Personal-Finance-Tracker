@@ -8,17 +8,17 @@
         <label for="name">Name</label>
         <input 
             type="text"
-            [field]="transactionForm().name">
+            [field]="transactionForm.name">
     </p>
     <p>
         <label for="amount">Amount</label>
         <input 
             type="number"
-            [field]="transactionForm().amount">
+            [field]="transactionForm.amount">
     </p>
     <p>
         <label for="category">Category</label>
-        <select [field]="transactionForm().category">
+        <select [field]="transactionForm.category">
             @for(category of categories(); track category.categoryId) {
                 <option [value]="category.categoryId">
                     {{ category.name }}
@@ -29,13 +29,13 @@
     <app-enum-select
         label="Transaction Type"
         [map]="TransactionTypeMap"
-        [field]="transactionForm().transactionType"
+        [field]="transactionForm.transactionType"
     />
 
     <app-enum-select
         label="Payment Type"
         [map]="PaymentTypeMap"
-        [field]="transactionForm().paymentType"
+        [field]="transactionForm.paymentType"
     />
-    <button type="submit">Update</button>
+    <button type="submit">{{ isEdit() ? "Update" : "Create" }}</button>
 </form>

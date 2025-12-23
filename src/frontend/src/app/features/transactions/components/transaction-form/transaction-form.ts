@@ -22,17 +22,18 @@ export class TransactionForm {
   PaymentTypeMap = PaymentTypeMap;
 
   private readonly modelSignal = signal({} as NewTransaction);
-  protected readonly transactionForm = signal(form(this.modelSignal));
+  protected readonly transactionForm = form(this.modelSignal);
 
   constructor() {
     effect(() => {
       this.modelSignal.set(this.model());
     });
+    console.log('isEdit value:', this.isEdit); 
   }
 
   onSave(): void {
-    if (this.transactionForm()().valid()) {
-      this.save.emit(this.transactionForm()().value() as NewTransaction);
+    if (this.transactionForm().valid()) {
+      this.save.emit(this.transactionForm().value() as NewTransaction);
     }
   }
 
