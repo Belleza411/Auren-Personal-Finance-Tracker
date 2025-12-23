@@ -1,0 +1,41 @@
+<div class="close-btn" (click)="onCancel()">
+    <span class="material-symbols-outlined">
+        close
+    </span>
+</div>
+<form (submit)="onSave()">
+    <p>
+        <label for="name">Name</label>
+        <input 
+            type="text"
+            [field]="transactionForm().name">
+    </p>
+    <p>
+        <label for="amount">Amount</label>
+        <input 
+            type="number"
+            [field]="transactionForm().amount">
+    </p>
+    <p>
+        <label for="category">Category</label>
+        <select [field]="transactionForm().category">
+            @for(category of categories(); track category.categoryId) {
+                <option [value]="category.categoryId">
+                    {{ category.name }}
+                </option>
+            }
+        </select>
+    </p>
+    <app-enum-select
+        label="Transaction Type"
+        [map]="TransactionTypeMap"
+        [field]="transactionForm().transactionType"
+    />
+
+    <app-enum-select
+        label="Payment Type"
+        [map]="PaymentTypeMap"
+        [field]="transactionForm().paymentType"
+    />
+    <button type="submit">Update</button>
+</form>

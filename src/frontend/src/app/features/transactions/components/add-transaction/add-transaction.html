@@ -1,6 +1,5 @@
 <app-transaction-form
-    [model]="transactionModel()"
-    [isEdit]="true"
+    [model]="model()"
     (save)="onSave($event)"
     (cancel)="dialogRef.close()"
     [categories]="categories()"

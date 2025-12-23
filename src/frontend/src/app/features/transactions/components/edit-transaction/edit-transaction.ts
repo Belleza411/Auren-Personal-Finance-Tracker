@@ -8,10 +8,11 @@ import { Category } from '../../../categories/models/categories.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EnumSelect } from "../../../../shared/components/enum-select/enum-select";
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
+import { TransactionForm } from "../transaction-form/transaction-form";
 
 @Component({
   selector: 'app-edit-transaction',
-  imports: [Field, EnumSelect],
+  imports: [TransactionForm],
   templateUrl: './edit-transaction.html',
   styleUrl: './edit-transaction.css',
 })
@@ -44,10 +45,6 @@ export class EditTransaction implements OnInit {
       createdAt: "June 10, 2025"
     }
   ]);
-  
-  isLoading = signal(false);
-  TransactionTypeMap = TransactionTypeMap;
-  PaymentTypeMap = PaymentTypeMap;
 
   ngOnInit(): void {
     if(this.data) {
@@ -76,24 +73,9 @@ export class EditTransaction implements OnInit {
     paymentType: 2
   })
 
-  protected readonly transactionForm = form(this.transactionModel);
-
-  onCancel(): void {
-    this.dialogRef.close();
-  }
-
-  onSave(): void {
-    if (this.transactionForm().valid()) {
-      const formValue = this.transactionForm().value();
-      const updatedDto: NewTransaction = {
-        name: formValue.name,
-        amount: formValue.amount,
-        category: formValue.category,
-        transactionType: formValue.transactionType,
-        paymentType: formValue.paymentType
-      };
-
-      this.dialogRef.close(updatedDto);
-    }
+  onSave(data: NewTransaction): void {
+    console.log(data);
+    
+    this.dialogRef.close(data);
   }
 }
