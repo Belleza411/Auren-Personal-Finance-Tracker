@@ -273,12 +273,11 @@ export class TransactionComponent implements OnInit {
                     console.log('Updated:', updated);
                     this.loadData();
                     this.router.navigate(['/transactions']);
-            },
+                },
                 error: err => {
                     console.error('Update failed', err);
-            }
+                }
         });
-    
     }
 
     onEditFromTable(transactionId: string): void {
@@ -288,5 +287,4 @@ export class TransactionComponent implements OnInit {
     onAddTransaction(): void {
         this.router.navigate(['/transactions', 'create']);
     }
-
 }

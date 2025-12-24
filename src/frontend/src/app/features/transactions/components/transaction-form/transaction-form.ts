@@ -20,7 +20,7 @@ export class TransactionForm {
   TransactionTypeMap = TransactionTypeMap;
   PaymentTypeMap = PaymentTypeMap;
 
-  isLoading = signal(false);
+  isLoading = input(false);
 
   private readonly modelSignal = signal({} as NewTransaction);
   protected readonly transactionForm = form(this.modelSignal, schema => {
@@ -52,7 +52,7 @@ export class TransactionForm {
     if (this.transactionForm().valid()) {
       this.save.emit(this.transactionForm().value() as NewTransaction);
     }
-  }
+  }   
 
   onCancel(): void {
     this.cancel.emit();

@@ -17,6 +17,8 @@ export class AddTransaction {
   private destroyRef = inject(DestroyRef);
   private readonly categorySer = inject(CategoryService);
   
+  isLoading = signal(false);
+  
   categories = signal<Category[]>([
     {
       categoryId: '1',
@@ -59,6 +61,7 @@ export class AddTransaction {
   });
 
   onSave(data: NewTransaction) {
+    this.isLoading.set(true);
     this.dialogRef.close(data);
   }
 }

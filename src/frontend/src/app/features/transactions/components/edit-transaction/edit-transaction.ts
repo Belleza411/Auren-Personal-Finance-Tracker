@@ -18,6 +18,8 @@ export class EditTransaction implements OnInit {
   private readonly categorySer = inject(CategoryService);
   protected dialogRef = inject(DialogRef<NewTransaction>);
   private destroyRef = inject(DestroyRef);
+
+  isLoading = signal(false);
   
   categories = signal<Category[]>([
     {
@@ -71,6 +73,7 @@ export class EditTransaction implements OnInit {
   })
 
   onSave(data: NewTransaction): void {
+    this.isLoading.set(true);
     this.dialogRef.close(data);
   }
 }

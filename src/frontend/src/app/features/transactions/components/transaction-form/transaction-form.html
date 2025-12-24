@@ -1,9 +1,9 @@
-<div class="close-btn" (click)="onCancel()">
+<div class="close-btn" type="button" (click)="onCancel()">
     <span class="material-symbols-outlined">
         close
     </span>
 </div>
-<form (submit)="onSave()">
+<form (submit)="onSave()" $event.preventDefault()>
     <p>
         <label for="name">Name</label>
         <input 
@@ -74,5 +74,13 @@
                 }
             </ul>
         }
-    <button type="submit">{{ isEdit() ? "Update" : "Create" }}</button>
+    <button type="submit" [disabled]="isLoading() || transactionForm().invalid()">
+       @if(isLoading()) {
+            <span class="material-symbols-outlined spinning">
+                progress_activity
+            </span>
+       } @else { 
+         <p>{{ isEdit() ? "Update" : "Create" }}</p>
+       }
+    </button>
 </form>
