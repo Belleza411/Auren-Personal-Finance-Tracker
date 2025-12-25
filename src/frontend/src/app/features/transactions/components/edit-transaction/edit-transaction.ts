@@ -14,52 +14,24 @@ import { TransactionForm } from "../transaction-form/transaction-form";
   styleUrl: './edit-transaction.css',
 })
 export class EditTransaction implements OnInit {
-  protected readonly data: Transaction | null = inject(MAT_DIALOG_DATA);
+  protected readonly data = inject(MAT_DIALOG_DATA);
   private readonly categorySer = inject(CategoryService);
   protected dialogRef = inject(DialogRef<NewTransaction>);
   private destroyRef = inject(DestroyRef);
-  
-  categories = signal<Category[]>([
-    {
-      categoryId: '1',
-      userId: '1',
-      name: 'Salary',
-      transactionType: 1,
-      createdAt: 'June 1, 2025'
-    },
-    {
-      categoryId: '2',
-      userId: '1',
-      name: 'Shopping',
-      transactionType: 2,
-      createdAt: "June 2, 2025"
-    },
-    {
-      categoryId: '3',
-      userId: '1',
-      name: 'Health',
-      transactionType: 2,
-      createdAt: "June 10, 2025"
-    }
-  ]);
+
+  private readonly transactionData: Transaction = this.data.transaction;
+  protected readonly categoriesData: Category[] = this.data.categories;
 
   ngOnInit(): void {
-    if(this.data) {
+    if(this.transactionData) {
       this.transactionModel.set({
-        name: this.data.name,
-        amount: this.data.amount,
-        category: this.data.categoryId,
-        transactionType: this.data.transactionType,
-        paymentType: this.data.paymentType
+        name: this.transactionData.name,
+        amount: this.transactionData.amount,
+        category: this.transactionData.categoryId,
+        transactionType: this.transactionData.transactionType,
+        paymentType: this.transactionData.paymentType
       });
     }
-
-    this.categorySer.getAllCategories()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: data => this.categories.set(data),
-        error: err => console.error(err)
-      })
   }
 
   protected readonly transactionModel = signal<NewTransaction>({

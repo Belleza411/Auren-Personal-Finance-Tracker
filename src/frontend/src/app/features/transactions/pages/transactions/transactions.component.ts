@@ -115,6 +115,20 @@ export class TransactionComponent implements OnInit {
             name: 'Salary',
             transactionType: 1,
             createdAt: "June 1, 2025"
+        },
+        {
+            categoryId: '2',
+            userId: '1',
+            name: 'Shopping',
+            transactionType: 2,
+            createdAt: "June 2, 2025"
+        },
+        {
+            categoryId: '3',
+            userId: '1',
+            name: 'Health',
+            transactionType: 2,
+            createdAt: "June 10, 2025"
         }
     ]);
 
@@ -204,7 +218,7 @@ export class TransactionComponent implements OnInit {
     openAddModal(): void {
         const dialogRef = this.dialog.open<
             AddTransaction,
-            null,
+            Category[] | null,
             NewTransaction
         >(AddTransaction, {
             width: '30rem',
@@ -214,7 +228,7 @@ export class TransactionComponent implements OnInit {
                 bottom: '0',
                 right: '0'
             },
-            data: null
+            data: this.categories()
         });
 
         dialogRef.afterClosed()
@@ -240,7 +254,7 @@ export class TransactionComponent implements OnInit {
     openEditModal(transaction: Transaction): void {
         const dialogRef = this.dialog.open<
             EditTransaction,
-            Transaction,
+            { transaction: Transaction; categories: Category[] } | null,
             NewTransaction>
         (EditTransaction,
             {
@@ -251,7 +265,10 @@ export class TransactionComponent implements OnInit {
                     bottom: '0',
                     right: '0'
                 },
-                data: transaction,
+                data: {
+                    transaction: transaction,
+                    categories: this.categories()
+                },
                 disableClose: false
             }
         );
