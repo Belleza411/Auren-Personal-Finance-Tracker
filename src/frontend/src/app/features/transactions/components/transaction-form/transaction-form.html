@@ -35,8 +35,9 @@
     <p>
         <label for="category">Category</label>
         <select [field]="transactionForm.category" [class.error]="fieldErrors.category()">
+            <option value="" disabled>Select a category</option>
             @for(category of categories(); track category.categoryId) {
-                <option [value]="category.name">
+                <option [value]="category.categoryId">
                     {{ category.name }}
                 </option>
             }

@@ -4,6 +4,7 @@ import { Field, FieldState, form, required, submit, validate } from '@angular/fo
 import { Category } from '../../../categories/models/categories.model';
 import { TransactionTypeMap, PaymentTypeMap } from '../../constants/transaction-map';
 import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
+import { findCategoryName } from '../../../../shared/utils/category-name.util';
 
 @Component({
   selector: 'app-transaction-form',
@@ -50,10 +51,17 @@ export class TransactionForm {
 
   onSubmit(event: Event) {
     event.preventDefault();
+    
+    const categoryName = findCategoryName(this.categories(), this.modelSignal().category);
+    
+    const updatedModel: NewTransaction = {
+      ...this.modelSignal(),
+      category: categoryName,
+    } 
 
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);
-      this.save.emit(this.modelSignal() as NewTransaction);
+      this.save.emit(updatedModel);
     })
   }
 
