@@ -17,7 +17,6 @@ export class AddTransaction {
   private destroyRef = inject(DestroyRef);
   private readonly categorySer = inject(CategoryService);
 
-  
   categories = signal<Category[]>([
     {
       categoryId: '1',

@@ -53,18 +53,7 @@ export class TransactionForm {
 
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);
-      const data = this.modelSignal();
-      console.log(data);
-
-      try {
-        if (this.transactionForm().valid()) {
-          this.save.emit(data as NewTransaction);
-          this.isLoading.set(false);
-        }
-      } catch (err) {
-        console.error(`Failed to ${this.isEdit() ? "edit" : "add"}: ${err}`);
-        this.isLoading.set(false);
-      }
+      this.save.emit(this.modelSignal() as NewTransaction);
     })
   }
 
