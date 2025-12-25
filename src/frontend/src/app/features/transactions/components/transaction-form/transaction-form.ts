@@ -1,6 +1,6 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { NewTransaction } from '../../models/transaction.model';
-import { Field, FieldState, form, required, validate } from '@angular/forms/signals';
+import { Field, FieldState, form, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
 import { TransactionTypeMap, PaymentTypeMap } from '../../constants/transaction-map';
 import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
@@ -20,7 +20,7 @@ export class TransactionForm {
   TransactionTypeMap = TransactionTypeMap;
   PaymentTypeMap = PaymentTypeMap;
 
-  isLoading = input(false);
+  isLoading = signal(false);
 
   private readonly modelSignal = signal({} as NewTransaction);
   protected readonly transactionForm = form(this.modelSignal, schema => {
@@ -48,11 +48,25 @@ export class TransactionForm {
     });
   }
 
-  onSave(): void {
-    if (this.transactionForm().valid()) {
-      this.save.emit(this.transactionForm().value() as NewTransaction);
-    }
-  }   
+  onSubmit(event: Event) {
+    event.preventDefault();
+
+    submit(this.transactionForm, async () => {
+      this.isLoading.set(true);
+      const data = this.modelSignal();
+      console.log(data);
+
+      try {
+        if (this.transactionForm().valid()) {
+          this.save.emit(data as NewTransaction);
+          this.isLoading.set(false);
+        }
+      } catch (err) {
+        console.error(`Failed to ${this.isEdit() ? "edit" : "add"}: ${err}`);
+        this.isLoading.set(false);
+      }
+    })
+  }
 
   onCancel(): void {
     this.cancel.emit();
