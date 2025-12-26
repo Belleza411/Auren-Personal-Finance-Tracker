@@ -1,9 +1,7 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NewTransaction } from '../../models/transaction.model';
 import { DialogRef } from '@angular/cdk/dialog';
 import { TransactionForm } from "../transaction-form/transaction-form";
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CategoryService } from '../../../categories/services/category.service';
 import { Category } from '../../../categories/models/categories.model';
 import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
 

@@ -1,10 +1,8 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
 import { DialogRef } from '@angular/cdk/dialog';
-import { CategoryService } from '../../../categories/services/category.service';
 import { Category } from '../../../categories/models/categories.model';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TransactionForm } from "../transaction-form/transaction-form";
 
 @Component({
@@ -15,9 +13,7 @@ import { TransactionForm } from "../transaction-form/transaction-form";
 })
 export class EditTransaction implements OnInit {
   protected readonly data = inject(MAT_DIALOG_DATA);
-  private readonly categorySer = inject(CategoryService);
   protected dialogRef = inject(DialogRef<NewTransaction>);
-  private destroyRef = inject(DestroyRef);
 
   private readonly transactionData: Transaction = this.data.transaction;
   protected readonly categoriesData: Category[] = this.data.categories;
