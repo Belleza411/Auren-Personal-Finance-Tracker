@@ -56,7 +56,6 @@
         label="Transaction Type"
         [map]="TransactionTypeMap"
         [field]="transactionForm.transactionType"
-        [showError]="fieldErrors.transactionType"
     />
     @if(fieldErrors.transactionType()) {
         <ul class="error-list">
@@ -70,7 +69,6 @@
         label="Payment Type"
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
-        [showError]="fieldErrors.paymentType"
     />
     @if(fieldErrors.paymentType()) {
             <ul class="error-list">
