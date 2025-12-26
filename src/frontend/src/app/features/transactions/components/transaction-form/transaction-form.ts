@@ -58,9 +58,6 @@ export class TransactionForm {
       category: categoryName,
     } 
 
-    console.log(updatedModel);
-    
-
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);
       this.save.emit(updatedModel);
@@ -71,7 +68,7 @@ export class TransactionForm {
     this.cancel.emit();
   }
 
-  protected fieldErrors = {
+  protected readonly fieldErrors = {
     name: this.createErrorSignal(() => this.transactionForm.name()),
     amount: this.createErrorSignal(() => this.transactionForm.amount()),
     category: this.createErrorSignal(() => this.transactionForm.category()),
