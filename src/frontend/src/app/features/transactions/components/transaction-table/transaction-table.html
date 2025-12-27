@@ -1,25 +1,19 @@
-<h2>All Transaction</h2>
+<h5>All Transaction</h5>
 <table>
     <thead>
         <tr>
-            <th>
-                <input type="checkbox">
-            </th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Transaction</th>
-            <th>Payment Method</th>
-            <th>Amount</th>
+            <th>DATE</th>
+            <th>TYPE</th>
+            <th>CATEGORY</th>
+            <th>TRANSACTION</th>
+            <th>PAYMENT METHOD</th>
+            <th>AMOUNT</th>
             <th>&nbsp;</th>
         </tr>
     </thead>
     <tbody>
         @for(t of transactions(); track t.transactionId) {
             <tr>
-                <td>
-                    <input type="checkbox">
-                </td>
                 <td>
                     <p>{{ t.transactionDate }}</p>
                 </td>
