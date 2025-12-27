@@ -56,6 +56,13 @@ interface BalanceSummary {
     balance: number;
 }
 
+interface PagedResult<T> {
+    items: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+}
+
 export type {
     Transaction,
     NewTransaction,
@@ -63,5 +70,6 @@ export type {
     TransactionType,
     PaymentType,
     TimePeriod,
-    BalanceSummary
+    BalanceSummary,
+    PagedResult
 }

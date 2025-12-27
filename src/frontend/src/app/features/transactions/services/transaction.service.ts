@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable} from 'rxjs';
 
-import { BalanceSummary, NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../models/transaction.model';
+import { BalanceSummary, NewTransaction, PagedResult, TimePeriod, Transaction, TransactionFilter } from '../models/transaction.model';
 import { apiUrl } from '../../../../environments/environment';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
@@ -17,10 +17,10 @@ export class TransactionService {
 		filters?: Partial<TransactionFilter>,
 		pageSize: number = 5,
 		pageNumber: number = 1
-	) : Observable<Transaction[]> {
+	) : Observable<PagedResult<Transaction>> {
 		const params = createHttpParams(filters, pageSize, pageNumber);
 		
-		return this.http.get<Transaction[]>(this.baseUrl, { params });
+		return this.http.get<PagedResult<Transaction>>(this.baseUrl, { params });
 	}
 
 	getTransactionById(id: string): Observable<Transaction> {

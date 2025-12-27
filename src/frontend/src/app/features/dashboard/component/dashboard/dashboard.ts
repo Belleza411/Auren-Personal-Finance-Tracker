@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit {
         next: ({  dashboardSummaries, expenseCategoriesChart, transactions }) => {
           this.dashboardSummaries.set(dashboardSummaries),
           this.expenseCategoriesChart.set(expenseCategoriesChart),
-          this.recentTransactions.set(transactions)
+          this.recentTransactions.set(transactions.items)
         },
         error: err => {
           console.error("Failed to load data: ", err);
