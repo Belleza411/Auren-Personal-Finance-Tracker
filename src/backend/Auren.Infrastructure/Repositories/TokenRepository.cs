@@ -107,61 +107,63 @@ namespace Auren.Infrastructure.Repositories
             }
 		}
 
-		public async Task<bool> ValidateRefreshTokenAsync(CookieValidatePrincipalContext context)
-		{
-			try
-			{
-				var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				
+        public async Task<bool> ValidateRefreshTokenAsync(CookieValidatePrincipalContext context)
+        {
+            try
+            {
+                var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Principal?.FindFirst("UserId")?.Value;
+
                 var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
 
-                if (string.IsNullOrEmpty(email) || !Guid.TryParse(userIdClaim, out var userId))
-				{
-                    context.RejectPrincipal();
-                    return false;
+                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                {
+                    return true;
                 }
 
                 if (string.IsNullOrEmpty(email))
+                {
+                    return true; 
+                }
+
+                var user = await userManager.FindByEmailAsync(email);
+
+                if (user == null || user.UserId != userId)
                 {
                     context.RejectPrincipal();
                     return false;
                 }
 
-                var user = await userManager.FindByEmailAsync(email);
+                var hasValidRefreshToken = await dbContext.RefreshTokens
+                    .AnyAsync(rt => rt.UserId == userId && rt.IsActive);
 
-				if(user == null || user.UserId != userId)
-				{
-                    context.RejectPrincipal();
-                    return false;
+                if (!hasValidRefreshToken)
+                {
+                    if (context.Properties.ExpiresUtc.HasValue)
+                    {
+                        context.RejectPrincipal();
+                        return false;
+                    }
                 }
 
-				var hasValidRefreshToken = await dbContext.RefreshTokens
-					.AnyAsync(rt => rt.UserId == userId && rt.IsActive);
+                var expiresUtc = context.Properties.ExpiresUtc;
+                var shouldRenew = expiresUtc.HasValue && DateTime.UtcNow > expiresUtc.Value.AddMinutes(-2);
 
-				if(!hasValidRefreshToken)
-				{
-                    context.RejectPrincipal();
-                    return false;
-                }
+                if (shouldRenew)
+                {
+                    var newAccessToken = GenerateAccessTokenAsync(user);
 
-				var expiresUtc = context.Properties.ExpiresUtc;
-				var shouldRenew = expiresUtc.HasValue && DateTime.UtcNow > expiresUtc.Value.AddMinutes(-2);
+                    var identity = (ClaimsIdentity)context.Principal?.Identity!;
+                    var existingTokenClaim = identity.FindFirst("AccessToken");
 
-                if(shouldRenew)
-				{
-					var newAccessToken = GenerateAccessTokenAsync(user);
-
-					var identity = (ClaimsIdentity)context.Principal?.Identity!;
-					var existingTokenClaim = identity.FindFirst("AccessToken");
-
-					if (existingTokenClaim != null)
-					{
-						identity.RemoveClaim(existingTokenClaim);
+                    if (existingTokenClaim != null)
+                    {
+                        identity.RemoveClaim(existingTokenClaim);
                     }
 
-					identity.AddClaim(new Claim("AccessToken", newAccessToken));
+                    identity.AddClaim(new Claim("AccessToken", newAccessToken));
 
-					await RotateRefreshTokenAsync(userId);
+                    await RotateRefreshTokenAsync(userId);
 
                     context.Properties.IssuedUtc = DateTimeOffset.UtcNow;
                     context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10);
@@ -170,11 +172,10 @@ namespace Auren.Infrastructure.Repositories
 
                 return true;
             }
-			catch (Exception)
-			{
-                context.RejectPrincipal();
-                return false;
+            catch (Exception)
+            {
+                return true;
             }
-		}
-	}
+        }
+    }
 }

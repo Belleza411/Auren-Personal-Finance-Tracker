@@ -5,6 +5,7 @@ using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -15,6 +16,7 @@ namespace Auren.API.Controllers
 	[Route("api/categories")]
 	[ApiController]
     [EnableRateLimiting("fixed")]
+    [Authorize]
 	public class CategoriesController(ICategoryService categoryService) : ControllerBase
 	{
 		[HttpGet]

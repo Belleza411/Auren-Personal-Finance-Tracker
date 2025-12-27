@@ -8,6 +8,7 @@ using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -18,6 +19,7 @@ namespace Auren.API.Controllers
 	[Route("api/goals")]
 	[ApiController]
     [EnableRateLimiting("fixed")]
+    [Authorize]
     public class GoalsController(IGoalService goalService) : ControllerBase
 	{
 		[HttpGet]

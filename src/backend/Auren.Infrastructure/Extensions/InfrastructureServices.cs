@@ -60,7 +60,7 @@ namespace Auren.Infrastructure.Extensions
                     options.Cookie.Name = "Auren.Session";
                     options.Cookie.HttpOnly = true;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
                     options.SlidingExpiration = true;
                     options.LoginPath = "/auth/login";

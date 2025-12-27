@@ -287,6 +287,8 @@ namespace Auren.Application.Services
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+            var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
+
             await _httpContextAccessor.HttpContext!.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
