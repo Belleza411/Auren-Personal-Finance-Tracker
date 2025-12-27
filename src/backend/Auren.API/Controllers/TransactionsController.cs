@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Services;
@@ -15,13 +16,14 @@ using System.Transactions;
 
 namespace Auren.API.Controllers
 {
-	[Route("api/transactions")]
+	[Route("api/[controller]")]
 	[ApiController]
     [EnableRateLimiting("fixed")]
+    [Authorize]
     public class TransactionsController(ITransactionService transactionService) : ControllerBase
 	{
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Transaction>>> GetAllTransaction(
+		public async Task<ActionResult<PagedResult<Transaction>>> GetAllTransaction(
             [FromQuery] TransactionFilter transactionFilter,
             [FromQuery] int pageSize = 5,
             [FromQuery] int pageNumber = 1,

@@ -61,7 +61,7 @@ namespace Auren.Infrastructure.Repositories
 		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken) 
             => await dbContext.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(
+        public async Task<PagedResult<Transaction>> GetTransactionsAsync(
             Guid userId,
             TransactionFilter filter,
             int pageSize = 5, int pageNumber = 1,
@@ -72,10 +72,12 @@ namespace Auren.Infrastructure.Repositories
             var query = dbContext.Transactions
                 .Where(t => t.UserId == userId);
 
-            if(HasActiveFilters(filter))
+            if (HasActiveFilters(filter))
             {
                 query = ApplyTransactionFilters(query, filter, userId);
             }
+
+            var totalCount = await query.CountAsync(cancellationToken);
 
             var transactions = await query
                 .OrderByDescending(t => t.TransactionDate)
@@ -84,7 +86,13 @@ namespace Auren.Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            return transactions;
+            return new PagedResult<Transaction>
+            {
+                Items = transactions,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
 		public async Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, Transaction transaction, CancellationToken cancellationToken)

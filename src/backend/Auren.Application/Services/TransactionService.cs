@@ -114,7 +114,6 @@ namespace Auren.Application.Services
             var balance = await _transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
             return Result.Success<BalanceSummaryResponse>(balance);
         }
-            
 
         public async Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {
@@ -124,7 +123,7 @@ namespace Auren.Application.Services
                 : Result.Failure<Transaction?>(Error.NotFound("Transaction not found. "));
         }
 
-        public async Task<Result<IEnumerable<Transaction>>> GetAllTransactions(Guid userId,
+        public async Task<Result<PagedResult<Transaction>>> GetAllTransactions(Guid userId,
             TransactionFilter filter,
             int pageSize = 5, int pageNumber = 1,
             CancellationToken cancellationToken = default) 

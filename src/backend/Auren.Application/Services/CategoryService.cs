@@ -154,8 +154,8 @@ namespace Auren.Application.Services
 
             var categoryLookup = categories.ToDictionary(c => c.CategoryId, c => c.Name);
 
-            var totalAmount = expenses.Sum(e => e.Amount);
-            var chartData = expenses
+            var totalAmount = expenses.Items.Sum(e => e.Amount);
+            var chartData = expenses.Items
                 .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
