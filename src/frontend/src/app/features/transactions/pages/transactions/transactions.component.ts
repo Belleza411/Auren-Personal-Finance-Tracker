@@ -3,12 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
+import { CountUpDirective } from 'ngx-countup';
+import { CurrencyPipe } from '@angular/common';
 
 import { TransactionService } from '../../services/transaction.service';
 import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
-import { CurrencyPipe } from '@angular/common';
 import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
@@ -16,7 +17,7 @@ import { AddTransaction } from '../../components/add-transaction/add-transaction
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, CurrencyPipe, RouterOutlet],
+  imports: [TransactionTable, SummaryCard, CurrencyPipe, RouterOutlet, CountUpDirective],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
@@ -30,7 +31,6 @@ export class TransactionComponent implements OnInit {
 
     pageNumber = signal(1);
     pageSize = signal(5);
-    totalCount = signal(0);
 
     transactions = signal<Transaction[]>(
     [
@@ -143,9 +143,11 @@ export class TransactionComponent implements OnInit {
     isLoading = signal(false);
     error = signal<string | null>(null);
 
-    totalPages = computed(() =>
-        Math.ceil(this.totalCount() / this.pageSize())
-    );
+    options = {
+        duration: 1.2,
+        separator: ',',
+        prefix: '$'
+    };
     
     ngOnInit(): void {
         this.loadData();

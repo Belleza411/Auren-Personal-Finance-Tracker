@@ -18,7 +18,7 @@
                 attach_money
             </span>
         </div>
-        <p class="amount">{{ totalBalance() | currency }}</p>
+        <p class="amount" [countUp]="totalBalance()" [countUpOptions]="options">0</p>
     </app-summary-card>
     <app-summary-card>
         <div class="header">
@@ -27,7 +27,7 @@
                 trending_up
             </span>
         </div>
-        <p class="amount">{{ income() | currency }}</p>
+        <p class="amount" [countUp]="income()" [countUpOptions]="options">0</p>
     </app-summary-card>
     <app-summary-card>
         <div class="header">
@@ -36,7 +36,7 @@
                 trending_down
             </span>
         </div>
-        <p class="amount">{{ expense() | currency }}</p>
+        <p class="amount" [countUp]="expense()" [countUpOptions]="options">0</p>
     </app-summary-card>
     <app-summary-card>
         <div class="header">
@@ -45,7 +45,7 @@
                 attach_money
             </span>
         </div>
-        <p class="amount">{{ avgDailySpending() | currency }}</p>
+        <p class="amount" [countUp]="avgDailySpending()" [countUpOptions]="options">0</p>
     </app-summary-card>
 </div>
 <app-transaction-table 
