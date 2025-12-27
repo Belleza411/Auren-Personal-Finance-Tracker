@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
@@ -27,6 +27,10 @@ export class TransactionComponent implements OnInit {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
+
+    pageNumber = signal(1);
+    pageSize = signal(5);
+    totalCount = signal(0);
 
     transactions = signal<Transaction[]>(
     [
@@ -138,6 +142,10 @@ export class TransactionComponent implements OnInit {
     expense = signal<number>(500);
     isLoading = signal(false);
     error = signal<string | null>(null);
+
+    totalPages = computed(() =>
+        Math.ceil(this.totalCount() / this.pageSize())
+    );
     
     ngOnInit(): void {
         this.loadData();
@@ -162,7 +170,7 @@ export class TransactionComponent implements OnInit {
         this.error.set(null);
 
         forkJoin({
-            transactions: this.transactionSer.getAllTransactions(),
+            transactions: this.transactionSer.getAllTransactions({}, this.pageSize(), this.pageNumber()),
             avgDailySpending: this.transactionSer.getAvgDailySpending(),
             balance: this.transactionSer.getBalance(),
             categories: this.categorySer.getAllCategories()
@@ -173,7 +181,7 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: ({ transactions, avgDailySpending, balance, categories }) => {
-                    this.transactions.set(transactions);
+                    this.transactions.set(transactions.items);
                     this.avgDailySpending.set(avgDailySpending);
                     this.totalBalance.set(balance.balance);
                     this.income.set(balance.income);
@@ -239,8 +247,9 @@ export class TransactionComponent implements OnInit {
                 switchMap(result => this.transactionSer.createTransaction(result))
             )
             .subscribe({
-                next: () => {
+                next: data => {
                     this.loadData();
+                    this.transactions.update(t => [...t, data]);
                     this.router.navigate(['/transactions']);
                 },
                 error: err => {
@@ -287,7 +296,9 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: updated => {
-                    console.log('Updated:', updated);
+                    this.transactions.update(transactions => 
+                        transactions.map(t => 
+                            t.transactionId === updated.transactionId ? updated : t))
                     this.loadData();
                     this.router.navigate(['/transactions']);
                 },
