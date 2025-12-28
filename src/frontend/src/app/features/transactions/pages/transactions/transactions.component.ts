@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
@@ -13,13 +13,13 @@ import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
-import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-transaction',
   imports: [TransactionTable, SummaryCard, RouterOutlet, CountUpDirective],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionComponent implements OnInit {
     private transactionSer = inject(TransactionService);

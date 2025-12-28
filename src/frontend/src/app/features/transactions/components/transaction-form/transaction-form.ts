@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { NewTransaction } from '../../models/transaction.model';
 import { Field, FieldState, form, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
@@ -10,6 +10,7 @@ import { EnumSelect } from '../../../../shared/components/enum-select/enum-selec
   imports: [Field, EnumSelect],
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionForm {
   isEdit = input(false);

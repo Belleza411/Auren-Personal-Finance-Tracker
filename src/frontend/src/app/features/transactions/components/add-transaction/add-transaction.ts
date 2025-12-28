@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NewTransaction } from '../../models/transaction.model';
 import { DialogRef } from '@angular/cdk/dialog';
 import { TransactionForm } from "../transaction-form/transaction-form";
@@ -10,6 +10,7 @@ import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
   imports: [TransactionForm],
   templateUrl: './add-transaction.html',
   styleUrl: './add-transaction.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransaction {
   protected readonly data: Category[] = inject(MAT_DIALOG_DATA);

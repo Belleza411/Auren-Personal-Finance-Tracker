@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Field } from '@angular/forms/signals';
 
 @Component({
@@ -6,6 +6,7 @@ import { Field } from '@angular/forms/signals';
   imports: [Field],
   templateUrl: './enum-select.html',
   styleUrl: './enum-select.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EnumSelect<T extends number> {
   label = input.required<string>();
