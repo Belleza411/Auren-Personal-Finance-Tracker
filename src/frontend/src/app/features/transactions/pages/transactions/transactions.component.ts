@@ -1,10 +1,9 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 import { CountUpDirective } from 'ngx-countup';
-import { CurrencyPipe } from '@angular/common';
 
 import { TransactionService } from '../../services/transaction.service';
 import { NewTransaction, Transaction } from '../../models/transaction.model';
@@ -14,10 +13,11 @@ import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, CurrencyPipe, RouterOutlet, CountUpDirective],
+  imports: [TransactionTable, SummaryCard, RouterOutlet, CountUpDirective],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
@@ -146,7 +146,8 @@ export class TransactionComponent implements OnInit {
     options = {
         duration: 1.2,
         separator: ',',
-        prefix: '$'
+        prefix: '$',
+        decimalPlaces: 2
     };
     
     ngOnInit(): void {
