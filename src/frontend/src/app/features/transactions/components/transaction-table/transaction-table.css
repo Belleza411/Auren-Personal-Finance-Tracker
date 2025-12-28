@@ -48,14 +48,10 @@
     color: #111827;
 }
 
-:host table input {
-    width: 0.9rem;
-    height: 0.9rem;
-}
-
 :host table tbody tr .buttons {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
 }
 
 :host table tbody tr .buttons button {

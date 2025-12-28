@@ -30,7 +30,11 @@
                     <p>{{ PaymentTypeMap[t.paymentType] }}</p>
                 </td>
                 <td>
-                    <p>{{ t.amount | currency }}</p>
+                    <p 
+                        [style.color]="t.transactionType === 1 ? 'green' : 'red'"
+                    >
+                        {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
+                    </p>
                 </td>
                 <td>
                     <div class="buttons">
