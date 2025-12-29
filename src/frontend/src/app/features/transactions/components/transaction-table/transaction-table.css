@@ -14,6 +14,134 @@
     margin-left: 1.8rem;
 }
 
+:host .filters {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 1.75rem;
+    gap: 0.7rem;
+}
+
+:host .filters .search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+:host .filters .search-bar span {
+    position: absolute;
+    margin: 0 0.5rem;
+    color: #9ca3af;
+}
+
+:host .filters .search-bar input {
+    width: 100%;
+    padding: 0.6rem 7rem 0.6rem 2.3rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .types,
+:host .filters .categories {
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .amount,
+:host .filters .date {
+    position: relative;
+    padding: 0.4rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .amount .amount-header,
+:host .filters .date .date-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+:host .filters .amount p,
+:host .filters .date span {
+    margin-right: 0.3rem;
+}
+
+:host .filters .amount .amount-modal {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1.2rem;
+    top: 50px;
+    left: 0;
+    display: none;
+}
+
+:host .filters .date .date-modal {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1.2rem;
+    top: 50px;
+    left: 0;
+    display: none;
+}
+
+:host .filters .amount .amount-modal.open,
+:host .filters .date .date-modal.open {
+    display: flex;
+}
+
+:host .filters .amount .amount-modal .inputs,
+:host .filters .date .date-modal .inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+:host .filters .amount .amount-modal .inputs input,
+:host .filters .date .date-modal .inputs input {
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .amount .amount-modal .actions,
+:host .filters .date .date-modal .actions  {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+:host .filters .amount .amount-modal .actions .select,
+:host .filters .date .date-modal .actions .select  {
+    background-color: #1C4532;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+:host .filters .amount .amount-modal .actions .cancel,
+:host .filters .date .date-modal .actions .cancel {
+    background: none;
+    color: #000;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
 :host table {
     width: 100%;
     border-collapse: collapse;

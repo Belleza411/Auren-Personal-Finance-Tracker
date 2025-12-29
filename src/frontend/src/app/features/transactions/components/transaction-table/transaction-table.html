@@ -1,4 +1,59 @@
 <h5>All Transaction</h5>
+<div class="filters">
+    <div class="search-bar">
+        <span class="material-symbols-outlined">
+            search
+        </span>
+        <input type="text" placeholder="Search Transactions...">
+    </div>
+    <select class="types">
+        <option value="" selected>All Types</option>
+        <option value="1">Income</option>
+        <option value="2">Expense</option>
+    </select>
+    <select class="categories">
+        <option value="" selected>All Categories</option>
+        @for(c of categories(); track c.categoryId) {
+            <option [value]="c.name">{{ c.name }}</option>
+        }
+    </select>
+    <div class="amount">
+        <div class="amount-header" (click)="toggleAmountModal()">
+            <p>Amount</p>
+            <span class="material-symbols-outlined">
+                keyboard_arrow_down
+            </span>
+        </div>
+        <div class="amount-modal" [class.open]="isAmountModalVisible()">
+            <div class="inputs">
+                <input type="number" placeholder="Min Amount">
+                <input type="number" placeholder="Max Amount">
+            </div>
+            <div class="actions">
+                <button class="cancel" (click)="toggleAmountModal()">Cancel</button>
+                <button class="select" (click)="toggleAmountModal()">Select</button>
+            </div>
+        </div>
+    </div>
+    <div class="date">
+        <div class="date-header" (click)="toggleDateModal()">
+            <span class="material-symbols-outlined">
+                calendar_today
+            </span>
+            <p>Date</p>
+        </div>
+        <div class="date-modal" [class.open]="isDateModalVisible()">
+            <div class="inputs">
+                <input type="date" placeholder="From">
+                <input type="date" placeholder="To">
+            </div>
+            <div class="actions">
+                <button class="cancel" (click)="toggleDateModal()">Cancel</button>
+                <button class="select" (click)="toggleDateModal()">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
 <table>
     <thead>
         <tr>

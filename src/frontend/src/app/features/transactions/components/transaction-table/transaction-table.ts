@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { Transaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
@@ -18,12 +18,23 @@ export class TransactionTable {
   delete = output<string>();
   edit = output<string>(); 
 
+  isAmountModalVisible = signal<boolean>(false);
+  isDateModalVisible = signal<boolean>(false);
+
   onDelete(id: string) {
     this.delete.emit(id);
   }
 
   onEdit(id: string) {
     this.edit.emit(id);
+  }
+
+  toggleAmountModal() {
+    this.isAmountModalVisible.update(v => !v);
+  }
+
+  toggleDateModal() {
+    this.isDateModalVisible.update(v => !v);
   }
 
   protected TransactionTypeMap = TransactionTypeMap;
