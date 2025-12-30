@@ -42,7 +42,8 @@
 }
 
 :host .filters .types,
-:host .filters .categories {
+:host .filters .categories,
+:host .filters .payment-methods {
     padding: 0.6rem 1rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;

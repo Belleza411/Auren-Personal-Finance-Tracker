@@ -17,6 +17,13 @@
             <option [value]="c.name">{{ c.name }}</option>
         }
     </select>
+    <select class="payment-methods">
+        <option value="" selected>All Payment Method</option>
+        <option value="1">Cash</option>
+        <option value="2">Credit Card</option>
+        <option value="3">Bank Transfer</option>
+        <option value="4">Other</option>
+    </select>
     <div class="amount">
         <div class="amount-header" (click)="toggleAmountModal()">
             <p>Amount</p>
