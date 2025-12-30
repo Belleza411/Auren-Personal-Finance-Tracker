@@ -1,23 +1,27 @@
 <h5>All Transaction</h5>
 <div class="filters">
     <div class="search-bar">
-        <span class="material-symbols-outlined">
+        <span class="material-symbols-outlined" aria-hidden="true">
             search
         </span>
-        <input type="text" placeholder="Search Transactions...">
+        <input 
+            type="text" 
+            placeholder="Search Transactions..."
+            aria-label="Search Transactions"
+        >
     </div>
-    <select class="types">
+    <select class="types" aria-label="Filter by transaction type">
         <option value="" selected>All Types</option>
         <option value="1">Income</option>
         <option value="2">Expense</option>
     </select>
-    <select class="categories">
+    <select class="categories" aria-label="Filter by category">
         <option value="" selected>All Categories</option>
         @for(c of categories(); track c.categoryId) {
             <option [value]="c.name">{{ c.name }}</option>
         }
     </select>
-    <select class="payment-methods">
+    <select class="payment-methods" aria-label="Filter by payment method">
         <option value="" selected>All Payment Method</option>
         <option value="1">Cash</option>
         <option value="2">Credit Card</option>
@@ -25,39 +29,87 @@
         <option value="4">Other</option>
     </select>
     <div class="amount">
-        <div class="amount-header" (click)="toggleAmountModal()">
+        <button class="amount-header" (click)="toggleAmountModal()" aria-label="Filter by amount range">
             <p>Amount</p>
             <span class="material-symbols-outlined">
                 keyboard_arrow_down
             </span>
-        </div>
-        <div class="amount-modal" [class.open]="isAmountModalVisible()">
-            <div class="inputs">
-                <input type="number" placeholder="Min Amount">
-                <input type="number" placeholder="Max Amount">
-            </div>
-            <div class="actions">
-                <button class="cancel" (click)="toggleAmountModal()">Cancel</button>
-                <button class="select" (click)="toggleAmountModal()">Select</button>
-            </div>
+        </button>
+        <div 
+            class="amount-modal" 
+            [class.open]="isAmountModalVisible()" 
+            role="dialog"
+            aria-label="Amount filter options"
+            [attr.aria-hidden]="!isAmountModalVisible()"]
+             >
+                <div class="inputs">
+                    <input 
+                        type="number" 
+                        placeholder="Min Amount"
+                        aria-label="Minimum amount">
+                    <input 
+                        type="number" 
+                        placeholder="Max Amount"
+                        aria-label="Maximum amount">
+                </div>
+                <div class="actions">
+                    <button 
+                        class="cancel" 
+                        (click)="toggleAmountModal()"
+                        aria-label="Cancel amount filter">
+                            Cancel
+                    </button>
+                    <button 
+                        class="select" 
+                        (click)="toggleAmountModal()"
+                        aria-label="Select amount filter">
+                            Select
+                    </button>
+                </div>
         </div>
     </div>
     <div class="date">
-        <div class="date-header" (click)="toggleDateModal()">
-            <span class="material-symbols-outlined">
-                calendar_today
-            </span>
-            <p>Date</p>
-        </div>
-        <div class="date-modal" [class.open]="isDateModalVisible()">
-            <div class="inputs">
-                <input type="date" placeholder="From">
-                <input type="date" placeholder="To">
-            </div>
-            <div class="actions">
-                <button class="cancel" (click)="toggleDateModal()">Cancel</button>
-                <button class="select" (click)="toggleDateModal()">Select</button>
-            </div>
+        <button 
+            class="date-header" 
+            (click)="toggleDateModal()"
+            [attr.aria-expanded]="isDateModalVisible()"
+            aria-controls="date-modal"
+            aria-label="Filter by date range">
+                <span class="material-symbols-outlined">
+                    calendar_today
+                </span>
+                <p>Date</p>
+        </button>
+        <div 
+            class="date-modal" 
+            role="dialog"
+            aria-label="Date filter options"
+            [class.open]="isDateModalVisible()"
+            [attr.aria-hidden]="!isDateModalVisible()">
+                <div class="inputs">
+                    <input 
+                        type="date" 
+                        placeholder="From"
+                        aria-label="Start date">
+                    <input 
+                        type="date" 
+                        placeholder="To"
+                        aria-label="End date">
+                </div>
+                <div class="actions">
+                    <button 
+                        class="cancel" 
+                        (click)="toggleDateModal()"
+                        aria-label="Cancel date filter">
+                        Cancel
+                    </button>
+                    <button 
+                        class="select" 
+                        (click)="toggleDateModal()"
+                        aria-label="Select date filter">
+                        Select
+                    </button>
+                </div>
         </div>
     </div>
 </div>
