@@ -24,14 +24,14 @@
         <button 
             class="category-header" 
             aria-label="Filter by categories"
-            (click)="toggleCategoryModal()"
+            (click)="toggleModal('category')"
         >
             <p>Categories</p>
             <span class="material-symbols-outlined">
                 keyboard_arrow_down
             </span>
         </button>
-        <div class="category-modal" [class.open]="isCategoryModalVisible()">
+        <div class="category-modal" [class.open]="modals().category">
             @for (c of categories(); track c.categoryId) {
                 <label class="category-option">
                     <input
@@ -56,7 +56,7 @@
         <option value="4">Other</option>
     </select>
     <div class="amount">
-        <button class="amount-header" (click)="toggleAmountModal()" aria-label="Filter by amount range">
+        <button class="amount-header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
             <p>Amount</p>
             <span class="material-symbols-outlined">
                 keyboard_arrow_down
@@ -64,10 +64,10 @@
         </button>
         <div 
             class="amount-modal" 
-            [class.open]="isAmountModalVisible()" 
+            [class.open]="modals().amount" 
             role="dialog"
             aria-label="Amount filter options"
-            [attr.aria-hidden]="!isAmountModalVisible()"]
+            [attr.aria-hidden]="!modals().amount"]
         >
             <div class="inputs">
                 <input 
@@ -86,8 +86,8 @@
     <div class="date">
         <button 
             class="date-header" 
-            (click)="toggleDateModal()"
-            [attr.aria-expanded]="isDateModalVisible()"
+            (click)="toggleModal('date')"
+            [attr.aria-expanded]="modals().date"
             aria-controls="date-modal"
             aria-label="Filter by date range"
         >
@@ -100,8 +100,8 @@
             class="date-modal" 
             role="dialog"
             aria-label="Date filter options"
-            [class.open]="isDateModalVisible()"
-            [attr.aria-hidden]="!isDateModalVisible()"
+            [class.open]="modals().date"
+            [attr.aria-hidden]="!modals().date"
         >
             <div class="inputs">
                 <input 

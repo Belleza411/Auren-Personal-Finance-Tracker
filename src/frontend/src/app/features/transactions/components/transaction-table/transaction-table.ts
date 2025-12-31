@@ -25,13 +25,22 @@ export class TransactionTable {
   endDate = signal<string | null>(null);
   selectedCategories = signal<string[]>([]);
   selectedPaymentType = signal<PaymentType | null>(null);
+
+  modals = signal({
+    amount: false,
+    date: false,
+    category: false
+  })
+
+  toggleModal(modalName: 'amount' | 'date' | 'category') {
+    this.modals.update(modals => ({
+      ...modals,
+      [modalName]: !modals[modalName]
+    }));
+  }
   
   delete = output<string>();
   edit = output<string>(); 
-  
-  isAmountModalVisible = signal<boolean>(false);
-  isDateModalVisible = signal<boolean>(false);
-  isCategoryModalVisible = signal<boolean>(false);
 
   private readonly filters = computed<TransactionFilter>(() => ({
     searchTerm: this.searchTerm(),
@@ -56,18 +65,6 @@ export class TransactionTable {
 
   onEdit(id: string) {
     this.edit.emit(id);
-  }
-
-  toggleAmountModal() {
-    this.isAmountModalVisible.update(v => !v);
-  }
-
-  toggleDateModal() {
-    this.isDateModalVisible.update(v => !v);
-  }
-
-  toggleCategoryModal() {
-    this.isCategoryModalVisible.update(v => !v);
   }
 
   protected TransactionTypeMap = TransactionTypeMap;
