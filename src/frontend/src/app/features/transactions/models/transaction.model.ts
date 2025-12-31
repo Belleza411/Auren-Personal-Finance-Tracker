@@ -19,14 +19,14 @@ interface NewTransaction {
 }
 
 interface TransactionFilter {
-    isIncome: boolean;
-    isExpense: boolean;
+    searchTerm: string;
+    transactionType: TransactionType;
     minAmount: number;
     maxAmount: number;
     endDate: Date | string;
     startDate: Date | string;
-    category: string;
-    paymentMethod: string;
+    category: string[];
+    paymentType: PaymentType;
 }
 
 enum TransactionType {
