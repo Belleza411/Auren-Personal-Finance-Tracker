@@ -163,28 +163,21 @@ export class TransactionComponent implements OnInit {
         decimalPlaces: 2
     };
 
-    constructor() {
-        effect(() => {
-            this.filterSubject
-                .pipe(
-                    debounceTime(300), 
-                    distinctUntilChanged(),
-                    takeUntilDestroyed(this.destroyRef)
-                )
-                .subscribe(filters => {
-                    this.currentFilters.set(filters);
-                    this.pageNumber.set(1); 
-                });
-        });
-
-        effect(() => {
-            this.currentFilters();
-            this.pageNumber();
-            this.loadData();
-        });
-    }
-    
     ngOnInit(): void {
+        this.filterSubject
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged(),
+                tap(filters => {
+                    this.currentFilters.set(filters);
+                    this.pageNumber.set(1);
+                }),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe();
+
+        this.loadData();
+
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
@@ -234,10 +227,7 @@ export class TransactionComponent implements OnInit {
         this.transactionSer.deleteTransaction(id)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
-                next: () => {
-                    this.transactions.update(list => list.filter(t => t.transactionId !== id)),
-                    this.loadData()
-                },
+                next: () => this.loadData(),
                 error: err => {
                     console.error('Failed to delete transaction:', err);
                     this.error.set('Failed to delete transaction. Please try again.');
@@ -277,23 +267,16 @@ export class TransactionComponent implements OnInit {
         dialogRef.afterClosed()
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                tap(() => this.router.navigate(['transactions'])),
+                tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
                 switchMap(result => this.transactionSer.createTransaction(result))
             )
             .subscribe({
-                next: data => {
-                    this.loadData();
-                    this.transactions.update(t => [...t, data]);
-                    this.router.navigate(['/transactions']);
-                },
-                error: err => {
-                    console.error('Create failed', err);
-                }
+                next: () => this.loadData(),
+                error: err => console.error('Create failed', err)
+                
             });
-        }
-
-
+    }
 
     openEditModal(transaction: Transaction): void {
         const dialogRef = this.dialog.open<
@@ -330,16 +313,8 @@ export class TransactionComponent implements OnInit {
                 )
             )
             .subscribe({
-                next: updated => {
-                    this.transactions.update(transactions => 
-                        transactions.map(t => 
-                            t.transactionId === updated.transactionId ? updated : t))
-                    this.loadData();
-                    this.router.navigate(['/transactions']);
-                },
-                error: err => {
-                    console.error('Update failed', err);
-                }
+                next: () => this.loadData(),
+                error: err => console.error('Update failed', err)
         });
     }
 
