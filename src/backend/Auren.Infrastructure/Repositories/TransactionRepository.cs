@@ -107,11 +107,33 @@ namespace Auren.Infrastructure.Repositories
         {
             if (filter == null) return query;
 
-            if(filter.IsIncome == true)
-                query = query.Where(t => t.TransactionType == TransactionType.Income);
-            
-            if (filter.IsExpense == true)
-                query = query.Where(t => t.TransactionType == TransactionType.Expense);
+            var searchTerm = filter.SearchTerm?.Trim();
+
+            if (string.IsNullOrEmpty(searchTerm))
+                return query;
+
+            var isAmount = decimal.TryParse(searchTerm, out var amount);
+            var isDate = DateTime.TryParse(searchTerm, out var date);
+
+            var isTransactionType = Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType);
+            var isPaymentType = Enum.TryParse<PaymentType>(searchTerm, true, out var paymentType);
+
+            query = query.Where(t =>
+                t.Name.Contains(searchTerm) ||
+                (isTransactionType && t.TransactionType == transactionType) ||
+                (isPaymentType && t.PaymentType == paymentType) ||
+                (isAmount && t.Amount == amount) ||
+                (isDate && t.TransactionDate.Date == date.Date) ||
+
+                dbContext.Categories.Any(c =>
+                    c.CategoryId == t.CategoryId &&
+                    c.UserId == userId &&
+                    c.Name.Contains(searchTerm)
+                )
+            );
+
+            if (filter.TransactionType.HasValue)
+                query = query.Where(t => t.TransactionType == filter.TransactionType.Value);
 
             if (filter.StartDate.HasValue && filter.EndDate.HasValue)
                 query = query.Where(t => t.TransactionDate >= filter.StartDate && t.TransactionDate <= filter.EndDate);
@@ -122,21 +144,17 @@ namespace Auren.Infrastructure.Repositories
             if (filter.MaxAmount.HasValue)
                 query = query.Where(t => t.Amount <= filter.MaxAmount.Value);          
 
-            if (!string.IsNullOrEmpty(filter.Category))
+            if (filter.Category != null && filter.Category.Any())
             {
                 query = query.Where(t => dbContext.Categories
                     .Where(c => c.CategoryId == t.CategoryId
-                    && c.Name.Contains(filter.Category)
-                    && c.UserId == userId).Any()
-                );
+                        && filter.Category.Contains(c.Name)
+                        && c.UserId == userId).Any());
             }
 
-            if(!string.IsNullOrEmpty(filter.PaymentMethod))
+            if(filter.PaymentType.HasValue)
             {
-                if(Enum.TryParse<PaymentType>(filter.PaymentMethod, true, out var paymentType))
-                {
-                    query = query.Where(t => t.PaymentType == paymentType);
-                }
+                query = query.Where(t => t.PaymentType == filter.PaymentType.Value);
             }
 
             return query;
@@ -146,14 +164,14 @@ namespace Auren.Infrastructure.Repositories
         {
             if (filter == null) return false;
 
-            return filter.IsIncome.HasValue ||
-                   filter.IsExpense.HasValue ||
+            return !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
+                   filter.TransactionType.HasValue ||
                    filter.MinAmount.HasValue ||
                    filter.MaxAmount.HasValue ||
                    filter.StartDate.HasValue ||
                    filter.EndDate.HasValue ||
-                   !string.IsNullOrEmpty(filter.Category) ||
-                   !string.IsNullOrEmpty(filter.PaymentMethod);
+                   (filter.Category != null && filter.Category.Any()) ||
+                   filter.PaymentType.HasValue;
         }
 
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)

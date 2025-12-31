@@ -6,6 +6,7 @@ using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
+using Auren.Domain.Enums;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
@@ -146,7 +147,7 @@ namespace Auren.Application.Services
 
         public async Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken)
         {
-            var transactionExpenses = new TransactionFilter { IsExpense = true };
+            var transactionExpenses = new TransactionFilter { TransactionType = TransactionType.Expense };
             var expenses = await _transactionRepository.GetTransactionsAsync(
                 userId, transactionExpenses, 5, 1, cancellationToken);
 
