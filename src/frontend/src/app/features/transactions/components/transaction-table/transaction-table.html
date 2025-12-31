@@ -108,12 +108,12 @@
                     type="date" 
                     placeholder="From"
                     aria-label="Start date"
-                    (input)="startDate.set($event.target.value)">
+                    (input)="startDate.set($event.target.value || null)">
                 <input 
                     type="date" 
                     placeholder="To"
                     aria-label="End date"
-                    (input)="endDate.set($event.target.value)">
+                    (input)="endDate.set($event.target.value || null)">
             </div>
         </div>
     </div>
