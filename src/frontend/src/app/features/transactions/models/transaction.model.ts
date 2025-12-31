@@ -20,13 +20,13 @@ interface NewTransaction {
 
 interface TransactionFilter {
     searchTerm: string;
-    transactionType: TransactionType;
-    minAmount: number;
-    maxAmount: number;
-    endDate: Date | string;
-    startDate: Date | string;
+    transactionType: TransactionType | null;
+    minAmount: number | null;
+    maxAmount: number | null;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
     category: string[];
-    paymentType: PaymentType;
+    paymentType: PaymentType | null;
 }
 
 enum TransactionType {

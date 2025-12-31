@@ -5,15 +5,22 @@ export function createHttpParams(
   pageNumber?: number,
   pageSize?: number
 ): HttpParams {
-
-  const cleaned: Record<string, string> = {};
+  const cleaned: Record<string, string | string[]> = {};
 
   for (const [key, value] of Object.entries(filters)) {
-    if (value !== undefined && value !== null) {
-      cleaned[key] =
-        value instanceof Date
-          ? value.toISOString()
-          : String(value);
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        cleaned[key] = value.map(v => String(v));
+      }
+    }
+    else if (value instanceof Date) {
+      cleaned[key] = value.toISOString();
+    }
+    else {
+      cleaned[key] = String(value);
     }
   }
 

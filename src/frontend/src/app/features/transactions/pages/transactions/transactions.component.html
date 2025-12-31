@@ -53,5 +53,6 @@
     [categories]="categories()"
     (delete)="deleteTransaction($event)"
     (edit)="onEditFromTable($event)"
+    (filtersChange)="onFiltersChange($event)"
 />
 <router-outlet></router-outlet>

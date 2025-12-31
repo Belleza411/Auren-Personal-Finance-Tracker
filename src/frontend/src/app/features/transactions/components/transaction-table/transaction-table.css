@@ -42,7 +42,6 @@
 }
 
 :host .filters .types,
-:host .filters .categories,
 :host .filters .payment-methods {
     padding: 0.6rem 1rem;
     border-radius: 10px;
@@ -50,7 +49,8 @@
 }
 
 :host .filters .amount,
-:host .filters .date {
+:host .filters .date,
+:host .filters .categories {
     position: relative;
     padding: 0.4rem 1rem;
     border-radius: 10px;
@@ -58,7 +58,8 @@
 }
 
 :host .filters .amount .amount-header,
-:host .filters .date .date-header {
+:host .filters .date .date-header,
+:host .filters .categories .category-header {
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -67,11 +68,13 @@
 }
 
 :host .filters .amount p,
-:host .filters .date span {
+:host .filters .date span,
+:host .filters .categories p {
     margin-right: 0.3rem;
 }
 
-:host .filters .amount .amount-modal {
+:host .filters .amount .amount-modal,
+:host .filters .categories .category-modal {
     position: absolute;
     background-color: #fff;
     border-radius: 10px;
@@ -97,8 +100,18 @@
     display: none;
 }
 
+:host .filters .categories .category-modal label {
+    display: flex;
+    align-items: center;
+}
+
+:host .filters .categories .category-modal label input {
+    margin-right: 0.5rem;
+}
+
 :host .filters .amount .amount-modal.open,
-:host .filters .date .date-modal.open {
+:host .filters .date .date-modal.open,
+:host .filters .categories .category-modal.open {
     display: flex;
 }
 
@@ -115,35 +128,6 @@
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
-
-:host .filters .amount .amount-modal .actions,
-:host .filters .date .date-modal .actions  {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: flex-end;
-}
-
-:host .filters .amount .amount-modal .actions .select,
-:host .filters .date .date-modal .actions .select  {
-    background-color: #1C4532;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-:host .filters .amount .amount-modal .actions .cancel,
-:host .filters .date .date-modal .actions .cancel {
-    background: none;
-    color: #000;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
 
 :host table {
     width: 100%;

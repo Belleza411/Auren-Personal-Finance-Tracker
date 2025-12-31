@@ -8,20 +8,47 @@
             type="text" 
             placeholder="Search Transactions..."
             aria-label="Search Transactions"
+            (input)="searchTerm.set($any($event.target).value)"
         >
     </div>
-    <select class="types" aria-label="Filter by transaction type">
+    <select 
+        class="types" 
+        aria-label="Filter by transaction type"
+        (change)="onChangeType($event)"
+    >
         <option value="" selected>All Types</option>
         <option value="1">Income</option>
         <option value="2">Expense</option>
     </select>
-    <select class="categories" aria-label="Filter by category">
-        <option value="" selected>All Categories</option>
-        @for(c of categories(); track c.categoryId) {
-            <option [value]="c.name">{{ c.name }}</option>
-        }
-    </select>
-    <select class="payment-methods" aria-label="Filter by payment method">
+    <div class="categories">
+        <button 
+            class="category-header" 
+            aria-label="Filter by categories"
+            (click)="toggleCategoryModal()"
+        >
+            <p>Categories</p>
+            <span class="material-symbols-outlined">
+                keyboard_arrow_down
+            </span>
+        </button>
+        <div class="category-modal" [class.open]="isCategoryModalVisible()">
+            @for (c of categories(); track c.categoryId) {
+                <label class="category-option">
+                    <input
+                        type="checkbox"
+                        [value]="c.name"
+                        (change)="onCategoryToggle(c.name, $event.target.checked)"
+                    />
+                {{ c.name }}
+                </label>
+            }
+        </div>
+    </div>
+    <select 
+        class="payment-methods" 
+        aria-label="Filter by payment method"
+        (change)="onChangePaymentType($event)"
+    >
         <option value="" selected>All Payment Method</option>
         <option value="1">Cash</option>
         <option value="2">Credit Card</option>
@@ -41,31 +68,19 @@
             role="dialog"
             aria-label="Amount filter options"
             [attr.aria-hidden]="!isAmountModalVisible()"]
-             >
-                <div class="inputs">
-                    <input 
-                        type="number" 
-                        placeholder="Min Amount"
-                        aria-label="Minimum amount">
-                    <input 
-                        type="number" 
-                        placeholder="Max Amount"
-                        aria-label="Maximum amount">
-                </div>
-                <div class="actions">
-                    <button 
-                        class="cancel" 
-                        (click)="toggleAmountModal()"
-                        aria-label="Cancel amount filter">
-                            Cancel
-                    </button>
-                    <button 
-                        class="select" 
-                        (click)="toggleAmountModal()"
-                        aria-label="Select amount filter">
-                            Select
-                    </button>
-                </div>
+        >
+            <div class="inputs">
+                <input 
+                    type="number" 
+                    placeholder="Min Amount"
+                    aria-label="Minimum amount"
+                    (input)="minAmount.set($event.target.valueAsNumber || null)">
+                <input 
+                    type="number" 
+                    placeholder="Max Amount"
+                    aria-label="Maximum amount"
+                    (input)="maxAmount.set($event.target.valueAsNumber || null)">
+            </div>
         </div>
     </div>
     <div class="date">
@@ -74,42 +89,32 @@
             (click)="toggleDateModal()"
             [attr.aria-expanded]="isDateModalVisible()"
             aria-controls="date-modal"
-            aria-label="Filter by date range">
-                <span class="material-symbols-outlined">
-                    calendar_today
-                </span>
-                <p>Date</p>
+            aria-label="Filter by date range"
+        >
+            <span class="material-symbols-outlined">
+                calendar_today
+            </span>
+            <p>Date</p>
         </button>
         <div 
             class="date-modal" 
             role="dialog"
             aria-label="Date filter options"
             [class.open]="isDateModalVisible()"
-            [attr.aria-hidden]="!isDateModalVisible()">
-                <div class="inputs">
-                    <input 
-                        type="date" 
-                        placeholder="From"
-                        aria-label="Start date">
-                    <input 
-                        type="date" 
-                        placeholder="To"
-                        aria-label="End date">
-                </div>
-                <div class="actions">
-                    <button 
-                        class="cancel" 
-                        (click)="toggleDateModal()"
-                        aria-label="Cancel date filter">
-                        Cancel
-                    </button>
-                    <button 
-                        class="select" 
-                        (click)="toggleDateModal()"
-                        aria-label="Select date filter">
-                        Select
-                    </button>
-                </div>
+            [attr.aria-hidden]="!isDateModalVisible()"
+        >
+            <div class="inputs">
+                <input 
+                    type="date" 
+                    placeholder="From"
+                    aria-label="Start date"
+                    (input)="startDate.set($event.target.value)">
+                <input 
+                    type="date" 
+                    placeholder="To"
+                    aria-label="End date"
+                    (input)="endDate.set($event.target.value)">
+            </div>
         </div>
     </div>
 </div>

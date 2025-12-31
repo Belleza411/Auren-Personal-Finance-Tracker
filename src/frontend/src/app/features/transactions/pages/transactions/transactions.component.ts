@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, finalize, forkJoin, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, finalize, forkJoin, Subject, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 import { CountUpDirective } from 'ngx-countup';
 
 import { TransactionService } from '../../services/transaction.service';
-import { NewTransaction, Transaction } from '../../models/transaction.model';
+import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { Category } from '../../../categories/models/categories.model';
@@ -143,16 +143,48 @@ export class TransactionComponent implements OnInit {
     isLoading = signal(false);
     error = signal<string | null>(null);
 
+    private filterSubject = new Subject<TransactionFilter>();
+
+    currentFilters = signal<TransactionFilter>({
+        searchTerm: '',
+        transactionType: null,
+        minAmount: null,
+        maxAmount: null,
+        startDate: null,
+        endDate: null,
+        category: [],
+        paymentType: null
+    });
+
     options = {
         duration: 1.2,
         separator: ',',
         prefix: '$',
         decimalPlaces: 2
     };
+
+    constructor() {
+        effect(() => {
+            this.filterSubject
+                .pipe(
+                    debounceTime(300), 
+                    distinctUntilChanged(),
+                    takeUntilDestroyed(this.destroyRef)
+                )
+                .subscribe(filters => {
+                    this.currentFilters.set(filters);
+                    this.pageNumber.set(1); 
+                });
+        });
+
+        effect(() => {
+            this.currentFilters();
+            this.pageNumber();
+            this.loadData();
+        });
+    }
     
     ngOnInit(): void {
-        this.loadData();
-
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
@@ -173,7 +205,7 @@ export class TransactionComponent implements OnInit {
         this.error.set(null);
 
         forkJoin({
-            transactions: this.transactionSer.getAllTransactions({}, this.pageSize(), this.pageNumber()),
+            transactions: this.transactionSer.getAllTransactions(this.currentFilters(), this.pageSize(), this.pageNumber()),
             avgDailySpending: this.transactionSer.getAvgDailySpending(),
             balance: this.transactionSer.getBalance(),
             categories: this.categorySer.getAllCategories()
@@ -317,5 +349,9 @@ export class TransactionComponent implements OnInit {
 
     onAddTransaction(): void {
         this.router.navigate(['/transactions', 'create']);
+    }
+
+    onFiltersChange(filters: TransactionFilter) {
+        this.filterSubject.next(filters);
     }
 }
