@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, OnInit, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
+import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-transaction-table',
@@ -12,10 +14,10 @@ import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionTable {
+  private destroyRef = inject(DestroyRef);
+
   transactions = input.required<Transaction[]>();
   categories = input.required<Category[]>();
-
-  filtersChange = output<TransactionFilter>();
 
   searchTerm = signal<string>('');
   selectedType = signal<TransactionType | null>(null);
@@ -53,12 +55,14 @@ export class TransactionTable {
     paymentType: this.selectedPaymentType()
   }));
 
-  constructor() {
-    effect(() => {
-      this.filtersChange.emit(this.filters());
-    });
-  }
-  
+  filtersChange = outputFromObservable(
+    toObservable(this.filters).pipe(
+      debounceTime(300),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      takeUntilDestroyed(this.destroyRef  )
+    )
+  );
+
   onDelete(id: string) {
     this.delete.emit(id);
   }

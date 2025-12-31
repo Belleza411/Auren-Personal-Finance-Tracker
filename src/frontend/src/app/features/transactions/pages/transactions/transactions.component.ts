@@ -166,18 +166,18 @@ export class TransactionComponent implements OnInit {
     ngOnInit(): void {
         this.filterSubject
             .pipe(
-                debounceTime(300),
-                distinctUntilChanged(),
                 tap(filters => {
                     this.currentFilters.set(filters);
                     this.pageNumber.set(1);
+                    console.log(filters);
+                    
                 }),
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe();
-
+    
         this.loadData();
-
+        
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
