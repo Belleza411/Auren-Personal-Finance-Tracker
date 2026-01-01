@@ -2,8 +2,8 @@ import { HttpParams } from '@angular/common/http';
 
 export function createHttpParams(
   filters: Record<string, any> = {},
-  pageNumber?: number,
-  pageSize?: number
+  pageSize?: number,
+  pageNumber?: number
 ): HttpParams {
   const cleaned: Record<string, string | string[]> = {};
 

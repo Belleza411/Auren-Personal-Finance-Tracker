@@ -1,0 +1,49 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+:host .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+:host .pagination-controls .pagination-btn {
+    padding: 0.6rem 0.85rem;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:host .pagination-controls .pagination-btn.active {
+    background-color: #1C4532;
+    color: #fff;
+}
+
+:host .pagination-controls .pagination-btn span {
+    font-size: 1.1rem;
+}
+
+:host .pagination-controls .pagination-btn span.left {
+    margin-right: 0.5rem;
+}
+
+:host .pagination-controls .pagination-btn span.right {
+    margin-left: 0.5rem;
+}
+
+:host .per-size select {
+    border: 1px solid #c5c5c5;
+    border-radius: 6px;
+    padding: 0.3rem 0.5rem;
+}
+
+:host .per-size label {
+    font-size: 0.9rem;
+}

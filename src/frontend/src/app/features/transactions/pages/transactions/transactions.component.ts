@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, filter, finalize, forkJoin, Subject, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
@@ -13,10 +13,11 @@ import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
+import { PaginationComponent } from "../../components/pagination/pagination";
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, RouterOutlet, CountUpDirective],
+  imports: [TransactionTable, SummaryCard, RouterOutlet, CountUpDirective, PaginationComponent],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -30,9 +31,12 @@ export class TransactionComponent implements OnInit {
     private dialog = inject(MatDialog);
 
     pageNumber = signal(1);
-    pageSize = signal(5);
+    pageSize = signal(10);
+    totalPage = signal(10);
+    totalCount = signal(100);
+    readonly pageSizeOptions: number[] = [5, 10, 15, 20, 25];
 
-    transactions = signal<Transaction[]>(
+    protected transactions = signal<Transaction[]>(
     [
         {
             transactionId: '1',
@@ -112,7 +116,7 @@ export class TransactionComponent implements OnInit {
             createdAt: "June 20, 2025"
         }
     ]);
-    categories = signal<Category[]>([
+    protected readonly categories = signal<Category[]>([
         {
             categoryId: '1',
             userId: '1',
@@ -163,20 +167,28 @@ export class TransactionComponent implements OnInit {
         decimalPlaces: 2
     };
 
+    constructor() {
+        effect(() => {
+            this.currentFilters();
+            this.pageSize();
+            this.pageNumber();
+            
+            untracked(() => {
+                this.loadData();
+            });
+        });
+    }
+
     ngOnInit(): void {
         this.filterSubject
             .pipe(
                 tap(filters => {
                     this.currentFilters.set(filters);
                     this.pageNumber.set(1);
-                    console.log(filters);
-                    
                 }),
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe();
-    
-        this.loadData();
         
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -186,7 +198,7 @@ export class TransactionComponent implements OnInit {
                 const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
                 
                 if (transactionId && shouldOpenEditModal) {
-                    this.openEditModalById(transactionId);
+                    this.openEditModalById(transactionId);  
                 } else if (shouldOpenAddModal) {
                     this.openAddModal();
                 }
@@ -198,7 +210,11 @@ export class TransactionComponent implements OnInit {
         this.error.set(null);
 
         forkJoin({
-            transactions: this.transactionSer.getAllTransactions(this.currentFilters(), this.pageSize(), this.pageNumber()),
+            transactions: this.transactionSer.getAllTransactions(
+                this.currentFilters(), 
+                this.pageSize(), 
+                this.pageNumber()
+            ),
             avgDailySpending: this.transactionSer.getAvgDailySpending(),
             balance: this.transactionSer.getBalance(),
             categories: this.categorySer.getAllCategories()
@@ -215,7 +231,7 @@ export class TransactionComponent implements OnInit {
                     this.income.set(balance.income);
                     this.expense.set(balance.expense);
                     this.categories.set(categories)
-                },
+                    this.totalCount.set(transactions.totalCount);                },
                 error: err => {
                     console.error("Failed to load data: ", err);
                     this.error.set("Failed to load data. Please try again.");
@@ -328,5 +344,14 @@ export class TransactionComponent implements OnInit {
 
     onFiltersChange(filters: TransactionFilter) {
         this.filterSubject.next(filters);
+    }
+
+    onPageChange(page: number): void {
+        this.pageNumber.set(page);
+    }
+
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.pageNumber.set(1);
     }
 }

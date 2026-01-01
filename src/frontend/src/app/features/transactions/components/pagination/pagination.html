@@ -1,0 +1,54 @@
+<div class="show-page">
+    <span>
+        Showing {{ endItem() }} out of {{ totalCount() }}
+    </span>
+</div>
+<div class="pagination-controls">
+    <button
+        (click)="onPageChange(pageNumber() - 1)"
+        [disabled]="pageNumber() === 1"
+        class="pagination-btn"
+    >
+        <span class="material-symbols-outlined left">
+            arrow_back
+        </span>
+        Previous
+    </button>
+
+    @for (page of pageNumbers(); track $index) {
+        @if (isNumber(page)) {
+            <button
+                (click)="onPageChange(page)"
+                [class.active]="page === pageNumber()"
+                class="pagination-btn"
+            >
+                {{ page }}
+            </button>
+        } @else {
+            <span class="pagination-ellipsis">...</span>
+        }
+    }
+
+    <button
+        (click)="onPageChange(pageNumber() + 1)"
+        [disabled]="pageNumber() === totalPages()"
+        class="pagination-btn right"
+    >
+        Next
+        <span class="material-symbols-outlined right">
+            arrow_forward
+        </span>
+    </button>
+</div>
+<div class="per-size">
+    <label for="per-size">Showing Per Page: </label>
+    <select 
+        [value]="pageSize()" 
+        (change)="onPageSizeChange($event)"
+        class="page-size-select"
+    >
+        @for (size of pageSizeOptions(); track size) {
+            <option [value]="size">{{ size }}</option>
+            }
+    </select>
+</div>
