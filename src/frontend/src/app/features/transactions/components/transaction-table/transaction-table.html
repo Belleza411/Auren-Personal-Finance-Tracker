@@ -8,17 +8,19 @@
             type="text" 
             placeholder="Search Transactions..."
             aria-label="Search Transactions"
+            [value]="searchTerm()"
             (input)="searchTerm.set($any($event.target).value)"
         >
     </div>
     <select 
         class="types" 
         aria-label="Filter by transaction type"
+        [value]="selectedType() ?? 0"
         (change)="onChangeType($event)"
     >
-        <option value="" selected>All Types</option>
-        <option value="1">Income</option>
-        <option value="2">Expense</option>
+        @for(type of transactionTypeOptions; track $index) {
+            <option [value]="$index">{{ type }}</option>
+        }
     </select>
     <div class="categories">
         <button 
@@ -39,7 +41,7 @@
                         [value]="c.name"
                         (change)="onCategoryToggle(c.name, $event.target.checked)"
                     />
-                {{ c.name }}
+                    {{ c.name }}
                 </label>
             }
         </div>
@@ -47,13 +49,12 @@
     <select 
         class="payment-methods" 
         aria-label="Filter by payment method"
+        [value]="selectedPaymentType() ?? 0"
         (change)="onChangePaymentType($event)"
     >
-        <option value="" selected>All Payment Method</option>
-        <option value="1">Cash</option>
-        <option value="2">Credit Card</option>
-        <option value="3">Bank Transfer</option>
-        <option value="4">Other</option>
+        @for(type of paymentTypeOptions; track $index) {
+            <option [value]="$index">{{ type }}</option>
+        }
     </select>
     <div class="amount">
         <button class="amount-header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
@@ -74,11 +75,13 @@
                     type="number" 
                     placeholder="Min Amount"
                     aria-label="Minimum amount"
+                    [value]="minAmount()"
                     (input)="minAmount.set($event.target.valueAsNumber || null)">
                 <input 
                     type="number" 
                     placeholder="Max Amount"
                     aria-label="Maximum amount"
+                    [value]="maxAmount()"
                     (input)="maxAmount.set($event.target.valueAsNumber || null)">
             </div>
         </div>
@@ -108,11 +111,13 @@
                     type="date" 
                     placeholder="From"
                     aria-label="Start date"
+                    [value]="startDate()"
                     (input)="startDate.set($event.target.value || null)">
                 <input 
                     type="date" 
                     placeholder="To"
                     aria-label="End date"
+                    [value]="endDate()"
                     (input)="endDate.set($event.target.value || null)">
             </div>
         </div>

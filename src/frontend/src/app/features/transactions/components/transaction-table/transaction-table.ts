@@ -28,6 +28,9 @@ export class TransactionTable {
   selectedCategories = signal<string[]>([]);
   selectedPaymentType = signal<PaymentType | null>(null);
 
+  transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
+  paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];
+
   modals = signal({
     amount: false,
     date: false,
@@ -59,7 +62,7 @@ export class TransactionTable {
     toObservable(this.filters).pipe(
       debounceTime(300),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      takeUntilDestroyed(this.destroyRef  )
+      takeUntilDestroyed(this.destroyRef)
     )
   );
 
@@ -88,13 +91,13 @@ export class TransactionTable {
   }
 
   onChangeType(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this.selectedType.set(Number(value) || null);
+    const value = Number((e.target as HTMLSelectElement).value);
+    this.selectedType.set(value === 0 ? null : value);
   }
 
   onChangePaymentType(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this.selectedPaymentType.set(Number(value) || null);
+    const value = Number((e.target as HTMLSelectElement).value);
+    this.selectedPaymentType.set(value === 0 ? null : value);
   }
 
   clearFilter() {
