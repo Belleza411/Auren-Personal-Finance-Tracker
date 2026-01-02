@@ -49,10 +49,16 @@
 }
 
 :host .filters .amount,
-:host .filters .date,
 :host .filters .categories {
     position: relative;
     padding: 0.4rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .date {
+    position: relative;
+    padding: 0.5rem 1rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
@@ -65,6 +71,11 @@
     align-items: center;
     border: none;
     background: none;
+}
+
+:host .filters .date .date-header span {
+    font-size: 1.3rem;
+    margin-right: 0.4rem;
 }
 
 :host .filters .amount p,
@@ -127,6 +138,21 @@
     padding: 0.6rem 1rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
+}
+
+:host .filters .clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+:host .filters .clear span {
+    margin-right: 0.3rem;
+    font-size: 1.2rem;
 }
 
 :host table {

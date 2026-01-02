@@ -17,7 +17,7 @@ import { PaginationComponent } from "../../components/pagination/pagination";
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, RouterOutlet, CountUpDirective, PaginationComponent],
+  imports: [TransactionTable, SummaryCard, CountUpDirective, PaginationComponent, RouterOutlet],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

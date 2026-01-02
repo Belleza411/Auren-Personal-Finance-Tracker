@@ -96,4 +96,26 @@ export class TransactionTable {
     const value = (e.target as HTMLSelectElement).value;
     this.selectedPaymentType.set(Number(value) || null);
   }
+
+  clearFilter() {
+    this.searchTerm.set('');
+    this.selectedType.set(null);
+    this.minAmount.set(null);
+    this.maxAmount.set(null);
+    this.startDate.set(null);
+    this.endDate.set(null);
+    this.selectedCategories.set([]);
+    this.selectedPaymentType.set(null);
+  }
+
+  hasActiveFilters = computed(() => {
+    const hasSearch = this.searchTerm().trim().length !== 0;
+    const hasType = this.selectedType() !== null;
+    const hasCategory = this.selectedCategories().length !== 0;
+    const hasPayment = this.selectedPaymentType() !== null;
+    const hasAmount = this.minAmount() !== null|| this.maxAmount() !== null;
+    const hasDate = this.startDate() !== null || this.endDate() !== null;
+
+    return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
+  });
 }
