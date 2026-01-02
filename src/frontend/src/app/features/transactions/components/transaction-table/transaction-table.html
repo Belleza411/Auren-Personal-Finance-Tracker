@@ -71,18 +71,24 @@
             [attr.aria-hidden]="!modals().amount"]
         >
             <div class="inputs">
-                <input 
-                    type="number" 
-                    placeholder="Min Amount"
-                    aria-label="Minimum amount"
-                    [value]="minAmount()"
-                    (input)="minAmount.set($event.target.valueAsNumber || null)">
-                <input 
-                    type="number" 
-                    placeholder="Max Amount"
-                    aria-label="Maximum amount"
-                    [value]="maxAmount()"
-                    (input)="maxAmount.set($event.target.valueAsNumber || null)">
+                <p>
+                    <label for="min-amount">Min Amount</label>
+                    <input 
+                        type="number" 
+                        placeholder="Min Amount"
+                        aria-label="Minimum amount"
+                        [value]="minAmount()"
+                        (input)="minAmount.set($event.target.valueAsNumber || null)">
+                </p>
+                <p>
+                    <label for="max-amount">Max Amount</label>
+                    <input 
+                        type="number" 
+                        placeholder="Max Amount"
+                        aria-label="Maximum amount"
+                        [value]="maxAmount()"
+                        (input)="maxAmount.set($event.target.valueAsNumber || null)">
+                </p>
             </div>
         </div>
     </div>
@@ -107,18 +113,24 @@
             [attr.aria-hidden]="!modals().date"
         >
             <div class="inputs">
-                <input 
-                    type="date" 
-                    placeholder="From"
-                    aria-label="Start date"
-                    [value]="startDate()"
-                    (input)="startDate.set($event.target.value || null)">
-                <input 
-                    type="date" 
-                    placeholder="To"
-                    aria-label="End date"
-                    [value]="endDate()"
-                    (input)="endDate.set($event.target.value || null)">
+                <p>
+                    <label for="start-date">Start Date</label>
+                    <input 
+                        type="date" 
+                        placeholder="From"
+                        aria-label="Start date"
+                        [value]="startDate()"
+                        (input)="startDate.set($event.target.value || null)">
+                </p>
+                <p>
+                    <label for="end-date">End Date</label>
+                    <input 
+                        type="date" 
+                        placeholder="To"
+                        aria-label="End date"
+                        [value]="endDate()"
+                        (input)="endDate.set($event.target.value || null)">
+                </p>
             </div>
         </div>
     </div>

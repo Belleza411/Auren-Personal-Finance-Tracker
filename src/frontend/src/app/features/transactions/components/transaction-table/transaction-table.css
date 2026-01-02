@@ -133,11 +133,16 @@
     gap: 0.5rem;
 }
 
-:host .filters .amount .amount-modal .inputs input,
-:host .filters .date .date-modal .inputs input {
+:host .filters .amount .amount-modal .inputs p input,
+:host .filters .date .date-modal .inputs p input {
     padding: 0.6rem 1rem;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid #c5c5c5;
+}
+
+:host .filters .amount .amount-modal .inputs p label,
+:host .filters .date .date-modal .inputs p label {
+    font-size: 0.85rem;
 }
 
 :host .filters .clear {
