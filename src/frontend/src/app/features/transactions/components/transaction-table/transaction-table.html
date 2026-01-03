@@ -39,6 +39,7 @@
                     <input
                         type="checkbox"
                         [value]="c.name"
+                        [checked]="selectedCategories().includes(c.name)"
                         (change)="onCategoryToggle(c.name, $event.target.checked)"
                     />
                     {{ c.name }}
@@ -59,9 +60,22 @@
     <div class="amount">
         <button class="amount-header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
             <p>Amount</p>
-            <span class="material-symbols-outlined">
-                keyboard_arrow_down
-            </span>
+            @if(minAmount() === null || maxAmount() === null) {
+                <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                </span>
+            }
+            @if(minAmount() !== null && maxAmount() !== null) {
+                <div>
+                    ${{ minAmount() }} - ${{ maxAmount() }} 
+                </div>
+                <span 
+                    class="material-symbols-outlined close" 
+                    role="button"
+                    (click)="clearAmountFilter()">
+                    close
+                </span>
+            }
         </button>
         <div 
             class="amount-modal" 
@@ -100,10 +114,23 @@
             aria-controls="date-modal"
             aria-label="Filter by date range"
         >
-            <span class="material-symbols-outlined">
-                calendar_today
-            </span>
+            @if(startDate() === null || endDate() === null) {
+                <span class="material-symbols-outlined">
+                    calendar_today
+                </span>
+            }
             <p>Date</p>
+            @if(startDate() !== null && endDate() !== null) {
+                <div>
+                    {{ startDate() }} - {{ endDate() }}
+                </div>
+                <span 
+                    class="material-symbols-outlined close" 
+                    role="button"
+                    (click)="clearDateFilter()">
+                    close
+                </span>
+            }
         </button>
         <div 
             class="date-modal" 
@@ -120,7 +147,7 @@
                         placeholder="From"
                         aria-label="Start date"
                         [value]="startDate()"
-                        (input)="startDate.set($event.target.value || null)">
+                        (input)="startDate.set(formatDate($event || null))">
                 </p>
                 <p>
                     <label for="end-date">End Date</label>
@@ -129,7 +156,7 @@
                         placeholder="To"
                         aria-label="End date"
                         [value]="endDate()"
-                        (input)="endDate.set($event.target.value || null)">
+                        (input)="endDate.set(formatDate($event || null))">
                 </p>
             </div>
         </div>

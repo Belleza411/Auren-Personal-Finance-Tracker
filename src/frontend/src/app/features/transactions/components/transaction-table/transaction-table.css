@@ -36,29 +36,37 @@
 
 :host .filters .search-bar input {
     width: 100%;
-    padding: 0.6rem 7rem 0.6rem 2.3rem;
+    padding: 0.6rem 4rem 0.6rem 2.3rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
 
 :host .filters .types,
 :host .filters .payment-methods {
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 0.6rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
 
-:host .filters .amount,
 :host .filters .categories {
     position: relative;
-    padding: 0.4rem 1rem;
+    padding: 0.4rem 0.7rem;
+    padding-right: 0.3rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
+:host .filters .amount {
+    position: relative;
+    padding: 0.5rem 0.6rem;
+    padding-right: 0.3rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
 
 :host .filters .date {
     position: relative;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.6rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
 }
@@ -73,9 +81,24 @@
     background: none;
 }
 
-:host .filters .date .date-header span {
+:host .filters .date .date-header span,
+:host .filters .amount .amount-header span,
+:host .filters .categories .category-header span {
     font-size: 1.3rem;
-    margin-right: 0.4rem;
+}
+
+:host .filters .date .date-header .close,
+:host .filters .amount .amount-header .close {
+    margin: 0 0 0 0.3rem;
+}
+
+:host .filters .date .date-header div,
+:host .filters .amount .amount-header div {
+    font-size: 0.7rem;
+    margin-left: 0.3rem;
+    border-radius: 8px;
+    background-color: #c1c1c1;
+    padding: 0.2rem 0.4rem;
 }
 
 :host .filters .amount p,

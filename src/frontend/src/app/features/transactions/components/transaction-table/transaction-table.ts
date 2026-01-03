@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
@@ -111,6 +111,16 @@ export class TransactionTable {
     this.selectedPaymentType.set(null);
   }
 
+  clearDateFilter() {
+    this.startDate.set(null);
+    this.endDate.set(null);
+  }
+
+  clearAmountFilter() {
+    this.minAmount.set(null);
+    this.maxAmount.set(null);
+  }
+
   hasActiveFilters = computed(() => {
     const hasSearch = this.searchTerm().trim().length !== 0;
     const hasType = this.selectedType() !== null;
@@ -118,7 +128,16 @@ export class TransactionTable {
     const hasPayment = this.selectedPaymentType() !== null;
     const hasAmount = this.minAmount() !== null|| this.maxAmount() !== null;
     const hasDate = this.startDate() !== null || this.endDate() !== null;
-
     return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
   });
+
+  formatDate(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    const date = new Date(value);
+    return date.toLocaleDateString('en-US', {
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric', 
+    })
+  }
 }
