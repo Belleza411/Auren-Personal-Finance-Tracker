@@ -14,10 +14,11 @@ import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
 import { PaginationComponent } from "../../components/pagination/pagination";
+import { ListFormat } from 'typescript';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, CountUpDirective, PaginationComponent, RouterOutlet],
+  imports: [TransactionTable, SummaryCard, CountUpDirective, PaginationComponent],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -196,6 +197,12 @@ export class TransactionComponent implements OnInit {
                 const transactionId = params['id'];
                 const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
                 const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
+
+                console.log(shouldOpenAddModal);
+                console.log(shouldOpenAddModal);
+                console.log(params);
+                
+                
                 
                 if (transactionId && shouldOpenEditModal) {
                     this.openEditModalById(transactionId);  
@@ -231,7 +238,8 @@ export class TransactionComponent implements OnInit {
                     this.income.set(balance.income);
                     this.expense.set(balance.expense);
                     this.categories.set(categories)
-                    this.totalCount.set(transactions.totalCount);                },
+                    this.totalCount.set(transactions.totalCount);                
+                },
                 error: err => {
                     console.error("Failed to load data: ", err);
                     this.error.set("Failed to load data. Please try again.");
