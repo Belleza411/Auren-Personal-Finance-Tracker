@@ -21,6 +21,14 @@
     justify-content: center;
 }
 
+:host .pagination-controls .pagination-btn:hover {
+    background-color: #dddddd;
+}
+
+:host .pagination-controls .pagination-btn:disabled {
+    cursor: not-allowed;
+}
+
 :host .pagination-controls .pagination-btn.active {
     background-color: #1C4532;
     color: #fff;

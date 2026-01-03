@@ -9,9 +9,11 @@
     box-shadow: 0px 16px 16px -8px rgba(12, 12, 13, 0.1), 0px 4px 4px -4px rgba(12, 12, 13, 0.05);
 }
 
-:host h5 {
-    font-size: 1.25rem;
+:host h1 {
+    font-size: 1.4rem;
     margin-left: 1.8rem;
+    font-weight: 400;
+    margin-top: 0.5rem;
 }
 
 :host .filters {
@@ -50,7 +52,7 @@
 
 :host .filters .categories {
     position: relative;
-    padding: 0.4rem 0.7rem;
+    padding: 0.47rem 0.7rem;
     padding-right: 0.3rem;
     border-radius: 10px;
     border: 1px solid #c5c5c5;
