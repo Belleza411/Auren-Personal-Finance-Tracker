@@ -11,3 +11,7 @@ body {
     background-color: #F9F9F9;
     overflow-x: hidden;
 }
+
+.dialog .mdc-dialog__surface {
+  border-radius: 0 !important;
+}

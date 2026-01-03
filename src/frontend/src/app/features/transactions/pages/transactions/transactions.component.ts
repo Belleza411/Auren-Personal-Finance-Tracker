@@ -198,12 +198,6 @@ export class TransactionComponent implements OnInit {
                 const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
                 const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
 
-                console.log(shouldOpenAddModal);
-                console.log(shouldOpenAddModal);
-                console.log(params);
-                
-                
-                
                 if (transactionId && shouldOpenEditModal) {
                     this.openEditModalById(transactionId);  
                 } else if (shouldOpenAddModal) {
@@ -285,6 +279,7 @@ export class TransactionComponent implements OnInit {
                 bottom: '0',
                 right: '0'
             },
+            panelClass: 'dialog',
             data: this.categories()
         });
 
@@ -320,6 +315,7 @@ export class TransactionComponent implements OnInit {
                     transaction: transaction,
                     categories: this.categories()
                 },
+                panelClass: 'dialog',
                 disableClose: false
             }
         );
