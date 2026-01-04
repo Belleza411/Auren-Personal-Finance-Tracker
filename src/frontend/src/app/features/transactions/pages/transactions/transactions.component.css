@@ -1,13 +1,13 @@
 :host {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
 }
 
 :host header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 :host header .header {
@@ -44,10 +44,24 @@
     margin-left: 0.5rem;
 }
 
+:host .filter-range {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+:host .filter-range select {
+    padding: 0.6rem 0.6rem;
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+}
+
 :host .transaction-summary {
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 :host .transaction-summary .header {

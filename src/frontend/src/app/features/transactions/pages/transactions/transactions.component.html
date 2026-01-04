@@ -10,6 +10,13 @@
         </span>
     </button>
 </header>
+<div class="filter-range">
+    <select (change)="onRangeChange($event)">
+        @for(range of timePeriodOptions; track $index) {
+            <option [value]="$index">{{ range }}</option>
+        }
+    </select>
+</div>
 <div class="transaction-summary">
     <app-summary-card>
         <div class="header">

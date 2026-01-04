@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CountUpDirective } from 'ngx-countup';
 
 import { TransactionService } from '../../services/transaction.service';
-import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
+import { NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { Category } from '../../../categories/models/categories.model';
@@ -35,7 +35,9 @@ export class TransactionComponent implements OnInit {
     pageSize = signal(10);
     totalPage = signal(10);
     totalCount = signal(100);
+    selectedRange = signal<TimePeriod>(1);
     readonly pageSizeOptions: number[] = [5, 10, 15, 20, 25];
+    timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
     protected transactions = signal<Transaction[]>(
     [
@@ -173,6 +175,7 @@ export class TransactionComponent implements OnInit {
             this.currentFilters();
             this.pageSize();
             this.pageNumber();
+            this.selectedRange();
             
             untracked(() => {
                 this.loadData();
@@ -216,8 +219,8 @@ export class TransactionComponent implements OnInit {
                 this.pageSize(), 
                 this.pageNumber()
             ),
-            avgDailySpending: this.transactionSer.getAvgDailySpending(),
-            balance: this.transactionSer.getBalance(),
+            avgDailySpending: this.transactionSer.getAvgDailySpending(this.selectedRange()),
+            balance: this.transactionSer.getBalance(this.selectedRange()),
             categories: this.categorySer.getAllCategories()
         })
             .pipe(
@@ -357,5 +360,10 @@ export class TransactionComponent implements OnInit {
     onPageSizeChange(size: number): void {
         this.pageSize.set(size);
         this.pageNumber.set(1);
+    }
+
+    onRangeChange(e: Event) {
+        const value = Number((e.target as HTMLSelectElement).value);
+        this.selectedRange.set(value + 1);  
     }
 }
