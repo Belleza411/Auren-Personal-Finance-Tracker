@@ -35,13 +35,15 @@ export class TransactionTable {
     amount: false,
     date: false,
     category: false
-  })
+  });
 
   toggleModal(modalName: 'amount' | 'date' | 'category') {
     this.modals.update(modals => ({
       ...modals,
       [modalName]: !modals[modalName]
     }));
+    console.log(this.modals());
+    
   }
   
   delete = output<string>();

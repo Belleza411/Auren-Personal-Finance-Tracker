@@ -212,8 +212,13 @@ export class TransactionComponent implements OnInit {
                 )),
                 firstValueFrom(this.transactionSer.getAvgDailySpending(params.range)),
                 firstValueFrom(this.transactionSer.getBalance(params.range)),
-                firstValueFrom(this.categorySer.getAllCategories())
-            ]);
+                firstValueFrom(this.categorySer.getAllCategories({}, Number.MAX_SAFE_INTEGER))
+            ])
+                .catch((err: any) =>{
+                    throw new Error(
+                        err?.message ?? 'Failed to load transactions'
+                    );
+                });
 
             return {
                 transactions,
