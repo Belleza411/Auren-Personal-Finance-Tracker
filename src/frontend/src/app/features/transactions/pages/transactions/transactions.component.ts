@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, filter, finalize, forkJoin, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, forkJoin, Subject, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 import { CountUpDirective } from 'ngx-countup';
@@ -34,12 +34,12 @@ export class TransactionComponent implements OnInit {
     pageNumber = signal(1);
     pageSize = signal(10);
     totalPage = signal(10);
-    totalCount = signal(100);
     selectedRange = signal<TimePeriod>(1);
+
     readonly pageSizeOptions: number[] = [5, 10, 15, 20, 25];
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-    protected transactions = signal<Transaction[]>(
+    protected dummyTransactions = signal<Transaction[]>(
     [
         {
             transactionId: '1',
@@ -119,7 +119,7 @@ export class TransactionComponent implements OnInit {
             createdAt: "June 20, 2025"
         }
     ]);
-    protected readonly categories = signal<Category[]>([
+    protected readonly dummyCategories = signal<Category[]>([
         {
             categoryId: '1',
             userId: '1',
@@ -143,15 +143,15 @@ export class TransactionComponent implements OnInit {
         }
     ]);
 
-    avgDailySpending = signal<number>(500);
-    totalBalance = signal<number>(2500);
-    income = signal<number>(2000);
-    expense = signal<number>(500);
-    isLoading = signal(false);
-    error = signal<string | null>(null);
+    transactions = computed(() => this.transactionResource.value()?.transactions.items ?? this.dummyTransactions());
+    categories = computed(() => this.transactionResource.value()?.categories ?? this.dummyCategories());
+    totalCount = computed(() => this.transactionResource.value()?.transactions.totalCount ?? 100);
+    avgDailySpending = computed(() => this.transactionResource.value()?.avgDailySpending ?? 2500);
+    totalBalance = computed(() => this.transactionResource.value()?.balance.balance ?? 2500);
+    income = computed(() => this.transactionResource.value()?.balance.income ?? 2000);
+    expense = computed(() => this.transactionResource.value()?.balance.expense ?? 500);
 
     private filterSubject = new Subject<TransactionFilter>();
-
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
@@ -169,19 +169,6 @@ export class TransactionComponent implements OnInit {
         prefix: '$',
         decimalPlaces: 2
     };
-
-    constructor() {
-        effect(() => {
-            this.currentFilters();
-            this.pageSize();
-            this.pageNumber();
-            this.selectedRange();
-            
-            untracked(() => {
-                this.loadData();
-            });
-        });
-    }
 
     ngOnInit(): void {
         this.filterSubject
@@ -209,49 +196,41 @@ export class TransactionComponent implements OnInit {
             });
     }  
 
-    private loadData() {
-        this.isLoading.set(true);
-        this.error.set(null);
+    transactionResource = resource({
+        params: () => ({
+            filters: this.currentFilters(),
+            pageSize: this.pageSize(),
+            pageNumber: this.pageNumber(),
+            range: this.selectedRange()
+        }),
+        loader: async ({ params }) => {
+            const [transactions, avgDailySpending, balance, categories] = await Promise.all([
+                firstValueFrom(this.transactionSer.getAllTransactions(
+                    params.filters,
+                    params.pageSize,
+                    params.pageNumber
+                )),
+                firstValueFrom(this.transactionSer.getAvgDailySpending(params.range)),
+                firstValueFrom(this.transactionSer.getBalance(params.range)),
+                firstValueFrom(this.categorySer.getAllCategories())
+            ]);
 
-        forkJoin({
-            transactions: this.transactionSer.getAllTransactions(
-                this.currentFilters(), 
-                this.pageSize(), 
-                this.pageNumber()
-            ),
-            avgDailySpending: this.transactionSer.getAvgDailySpending(this.selectedRange()),
-            balance: this.transactionSer.getBalance(this.selectedRange()),
-            categories: this.categorySer.getAllCategories()
-        })
-            .pipe(
-                takeUntilDestroyed(this.destroyRef),
-                finalize(() => this.isLoading.set(false))
-            )
-            .subscribe({
-                next: ({ transactions, avgDailySpending, balance, categories }) => {
-                    this.transactions.set(transactions.items);
-                    this.avgDailySpending.set(avgDailySpending);
-                    this.totalBalance.set(balance.balance);
-                    this.income.set(balance.income);
-                    this.expense.set(balance.expense);
-                    this.categories.set(categories)
-                    this.totalCount.set(transactions.totalCount);                
-                },
-                error: err => {
-                    console.error("Failed to load data: ", err);
-                    this.error.set("Failed to load data. Please try again.");
-                }
-        })
-    }
+            return {
+                transactions,
+                avgDailySpending,
+                balance,
+                categories
+            };
+        }
+    });
 
     deleteTransaction(id: string) {
         this.transactionSer.deleteTransaction(id)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
-                next: () => this.loadData(),
+                next: () => this.transactionResource.reload(),
                 error: err => {
                     console.error('Failed to delete transaction:', err);
-                    this.error.set('Failed to delete transaction. Please try again.');
                 }
             })
     }
@@ -294,7 +273,7 @@ export class TransactionComponent implements OnInit {
                 switchMap(result => this.transactionSer.createTransaction(result))
             )
             .subscribe({
-                next: () => this.loadData(),
+                next: () => this.transactionResource.reload(),
                 error: err => console.error('Create failed', err)
                 
             });
@@ -336,7 +315,7 @@ export class TransactionComponent implements OnInit {
                 )
             )
             .subscribe({
-                next: () => this.loadData(),
+                next: () => this.transactionResource.reload(),
                 error: err => console.error('Update failed', err)
         });
     }
