@@ -2,6 +2,7 @@
 using Auren.Application.Constants;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
@@ -72,7 +73,7 @@ namespace Auren.Application.Services
                 : Result.Failure<bool>(Error.DeleteFailed("Failed to delete category."));
         }
 
-        public async Task<Result<IEnumerable<Category>>> GetCategories(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
+        public async Task<Result<PagedResult<Category>>> GetCategories(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
             => Result.Success(await _categoryRepository.GetCategoriesAsync(userId, filter, pageSize, pageNumber, cancellationToken));
 
         public async Task<Result<Category?>> GetCategoryById(Guid categoryId, Guid userId, CancellationToken cancellationToken)
@@ -153,7 +154,7 @@ namespace Auren.Application.Services
 
             var categories = await _categoryRepository.GetCategoriesAsync(userId, null!, int.MaxValue, 1, cancellationToken);
 
-            var categoryLookup = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+            var categoryLookup = categories.Items.ToDictionary(c => c.CategoryId, c => c.Name);
 
             var totalAmount = expenses.Items.Sum(e => e.Amount);
             var chartData = expenses.Items
@@ -173,8 +174,6 @@ namespace Auren.Application.Services
                 })
                 .OrderByDescending(c => c.Amount)
                 .ToList();
-                
-
 
             return Result.Success<IEnumerable<ExpenseCategoryChartResponse>>(chartData);
         }

@@ -1,15 +1,18 @@
 ﻿using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
+using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
+using CloudinaryDotNet;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Auren.Application.DTOs.Responses.Category;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Auren.Infrastructure.Repositories
 {
@@ -41,7 +44,12 @@ namespace Auren.Infrastructure.Repositories
             return true;
         }
 
-		public async Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
+		public async Task<PagedResult<Category>> GetCategoriesAsync(
+            Guid userId,
+            CategoriesFilter filter,
+            int pageSize = 5,
+            int pageNumber = 1,
+            CancellationToken cancellationToken = default)
 		{
             var skip = (pageNumber - 1) * pageSize;
 
@@ -50,13 +58,10 @@ namespace Auren.Infrastructure.Repositories
 
             if (HasActiveFilter(filter))
             {
-                var filteredQuery = ApplyFilters(query, filter);
-
-                if (filteredQuery is IQueryable<Category> categoryQuery)
-                {
-                    query = categoryQuery;
-                }
+                query = ApplyFilters(query, filter);
             }
+
+            var totalCount = await query.CountAsync(cancellationToken);
 
             var categories = await query
                 .Skip(skip)
@@ -64,7 +69,13 @@ namespace Auren.Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            return categories;           
+            return new PagedResult<Category>
+            {
+                Items = categories,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
 		}
 
 		public async Task<Category?> GetCategoryByIdAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken)
@@ -86,39 +97,23 @@ namespace Auren.Infrastructure.Repositories
             return categories;
         }
 
-        private IQueryable<object> ApplyFilters(IQueryable<Category> query, CategoriesFilter filter)
+        private static IQueryable<Category> ApplyFilters(IQueryable<Category> query, CategoriesFilter filter)
         {
             if (filter == null) return query;
 
-            if (filter.IsIncome == true)
-                query = query.Where(t => t.TransactionType == TransactionType.Income);
+            if (!string.IsNullOrEmpty(filter.SearchTerm))
+            {
+                query = query.Where(c => c.Name.Contains(filter.SearchTerm.Trim()));
+            }
 
-            if (filter.IsExpense == true)
-                query = query.Where(t => t.TransactionType == TransactionType.Expense);
+            if (filter.TransactionType.HasValue)
+                query = query.Where(c => c.TransactionType == filter.TransactionType.Value);
 
             if (!string.IsNullOrWhiteSpace(filter.Category))
             {
                 query = query.Where(c => c.Name.Contains(filter.Category));
             }
 
-            if(filter.Transactions > 0)
-            {
-                var q = from c in query
-                        join t in _dbContext.Transactions on c.CategoryId equals t.CategoryId
-                        group t by new { c.CategoryId, c.Name } into g
-                        select new
-                        {
-                            CategoryName = g.Key.Name,
-                            TransactionCount = g.Count()
-                        };
-
-                if (filter.Transactions > 0)
-                {
-                    q = q.Where(x => x.TransactionCount >= filter.Transactions);
-                }
-
-                return q.OrderByDescending(x => x.TransactionCount);
-            }
             return query;
         }
 
@@ -126,13 +121,13 @@ namespace Auren.Infrastructure.Repositories
         {
             if (filter == null) return false;
 
-            return filter.IsExpense.HasValue ||
-                   filter.IsIncome.HasValue ||
-                   !string.IsNullOrWhiteSpace(filter.Category) ||
-                   filter.Transactions > 0;
+            return
+                !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
+                filter.TransactionType.HasValue ||
+                !string.IsNullOrWhiteSpace(filter.Category);
         }
 
-		public async Task<Category?> GetCategoryByNameAsync(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
+        public async Task<Category?> GetCategoryByNameAsync(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
             =>  await _dbContext.Categories.FirstOrDefaultAsync(c => c.UserId == userId
                     && c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)
                     && c.TransactionType == categoryDto.TransactionType,

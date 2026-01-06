@@ -1,5 +1,6 @@
 ﻿using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
+using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Category;
 using Auren.Domain.Entities;
 
@@ -7,7 +8,7 @@ namespace Auren.Application.Interfaces.Repositories
 {
 	public interface ICategoryRepository
 	{
-        Task<IEnumerable<Category>> GetCategoriesAsync(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default);
+        Task<PagedResult<Category>> GetCategoriesAsync(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default);
         Task<Category?> GetCategoryByIdAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken);
         Task<Category> CreateCategoryAsync(Category category, CancellationToken cancellationToken);
         Task<Category?> UpdateCategoryAsync(Category category, CancellationToken cancellationToken);

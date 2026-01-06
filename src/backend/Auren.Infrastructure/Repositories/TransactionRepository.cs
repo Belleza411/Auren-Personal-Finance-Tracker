@@ -187,7 +187,6 @@ namespace Auren.Infrastructure.Repositories
                 _ => (DateTime.MinValue, DateTime.Today) 
             };
 
-
             var monthlyData = await dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
                 .GroupBy(t => new

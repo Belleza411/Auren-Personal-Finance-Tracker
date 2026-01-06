@@ -1,10 +1,11 @@
-﻿namespace Auren.Application.DTOs.Filters
+﻿using Auren.Domain.Enums;
+
+namespace Auren.Application.DTOs.Filters
 {
 	public class CategoriesFilter
 	{
-        public bool? IsIncome { get; set; }
-        public bool? IsExpense { get; set; }
-        public int? Transactions { get; set; }
+        public string? SearchTerm { get; set; }
+        public TransactionType? TransactionType { get; set; }
         public string? Category { get; set; }
     }
 }
