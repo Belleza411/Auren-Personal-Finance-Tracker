@@ -1,6 +1,7 @@
 :host {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 :host header {
@@ -8,6 +9,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    gap: 0.3rem;
 }
 
 :host header .header {
@@ -17,6 +19,7 @@
 
 :host header .header h2 {
     font-weight: 500;
+    margin-bottom: 0.2rem;
 }
 
 :host header .header p {
@@ -27,7 +30,7 @@
 
 :host header button {
     display: flex;
-    align-items: center;
+    align-items: center; 
     justify-content: center;
     border: none;
     color: #fff;
@@ -37,6 +40,7 @@
     border-radius: 10px;
     font-weight: 200;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 :host header a span {
@@ -58,8 +62,8 @@
 }
 
 :host .transaction-summary {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
     gap: 1rem;
     margin-bottom: 1rem;
 }
@@ -77,4 +81,25 @@
 
 :host .transaction-summary .amount {
     font-size: 1.7rem;
+}
+
+@media screen and (max-width: 1280px) { 
+    :host .transaction-summary {
+        grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr));
+    }
+
+    :host header button {
+        margin-top: 0.4rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    :host header {
+        flex-direction: column;
+        align-items: flex-start;
+    }   
+
+    :host .filter-range {
+        justify-content: flex-start;
+    }
 }

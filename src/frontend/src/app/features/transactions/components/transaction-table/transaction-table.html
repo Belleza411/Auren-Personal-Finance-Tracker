@@ -170,58 +170,60 @@
         </button>
     }
 </div>
-<table>
-    <thead>
-        <tr>
-            <th>DATE</th>
-            <th>TYPE</th>
-            <th>CATEGORY</th>
-            <th>TRANSACTION</th>
-            <th>PAYMENT METHOD</th>
-            <th>AMOUNT</th>
-            <th>&nbsp;</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for(t of transactions(); track t.transactionId) {
+<div class="table-wrapper">
+    <table>
+        <thead>
             <tr>
-                <td>
-                    <p>{{ t.transactionDate }}</p>
-                </td>
-                <td>
-                    <p>{{ TransactionTypeMap[t.transactionType] }}</p>
-                </td>
-                <td>
-                    <p>{{ categoryMap().get(t.categoryId) ?? 'Unknown' }}</p>
-                </td>
-                <td>
-                    <p>{{ t.name }}</p>
-                </td>
-                <td>
-                    <p>{{ PaymentTypeMap[t.paymentType] }}</p>
-                </td>
-                <td>
-                    <p 
-                        [style.color]="t.transactionType === 1 ? 'green' : 'red'"
-                    >
-                        {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
-                    </p>
-                </td>
-                <td>
-                    <div class="buttons">
-                        <button (click)="onDelete(t.transactionId)">
-                            <span class="material-symbols-outlined">
-                                delete
-                            </span>
-                        </button>
-                        <button (click)="onEdit(t.transactionId)">
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
-                        </button>
-                    </div>
-                </td>
+                <th>DATE</th>
+                <th>TYPE</th>
+                <th>CATEGORY</th>
+                <th>TRANSACTION</th>
+                <th>PAYMENT METHOD</th>
+                <th>AMOUNT</th>
+                <th>&nbsp;</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @for(t of transactions(); track t.transactionId) {
+                <tr>
+                    <td>
+                        <p>{{ t.transactionDate }}</p>
+                    </td>
+                    <td>
+                        <p>{{ TransactionTypeMap[t.transactionType] }}</p>
+                    </td>
+                    <td>
+                        <p>{{ categoryMap().get(t.categoryId) ?? 'Unknown' }}</p>
+                    </td>
+                    <td>
+                        <p>{{ t.name }}</p>
+                    </td>
+                    <td>
+                        <p>{{ PaymentTypeMap[t.paymentType] }}</p>
+                    </td>
+                    <td>
+                        <p 
+                            [style.color]="t.transactionType === 1 ? 'green' : 'red'"
+                        >
+                            {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
+                        </p>
+                    </td>
+                    <td>
+                        <div class="buttons">
+                            <button (click)="onDelete(t.transactionId)">
+                                <span class="material-symbols-outlined">
+                                    delete
+                                </span>
+                            </button>
+                            <button (click)="onEdit(t.transactionId)">
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

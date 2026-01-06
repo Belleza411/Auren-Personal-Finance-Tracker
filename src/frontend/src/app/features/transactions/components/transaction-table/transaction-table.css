@@ -92,7 +92,7 @@
 
 :host .filters .date .date-header .close,
 :host .filters .amount .amount-header .close {
-    margin: 0 0 0 0.3rem;
+    margin-left: 0.3rem;
 }
 
 :host .filters .date .date-header div,
@@ -111,19 +111,7 @@
 }
 
 :host .filters .amount .amount-modal,
-:host .filters .categories .category-modal {
-    position: absolute;
-    background-color: #fff;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1.2rem;
-    top: 50px;
-    left: 0;
-    display: none;
-}
-
+:host .filters .categories .category-modal,
 :host .filters .date .date-modal {
     position: absolute;
     background-color: #fff;
@@ -198,14 +186,17 @@
     border-bottom: 1px solid #c5c5c5;
 }
 
-:host table thead tr th,
+:host table thead tr th {
+    padding: 0.7rem 2rem;
+}
+
 :host table tbody tr td {
-    padding: 1.5rem 2rem 1.3rem 2rem;
+    padding: 1rem 2rem;
 }
 
 :host table thead tr th {
     text-align: left;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #4B5563;
     letter-spacing: 0.05rem;
@@ -237,4 +228,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media screen and (max-width: 1280px) {
+    :host .table-wrapper {
+        overflow-x: auto;
+    }
+
+    :host table thead tr th {
+        font-size: 0.7rem;
+    }
+
+    :host table tbody tr td p {
+        font-size: 0.8rem;
+    }
+
+    :host h1,
+    :host .filters,
+    :host table thead tr th,
+    :host table tbody tr td {
+        padding-left: 1.3rem;
+        margin: 0;
+    }
+
+    :host .filters .search-bar input {
+        padding: 0.6rem 2rem 0.6rem 2.3rem;
+    }
 }
