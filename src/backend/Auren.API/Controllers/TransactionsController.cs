@@ -73,7 +73,7 @@ namespace Auren.API.Controllers
                 };
             }
 
-            return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.TransactionId }, createdTransaction.Value);
+            return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.Id }, createdTransaction.Value);
         }
 
 		[HttpPut("{transactionId:guid}")]

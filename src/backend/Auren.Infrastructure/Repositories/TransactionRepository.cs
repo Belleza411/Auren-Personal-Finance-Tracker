@@ -14,37 +14,25 @@ using System.Runtime.InteropServices;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class TransactionRepository(AurenDbContext dbContext) : ITransactionRepository
+	public class TransactionRepository : Repository<Transaction>, ITransactionRepository
 	{
-		public async Task<Transaction> CreateTransactionAsync(Transaction transaction, Guid userId, CancellationToken cancellationToken)
-		{
-            await dbContext.Transactions.AddAsync(transaction, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-            return transaction;     
-        }
+		private readonly AurenDbContext _dbContext;
 
-		public async Task<bool> DeleteTransactionAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken)
-		{
-            var transaction = await GetTransactionByIdAsync(transactionId, userId, cancellationToken);
-
-            if (transaction == null) return false;
-
-            dbContext.Transactions.Remove(transaction);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return true;
-        }
+		public TransactionRepository(AurenDbContext dbContext) : base(dbContext)
+        {
+			_dbContext = dbContext;
+		}
 
 		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
 		{
-            var income = await dbContext.Transactions
+            var income = await _dbContext.Transactions
                 .Where(t => t.UserId == userId &&
                             t.TransactionType == TransactionType.Income &&
                             t.TransactionDate >= start &&
                             t.TransactionDate <= end)
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
-            var expense = await dbContext.Transactions
+            var expense = await _dbContext.Transactions
                 .Where(t => t.UserId == userId &&
                             t.TransactionType == TransactionType.Expense &&
                             t.TransactionDate >= start &&
@@ -58,9 +46,6 @@ namespace Auren.Infrastructure.Repositories
             );
         }
 
-		public async Task<Transaction?> GetTransactionByIdAsync(Guid transactionId, Guid userId, CancellationToken cancellationToken) 
-            => await dbContext.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId, cancellationToken);
-
         public async Task<PagedResult<Transaction>> GetTransactionsAsync(
             Guid userId,
             TransactionFilter filter,
@@ -69,7 +54,7 @@ namespace Auren.Infrastructure.Repositories
 		{
             var skip = (pageNumber - 1) * pageSize;
 
-            var query = dbContext.Transactions
+            var query = _dbContext.Transactions
                 .Where(t => t.UserId == userId);
 
             if (HasActiveFilters(filter))
@@ -95,14 +80,6 @@ namespace Auren.Infrastructure.Repositories
             };
         }
 
-		public async Task<Transaction?> UpdateTransactionAsync(Guid transactionId, Guid userId, Transaction transaction, CancellationToken cancellationToken)
-		{
-            dbContext.Transactions.Update(transaction);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return transaction;
-		}
-
         private IQueryable<Transaction> ApplyTransactionFilters(IQueryable<Transaction> query, TransactionFilter filter, Guid userId)
         {
             if (filter == null) return query;
@@ -125,7 +102,7 @@ namespace Auren.Infrastructure.Repositories
                 (isAmount && t.Amount == amount) ||
                 (isDate && t.TransactionDate.Date == date.Date) ||
 
-                dbContext.Categories.Any(c =>
+                _dbContext.Categories.Any(c =>
                     c.CategoryId == t.CategoryId &&
                     c.UserId == userId &&
                     c.Name.Contains(searchTerm)
@@ -146,7 +123,7 @@ namespace Auren.Infrastructure.Repositories
 
             if (filter.Category != null && filter.Category.Any())
             {
-                query = query.Where(t => dbContext.Categories
+                query = query.Where(t => _dbContext.Categories
                     .Where(c => c.CategoryId == t.CategoryId
                         && filter.Category.Contains(c.Name)
                         && c.UserId == userId).Any());
@@ -187,7 +164,7 @@ namespace Auren.Infrastructure.Repositories
                 _ => (DateTime.MinValue, DateTime.Today) 
             };
 
-            var monthlyData = await dbContext.Transactions
+            var monthlyData = await _dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
                 .GroupBy(t => new
                 {
@@ -249,8 +226,9 @@ namespace Auren.Infrastructure.Repositories
 
         public async Task<IEnumerable<Transaction>> GetExpensesAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
         {
-            var expenses = await dbContext.Transactions
+            var expenses = await _dbContext.Transactions
                 .Where(t => t.UserId == userId 
+                    && t.TransactionType == TransactionType.Expense
                     && t.TransactionDate >= start 
                     && t.TransactionDate <= end)
                 .AsNoTracking()
@@ -260,4 +238,3 @@ namespace Auren.Infrastructure.Repositories
         }
     }
 }
-

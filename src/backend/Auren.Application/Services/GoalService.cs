@@ -172,7 +172,7 @@ namespace Auren.Application.Services
 
 			var newGoalTransaction = new Transaction
 			{
-				TransactionId = Guid.NewGuid(),
+				Id = Guid.NewGuid(),
 				UserId = userId,
 				CategoryId = existingCategory.CategoryId,
 				Amount = amount,
@@ -183,7 +183,7 @@ namespace Auren.Application.Services
 				CreatedAt = DateTime.UtcNow
 			};
 
-			var transactionResult = await _transactionRepository.CreateTransactionAsync(newGoalTransaction, userId, cancellationToken);
+			var transactionResult = await _transactionRepository.AddAsync(newGoalTransaction, cancellationToken);
 
 			if (transactionResult == null)
 				return Result.Failure<Goal>(Error.CreateFailed("Failed to create transaction for adding money to goal."));

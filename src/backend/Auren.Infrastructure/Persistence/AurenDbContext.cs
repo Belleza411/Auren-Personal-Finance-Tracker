@@ -16,7 +16,7 @@ namespace Auren.Infrastructure.Persistence
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Transaction>().HasKey(t => t.TransactionId);
+            builder.Entity<Transaction>().HasKey(t => t.Id);
 
             builder.Entity<Transaction>(entity =>
             {

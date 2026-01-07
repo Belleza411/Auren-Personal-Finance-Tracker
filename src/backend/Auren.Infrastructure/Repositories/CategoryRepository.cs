@@ -129,7 +129,7 @@ namespace Auren.Infrastructure.Repositories
 
         public async Task<Category?> GetCategoryByNameAsync(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
             =>  await _dbContext.Categories.FirstOrDefaultAsync(c => c.UserId == userId
-                    && c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)
+                    && c.Name.Equals(categoryDto.Name)
                     && c.TransactionType == categoryDto.TransactionType,
                     cancellationToken);
 

@@ -1,10 +1,11 @@
-﻿using Auren.Domain.Enums;
+﻿using Auren.Domain.Common;
+using Auren.Domain.Enums;
 
 namespace Auren.Domain.Entities
 {
-	public class Transaction
+	public class Transaction : IEntity
 	{
-        public Guid TransactionId { get; set; }
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid CategoryId { get; set; }
         public TransactionType TransactionType { get; set; }

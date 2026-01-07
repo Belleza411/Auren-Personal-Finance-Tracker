@@ -73,7 +73,7 @@ namespace Auren.Application.Services
 
             var transaction = new Transaction
             {
-                TransactionId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 CategoryId = category.CategoryId,
                 TransactionType = category.TransactionType,
@@ -83,7 +83,7 @@ namespace Auren.Application.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdTransaction = await _transactionRepository.CreateTransactionAsync(transaction, userId, cancellationToken);
+            var createdTransaction = await _transactionRepository.AddAsync(transaction, cancellationToken);
             return createdTransaction != null 
                 ? Result.Success<Transaction>(transaction)
                 : Result.Failure<Transaction>(Error.CreateFailed("Failed to create transaction. "));
@@ -91,7 +91,7 @@ namespace Auren.Application.Services
 
         public async Task<Result<bool>> DeleteTransaction(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {
-            var deletedTransaction = await _transactionRepository.DeleteTransactionAsync(transactionId, userId, cancellationToken);
+            var deletedTransaction = await _transactionRepository.DeleteAsync(transactionId, userId, cancellationToken);
 
             return deletedTransaction
                 ? Result.Success(true)
@@ -117,7 +117,7 @@ namespace Auren.Application.Services
 
         public async Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {
-            var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId, cancellationToken);
+            var transaction = await _transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
             return transaction != null
                 ? Result.Success<Transaction?>(transaction)
                 : Result.Failure<Transaction?>(Error.NotFound("Transaction not found. "));
@@ -142,7 +142,7 @@ namespace Auren.Application.Services
                 return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
-            var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId, userId, cancellationToken);
+            var transaction = await _transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
 
             if (transaction == null)
                 return Result.Failure<Transaction>(Error.NotFound("Transaction not found. "));
@@ -166,7 +166,7 @@ namespace Auren.Application.Services
             transaction.TransactionType = category.TransactionType;
             transaction.CategoryId = category.CategoryId;
 
-            var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transactionId, userId, transaction, cancellationToken);
+            var updatedTransaction = await _transactionRepository.UpdateAsync(transaction, cancellationToken);
 
             return updatedTransaction != null
                 ? Result.Success<Transaction>(updatedTransaction)
