@@ -103,7 +103,7 @@ namespace Auren.Infrastructure.Repositories
                 (isDate && t.TransactionDate.Date == date.Date) ||
 
                 _dbContext.Categories.Any(c =>
-                    c.CategoryId == t.CategoryId &&
+                    c.Id == t.CategoryId &&
                     c.UserId == userId &&
                     c.Name.Contains(searchTerm)
                 )
@@ -124,7 +124,7 @@ namespace Auren.Infrastructure.Repositories
             if (filter.Category != null && filter.Category.Any())
             {
                 query = query.Where(t => _dbContext.Categories
-                    .Where(c => c.CategoryId == t.CategoryId
+                    .Where(c => c.Id == t.CategoryId
                         && filter.Category.Contains(c.Name)
                         && c.UserId == userId).Any());
             }

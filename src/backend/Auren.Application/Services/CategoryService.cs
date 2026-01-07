@@ -46,14 +46,14 @@ namespace Auren.Application.Services
 
             var category = new Category
             {
-                CategoryId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = categoryDto.Name,
                 TransactionType = categoryDto.TransactionType,
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdCategory = await _categoryRepository.CreateCategoryAsync(category, cancellationToken);
+            var createdCategory = await _categoryRepository.AddAsync(category, cancellationToken);
 
             return createdCategory == null 
                 ? Result.Failure<Category>(Error.CreateFailed("Failed to create category.")) 
@@ -62,15 +62,11 @@ namespace Auren.Application.Services
 
         public async Task<Result<bool>> DeleteCategory(Guid categoryId, Guid userId, CancellationToken cancellationToken)
         {
-            var existingCategory = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
+            var categoryToDelete = await _categoryRepository.DeleteAsync(categoryId, userId, cancellationToken);
 
-            if(existingCategory == null)
-                return Result.Failure<bool>(Error.NotFound($"Category with id {categoryId} not found"));
-
-            var categoryToDelete = await _categoryRepository.DeleteCategoryAsync(existingCategory, cancellationToken);
             return categoryToDelete 
                 ? Result.Success(true) 
-                : Result.Failure<bool>(Error.DeleteFailed("Failed to delete category."));
+                : Result.Failure<bool>(Error.NotFound("Category not found. "));
         }
 
         public async Task<Result<PagedResult<Category>>> GetCategories(Guid userId, CategoriesFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default)
@@ -78,8 +74,8 @@ namespace Auren.Application.Services
 
         public async Task<Result<Category?>> GetCategoryById(Guid categoryId, Guid userId, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
-            
+            var category = await _categoryRepository.GetByIdAsync(categoryId, userId, cancellationToken);
+
             if(category == null)
                 return Result.Failure<Category?>(Error.NotFound($"Category with id {categoryId} not found"));
 
@@ -98,17 +94,17 @@ namespace Auren.Application.Services
                 return Result.Failure<Category>(Error.ValidationFailed(errors));
             }
 
-            var existingCategory = await _categoryRepository.GetCategoryByIdAsync(categoryId, userId, cancellationToken);
+            var existingCategory = await _categoryRepository.GetByIdAsync(categoryId, userId, cancellationToken);
             if(existingCategory == null)
                 return Result.Failure<Category>(Error.NotFound($"Category with id {categoryId} not found"));
 
             existingCategory.Name = categoryDto.Name;
             existingCategory.TransactionType = categoryDto.TransactionType;
 
-            var updatedCategory = await _categoryRepository.UpdateCategoryAsync(existingCategory, cancellationToken);
+            var updatedCategory = await _categoryRepository.UpdateAsync(existingCategory, cancellationToken);
 
-            return updatedCategory == null 
-                ? Result.Failure<Category>(Error.UpdateFailed("Failed to update category. ")) 
+            return updatedCategory == null
+                ? Result.Failure<Category>(Error.UpdateFailed("Failed to update category. "))
                 : Result.Success(updatedCategory);
         }
 
@@ -116,7 +112,7 @@ namespace Auren.Application.Services
         {
             var categories = CategorySeeder.DefaultCategories.Select(c => new Category
             {
-                CategoryId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = c.Name,
                 TransactionType = c.transactionType,
@@ -154,7 +150,7 @@ namespace Auren.Application.Services
 
             var categories = await _categoryRepository.GetCategoriesAsync(userId, null!, int.MaxValue, 1, cancellationToken);
 
-            var categoryLookup = categories.Items.ToDictionary(c => c.CategoryId, c => c.Name);
+            var categoryLookup = categories.Items.ToDictionary(c => c.Id, c => c.Name);
 
             var totalAmount = expenses.Items.Sum(e => e.Amount);
             var chartData = expenses.Items

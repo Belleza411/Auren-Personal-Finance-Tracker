@@ -24,7 +24,7 @@ namespace Auren.Infrastructure.Persistence
                     .HasPrecision(12, 2);
             });
                 
-            builder.Entity<Category>().HasKey(c => c.CategoryId);
+            builder.Entity<Category>().HasKey(c => c.Id);
 
             builder.Entity<Goal>().HasKey(g => g.GoalId);
 

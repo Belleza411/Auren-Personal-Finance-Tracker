@@ -67,7 +67,7 @@ namespace Auren.API.Controllers
                 };
             }
 
-            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.CategoryId }, createdCategory.Value);
+            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.Id }, createdCategory.Value);
         }
 
         [HttpPut("{categoryId:guid}")]

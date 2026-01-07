@@ -160,21 +160,21 @@ namespace Auren.Application.Services
 			{
 				var newCategory = new Category
 				{
-					CategoryId = Guid.NewGuid(),
+					Id = Guid.NewGuid(),
 					UserId = userId,
 					Name = goalCategory.Name,
 					TransactionType = goalCategory.TransactionType,
 					CreatedAt = DateTime.UtcNow
 				};
 
-				existingCategory = await _categoryRepository.CreateCategoryAsync(newCategory, cancellationToken);
+				existingCategory = await _categoryRepository.AddAsync(newCategory, cancellationToken);
 			}
 
 			var newGoalTransaction = new Transaction
 			{
 				Id = Guid.NewGuid(),
 				UserId = userId,
-				CategoryId = existingCategory.CategoryId,
+				CategoryId = existingCategory.Id,
 				Amount = amount,
 				Name = $"Transfer to goal: {existingGoal.Name}",
 				PaymentType = PaymentType.Other,

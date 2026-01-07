@@ -194,7 +194,7 @@ namespace Auren.Application.Services
         {
             var categories = CategorySeeder.DefaultCategories.Select(c => new Category
             {
-                CategoryId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = c.Name,
                 TransactionType = c.transactionType,

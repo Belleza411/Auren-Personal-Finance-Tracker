@@ -16,32 +16,16 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class CategoryRepository : ICategoryRepository
+	public class CategoryRepository : Repository<Category>, ICategoryRepository
 	{
         private readonly AurenDbContext _dbContext;
         private readonly string _connectionString;
 
-        public CategoryRepository(AurenDbContext dbContext, IConfiguration configuration)
+        public CategoryRepository(AurenDbContext dbContext, IConfiguration configuration) : base(dbContext)
 		{
-			_dbContext = dbContext;
+            _dbContext = dbContext;
             _connectionString = configuration.GetConnectionString("AurenDbConnection")
 								?? throw new ArgumentNullException("Connection not found");
-        }
-
-		public async Task<Category> CreateCategoryAsync(Category category, CancellationToken cancellationToken)
-		{
-            await _dbContext.Categories.AddAsync(category, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return category;
-        }
-
-		public async Task<bool> DeleteCategoryAsync(Category category, CancellationToken cancellationToken)
-		{
-            _dbContext.Categories.Remove(category);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return true;
         }
 
 		public async Task<PagedResult<Category>> GetCategoriesAsync(
@@ -77,17 +61,6 @@ namespace Auren.Infrastructure.Repositories
                 TotalCount = totalCount
             };
 		}
-
-		public async Task<Category?> GetCategoryByIdAsync(Guid categoryId, Guid userId, CancellationToken cancellationToken)
-            => await _dbContext.Categories
-                .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId, cancellationToken);
-
-		public async Task<Category?> UpdateCategoryAsync(Category category, CancellationToken cancellationToken)
-		{
-            _dbContext.Categories.Update(category);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-			return category;			
-        }
 
         public async Task<List<Category>> SeedDefaultCategoryToUserAsync(List<Category> categories, CancellationToken cancellationToken)
         {
@@ -192,9 +165,9 @@ namespace Auren.Infrastructure.Repositories
                 .Select(c => new
                 {
                     c.Name,
-                    TotalCategories = _dbContext.Transactions.Count(t => t.CategoryId == c.CategoryId),
+                    TotalCategories = _dbContext.Transactions.Count(t => t.CategoryId == c.Id),
                     HighestSpending = _dbContext.Transactions
-                        .Where(t => t.CategoryId == c.CategoryId && t.TransactionType == TransactionType.Expense)
+                        .Where(t => t.CategoryId == c.Id && t.TransactionType == TransactionType.Expense)
                         .Sum(t => (decimal?)t.Amount) ?? 0
                 })
                 .ToListAsync(cancellationToken);
