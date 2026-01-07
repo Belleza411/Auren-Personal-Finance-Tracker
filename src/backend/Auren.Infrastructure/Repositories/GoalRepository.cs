@@ -12,8 +12,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class GoalRepository(AurenDbContext dbContext) : IGoalRepository
+	public class GoalRepository : Repository<Goal>, IGoalRepository
 	{
+		private readonly AurenDbContext _dbContext;
+
+		public GoalRepository(AurenDbContext dbContext) : base(dbContext)
+        {
+			_dbContext = dbContext;
+		}
+
 		public async Task<IEnumerable<Goal>> GetGoalsAsync(
 			Guid userId, GoalFilter filter,
 			int pageSize = 5, int pageNumber = 1,
@@ -21,7 +28,7 @@ namespace Auren.Infrastructure.Repositories
 		{
 			var skip = (pageNumber - 1) * pageSize;
 
-			var query = dbContext.Goals
+			var query = _dbContext.Goals
 				.Where(g => g.UserId == userId);
 
             if(HasActiveFilters(filter))
@@ -38,40 +45,6 @@ namespace Auren.Infrastructure.Repositories
 
             return goal;
         }
-
-		public async Task<Goal?> GetGoalByIdAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
-			=> await dbContext.Goals
-				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
-
-        public async Task<Goal> CreateGoalAsync(Goal goal, Guid userId, CancellationToken cancellationToken)
-        {
-            await dbContext.Goals.AddAsync(goal, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return goal;
-        }
-
-        public async Task<Goal?> UpdateGoalAsync(Goal goal, CancellationToken cancellationToken)
-		{
-			dbContext.Goals.Update(goal);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-			return goal;     
-        }
-
-		public async Task<bool> DeleteGoalAsync(Guid goalId, Guid userId, CancellationToken cancellationToken)
-		{
-			var goal = await dbContext.Goals
-				.FirstOrDefaultAsync(g => g.GoalId == goalId && g.UserId == userId, cancellationToken);
-
-			if (goal == null) return false;
-
-			dbContext.Goals.Remove(goal);
-			await dbContext.SaveChangesAsync(cancellationToken);
-
-			return true;
-		}
-
 		private static IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
 		{
 			if (filter == null)
@@ -120,7 +93,7 @@ namespace Auren.Infrastructure.Repositories
 				GoalStatus.BehindSchedule
 			};
 
-            var goals = dbContext.Goals.Where(g => g.UserId == userId);
+            var goals = _dbContext.Goals.Where(g => g.UserId == userId);
 
             var goalsSummary = new
             {

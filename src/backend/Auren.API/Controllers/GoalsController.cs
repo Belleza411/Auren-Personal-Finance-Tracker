@@ -68,7 +68,7 @@ namespace Auren.API.Controllers
                 };
             }
 
-            return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.Value.GoalId }, createdGoal.Value);
+            return CreatedAtAction(nameof(GetGoalById), new { goalId = createdGoal.Value.Id }, createdGoal.Value);
         }
 
         [HttpPut("{goalId:guid}")]

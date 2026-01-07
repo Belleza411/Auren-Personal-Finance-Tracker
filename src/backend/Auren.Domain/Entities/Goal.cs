@@ -1,10 +1,11 @@
-﻿using Auren.Domain.Enums;
+﻿using Auren.Domain.Common;
+using Auren.Domain.Enums;
 
 namespace Auren.Domain.Entities
 {
-	public class Goal
+	public class Goal : IEntity
 	{
-        public Guid GoalId { get; set; }
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;

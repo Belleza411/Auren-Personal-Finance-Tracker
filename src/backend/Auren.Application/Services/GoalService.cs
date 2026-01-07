@@ -41,7 +41,7 @@ namespace Auren.Application.Services
 			
 		public async Task<Result<Goal>> GetGoalById(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
-			var goal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
+			var goal = await _goalRepository.GetByIdAsync(goalId, userId, cancellationToken);
 
 			if (goal == null)
 				return Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."));
@@ -69,7 +69,7 @@ namespace Auren.Application.Services
 
 			var goal = new Goal
 			{
-				GoalId = Guid.NewGuid(),
+				Id = Guid.NewGuid(),
 				UserId = userId,
 				Name = goalDto.Name,
 				Description = goalDto.Description,
@@ -82,7 +82,7 @@ namespace Auren.Application.Services
 				CreatedAt = DateTime.UtcNow
 			};
 
-			var createdGoal = await _goalRepository.CreateGoalAsync(goal, userId, cancellationToken);
+			var createdGoal = await _goalRepository.AddAsync(goal, cancellationToken);
 
 			return createdGoal == null
 				? Result.Failure<Goal>(Error.CreateFailed("Failed to create goal."))
@@ -101,12 +101,12 @@ namespace Auren.Application.Services
 				return Result.Failure<Goal>(Error.ValidationFailed(errors));
 			}
 
-			var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
+			var existingGoal = await _goalRepository.GetByIdAsync(goalId, userId, cancellationToken);
 
 			if (existingGoal == null)
 				return Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."));
 
-			existingGoal.GoalId = goalId;
+			existingGoal.Id = goalId;
 			existingGoal.UserId = userId;
 			existingGoal.Name = goalDto.Name;
 			existingGoal.Description = goalDto.Description;
@@ -117,7 +117,7 @@ namespace Auren.Application.Services
 			existingGoal.CompletionPercentage = GetCompletionPercentage(existingGoal.Spent ?? 0, existingGoal.Budget);
 			existingGoal.TimeRemaining = GetTimeRemaining(DateTime.UtcNow, existingGoal.TargetDate);
 
-			var updatedGoal = await _goalRepository.UpdateGoalAsync(existingGoal, cancellationToken);
+			var updatedGoal = await _goalRepository.UpdateAsync(existingGoal, cancellationToken);
 
 			return updatedGoal == null
 				? Result.Failure<Goal>(Error.UpdateFailed("Failed to update goal."))
@@ -126,15 +126,11 @@ namespace Auren.Application.Services
 
 		public async Task<Result<bool>> DeleteGoal(Guid goalId, Guid userId, CancellationToken cancellationToken)
 		{
-			var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
-			if (existingGoal == null)
-				return Result.Failure<bool>(Error.NotFound($"Goal with id of {goalId} not found. "));
-
-			var deletedGoal = await _goalRepository.DeleteGoalAsync(goalId, userId, cancellationToken);
+			var deletedGoal = await _goalRepository.DeleteAsync(goalId, userId, cancellationToken);
 
 			return deletedGoal
 				? Result.Success(true)
-				: Result.Failure<bool>(Error.DeleteFailed("Failed to delete goal"));
+				: Result.Failure<bool>(Error.NotFound("Goal not found."));
 		}
 
 		public async Task<Result<Goal>> AddMoneyToGoal(Guid goalId, Guid userId, decimal amount, CancellationToken cancellationToken)
@@ -147,7 +143,7 @@ namespace Auren.Application.Services
 			if (currentBalance.Balance < amount)
 				return Result.Failure<Goal>(Error.NotEnoughBalance($"{amount} is not enough balance. "));
 
-			var existingGoal = await _goalRepository.GetGoalByIdAsync(goalId, userId, cancellationToken);
+			var existingGoal = await _goalRepository.GetByIdAsync(goalId, userId, cancellationToken);
 
 			if (existingGoal == null)
 				return Result.Failure<Goal>(Error.NotFound($"Goal with id of {goalId} is not found."));
@@ -191,7 +187,7 @@ namespace Auren.Application.Services
 			existingGoal.Spent = (existingGoal.Spent ?? 0) + amount;
 			existingGoal.CompletionPercentage = GetCompletionPercentage(existingGoal.Spent ?? 0, existingGoal.Budget);
 
-			var goalWithAddedMoney = await _goalRepository.UpdateGoalAsync(existingGoal, cancellationToken);
+			var goalWithAddedMoney = await _goalRepository.UpdateAsync(existingGoal, cancellationToken);
 
 			return goalWithAddedMoney == null
 				? Result.Failure<Goal>(Error.UpdateFailed("Failed to add money to goal."))

@@ -26,7 +26,7 @@ namespace Auren.Infrastructure.Persistence
                 
             builder.Entity<Category>().HasKey(c => c.Id);
 
-            builder.Entity<Goal>().HasKey(g => g.GoalId);
+            builder.Entity<Goal>().HasKey(g => g.Id);
 
             builder.Entity<Goal>(entity =>
             {
