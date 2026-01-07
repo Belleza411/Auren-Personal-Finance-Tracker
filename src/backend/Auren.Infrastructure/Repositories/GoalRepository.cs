@@ -49,24 +49,17 @@ namespace Auren.Infrastructure.Repositories
 		{
 			if (filter == null)
 				return query;
-			
-			if (filter.IsCompleted.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.Completed);
-            	
-			if (filter.IsOnTrack.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.OnTrack);
-			
-			if (filter.IsOnHold.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.OnHold);
-			
-			if (filter.IsNotStarted.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.NotStarted);
-			
-			if (filter.IsBehindSchedule.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.BehindSchedule);
-			
-			if (filter.IsCancelled.HasValue)
-				query = query.Where(g => g.Status == GoalStatus.Cancelled);
+
+            if (!string.IsNullOrEmpty(filter.SearchTerm))
+            {
+                query = query.Where(c => 
+					c.Name.Contains(filter.SearchTerm.Trim()) ||
+					c.Description.Contains(filter.SearchTerm.Trim())
+                );
+            }
+
+            if (filter.GoalStatus.HasValue) 
+				query = query.Where(g => g.Status == filter.GoalStatus.Value);
 			
 			return query;
         }
@@ -76,12 +69,7 @@ namespace Auren.Infrastructure.Repositories
 			if(filter == null)
 				return false;
 
-			return filter.IsCompleted.HasValue ||
-				filter.IsOnTrack.HasValue ||
-				filter.IsOnHold.HasValue ||
-				filter.IsNotStarted.HasValue ||
-				filter.IsBehindSchedule.HasValue ||
-				filter.IsCancelled.HasValue;
+			return !string.IsNullOrEmpty(filter.SearchTerm) || filter.GoalStatus.HasValue;
         }
 
 		public async Task<GoalsSummaryResponse> GetGoalsSummaryAsync(Guid userId, CancellationToken cancellationToken)

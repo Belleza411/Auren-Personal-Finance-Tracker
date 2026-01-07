@@ -1,12 +1,10 @@
-﻿namespace Auren.Application.DTOs.Filters
+﻿using Auren.Domain.Enums;
+
+namespace Auren.Application.DTOs.Filters
 {
 	public class GoalFilter
 	{
-		public bool? IsCompleted { get; set; }
-		public bool? IsOnTrack { get; set; }
-		public bool? IsOnHold { get; set; }
-		public bool? IsNotStarted { get; set; }
-		public bool? IsBehindSchedule { get; set; }
-		public bool? IsCancelled { get; set; }
+		public string? SearchTerm { get; set; }
+        public GoalStatus? GoalStatus { get; set; }
     }
 }
