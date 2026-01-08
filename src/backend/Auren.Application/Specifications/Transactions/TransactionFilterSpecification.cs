@@ -1,5 +1,6 @@
 ﻿using Auren.Application.DTOs.Filters;
 using Auren.Application.Interfaces.Specification;
+using Auren.Application.Specifications.Common;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using System;
@@ -49,7 +50,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if(_filter.TransactionType.HasValue)
             {
-                var typeSpec = new TransactionTypeFilterSpecification(_filter.TransactionType.Value);
+                var typeSpec = new TransactionTypeFilterSpecification<Transaction>(_filter.TransactionType.Value);
                 spec = new AndSpecification<Transaction>(spec, typeSpec);
             }
 
@@ -98,7 +99,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if (Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType))
             {
-                var typeSpec = new TransactionTypeFilterSpecification(transactionType);
+                var typeSpec = new TransactionTypeFilterSpecification<Transaction>(transactionType);
                 return new OrSpecification<Transaction>(spec, typeSpec);
             }
 

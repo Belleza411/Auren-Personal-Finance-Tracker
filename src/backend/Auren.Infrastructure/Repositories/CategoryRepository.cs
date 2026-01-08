@@ -3,6 +3,7 @@ using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Category;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Specifications.Categories;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
@@ -37,13 +38,9 @@ namespace Auren.Infrastructure.Repositories
 		{
             var skip = (pageNumber - 1) * pageSize;
 
+            var spec = new CategoryFilterSpecification(userId, filter);
             var query = _dbContext.Categories
-                .Where(c => c.UserId == userId);
-
-            if (HasActiveFilter(filter))
-            {
-                query = ApplyFilters(query, filter);
-            }
+                .Where(spec.ToExpression());
 
             var totalCount = await query.CountAsync(cancellationToken);
 
@@ -68,36 +65,6 @@ namespace Auren.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return categories;
-        }
-
-        private static IQueryable<Category> ApplyFilters(IQueryable<Category> query, CategoriesFilter filter)
-        {
-            if (filter == null) return query;
-
-            if (!string.IsNullOrEmpty(filter.SearchTerm))
-            {
-                query = query.Where(c => c.Name.Contains(filter.SearchTerm.Trim()));
-            }
-
-            if (filter.TransactionType.HasValue)
-                query = query.Where(c => c.TransactionType == filter.TransactionType.Value);
-
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-            {
-                query = query.Where(c => c.Name.Contains(filter.Category));
-            }
-
-            return query;
-        }
-
-        private static bool HasActiveFilter(CategoriesFilter filter)
-        {
-            if (filter == null) return false;
-
-            return
-                !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
-                filter.TransactionType.HasValue ||
-                !string.IsNullOrWhiteSpace(filter.Category);
         }
 
         public async Task<Category?> GetCategoryByNameAsync(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken)
