@@ -3,6 +3,7 @@
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Responses.Goal;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Specifications.Goals;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
@@ -28,14 +29,11 @@ namespace Auren.Infrastructure.Repositories
 		{
 			var skip = (pageNumber - 1) * pageSize;
 
+			var spec = new GoalFilterSpecification(userId, filter);
 			var query = _dbContext.Goals
-				.Where(g => g.UserId == userId);
+				.Where(spec.ToExpression());
 
-            if(HasActiveFilters(filter))
-				query = ApplyFilters(query, filter);
-            
 			var goal = await query
-				.Where(g => g.UserId == userId)
 				.OrderByDescending(g => g.Spent)
 				.ThenByDescending(g => g.CreatedAt)
 				.Skip(skip)
@@ -45,33 +43,6 @@ namespace Auren.Infrastructure.Repositories
 
             return goal;
         }
-		private static IQueryable<Goal> ApplyFilters(IQueryable<Goal> query, GoalFilter filter)
-		{
-			if (filter == null)
-				return query;
-
-            if (!string.IsNullOrEmpty(filter.SearchTerm))
-            {
-                query = query.Where(c => 
-					c.Name.Contains(filter.SearchTerm.Trim()) ||
-					c.Description.Contains(filter.SearchTerm.Trim())
-                );
-            }
-
-            if (filter.GoalStatus.HasValue) 
-				query = query.Where(g => g.Status == filter.GoalStatus.Value);
-			
-			return query;
-        }
-
-		private static bool HasActiveFilters(GoalFilter filter)
-		{
-			if(filter == null)
-				return false;
-
-			return !string.IsNullOrEmpty(filter.SearchTerm) || filter.GoalStatus.HasValue;
-        }
-
 		public async Task<GoalsSummaryResponse> GetGoalsSummaryAsync(Guid userId, CancellationToken cancellationToken)
 		{
             var activeStatuses = new[]
