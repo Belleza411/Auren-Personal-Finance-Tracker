@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Auren.Domain\Auren.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Specifications\Transactions\" />
-  </ItemGroup>
-
 </Project>

@@ -4,6 +4,7 @@ using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
+using Auren.Application.Specifications.Transactions;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
@@ -54,12 +55,18 @@ namespace Auren.Infrastructure.Repositories
 		{
             var skip = (pageNumber - 1) * pageSize;
 
-            var query = _dbContext.Transactions
-                .Where(t => t.UserId == userId);
+            var spec = new TransactionFilterSpecification(userId, filter);
+            var query = _dbContext.Transactions.Where(spec.ToExpression());
 
-            if (HasActiveFilters(filter))
+            if (filter?.Category != null && filter.Category.Any())
             {
-                query = ApplyTransactionFilters(query, filter, userId);
+                query = query.Where(t =>
+                    _dbContext.Categories.Any(c =>
+                        c.Id == t.CategoryId &&
+                        c.UserId == userId &&
+                        filter.Category.Contains(c.Name)
+                    )
+                );
             }
 
             var totalCount = await query.CountAsync(cancellationToken);
@@ -78,77 +85,6 @@ namespace Auren.Infrastructure.Repositories
                 PageSize = pageSize,
                 TotalCount = totalCount
             };
-        }
-
-        private IQueryable<Transaction> ApplyTransactionFilters(IQueryable<Transaction> query, TransactionFilter filter, Guid userId)
-        {
-            if (filter == null) return query;
-
-            var searchTerm = filter.SearchTerm?.Trim();
-
-            if (string.IsNullOrEmpty(searchTerm))
-                return query;
-
-            var isAmount = decimal.TryParse(searchTerm, out var amount);
-            var isDate = DateTime.TryParse(searchTerm, out var date);
-
-            var isTransactionType = Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType);
-            var isPaymentType = Enum.TryParse<PaymentType>(searchTerm, true, out var paymentType);
-
-            query = query.Where(t =>
-                t.Name.Contains(searchTerm) ||
-                (isTransactionType && t.TransactionType == transactionType) ||
-                (isPaymentType && t.PaymentType == paymentType) ||
-                (isAmount && t.Amount == amount) ||
-                (isDate && t.TransactionDate.Date == date.Date) ||
-
-                _dbContext.Categories.Any(c =>
-                    c.Id == t.CategoryId &&
-                    c.UserId == userId &&
-                    c.Name.Contains(searchTerm)
-                )
-            );
-
-            if (filter.TransactionType.HasValue)
-                query = query.Where(t => t.TransactionType == filter.TransactionType.Value);
-
-            if (filter.StartDate.HasValue && filter.EndDate.HasValue)
-                query = query.Where(t => t.TransactionDate >= filter.StartDate && t.TransactionDate <= filter.EndDate);
-            
-            if (filter.MinAmount.HasValue)
-                query = query.Where(t => t.Amount >= filter.MinAmount.Value);
-            
-            if (filter.MaxAmount.HasValue)
-                query = query.Where(t => t.Amount <= filter.MaxAmount.Value);          
-
-            if (filter.Category != null && filter.Category.Any())
-            {
-                query = query.Where(t => _dbContext.Categories
-                    .Where(c => c.Id == t.CategoryId
-                        && filter.Category.Contains(c.Name)
-                        && c.UserId == userId).Any());
-            }
-
-            if(filter.PaymentType.HasValue)
-            {
-                query = query.Where(t => t.PaymentType == filter.PaymentType.Value);
-            }
-
-            return query;
-        }
-
-        private static bool HasActiveFilters(TransactionFilter filter)
-        {
-            if (filter == null) return false;
-
-            return !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
-                   filter.TransactionType.HasValue ||
-                   filter.MinAmount.HasValue ||
-                   filter.MaxAmount.HasValue ||
-                   filter.StartDate.HasValue ||
-                   filter.EndDate.HasValue ||
-                   (filter.Category != null && filter.Category.Any()) ||
-                   filter.PaymentType.HasValue;
         }
 
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
