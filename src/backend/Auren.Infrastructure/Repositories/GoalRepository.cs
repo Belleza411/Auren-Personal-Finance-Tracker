@@ -30,8 +30,7 @@ namespace Auren.Infrastructure.Repositories
 			var skip = (pageNumber - 1) * pageSize;
 
 			var spec = new GoalFilterSpecification(userId, filter);
-			var query = _dbContext.Goals
-				.Where(spec.ToExpression());
+			var query = _dbContext.Goals.Where(spec.ToExpression());
 
 			var goal = await query
 				.OrderByDescending(g => g.Spent)

@@ -159,18 +159,5 @@ namespace Auren.Infrastructure.Repositories
 
             return Math.Round(change, 2);
         }
-
-        public async Task<IEnumerable<Transaction>> GetExpensesAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
-        {
-            var expenses = await _dbContext.Transactions
-                .Where(t => t.UserId == userId 
-                    && t.TransactionType == TransactionType.Expense
-                    && t.TransactionDate >= start 
-                    && t.TransactionDate <= end)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-
-            return expenses;
-        }
     }
 }

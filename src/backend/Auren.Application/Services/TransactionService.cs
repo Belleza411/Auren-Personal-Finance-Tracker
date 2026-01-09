@@ -189,18 +189,23 @@ namespace Auren.Application.Services
                 _ => (DateTime.MinValue, DateTime.Today)
             };
 
-            var expenses = await _transactionRepository.GetExpensesAsync(userId, startDate, endDate, cancellationToken);
+            var filter = new TransactionFilter { 
+                TransactionType = TransactionType.Expense,
+                StartDate = startDate,
+                EndDate = endDate,
+            };
+            var expenses = await _transactionRepository.GetTransactionsAsync(userId, filter, int.MaxValue, 1, cancellationToken);
 
             if (expenses is null)
                 return Result.Success(0m);
 
-            var totalSpending = expenses.Sum(e => e.Amount);
+            var totalSpending = expenses.Items.Sum(e => e.Amount);
             var totalDays = (endDate - startDate).TotalDays + 1;
 
             if (totalDays <= 0)
                 return Result.Success(0m);
 
-            var avg = totalSpending / (decimal)totalDays;
+            var avg = Math.Round(totalSpending / (decimal)totalDays, 2);
 
             return Result.Success(avg);
         }
