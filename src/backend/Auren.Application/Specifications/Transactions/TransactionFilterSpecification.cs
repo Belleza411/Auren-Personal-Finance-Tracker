@@ -50,7 +50,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if(_filter.TransactionType.HasValue)
             {
-                spec.And(new TransactionTypeFilterSpecification<Transaction>(_filter.TransactionType.Value));
+                spec = spec.And(new TransactionTypeFilterSpecification<Transaction>(_filter.TransactionType.Value));
             }
 
             if(_filter.PaymentType.HasValue)

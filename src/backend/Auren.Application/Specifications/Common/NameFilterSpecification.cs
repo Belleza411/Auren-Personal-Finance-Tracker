@@ -10,7 +10,7 @@ namespace Auren.Application.Specifications.Common
 	{
 		public override Expression<Func<T, bool>> ToExpression()
 		{
-			return e => e.Name == name;
+			return e => e.Name.Contains(name.Trim());
 		}
 	}
 }
