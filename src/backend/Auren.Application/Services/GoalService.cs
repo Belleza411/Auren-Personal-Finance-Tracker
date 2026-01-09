@@ -175,7 +175,6 @@ namespace Auren.Application.Services
 				Name = $"Transfer to goal: {existingGoal.Name}",
 				PaymentType = PaymentType.Other,
 				TransactionType = TransactionType.Expense,
-				TransactionDate = DateTime.UtcNow,
 				CreatedAt = DateTime.UtcNow
 			};
 
