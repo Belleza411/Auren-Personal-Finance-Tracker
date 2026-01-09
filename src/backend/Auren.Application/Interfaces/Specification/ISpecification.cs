@@ -9,5 +9,7 @@ namespace Auren.Application.Interfaces.Specification
 	{
 		Expression<Func<T, bool>> ToExpression();
 		bool IsSatisfiedBy(T entity);
+        ISpecification<T> And(ISpecification<T> other);
+        ISpecification<T> Or(ISpecification<T> other);
     }
 }

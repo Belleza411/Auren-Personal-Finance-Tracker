@@ -45,19 +45,17 @@ namespace Auren.Application.Specifications.Categories
 		{
             if (_filter.TransactionType.HasValue)
             {
-                var typeSpec = new TransactionTypeFilterSpecification<Category>(_filter.TransactionType.Value);
-                spec = new AndSpecification<Category>(spec, typeSpec);
+				spec = spec.And(new TransactionTypeFilterSpecification<Category>(_filter.TransactionType.Value));
             }
             
 			if(!string.IsNullOrWhiteSpace(_filter.Category))
 			{
-				var categorySpec = new CategoryNameSpecification(_filter.Category);
-				spec = new AndSpecification<Category>(spec, categorySpec);
+				spec = spec.And(new CategoryNameSpecification(_filter.Category));
             }
+
             if (!string.IsNullOrEmpty(_filter.SearchTerm))
             {
-                var searchSpec = BuildSearchSpecification(_filter.SearchTerm.Trim());
-                spec = new AndSpecification<Category>(spec, searchSpec);
+				spec = spec.And(BuildSearchSpecification(_filter.SearchTerm.Trim()));
             }
 
             return spec;
@@ -76,8 +74,7 @@ namespace Auren.Application.Specifications.Categories
 		{
             if (Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType))
             {
-                var typeSpec = new TransactionTypeFilterSpecification<Category>(transactionType);
-                return new OrSpecification<Category>(spec, typeSpec);
+				return spec.Or(new TransactionTypeFilterSpecification<Category>(transactionType));
             }
 
             return spec;

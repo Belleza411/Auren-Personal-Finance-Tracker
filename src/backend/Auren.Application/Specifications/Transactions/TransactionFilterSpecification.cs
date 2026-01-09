@@ -50,32 +50,27 @@ namespace Auren.Application.Specifications.Transactions
         {
             if(_filter.TransactionType.HasValue)
             {
-                var typeSpec = new TransactionTypeFilterSpecification<Transaction>(_filter.TransactionType.Value);
-                spec = new AndSpecification<Transaction>(spec, typeSpec);
+                spec.And(new TransactionTypeFilterSpecification<Transaction>(_filter.TransactionType.Value));
             }
 
             if(_filter.PaymentType.HasValue)
             {
-                var paymentSpec = new PaymentTypeFilterSpecification(_filter.PaymentType.Value);
-                spec = new AndSpecification<Transaction>(spec, paymentSpec);
+                spec = spec.And(new PaymentTypeFilterSpecification(_filter.PaymentType.Value));
             }
 
             if(_filter.StartDate.HasValue && _filter.EndDate.HasValue)
             {
-                var dateSpec = new DateRangeFilterSpecification(_filter.StartDate.Value, _filter.EndDate.Value);
-                spec = new AndSpecification<Transaction>(spec, dateSpec);
+                spec = spec.And(new DateRangeFilterSpecification(_filter.StartDate.Value, _filter.EndDate.Value));
             }
 
             if(_filter.MinAmount.HasValue && _filter.MaxAmount.HasValue) 
             {
-                var amountSpec = new AmountRangeFilterspecification(_filter.MinAmount.Value, _filter.MaxAmount.Value);
-                spec = new AndSpecification<Transaction>(spec, amountSpec);
+                spec = spec.And(new AmountRangeFilterspecification(_filter.MinAmount.Value, _filter.MaxAmount.Value));
             }
 
             if(!string.IsNullOrEmpty(_filter.SearchTerm))
             {
-                var searchSpec = BuildSearchSpecification(_filter.SearchTerm.Trim()); 
-                spec = new AndSpecification<Transaction>(spec, searchSpec);
+                spec = spec.And(BuildSearchSpecification(_filter.SearchTerm.Trim()));
             }
 
             return spec;
@@ -99,8 +94,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if (Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType))
             {
-                var typeSpec = new TransactionTypeFilterSpecification<Transaction>(transactionType);
-                return new OrSpecification<Transaction>(spec, typeSpec);
+                return spec.Or(new TransactionTypeFilterSpecification<Transaction>(transactionType));
             }
 
             return spec;
@@ -112,8 +106,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if (Enum.TryParse<PaymentType>(searchTerm, true, out var paymentType))
             {
-                var typeSpec = new PaymentTypeFilterSpecification(paymentType);
-                return new OrSpecification<Transaction>(spec, typeSpec);
+                return spec.Or(new PaymentTypeFilterSpecification(paymentType));
             }
 
             return spec;
@@ -125,8 +118,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if(decimal.TryParse(searchTerm, out decimal amount))
             {
-                var amountSpec = new SearchTermSpecification.AmountSearchSpecification(amount);
-                return new OrSpecification<Transaction>(spec, amountSpec);
+                return spec.Or(new SearchTermSpecification.AmountSearchSpecification(amount));
             }
 
             return spec;
@@ -138,8 +130,7 @@ namespace Auren.Application.Specifications.Transactions
         {
             if(DateTime.TryParse(searchTerm, out var date))
             {
-                var dateSpec = new SearchTermSpecification.DateSearchSpecification(date);
-                return new OrSpecification<Transaction>(spec, dateSpec);
+                return spec.Or(new SearchTermSpecification.DateSearchSpecification(date));
             }
 
             return spec;

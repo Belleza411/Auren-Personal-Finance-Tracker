@@ -50,32 +50,27 @@ namespace Auren.Application.Specifications.Goals
 		{
 			if (_goalFilter.GoalStatus.HasValue)
 			{
-				var statusSpec = new GoalStatusSpecification(_goalFilter.GoalStatus.Value);
-				spec = new AndSpecification<Goal>(spec, statusSpec);
+				spec = spec.And(new GoalStatusSpecification(_goalFilter.GoalStatus.Value));
             }
 
 			if(_goalFilter.MinBudget.HasValue && _goalFilter.MaxBudget.HasValue)
 			{
-				var budgetSpec = new GoalBudgetRangeSpecification(_goalFilter.MinBudget.Value, _goalFilter.MaxBudget.Value);
-				spec = new AndSpecification<Goal>(spec, budgetSpec);
-			}
+				spec = spec.And(new GoalBudgetRangeSpecification(_goalFilter.MinBudget.Value, _goalFilter.MaxBudget.Value));
+            }
 
 			if(_goalFilter.MinCompletionPercentage.HasValue && _goalFilter.MaxCompletionPercentage.HasValue)
 			{
-				var completionSpec = new GoalCompletionPercentageRangeSpecification(_goalFilter.MinCompletionPercentage.Value, _goalFilter.MaxCompletionPercentage.Value);
-				spec = new AndSpecification<Goal>(spec, completionSpec);
+				spec = spec.And(new GoalCompletionPercentageRangeSpecification(_goalFilter.MinCompletionPercentage.Value, _goalFilter.MaxCompletionPercentage.Value));
 			}
 
 			if(_goalFilter.TargetFrom.HasValue && _goalFilter.TargetTo.HasValue)
 			{
-				var targetDateSpec = new GoalTargetDateRangeSpecification(_goalFilter.TargetFrom.Value, _goalFilter.TargetTo.Value);
-				spec = new AndSpecification<Goal>(spec, targetDateSpec);
+				spec = spec.And(new GoalTargetDateRangeSpecification(_goalFilter.TargetFrom.Value, _goalFilter.TargetTo.Value));
 			}
 
             if (!string.IsNullOrEmpty(_goalFilter.SearchTerm))
             {
-                var searchSpec = BuildSearchSpecification(_goalFilter.SearchTerm.Trim());
-                spec = new AndSpecification<Goal>(spec, searchSpec);
+				spec = spec.And(BuildSearchSpecification(_goalFilter.SearchTerm.Trim()));
             }
 
             return spec;
@@ -95,8 +90,7 @@ namespace Auren.Application.Specifications.Goals
 		{
 			if (Enum.TryParse<GoalStatus>(searchTerm, true, out var status))
 			{
-				var statusSpec = new GoalStatusSpecification(status);
-				spec = new OrSpecification<Goal>(spec, statusSpec);
+				spec.Or(new GoalStatusSpecification(status));
 			}
 
 			return spec;
