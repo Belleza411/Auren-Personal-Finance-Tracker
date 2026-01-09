@@ -3,7 +3,7 @@ using Auren.Domain.Enums;
 
 namespace Auren.Domain.Entities
 {
-	public class Goal : IEntity
+	public class Goal : IEntity, IHasName
 	{
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

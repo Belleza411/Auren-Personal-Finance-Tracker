@@ -1,5 +1,6 @@
 ﻿using Auren.Application.DTOs.Filters;
 using Auren.Application.Interfaces.Specification;
+using Auren.Application.Specifications.Common;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using System;
@@ -78,9 +79,9 @@ namespace Auren.Application.Specifications.Goals
 
 		private static ISpecification<Goal> BuildSearchSpecification(string searchTerm)
 		{
-			ISpecification<Goal> spec = new GoalNameSearchSpecification(searchTerm);
+			ISpecification<Goal> spec = new NameFilterSpecification<Goal>(searchTerm);
 
-			spec = new GoalDescriptionSearchSpecification(searchTerm);
+            spec = new GoalDescriptionSearchSpecification(searchTerm);
 			spec = TryAddGoalStatus(spec, searchTerm);
 
 			return spec;

@@ -50,7 +50,7 @@ namespace Auren.Application.Specifications.Categories
             
 			if(!string.IsNullOrWhiteSpace(_filter.Category))
 			{
-				spec = spec.And(new CategoryNameSpecification(_filter.Category));
+				spec = spec.And(new NameFilterSpecification<Category>(_filter.Category));
             }
 
             if (!string.IsNullOrEmpty(_filter.SearchTerm))
@@ -63,7 +63,7 @@ namespace Auren.Application.Specifications.Categories
 
 		private static ISpecification<Category> BuildSearchSpecification(string searchTerm)
 		{
-			ISpecification<Category> spec = new CategoryNameSpecification(searchTerm);
+			ISpecification<Category> spec = new NameFilterSpecification<Category>(searchTerm);
 			spec = TryAddTransactionTypeSearch(spec, searchTerm);
 			return spec;
         }

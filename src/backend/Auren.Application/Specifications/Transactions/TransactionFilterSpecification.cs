@@ -78,60 +78,7 @@ namespace Auren.Application.Specifications.Transactions
 
         private static ISpecification<Transaction> BuildSearchSpecification(string searchTerm)
         {
-            ISpecification<Transaction> spec = new SearchTermSpecification.NameSearchSpecification(searchTerm);
-
-            spec = TryAddTransactionTypeSearch(spec, searchTerm);
-            spec = TryAddPaymentTypeSearch(spec, searchTerm);
-            spec = TryAddAmountSearch(spec, searchTerm);
-            spec = TryAddDateSearch(spec, searchTerm);
-
-            return spec;
-        }
-
-        private static ISpecification<Transaction> TryAddTransactionTypeSearch(
-            ISpecification<Transaction> spec,
-            string searchTerm)
-        {
-            if (Enum.TryParse<TransactionType>(searchTerm, true, out var transactionType))
-            {
-                return spec.Or(new TransactionTypeFilterSpecification<Transaction>(transactionType));
-            }
-
-            return spec;
-        }
-
-        private static ISpecification<Transaction> TryAddPaymentTypeSearch(
-            ISpecification<Transaction> spec,
-            string searchTerm)
-        {
-            if (Enum.TryParse<PaymentType>(searchTerm, true, out var paymentType))
-            {
-                return spec.Or(new PaymentTypeFilterSpecification(paymentType));
-            }
-
-            return spec;
-        }
-
-        private static ISpecification<Transaction> TryAddAmountSearch(
-            ISpecification<Transaction> spec,
-            string searchTerm)
-        {
-            if(decimal.TryParse(searchTerm, out decimal amount))
-            {
-                return spec.Or(new SearchTermSpecification.AmountSearchSpecification(amount));
-            }
-
-            return spec;
-        }
-
-        private static ISpecification<Transaction> TryAddDateSearch(
-            ISpecification<Transaction> spec,
-            string searchTerm)
-        {
-            if(DateTime.TryParse(searchTerm, out var date))
-            {
-                return spec.Or(new SearchTermSpecification.DateSearchSpecification(date));
-            }
+            ISpecification<Transaction> spec = new NameFilterSpecification<Transaction>(searchTerm);
 
             return spec;
         }
