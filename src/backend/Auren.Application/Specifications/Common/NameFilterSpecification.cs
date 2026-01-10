@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Auren.Application.Specifications.Common
 {
-	public class NameFilterSpecification<T>(string name) : BaseSpecification<T> where T : IHasName
+	public class NameFilterSpecification<TEntity>(string name) : BaseSpecification<TEntity> where TEntity : IHasName
 	{
-		public override Expression<Func<T, bool>> ToExpression()
+		public override Expression<Func<TEntity, bool>> ToExpression()
 		{
 			return e => e.Name.Contains(name.Trim());
 		}

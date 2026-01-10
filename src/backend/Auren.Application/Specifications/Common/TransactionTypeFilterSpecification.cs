@@ -9,9 +9,9 @@ using System.Text;
 
 namespace Auren.Application.Specifications.Common
 {
-	public class TransactionTypeFilterSpecification<T>(TransactionType type) : BaseSpecification<T> where T : IHasTransactionType
+	public class TransactionTypeFilterSpecification<TEntity>(TransactionType type) : BaseSpecification<TEntity> where TEntity : IHasTransactionType
     {
-		public override Expression<Func<T, bool>> ToExpression()
+		public override Expression<Func<TEntity, bool>> ToExpression()
 		{
 			return e => e.TransactionType == type;
 		}

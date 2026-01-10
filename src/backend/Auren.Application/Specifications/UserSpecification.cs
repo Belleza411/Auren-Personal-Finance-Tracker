@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Auren.Application.Specifications
 {
-	public class UserSpecification<T>(Guid userId) : BaseSpecification<T> where T : IEntity
+	public class UserSpecification<TEntity>(Guid userId) : BaseSpecification<TEntity> where TEntity : IEntity
 	{
-		public override Expression<Func<T, bool>> ToExpression()
+		public override Expression<Func<TEntity, bool>> ToExpression()
 		{
 			return e => e.UserId == userId;
 		}

@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Auren.Application.Interfaces.Specification
 {
-	public interface ISpecification<T>
+	public interface ISpecification<TEntity>
 	{
-		Expression<Func<T, bool>> ToExpression();
-        ISpecification<T> And(ISpecification<T> other);
-        ISpecification<T> Or(ISpecification<T> other);
+		Expression<Func<TEntity, bool>> ToExpression();
+        ISpecification<TEntity> And(ISpecification<TEntity> other);
+        ISpecification<TEntity> Or(ISpecification<TEntity   > other);
     }
 }
