@@ -24,11 +24,6 @@ namespace Auren.Application.Specifications
         {
             return new OrSpecification<T>(this, other);
         }
-
-        public ISpecification<T> Not()
-        {
-            return new NotSpecification<T>(this);
-        }
     }
 
     public class AndSpecification<T> : BaseSpecification<T>
@@ -78,25 +73,6 @@ namespace Auren.Application.Specifications
                 Expression.Invoke(leftExpr, param),
                 Expression.Invoke(rightExpr, param)
             );
-
-            return Expression.Lambda<Func<T, bool>>(body, param);
-        }
-    }
-
-    public class NotSpecification<T> : BaseSpecification<T>
-    {
-        private readonly ISpecification<T> _spec;
-
-        public NotSpecification(ISpecification<T> spec)
-        {
-            _spec = spec;
-        }
-
-        public override Expression<Func<T, bool>> ToExpression()
-        {
-            var expr = _spec.ToExpression();
-            var param = Expression.Parameter(typeof(T), "x");
-            var body = Expression.Not(Expression.Invoke(expr, param));
 
             return Expression.Lambda<Func<T, bool>>(body, param);
         }
