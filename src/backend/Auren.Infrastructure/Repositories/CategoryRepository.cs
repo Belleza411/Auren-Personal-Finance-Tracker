@@ -132,9 +132,9 @@ namespace Auren.Infrastructure.Repositories
                 .Select(c => new
                 {
                     c.Name,
-                    TotalCategories = _dbContext.Transactions.Count(t => t.CategoryId == c.Id),
+                    TotalCategories = _dbContext.Transactions.Count(t => t.Category.Id == c.Id),
                     HighestSpending = _dbContext.Transactions
-                        .Where(t => t.CategoryId == c.Id && t.TransactionType == TransactionType.Expense)
+                        .Where(t => t.Category.Id == c.Id && t.TransactionType == TransactionType.Expense)
                         .Sum(t => (decimal?)t.Amount) ?? 0
                 })
                 .ToListAsync(cancellationToken);

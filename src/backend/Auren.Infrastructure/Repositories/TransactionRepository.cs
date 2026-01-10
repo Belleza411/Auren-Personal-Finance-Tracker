@@ -62,7 +62,7 @@ namespace Auren.Infrastructure.Repositories
             {
                 query = query.Where(t =>
                     _dbContext.Categories.Any(c =>
-                        c.Id == t.CategoryId &&
+                        c.Id == t.Category.Id &&
                         c.UserId == userId &&
                         filter.Category.Contains(c.Name)
                     )
