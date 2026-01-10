@@ -9,11 +9,6 @@ namespace Auren.Application.Specifications
 	public abstract class BaseSpecification<T> : ISpecification<T>
 	{
         public abstract Expression<Func<T, bool>> ToExpression();
-        public bool IsSatisfiedBy(T entity)
-		{
-			var predicate = ToExpression().Compile();
-			return predicate(entity);
-        }
 
         public ISpecification<T> And(ISpecification<T> other)
         {
