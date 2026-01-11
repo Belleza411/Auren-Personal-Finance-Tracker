@@ -14,11 +14,13 @@ namespace Auren.Application.Specifications.Transactions
 	{
 		private readonly Guid _userId;
 		private readonly TransactionFilter _filter;
+        private readonly IEnumerable<Guid> _categoryIds;
 
-		public TransactionFilterSpecification(Guid userId, TransactionFilter filter)
+		public TransactionFilterSpecification(Guid userId, TransactionFilter filter, IEnumerable<Guid> categoryIds)
 		{
 			_userId = userId;
 			_filter = filter ?? new TransactionFilter();
+            _categoryIds = categoryIds;
 		}
 
 		public override Expression<Func<Transaction, bool>> ToExpression()
@@ -38,12 +40,14 @@ namespace Auren.Application.Specifications.Transactions
             if (filter == null) return false;
 
             return !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
+                   
                    filter.TransactionType.HasValue ||
                    filter.MinAmount.HasValue ||
                    filter.MaxAmount.HasValue ||
                    filter.StartDate.HasValue ||
                    filter.EndDate.HasValue ||
-                   filter.PaymentType.HasValue;
+                   filter.PaymentType.HasValue ||
+                   (filter.Category?.Any() == true);
         }
 
         private ISpecification<Transaction> ApplyFilters(ISpecification<Transaction> spec)
@@ -66,6 +70,11 @@ namespace Auren.Application.Specifications.Transactions
             if(_filter.MinAmount.HasValue && _filter.MaxAmount.HasValue) 
             {
                 spec = spec.And(new AmountRangeFilterspecification(_filter.MinAmount.Value, _filter.MaxAmount.Value));
+            }
+
+            if(_filter.Category?.Any() == true)
+            {
+                spec = spec.And(new CategoriesFilterSpec(_categoryIds));
             }
 
             if(!string.IsNullOrEmpty(_filter.SearchTerm))

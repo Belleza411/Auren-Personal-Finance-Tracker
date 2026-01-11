@@ -18,10 +18,14 @@ namespace Auren.Infrastructure.Repositories
 	public class TransactionRepository : Repository<Transaction>, ITransactionRepository
 	{
 		private readonly AurenDbContext _dbContext;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly ILogger<TransactionRepository> _logger;
 
-		public TransactionRepository(AurenDbContext dbContext) : base(dbContext)
+        public TransactionRepository(AurenDbContext dbContext, ICategoryRepository categoryRepository, ILogger<TransactionRepository> logger) : base(dbContext)
         {
 			_dbContext = dbContext;
+            _categoryRepository = categoryRepository;
+            _logger = logger;
 		}
 
 		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
@@ -53,21 +57,21 @@ namespace Auren.Infrastructure.Repositories
             int pageSize = 5, int pageNumber = 1,
             CancellationToken cancellationToken = default)
 		{
+            IEnumerable<Guid> categoryIds = [];
+
+            if(filter.Category?.Any() == true)
+            {
+                categoryIds = await _categoryRepository.GetIdsByNamesAsync(userId, filter.Category, cancellationToken);
+            }
+
+            _logger.LogInformation("Category ids for {Categories}: {CategoryIds}", string.Join(", ", filter.Category ?? []), string.Join(", ", categoryIds));
+
             var skip = (pageNumber - 1) * pageSize;
 
-            var spec = new TransactionFilterSpecification(userId, filter);
-            var query = _dbContext.Transactions.Where(spec.ToExpression());
-
-            if (filter?.Category != null && filter.Category.Any())
-            {
-                query = query.Where(t =>
-                    _dbContext.Categories.Any(c =>
-                        c.Id == t.Category.Id &&
-                        c.UserId == userId &&
-                        filter.Category.Contains(c.Name)
-                    )
-                );
-            }
+            var spec = new TransactionFilterSpecification(userId, filter, categoryIds);
+            var query = _dbContext.Transactions
+                .Where(spec.ToExpression())
+                .Include(t => t.Category);
 
             var totalCount = await query.CountAsync(cancellationToken);
 

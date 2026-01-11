@@ -150,5 +150,18 @@ namespace Auren.Infrastructure.Repositories
                 HighestSpendingCategory: highestSpendingCategory ?? "N/A"
             ); 
         }
+
+        public async Task<IReadOnlyList<Guid>> GetIdsByNamesAsync(Guid userId, IEnumerable<string> categories,  CancellationToken cancellationToken)
+        {
+            if (categories == null)
+                return [];
+
+            return await _dbContext.Categories
+              .Where(c =>
+                  c.UserId == userId &&
+                  categories.Contains(c.Name))
+              .Select(c => c.Id)
+              .ToListAsync(cancellationToken);
+        }
 	}
 }

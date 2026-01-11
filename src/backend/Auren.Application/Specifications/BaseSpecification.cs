@@ -9,7 +9,6 @@ namespace Auren.Application.Specifications
 	public abstract class BaseSpecification<TEntity> : ISpecification<TEntity>
 	{
         public abstract Expression<Func<TEntity, bool>> ToExpression();
-
         public ISpecification<TEntity> And(ISpecification<TEntity> other)
         {
             return new AndSpecification<TEntity>(this, other);

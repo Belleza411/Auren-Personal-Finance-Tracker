@@ -6,11 +6,11 @@ using System.Text;
 
 namespace Auren.Application.Specifications.Transactions
 {
-	public class DateRangeFilterSpecification(DateTime startDate, DateTime endDate) : BaseSpecification<Transaction>
+	public class CategoriesFilterSpec(IEnumerable<Guid> categoriesIds) : BaseSpecification<Transaction>
 	{
 		public override Expression<Func<Transaction, bool>> ToExpression()
 		{
-			return t => t.CreatedAt >= startDate && t.CreatedAt <= endDate;
+			return t => categoriesIds.Contains(t.CategoryId);
 		}
 	}
 }
