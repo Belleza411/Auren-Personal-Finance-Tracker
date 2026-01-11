@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace Auren.Infrastructure.Repositories
 {
-	public class Repository<T> : IRepository<T> where T : class, IEntity
+	public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
 	{
 		private readonly AurenDbContext _context;
-		private readonly DbSet<T> _dbSet;
+		private readonly DbSet<TEntity> _dbSet;
 
 		public Repository(AurenDbContext context)
 		{
 			_context = context;
-			_dbSet = _context.Set<T>();
+			_dbSet = _context.Set<TEntity>();
 		}
 
-		public async Task<T> AddAsync(T entity, CancellationToken ct)
+		public async Task<TEntity> AddAsync(TEntity entity, CancellationToken ct)
 		{
 			await _dbSet.AddAsync(entity, ct);
 			await _context.SaveChangesAsync(ct);
@@ -43,14 +43,14 @@ namespace Auren.Infrastructure.Repositories
 			return true;
         }
 
-		public async Task<T?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct)
+		public async Task<TEntity?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct)
 		{
 			return await _dbSet
 				.AsNoTracking()
 				.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId, ct);
 		}
 
-		public async Task<T> UpdateAsync(T entity, CancellationToken ct)
+		public async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken ct)
 		{
 			_dbSet.Update(entity);
 			await _context.SaveChangesAsync(ct);
