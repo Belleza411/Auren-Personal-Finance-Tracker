@@ -154,7 +154,7 @@ namespace Auren.Application.Services
 
             var totalAmount = expenses.Items.Sum(e => e.Amount);
             var chartData = expenses.Items
-                .GroupBy(e => e.Category.Id)
+                .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
                     var categoryName = categoryLookup.TryGetValue(g.Key, out var name)

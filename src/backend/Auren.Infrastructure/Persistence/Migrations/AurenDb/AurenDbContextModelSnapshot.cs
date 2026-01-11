@@ -125,20 +125,7 @@ namespace Auren.API.Migrations.AurenDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("Auren.Domain.Entities.Transaction", b =>
-                {
-                    b.HasOne("Auren.Domain.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

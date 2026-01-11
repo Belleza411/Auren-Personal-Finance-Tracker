@@ -75,7 +75,7 @@ namespace Auren.Application.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                Category = category,
+                CategoryId = category.Id,
                 TransactionType = category.TransactionType,
                 Name = transactionDto.Name,
                 Amount = transactionDto.Amount,
@@ -164,7 +164,7 @@ namespace Auren.Application.Services
             transaction.Amount = transactionDto.Amount;
             transaction.PaymentType = transactionDto.PaymentType;
             transaction.TransactionType = category.TransactionType;
-            transaction.Category = category;
+            transaction.CategoryId = category.Id;
 
             var updatedTransaction = await _transactionRepository.UpdateAsync(transaction, cancellationToken);
 

@@ -170,7 +170,7 @@ namespace Auren.Application.Services
 			{
 				Id = Guid.NewGuid(),
 				UserId = userId,
-				Category = existingCategory,
+				CategoryId = existingCategory.Id,
 				Amount = amount,
 				Name = $"Transfer to goal: {existingGoal.Name}",
 				PaymentType = PaymentType.Other,
