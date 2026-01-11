@@ -19,13 +19,11 @@ namespace Auren.Infrastructure.Repositories
 	{
 		private readonly AurenDbContext _dbContext;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly ILogger<TransactionRepository> _logger;
 
-        public TransactionRepository(AurenDbContext dbContext, ICategoryRepository categoryRepository, ILogger<TransactionRepository> logger) : base(dbContext)
+        public TransactionRepository(AurenDbContext dbContext, ICategoryRepository categoryRepository) : base(dbContext)
         {
 			_dbContext = dbContext;
             _categoryRepository = categoryRepository;
-            _logger = logger;
 		}
 
 		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
@@ -63,8 +61,6 @@ namespace Auren.Infrastructure.Repositories
             {
                 categoryIds = await _categoryRepository.GetIdsByNamesAsync(userId, filter.Category, cancellationToken);
             }
-
-            _logger.LogInformation("Category ids for {Categories}: {CategoryIds}", string.Join(", ", filter.Category ?? []), string.Join(", ", categoryIds));
 
             var skip = (pageNumber - 1) * pageSize;
 

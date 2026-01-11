@@ -40,7 +40,6 @@ namespace Auren.Application.Specifications.Transactions
             if (filter == null) return false;
 
             return !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
-                   
                    filter.TransactionType.HasValue ||
                    filter.MinAmount.HasValue ||
                    filter.MaxAmount.HasValue ||
