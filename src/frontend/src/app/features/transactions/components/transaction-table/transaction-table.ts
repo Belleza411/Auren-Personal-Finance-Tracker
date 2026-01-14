@@ -42,8 +42,6 @@ export class TransactionTable {
       ...modals,
       [modalName]: !modals[modalName]
     }));
-    console.log(this.modals());
-    
   }
   
   delete = output<string>();
@@ -78,11 +76,6 @@ export class TransactionTable {
 
   protected TransactionTypeMap = TransactionTypeMap;
   protected PaymentTypeMap = PaymentTypeMap;
-  protected categoryMap = computed(() => {
-    return new Map(
-      this.categories().map(c => [c.categoryId, c.name])
-    );
-  });
 
   onCategoryToggle(category: string, checked: boolean) {
     this.selectedCategories.update(categories =>

@@ -1,7 +1,10 @@
+import { Category } from "../../categories/models/categories.model";
+
 interface Transaction {
     transactionId: string;
     userId: string;
     categoryId: string;
+    category: Category;
     transactionType: TransactionType;
     name: string;
     amount: number

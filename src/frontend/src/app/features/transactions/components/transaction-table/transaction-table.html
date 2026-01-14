@@ -193,7 +193,7 @@
                         <p>{{ TransactionTypeMap[t.transactionType] }}</p>
                     </td>
                     <td>
-                        <p>{{ categoryMap().get(t.categoryId) ?? 'Unknown' }}</p>
+                        <p>{{ t.category.name }}</p>
                     </td>
                     <td>
                         <p>{{ t.name }}</p>
