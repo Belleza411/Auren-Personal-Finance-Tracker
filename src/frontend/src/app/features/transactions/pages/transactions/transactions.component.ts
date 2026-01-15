@@ -1,20 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, forkJoin, Subject, switchMap, tap } from 'rxjs';
-import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
+import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
+import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
-import { CountUpDirective } from 'ngx-countup';
 
 import { TransactionService } from '../../services/transaction.service';
 import { NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
-import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
 import { PaginationComponent } from "../../components/pagination/pagination";
-import { ListFormat } from 'typescript';
 
 @Component({
   selector: 'app-transaction',
@@ -165,13 +162,6 @@ export class TransactionComponent implements OnInit {
         category: [],
         paymentType: null
     });
-
-    options = {
-        duration: 1.2,
-        separator: ',',
-        prefix: '$',
-        decimalPlaces: 2
-    };
 
     ngOnInit(): void {
         this.filterSubject
