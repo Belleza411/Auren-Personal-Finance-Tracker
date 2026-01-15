@@ -1,20 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, forkJoin, Subject, switchMap, tap } from 'rxjs';
-import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
+import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
+import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
-import { CountUpDirective } from 'ngx-countup';
 
 import { TransactionService } from '../../services/transaction.service';
 import { NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
-import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
 import { PaginationComponent } from "../../components/pagination/pagination";
-import { ListFormat } from 'typescript';
 
 @Component({
   selector: 'app-transaction',
@@ -150,11 +147,6 @@ export class TransactionComponent implements OnInit {
         }
     ]);
     
-    transactions = computed(() => this.transactionResource.value()?.transactions.items ?? this.dummyTransactions());
-    categories = computed(() => this.transactionResource.value()?.categories ?? this.dummyCategories());
-    totalCount = computed(() => this.transactionResource.value()?.transactions.totalCount ?? 100);
-
-    private filterSubject = new Subject<TransactionFilter>();
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
@@ -166,24 +158,13 @@ export class TransactionComponent implements OnInit {
         paymentType: null
     });
 
-    options = {
-        duration: 1.2,
-        separator: ',',
-        prefix: '$',
-        decimalPlaces: 2
-    };
+    transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
+    categories = computed(() => this.categoryResource.value() ?? this.dummyCategories());
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
+    filters = computed(() => ({...this.currentFilters()}));
+
 
     ngOnInit(): void {
-        this.filterSubject
-            .pipe(
-                tap(filters => {
-                    this.currentFilters.set(filters);
-                    this.pageNumber.set(1);
-                }),
-                takeUntilDestroyed(this.destroyRef)
-            )
-            .subscribe();
-        
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
@@ -201,32 +182,26 @@ export class TransactionComponent implements OnInit {
 
     transactionResource = resource({
         params: () => ({
-            filters: this.currentFilters(),
+            filters: this.filters(),
             pageSize: this.pageSize(),
-            pageNumber: this.pageNumber(),
-            range: this.selectedRange()
+            pageNumber: this.pageNumber()
         }),
-        loader: async ({ params }) => {
-            const [transactions, categories] = await Promise.all([
-                firstValueFrom(this.transactionSer.getAllTransactions(
-                    params.filters,
-                    params.pageSize,
-                    params.pageNumber
-                )),
-                firstValueFrom(this.categorySer.getAllCategories({}, Number.MAX_SAFE_INTEGER))
-            ])
-                .catch((err: any) =>{
-                    throw new Error(
-                        err?.message ?? 'Failed to load transactions'
-                    );
-                });
+        loader: ({ params }) => {
+            console.count('TRANSACTION LOADER');
+            const transactions = firstValueFrom(this.transactionSer.getAllTransactions(
+                params.filters,
+                params.pageSize,
+                params.pageNumber
+            ));
 
-            return {
-                transactions,
-                categories
-            };
+            return transactions;
         }
     });
+
+    categoryResource = resource({
+        loader: () => 
+            firstValueFrom(this.categorySer.getAllCategories({}, Number.MAX_SAFE_INTEGER))
+    })
 
     deleteTransaction(id: string) {
         this.transactionSer.deleteTransaction(id)
@@ -333,7 +308,12 @@ export class TransactionComponent implements OnInit {
     }
 
     onFiltersChange(filters: TransactionFilter) {
-        this.filterSubject.next(filters);
+        if (JSON.stringify(filters) === JSON.stringify(this.currentFilters())) {
+            return;
+        }
+
+        this.currentFilters.set(filters);
+        this.pageNumber.set(1)
     }
 
     onPageChange(page: number): void {
@@ -346,7 +326,8 @@ export class TransactionComponent implements OnInit {
     }
 
     onRangeChange(e: Event) {
-        const value = Number((e.target as HTMLSelectElement).value);
-        this.selectedRange.set(value + 1);  
+        this.selectedRange.set(
+            Number((e.target as HTMLSelectElement).value) + 1
+        );
     }
 }
