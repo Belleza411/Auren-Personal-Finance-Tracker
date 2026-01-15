@@ -17,44 +17,6 @@
         }
     </select>
 </div>
-<div class="transaction-summary">
-    <app-summary-card>
-        <div class="header">
-            <p>Total Balance</p>
-            <span class="material-symbols-outlined">
-                attach_money
-            </span>
-        </div>
-        <p class="amount" [countUp]="totalBalance()" [countUpOptions]="options">0</p>
-    </app-summary-card>
-    <app-summary-card>
-        <div class="header">
-            <p>Income</p>
-            <span class="material-symbols-outlined">
-                trending_up
-            </span>
-        </div>
-        <p class="amount" [countUp]="income()" [countUpOptions]="options">0</p>
-    </app-summary-card>
-    <app-summary-card>
-        <div class="header">
-            <p>Expense</p>
-            <span class="material-symbols-outlined">
-                trending_down
-            </span>
-        </div>
-        <p class="amount" [countUp]="expense()" [countUpOptions]="options">0</p>
-    </app-summary-card>
-    <app-summary-card>
-        <div class="header">
-            <p>Avg Daily Spending</p>
-            <span class="material-symbols-outlined">
-                attach_money
-            </span>
-        </div>
-        <p class="amount" [countUp]="avgDailySpending()" [countUpOptions]="options">0</p>
-    </app-summary-card>
-</div>
 <app-transaction-table 
     [transactions]="transactions()" 
     [categories]="categories()"

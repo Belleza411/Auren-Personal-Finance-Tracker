@@ -18,7 +18,7 @@ import { ListFormat } from 'typescript';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, SummaryCard, CountUpDirective, PaginationComponent],
+  imports: [TransactionTable, PaginationComponent],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,86 +39,6 @@ export class TransactionComponent implements OnInit {
     readonly pageSizeOptions: number[] = [5, 10, 15, 20, 25];
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-    protected dummyTransactions = signal<Transaction[]>(
-    [
-        {
-            transactionId: '1',
-            userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.00,
-            paymentType: 3,
-            transactionDate: "June 1, 2025",
-            createdAt: "June 1, 2025"
-        },
-        {
-            transactionId: '2',
-            userId: '1',
-            categoryId: '2',
-            transactionType: 2,
-            name: 'Groceries',
-            amount: 100.00,
-            paymentType: 3,
-            transactionDate: "June 2, 2025",
-            createdAt: "June 2, 2025"
-        },
-        {
-            transactionId: '3',
-            userId: '1',
-            categoryId: '3',
-            transactionType: 2,
-            name: 'Health Insurance',
-            amount: 55.00,
-            paymentType: 3,
-            transactionDate: "June 10, 2025",
-            createdAt: "June 10, 2025"
-        },
-        {
-            transactionId: '4',
-            userId: '1',
-            categoryId: '4',
-            transactionType: 1,
-            name: 'Gas',
-            amount: 50.00,
-            paymentType: 3,
-            transactionDate: "June 5, 2025",
-            createdAt: "June 5, 2025"
-        },
-        {
-            transactionId: '5',
-            userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 1000.00,
-            paymentType: 3,
-            transactionDate: "June 11, 2025",
-            createdAt: "June 11, 2025"
-        },
-        {
-            transactionId: '6',
-            userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 1000.00,
-            paymentType: 3,
-            transactionDate: "June 15, 2025",
-            createdAt: "June 15, 2025"
-        },
-        {
-            transactionId: '7',
-            userId: '1',
-            categoryId: '1',
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 400.00,
-            paymentType: 3,
-            transactionDate: "June 20, 2025",
-            createdAt: "June 20, 2025"
-        }
-    ]);
     protected readonly dummyCategories = signal<Category[]>([
         {
             categoryId: '1',
@@ -143,13 +63,96 @@ export class TransactionComponent implements OnInit {
         }
     ]);
 
+    protected dummyTransactions = signal<Transaction[]>([
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            category: this.dummyCategories()[0],
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.0,
+            paymentType: 3,
+            transactionDate: 'June 1, 2025',
+            createdAt: 'June 1, 2025'
+        },
+        {
+            transactionId: '2',
+            userId: '1',
+            categoryId: '2',
+            category: this.dummyCategories()[1],
+            transactionType: 2,
+            name: 'Groceries',
+            amount: 100.0,
+            paymentType: 3,
+            transactionDate: 'June 2, 2025',
+            createdAt: 'June 2, 2025'
+        },
+        {
+            transactionId: '3',
+            userId: '1',
+            categoryId: '3',
+            category: this.dummyCategories()[2],
+            transactionType: 2,
+            name: 'Health Insurance',
+            amount: 55.0,
+            paymentType: 3,
+            transactionDate: 'June 10, 2025',
+            createdAt: 'June 10, 2025'
+        },
+        {
+            transactionId: '4',
+            userId: '1',
+            categoryId: '4',
+            category: this.dummyCategories()[3],
+            transactionType: 2,
+            name: 'Gas',
+            amount: 50.0,
+            paymentType: 3,
+            transactionDate: 'June 5, 2025',
+            createdAt: 'June 5, 2025'
+        },
+        {
+            transactionId: '5',
+            userId: '1',
+            categoryId: '1',
+            category: this.dummyCategories()[0],
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 1000.0,
+            paymentType: 3,
+            transactionDate: 'June 11, 2025',
+            createdAt: 'June 11, 2025'
+        },
+        {
+            transactionId: '6',
+            userId: '1',
+            categoryId: '1',
+            category: this.dummyCategories()[0],
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 1000.0,
+            paymentType: 3,
+            transactionDate: 'June 15, 2025',
+            createdAt: 'June 15, 2025'
+        },
+        {
+            transactionId: '7',
+            userId: '1',
+            categoryId: '1',
+            category: this.dummyCategories()[0],
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 400.0,
+            paymentType: 3,
+            transactionDate: 'June 20, 2025',
+            createdAt: 'June 20, 2025'
+        }
+    ]);
+    
     transactions = computed(() => this.transactionResource.value()?.transactions.items ?? this.dummyTransactions());
     categories = computed(() => this.transactionResource.value()?.categories ?? this.dummyCategories());
     totalCount = computed(() => this.transactionResource.value()?.transactions.totalCount ?? 100);
-    avgDailySpending = computed(() => this.transactionResource.value()?.avgDailySpending ?? 2500);
-    totalBalance = computed(() => this.transactionResource.value()?.balance.balance ?? 2500);
-    income = computed(() => this.transactionResource.value()?.balance.income ?? 2000);
-    expense = computed(() => this.transactionResource.value()?.balance.expense ?? 500);
 
     private filterSubject = new Subject<TransactionFilter>();
     currentFilters = signal<TransactionFilter>({
@@ -204,14 +207,12 @@ export class TransactionComponent implements OnInit {
             range: this.selectedRange()
         }),
         loader: async ({ params }) => {
-            const [transactions, avgDailySpending, balance, categories] = await Promise.all([
+            const [transactions, categories] = await Promise.all([
                 firstValueFrom(this.transactionSer.getAllTransactions(
                     params.filters,
                     params.pageSize,
                     params.pageNumber
                 )),
-                firstValueFrom(this.transactionSer.getAvgDailySpending(params.range)),
-                firstValueFrom(this.transactionSer.getBalance(params.range)),
                 firstValueFrom(this.categorySer.getAllCategories({}, Number.MAX_SAFE_INTEGER))
             ])
                 .catch((err: any) =>{
@@ -222,8 +223,6 @@ export class TransactionComponent implements OnInit {
 
             return {
                 transactions,
-                avgDailySpending,
-                balance,
                 categories
             };
         }
