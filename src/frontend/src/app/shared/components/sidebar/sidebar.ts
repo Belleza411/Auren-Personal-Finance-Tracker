@@ -1,11 +1,12 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { Router, RouterLink } from "@angular/router";
+import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from '../../../features/auth/service/auth-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SIDEBAR_MENU } from './sidebar-menu';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -14,7 +15,7 @@ export class Sidebar {
   private destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
-  error = signal<string | null>(null);
+  readonly sidebarItems = SIDEBAR_MENU;
 
   logout() {
     this.authSer.logout()
@@ -23,7 +24,6 @@ export class Sidebar {
         next: () => this.router.navigate(['/auth/sign-in']),
         error: err => {
           console.error("Something went wrong ", err);
-          this.error.set("Something went wrong. ");
           this.router.navigate(['/auth/sign-in']);
         }
       })

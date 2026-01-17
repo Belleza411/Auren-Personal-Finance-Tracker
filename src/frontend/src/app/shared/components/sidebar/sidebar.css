@@ -3,38 +3,52 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 1.5rem;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
+    background-color: #1C4532;
 }
 
-:host h3 {
+:host .active {
+    background-color: rgba(0, 204, 109, 0.2);
+    border-radius: 8px;
+}
+
+:host .wrapper {
+    padding: 1.5rem 1.2rem;
+}
+
+:host .wrapper .heading {
     margin-bottom: 2rem;
 }
 
-:host ul {
+:host .wrapper .heading h1 {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+:host .wrapper nav {
+    
+}
+
+:host nav ul {
     list-style-type: none;
 }
 
-:host ul li {
-    margin-bottom: 1.5rem;
-}
-
-:host ul li {
+:host nav ul li {
     display: flex;
     align-items: center;
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 0.3rem;
 }
 
-:host ul li span {
+:host nav ul li span {
     font-size: 1.3rem;
-    color: #324054;
+    color: #fff;
 }
 
-:host ul li a {
+:host nav ul li a {
     text-decoration: none;
-    color: #324054;
+    color: #fff;
     font-size: 0.95rem;
     margin-left: 1.3rem;
 }
@@ -48,7 +62,7 @@
     background: none;
     display: flex;
     align-items: center;
-    color: #324054;
+    color: #fff;
     font-size: 0.95rem;
     cursor: pointer;
 }
@@ -56,6 +70,7 @@
 :host div button span {
     margin-right: 1.2rem;
     font-size: 1.2rem;
+    color: #fff;
 }
 
 :host div .profile-wrapper {
@@ -79,11 +94,11 @@
 }
 
 :host div .profile-wrapper .profile-info .name {
-    color: #324054;
+    color: #fff;
     font-size: 0.9rem;
 }
 
 :host div .profile-wrapper .profile-info .email {
-    color: #71839B;
+    color: #fff;
     font-size: 0.75rem;
 }
