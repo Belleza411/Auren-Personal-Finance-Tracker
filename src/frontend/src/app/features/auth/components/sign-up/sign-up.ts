@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../service/auth-service';
 import { Register } from '../../models/user.model';
-import { email, Field, FieldState, form, minLength, required, submit, validate } from '@angular/forms/signals';
+import { email, FieldState, form, minLength, required, submit, validate, FormField } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sign-up',
-  imports: [Field, RouterLink],
+  imports: [RouterLink, FormField],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
   changeDetection: ChangeDetectionStrategy.OnPush

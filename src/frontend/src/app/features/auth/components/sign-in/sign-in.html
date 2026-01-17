@@ -9,7 +9,7 @@
             type="email" 
             placeholder="example@gmail.com"
             [class.error]="fieldErrors.email()"
-            [field]="loginForm.email">
+            [formField]="loginForm.email">
         @if(fieldErrors.email()) {
             <ul class="error-list">
                 @for (error of loginForm.email().errors(); track error.kind) {
@@ -21,7 +21,7 @@
     <div class="field">
         <label for="password">Password</label>
         <div class="password-wrapper">
-            @if (showPassword()) {
+            <!-- @if (showPassword()) {
                 <input
                     type="text"
                     placeholder="&@^ncq2"
@@ -35,7 +35,13 @@
                     [class.error]="fieldErrors.password()"
                     [field]="loginForm.password"
                 />
-            }
+            } -->
+                <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    placeholder="&@^ncq2"
+                    [class.error]="fieldErrors.password()"
+                    [formField]="loginForm.password"
+                />
             <span
                 class="material-symbols-outlined toggle-icon"
                 (click)="togglePassword()"

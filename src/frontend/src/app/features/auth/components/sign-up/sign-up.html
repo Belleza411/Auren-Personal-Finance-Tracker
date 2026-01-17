@@ -30,7 +30,7 @@
                 type="text"
                 placeholder="John"
                 [class.error]="fieldErrors.firstName()"
-                [field]="registerForm.firstName">
+                [formField]="registerForm.firstName">
             @if(fieldErrors.firstName()) {
                 <ul class="error-list">
                     @for (error of registerForm.firstName().errors(); track error.kind) {
@@ -45,7 +45,7 @@
                 type="text"
                 placeholder="Doe"
                 [class.error]="fieldErrors.lastName()"
-                [field]="registerForm.lastName">
+                [formField]="registerForm.lastName">
             @if(fieldErrors.lastName()) {
                 <ul class="error-list">
                     @for (error of registerForm.lastName().errors(); track error.kind) {
@@ -61,7 +61,7 @@
             type="email" 
             placeholder="example@gmail.com"
             [class.error]="fieldErrors.email()"
-            [field]="registerForm.email">
+            [formField]="registerForm.email">
         @if(fieldErrors.email()) {
             <ul class="error-list">
                 @for (error of registerForm.email().errors(); track error.kind) {
@@ -73,21 +73,12 @@
     <div class="field">
         <label for="password">Password</label>
         <div class="password-wrapper">
-            @if (showPassword()) {
-                <input
-                    type="text"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.password()"
-                    [field]="registerForm.password"
+            <input
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="&@^ncq2"
+                [class.error]="fieldErrors.password()"
+                [formField]="registerForm.password"
                 />
-            } @else {
-                <input
-                    type="password"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.password()"
-                    [field]="registerForm.password"
-                />
-            }
             <span
                 class="material-symbols-outlined toggle-icon"
                 (click)="togglePassword()"
@@ -106,21 +97,12 @@
     <div class="field">
         <label for="confirm-password">Confirm Password</label>
         <div class="password-wrapper">
-            @if (showConfirmPassword()) {
-                <input
-                    type="text"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.confirmPassword()"
-                    [field]="registerForm.confirmPassword"
-                />
-            } @else {
-                <input
-                    type="password"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.confirmPassword()"
-                    [field]="registerForm.confirmPassword"
-                />
-            }
+            <input
+                [type]="showConfirmPassword() ? 'text' : 'password'"
+                placeholder="&@^ncq2"
+                [class.error]="fieldErrors.confirmPassword()"
+                [formField]="registerForm.confirmPassword"
+            />
             <span
                 class="material-symbols-outlined toggle-icon"
                 (click)="toggleConfirmPassword()"

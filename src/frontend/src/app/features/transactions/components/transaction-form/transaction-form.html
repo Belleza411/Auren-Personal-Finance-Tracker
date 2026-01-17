@@ -8,7 +8,7 @@
         <label for="name">Name</label>
         <input 
             type="text"
-            [field]="transactionForm.name"
+            [formField]="transactionForm.name"
             [class.error]="fieldErrors.name()">
         @if(fieldErrors.name()) {
             <ul class="error-list">
@@ -22,7 +22,7 @@
         <label for="amount">Amount</label>
         <input 
             type="number"
-            [field]="transactionForm.amount"
+            [formField]="transactionForm.amount"
             [class.error]="fieldErrors.amount()">
         @if(fieldErrors.amount()) {
             <ul class="error-list">
@@ -34,7 +34,7 @@
     </p>
     <p>
         <label for="category">Category</label>
-        <select [field]="transactionForm.category" [class.error]="fieldErrors.category()">
+        <select [formField]="transactionForm.category" [class.error]="fieldErrors.category()">
             @if(!isEdit()) {
                 <option value="" disabled>Select a category</option>
             }

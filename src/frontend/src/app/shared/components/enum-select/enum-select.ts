@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { Field } from '@angular/forms/signals';
+import { FormField } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-enum-select',
-  imports: [Field],
+  imports: [FormField],
   templateUrl: './enum-select.html',
   styleUrl: './enum-select.css',
   changeDetection: ChangeDetectionStrategy.OnPush

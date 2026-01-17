@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { NewTransaction } from '../../models/transaction.model';
-import { Field, FieldState, form, required, submit, validate } from '@angular/forms/signals';
+import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
 import { TransactionTypeMap, PaymentTypeMap } from '../../constants/transaction-map';
 import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
 
 @Component({
   selector: 'app-transaction-form',
-  imports: [Field, EnumSelect],
+  imports: [EnumSelect, FormField],
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush
