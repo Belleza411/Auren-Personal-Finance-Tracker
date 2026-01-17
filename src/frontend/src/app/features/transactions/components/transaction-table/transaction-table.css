@@ -2,26 +2,17 @@
     display: flex;
     flex-direction: column;
     background-color: #fff;
-    border: 1px solid #c5c5c5;
+    border: 1px solid #e5e5e5;
     border-radius: 14px;
-    padding: 1.2rem 0;
+    padding: 1.4rem 1rem;
     gap: 1.2rem;
     margin-bottom: 1rem;
-    box-shadow: 0px 16px 16px -8px rgba(12, 12, 13, 0.1), 0px 4px 4px -4px rgba(12, 12, 13, 0.05);
-}
-
-:host h1 {
-    font-size: 1.4rem;
-    margin-left: 1.8rem;
-    font-weight: 400;
-    margin-top: 0.5rem;
 }
 
 :host .filters {
     width: 100%;
     display: flex;
     align-items: center;
-    padding-left: 1.75rem;
     gap: 0.7rem;
 }
 
@@ -174,36 +165,36 @@
     font-size: 1.2rem;
 }
 
+:host .table-wrapper {
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+    overflow: hidden;
+}
+
 :host table {
     width: 100%;
     border-collapse: collapse;
-    padding: 1.5rem 1.2rem 1rem 1.8rem;
 }
 
 :host table thead {
     background-color: #f4f4f4;
-    border-top: 1px solid #c5c5c5;
     border-bottom: 1px solid #c5c5c5;
 }
 
 :host table thead tr th {
-    padding: 0.7rem 2rem;
-}
-
-:host table tbody tr td {
-    padding: 1rem 2rem;
-}
-
-:host table thead tr th {
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.85rem;
     color: #4B5563;
     letter-spacing: 0.05rem;
+    padding: 0.6rem 0.8rem;
 }
 
 :host table tbody tr {
     border-bottom: 1px solid #cacaca;
+}
+
+:host table tbody tr td {
+    padding: 0.7rem 0.8rem;
 }
 
 :host table tbody tr td p {
@@ -228,30 +219,4 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-@media screen and (max-width: 1280px) {
-    :host .table-wrapper {
-        overflow-x: auto;
-    }
-
-    :host table thead tr th {
-        font-size: 0.7rem;
-    }
-
-    :host table tbody tr td p {
-        font-size: 0.8rem;
-    }
-
-    :host h1,
-    :host .filters,
-    :host table thead tr th,
-    :host table tbody tr td {
-        padding-left: 1.3rem;
-        margin: 0;
-    }
-
-    :host .filters .search-bar input {
-        padding: 0.6rem 2rem 0.6rem 2.3rem;
-    }
 }
