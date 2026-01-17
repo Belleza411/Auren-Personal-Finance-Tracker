@@ -1,22 +1,24 @@
 <header>
     <div class="header">
-        <h2>Transactions</h2>
+        <h2>All Transactions</h2>
         <p>It is the best time to manage your finances</p>
     </div>
-    <button (click)="onAddTransaction()">
-        Add Transaction
-        <span class="material-symbols-outlined">
-            add
-        </span>
-    </button>
+    <div>
+        <div class="filter-range">
+            <select (change)="onRangeChange($event)">
+                @for(range of timePeriodOptions; track $index) {
+                    <option [value]="$index">{{ range }}</option>
+                }
+            </select>
+        </div>
+        <button (click)="onAddTransaction()">
+            Add Transaction
+            <span class="material-symbols-outlined">
+                add
+            </span>
+        </button>
+    </div>
 </header>
-<div class="filter-range">
-    <select (change)="onRangeChange($event)">
-        @for(range of timePeriodOptions; track $index) {
-            <option [value]="$index">{{ range }}</option>
-        }
-    </select>
-</div>
 <app-transaction-table 
     [transactions]="transactions()" 
     [categories]="categories()"

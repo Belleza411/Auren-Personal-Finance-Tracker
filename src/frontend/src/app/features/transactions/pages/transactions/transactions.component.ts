@@ -187,7 +187,6 @@ export class TransactionComponent implements OnInit {
             pageNumber: this.pageNumber()
         }),
         loader: ({ params }) => {
-            console.count('TRANSACTION LOADER');
             const transactions = firstValueFrom(this.transactionSer.getAllTransactions(
                 params.filters,
                 params.pageSize,

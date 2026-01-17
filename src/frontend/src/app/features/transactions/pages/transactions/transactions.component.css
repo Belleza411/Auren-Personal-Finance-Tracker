@@ -17,6 +17,13 @@
     flex-direction: column;
 }
 
+:host header div:last-of-type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
 :host header .header h2 {
     font-weight: 500;
     margin-bottom: 0.2rem;
@@ -37,27 +44,21 @@
     background-color: #1C4532;
     font-size: 0.85rem;
     padding: 0.5rem 1rem;
-    border-radius: 10px;
+    border-radius: 6px;
     font-weight: 200;
     cursor: pointer;
     white-space: nowrap;
 }
 
-:host header a span {
+:host header button span {
     font-size: 1.3rem;
     margin-left: 0.5rem;
 }
 
-:host .filter-range {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-}
-
 :host .filter-range select {
-    padding: 0.6rem 0.6rem;
-    border-radius: 10px;
+    padding: 0.6rem 0.5rem;
+    padding-right: 2rem;
+    border-radius: 6px;
     border: 1px solid #c5c5c5;
 }
 
