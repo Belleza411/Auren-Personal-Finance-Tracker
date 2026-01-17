@@ -1,32 +1,45 @@
-<div class="wrapper">
-    <div class="heading">
-        <h1>Auren</h1>
-    </div>
-    <nav>
-        <ul>
-            @for(items of sidebarItems; track items.icon) {
-                <li routerLinkActive="active">
-                    <span class="material-symbols-rounded">
+<div class="mb-7">
+    <h1 class="text-white text-2xl">Auren</h1>
+</div>
+<nav class="flex flex-col overflow-y-auto">
+    <ul class="list-none">
+        @for (items of sidebarItems; track items.route) {
+            <li class="mb-3">
+                <a 
+                    [routerLink]="items.route"
+                    routerLinkActive="rounded-lg bg-[#00cc6d33]" 
+                    class="flex items-center w-full p-2 cursor-pointer rounded-md transition-colors duration-150"
+                >
+                    <span class="material-symbols-rounded text-xl text-white">
                         {{ items.icon }}
                     </span>
-                    <a [routerLink]="items.route">{{ items.label }}</a>
-                </li>
-            }
-        </ul>
-    </nav>
-    <div>
-        <button (click)="logout()" type="button">
-            <span class="material-symbols-rounded">
-                logout
-            </span>
-            Logout
-        </button>
-        <div class="profile-wrapper">
-            <img src="assets/default-profile.png">
-            <div class="profile-info">
-                <p class="name">Aevan Belleza</p>
-                <p class="email">aevanazelleb@gmail.com</p>
-            </div>
+                    <span class="text-white text-sm ml-2">
+                        {{ items.label }}
+                    </span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+<div class="pt-4 border-t border-white/10 mt-auto gap-2">
+    <button 
+        class="border-none bg-transparent flex items-center text-white text-sm cursor-pointer hover:opacity-80 transition-opacity"
+        (click)="logout()"
+        type="button" 
+    >
+        <span class="material-symbols-rounded mr-1 text-xl text-white">
+            logout
+        </span>
+        Logout
+    </button>
+    <div class="mt-5 flex">
+        <img 
+            class="rounded-full size-9"
+            src="assets/default-profile.png"
+            alt="Profile">
+        <div class="flex flex-col justify-center ml-3">
+            <p class="text-white text-sm">Aevan Belleza</p>
+            <p class="text-white text-xs">aevanazelleb@gmail.com</p>
         </div>
     </div>
 </div>

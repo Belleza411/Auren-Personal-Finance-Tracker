@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from '../../../features/auth/service/auth-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,6 +9,7 @@ import { SIDEBAR_MENU } from './sidebar-menu';
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Sidebar {
   private readonly authSer = inject(AuthService);
