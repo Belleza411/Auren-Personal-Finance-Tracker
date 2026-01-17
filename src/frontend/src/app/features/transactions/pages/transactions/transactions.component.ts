@@ -96,54 +96,6 @@ export class TransactionComponent implements OnInit {
             paymentType: 3,
             transactionDate: 'June 10, 2025',
             createdAt: 'June 10, 2025'
-        },
-        {
-            transactionId: '4',
-            userId: '1',
-            categoryId: '4',
-            category: this.dummyCategories()[3],
-            transactionType: 2,
-            name: 'Gas',
-            amount: 50.0,
-            paymentType: 3,
-            transactionDate: 'June 5, 2025',
-            createdAt: 'June 5, 2025'
-        },
-        {
-            transactionId: '5',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 1000.0,
-            paymentType: 3,
-            transactionDate: 'June 11, 2025',
-            createdAt: 'June 11, 2025'
-        },
-        {
-            transactionId: '6',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 1000.0,
-            paymentType: 3,
-            transactionDate: 'June 15, 2025',
-            createdAt: 'June 15, 2025'
-        },
-        {
-            transactionId: '7',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 400.0,
-            paymentType: 3,
-            transactionDate: 'June 20, 2025',
-            createdAt: 'June 20, 2025'
         }
     ]);
     
