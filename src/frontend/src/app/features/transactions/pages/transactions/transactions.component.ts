@@ -158,11 +158,16 @@ export class TransactionComponent implements OnInit {
         paymentType: null
     });
 
+    options = {
+        duration: 1.2,
+        separator: ',',
+        prefix: '$',
+        decimalPlaces: 2
+    };
+
     transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
     categories = computed(() => this.categoryResource.value() ?? this.dummyCategories());
-    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
-    filters = computed(() => ({...this.currentFilters()}));
-
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 10);
 
     ngOnInit(): void {
         this.route.params
@@ -182,7 +187,7 @@ export class TransactionComponent implements OnInit {
 
     transactionResource = resource({
         params: () => ({
-            filters: this.filters(),
+            filters: this.currentFilters(),
             pageSize: this.pageSize(),
             pageNumber: this.pageNumber()
         }),
