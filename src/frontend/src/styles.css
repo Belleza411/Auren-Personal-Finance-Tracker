@@ -8,17 +8,23 @@
 }
 
 *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  box-sizing: border-box;
+}
 
 body {
-    min-width: 100dvw;
-    min-height: 100dvh;    
-    font-family: "Roboto", sans-serif;
-    background-color: #F9F9F9;
-    overflow-x: hidden;
+  min-width: 100dvw;
+  min-height: 100dvh;    
+  font-family: "Roboto", sans-serif;
+  background-color: #F9F9F9;
+  overflow-x: hidden;
 }
 
 .dialog .mdc-dialog__surface {
   border-radius: 0 !important;
+}
+
+@layer components {
+  .gray-border {
+    @apply border border-solid border-[#c5c5c5] rounded-lg;
+  }
 }

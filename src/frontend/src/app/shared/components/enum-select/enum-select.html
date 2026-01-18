@@ -2,7 +2,7 @@
   <label>{{ label() }}</label>
   <select 
     [formField]="field()" 
-    class="py-[0.3rem] pl-3 border border-solid border-[#cbd5e0] rounded-lg"
+    class="p-3 border border-solid border-[#cbd5e0] rounded-lg"
   >
     @for (key of stringKeys; track key) {
       <option [value]="key">

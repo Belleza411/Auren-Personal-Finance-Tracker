@@ -36,12 +36,22 @@ export class TransactionTable {
     date: false,
     category: false
   });
-
+  
   toggleModal(modalName: 'amount' | 'date' | 'category') {
     this.modals.update(modals => ({
       ...modals,
       [modalName]: !modals[modalName]
     }));
+  }
+
+  openModalId = signal<string | null>(null);
+
+  toggleModalId(id: string) {
+    this.openModalId.set(id);
+  }
+
+  closeModalId() {
+    this.openModalId.set(null);
   }
   
   delete = output<string>();

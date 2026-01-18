@@ -244,21 +244,34 @@
                         </p>
                     </td>
                     <td>
-                        <div class="flex justify-between items-center">
-                            <button 
-                                class="cursor-pointer border-0 bg-none text-[##111827]"
-                                (click)="onDelete(t.transactionId)"
-                            >
-                                <span class="material-symbols-rounded flex items-center justify-center">
-                                    delete
-                                </span>
-                            </button>
-                            <button (click)="onEdit(t.transactionId)">
-                                <span class="material-symbols-rounded flex items-center justify-center">
-                                    edit
-                                </span>
-                            </button>
+                        <div 
+                            role="button" 
+                            class="relative flex items-center cursor-pointer"
+                            (click)="toggleModalId(t.transactionId)"
+                        >
+                            <span class="material-symbols-rounded">
+                                more_horiz
+                            </span>
                         </div>
+
+                        @if(openModalId() === t.transactionId) {
+                            <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
+                                <button 
+                                    class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
+                                    (click)="onEdit(t.transactionId)"
+                                >
+                                    <span class="material-symbols-rounded text-sm">edit</span>
+                                    Edit
+                                </button>
+                                <button 
+                                    class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                                    (click)="onDelete(t.transactionId)"
+                                >
+                                    <span class="material-symbols-rounded">delete</span>
+                                    Delete
+                                </button>
+                            </div>
+                        }
                     </td>
                 </tr>
             }

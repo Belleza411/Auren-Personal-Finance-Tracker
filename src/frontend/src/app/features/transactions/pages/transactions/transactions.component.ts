@@ -96,6 +96,42 @@ export class TransactionComponent implements OnInit {
             paymentType: 3,
             transactionDate: 'June 10, 2025',
             createdAt: 'June 10, 2025'
+        },
+        {
+            transactionId: '1',
+            userId: '1',
+            categoryId: '1',
+            category: this.dummyCategories()[0],
+            transactionType: 1,
+            name: 'Freelance Payment',
+            amount: 2000.0,
+            paymentType: 3,
+            transactionDate: 'June 1, 2025',
+            createdAt: 'June 1, 2025'
+        },
+        {
+            transactionId: '2',
+            userId: '1',
+            categoryId: '2',
+            category: this.dummyCategories()[1],
+            transactionType: 2,
+            name: 'Groceries',
+            amount: 100.0,
+            paymentType: 3,
+            transactionDate: 'June 2, 2025',
+            createdAt: 'June 2, 2025'
+        },
+        {
+            transactionId: '3',
+            userId: '1',
+            categoryId: '3',
+            category: this.dummyCategories()[2],
+            transactionType: 2,
+            name: 'Health Insurance',
+            amount: 55.0,
+            paymentType: 3,
+            transactionDate: 'June 10, 2025',
+            createdAt: 'June 10, 2025'
         }
     ]);
     
@@ -119,7 +155,7 @@ export class TransactionComponent implements OnInit {
 
     transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
     categories = computed(() => this.categoryResource.value() ?? this.dummyCategories());
-    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 10);
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
 
     ngOnInit(): void {
         this.route.params
