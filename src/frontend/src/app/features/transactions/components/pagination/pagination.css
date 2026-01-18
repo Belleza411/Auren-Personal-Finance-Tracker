@@ -1,77 +1,25 @@
+@reference 'tailwindcss';
+
 :host {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @apply flex items-center justify-between;
 }
 
-:host .pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+:host .pagination-btn {
+    @apply py-2.5 px-3.5 bg-none border-0 rounded-lg cursor-pointer flex items-center justify-center
 }
 
-:host .pagination-controls .pagination-btn {
-    padding: 0.6rem 0.85rem;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+:host .pagination-btn:hover {
+    @apply bg-[#ddd];
 }
 
-:host .pagination-controls .pagination-btn:hover {
-    background-color: #dddddd;
+:host .pagination-btn:disabled {
+    @apply cursor-not-allowed;
 }
 
-:host .pagination-controls .pagination-btn:disabled {
-    cursor: not-allowed;
+:host .pagination-btn.active {
+    @apply bg-[#1c4532] text-white;
 }
 
-:host .pagination-controls .pagination-btn.active {
-    background-color: #1C4532;
-    color: #fff;
-}
-
-:host .pagination-controls .pagination-btn span {
-    font-size: 1.1rem;
-}
-
-:host .pagination-controls .pagination-btn span.left {
-    margin-right: 0.5rem;
-}
-
-:host .pagination-controls .pagination-btn span.right {
-    margin-left: 0.5rem;
-}
-
-:host .per-size {
-    display: flex;
-    align-items: center;
-}
-
-:host .per-size select {
-    border: 1px solid #c5c5c5;
-    border-radius: 6px;
-    padding: 0.3rem 0.5rem;
-}
-
-:host .per-size label {
-    font-size: 0.9rem;
-    margin-right: 0.3rem;
-}
-
-@media screen and (max-width: 1280px) {
-    :host .show-page span {
-        font-size: 0.9rem;
-    }
-
-    :host .pagination-controls {
-        gap: 0.3rem;
-    }
-
-    :host .pagination-controls .pagination-btn {
-        padding: 0.4rem 0.6rem;
-    }
+:host .pagination-btn span {
+    @apply text-lg;
 }

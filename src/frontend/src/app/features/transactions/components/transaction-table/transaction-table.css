@@ -1,222 +1,41 @@
+@reference 'tailwindcss';
+
 :host {
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 14px;
-    padding: 1.4rem 1rem;
-    gap: 1.2rem;
-    margin-bottom: 1rem;
+    @apply flex flex-col bg-white border border-solid border-[#e5e5e5] rounded-xl py-6 px-4 gap-5 mb-4
 }
 
-:host .filters {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
+.gray-border {
+    @apply border border-solid border-[#c5c5c5] rounded-lg;
 }
 
-:host .filters .search-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
+.header {
+    @apply cursor-pointer flex items-center border-0 bg-none;
 }
 
-:host .filters .search-bar span {
-    position: absolute;
-    margin: 0 0.5rem;
-    color: #9ca3af;
+.filter-label {
+    @apply text-[0.7rem] ml-1.5 rounded-lg bg-[#c1c1c1] py-1 px-2;
 }
 
-:host .filters .search-bar input {
-    width: 100%;
-    padding: 0.6rem 4rem 0.6rem 2.3rem;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
+.modal {
+    @apply absolute bg-white rounded-lg p-4 flex-col top-[50px] left-0;
 }
 
-:host .filters .types,
-:host .filters .payment-methods {
-    padding: 0.6rem 0.6rem;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
+.input {
+    @apply py-2.5 px-4;
 }
 
-:host .filters .categories {
-    position: relative;
-    padding: 0.47rem 0.7rem;
-    padding-right: 0.3rem;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
+.label {
+    @apply text-[0.85rem];
 }
 
-:host .filters .amount {
-    position: relative;
-    padding: 0.5rem 0.6rem;
-    padding-right: 0.3rem;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
+th {
+    @apply text-left text-[0.85rem] text-[#4b5563] tracking-wider py-2.5 px-3.5;
 }
 
-:host .filters .date {
-    position: relative;
-    padding: 0.5rem 0.6rem;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
-}
-
-:host .filters .amount .amount-header,
-:host .filters .date .date-header,
-:host .filters .categories .category-header {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    border: none;
-    background: none;
-}
-
-:host .filters .date .date-header span,
-:host .filters .amount .amount-header span,
-:host .filters .categories .category-header span {
-    font-size: 1.3rem;
-}
-
-:host .filters .date .date-header .close,
-:host .filters .amount .amount-header .close {
-    margin-left: 0.3rem;
-}
-
-:host .filters .date .date-header div,
-:host .filters .amount .amount-header div {
-    font-size: 0.7rem;
-    margin-left: 0.3rem;
-    border-radius: 8px;
-    background-color: #c1c1c1;
-    padding: 0.2rem 0.4rem;
-}
-
-:host .filters .amount p,
-:host .filters .date span,
-:host .filters .categories p {
-    margin-right: 0.3rem;
-}
-
-:host .filters .amount .amount-modal,
-:host .filters .categories .category-modal,
-:host .filters .date .date-modal {
-    position: absolute;
-    background-color: #fff;
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1.2rem;
-    top: 50px;
-    left: 0;
-    display: none;
-}
-
-:host .filters .categories .category-modal label {
-    display: flex;
-    align-items: center;
-}
-
-:host .filters .categories .category-modal label input {
-    margin-right: 0.5rem;
-}
-
-:host .filters .amount .amount-modal.open,
-:host .filters .date .date-modal.open,
-:host .filters .categories .category-modal.open {
-    display: flex;
-}
-
-:host .filters .amount .amount-modal .inputs,
-:host .filters .date .date-modal .inputs {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-:host .filters .amount .amount-modal .inputs p input,
-:host .filters .date .date-modal .inputs p input {
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #c5c5c5;
-}
-
-:host .filters .amount .amount-modal .inputs p label,
-:host .filters .date .date-modal .inputs p label {
-    font-size: 0.85rem;
-}
-
-:host .filters .clear {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    padding: 0.6rem 0.8rem;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-:host .filters .clear span {
-    margin-right: 0.3rem;
-    font-size: 1.2rem;
-}
-
-:host .table-wrapper {
-    border-radius: 10px;
-    border: 1px solid #c5c5c5;
-    overflow: hidden;
-}
-
-:host table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-:host table thead {
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #c5c5c5;
-}
-
-:host table thead tr th {
-    text-align: left;
-    font-size: 0.85rem;
-    color: #4B5563;
-    letter-spacing: 0.05rem;
-    padding: 0.6rem 0.8rem;
-}
-
-:host table tbody tr {
-    border-bottom: 1px solid #cacaca;
-}
-
-:host table tbody tr td {
-    padding: 0.7rem 0.8rem;
+td {
+    @apply py-3 px-3.5;
 }
 
 :host table tbody tr td p {
-    font-size: 0.875rem;
-    color: #111827;
-}
-
-:host table tbody tr .buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-:host table tbody tr .buttons button {
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: #111827;
-}
-
-:host table tbody tr .buttons button span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @apply text-sm text-[#111827];
 }

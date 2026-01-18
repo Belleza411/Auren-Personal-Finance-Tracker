@@ -1,9 +1,9 @@
-<div class="close-btn" type="button" (click)="onCancel()">
-    <span class="material-symbols-outlined">
+<div class="cursor-pointer" type="button" (click)="onCancel()">
+    <span class="material-symbols-rounded">
         close
     </span>
 </div>
-<form (submit)="onSubmit($event)">
+<form class="flex flex-col gap-8" (submit)="onSubmit($event)">
     <p>
         <label for="name">Name</label>
         <input 
@@ -77,7 +77,11 @@
                 }
             </ul>
         }
-    <button type="submit" [disabled]="isLoading() || transactionForm().invalid()">
+    <button 
+        class="bg-[#1c4532] text-white border-0 py-[0.8rem] rounded-lg cursor-pointer"
+        type="submit" 
+        [disabled]="isLoading() || transactionForm().invalid()"
+    >
        @if(isLoading()) {
             <span class="material-symbols-outlined spinning">
                 progress_activity

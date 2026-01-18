@@ -1,9 +1,10 @@
-<div class="filters">
-    <div class="search-bar">
-        <span class="material-symbols-outlined" aria-hidden="true">
+<div class="w-full flex items-center gap-3">
+    <div class="relative flex items-center">
+        <span class="material-symbols-rounded absolute my-0 mx-2 text-[#9ca3af]" aria-hidden="true">
             search
         </span>
         <input 
+            class="w-full py-2 pr-16 pl-9 gray-border"
             type="text" 
             placeholder="Search Transactions..."
             aria-label="Search Transactions"
@@ -12,7 +13,7 @@
         >
     </div>
     <select 
-        class="types" 
+        class="p-2 gray-border" 
         aria-label="Filter by transaction type"
         [value]="selectedType() ?? 0"
         (change)="onChangeType($event)"
@@ -21,21 +22,26 @@
             <option [value]="$index">{{ type }}</option>
         }
     </select>
-    <div class="categories">
+    <div class="relative py-[0.35rem] pl-3 pr-1 gray-border">
         <button 
-            class="category-header" 
+            class="header" 
             aria-label="Filter by categories"
             (click)="toggleModal('category')"
         >
-            <p>Categories</p>
-            <span class="material-symbols-outlined">
+            <p class="mr-1.5">Categories</p>
+            <span class="material-symbols-rounded text-xl">
                 keyboard_arrow_down
             </span>
         </button>
-        <div class="category-modal" [class.open]="modals().category">
+        <div 
+            class="modal gray-border" 
+            [class.flex]="modals().category"
+            [class.hidden]="!modals().category"
+        >
             @for (c of categories(); track c.categoryId) {
-                <label class="category-option">
+                <label class="flex items-center">
                     <input
+                        class="mr-2"
                         type="checkbox"
                         [value]="c.name"
                         [checked]="selectedCategories().includes(c.name)"
@@ -47,7 +53,7 @@
         </div>
     </div>
     <select 
-        class="payment-methods" 
+        class="p-2 gray-border" 
         aria-label="Filter by payment method"
         [value]="selectedPaymentType() ?? 0"
         (change)="onChangePaymentType($event)"
@@ -56,20 +62,20 @@
             <option [value]="$index">{{ type }}</option>
         }
     </select>
-    <div class="amount">
-        <button class="amount-header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
-            <p>Amount</p>
+    <div class="relative py-[0.35rem] pr-2.5 pl-1.5 rounded-lg gray-border">
+        <button class="header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
+            <p class="mr-1.5">Amount</p>
             @if(minAmount() === null || maxAmount() === null) {
-                <span class="material-symbols-outlined">
+                <span class="material-symbols-rounded text-xl">
                     keyboard_arrow_down
                 </span>
             }
             @if(minAmount() !== null && maxAmount() !== null) {
-                <div>
+                <div class="filter-label">
                     ${{ minAmount() }} - ${{ maxAmount() }} 
                 </div>
                 <span 
-                    class="material-symbols-outlined close" 
+                    class="material-symbols-rounded ml-1.5" 
                     role="button"
                     (click)="clearAmountFilter()">
                     close
@@ -77,16 +83,23 @@
             }
         </button>
         <div 
-            class="amount-modal" 
-            [class.open]="modals().amount" 
+            class="modal gray-border" 
+            [class.flex]="modals().amount" 
+            [class.hidden]="!modals().amount"
             role="dialog"
             aria-label="Amount filter options"
             [attr.aria-hidden]="!modals().amount"]
         >
-            <div class="inputs">
+            <div class="flex items-center gap-2">
                 <p>
-                    <label for="min-amount">Min Amount</label>
+                    <label 
+                        for="min-amount"
+                        class="label"
+                    >
+                        Min Amount
+                    </label>
                     <input 
+                        class="input gray-border"
                         type="number" 
                         placeholder="Min Amount"
                         aria-label="Minimum amount"
@@ -94,8 +107,14 @@
                         (input)="minAmount.set($event.target.valueAsNumber || null)">
                 </p>
                 <p>
-                    <label for="max-amount">Max Amount</label>
+                    <label 
+                        for="max-amount"
+                        class="label"
+                    >
+                        Max Amount
+                    </label>
                     <input 
+                        class="input gray-border"
                         type="number" 
                         placeholder="Max Amount"
                         aria-label="Maximum amount"
@@ -105,26 +124,26 @@
             </div>
         </div>
     </div>
-    <div class="date">
+    <div class="relative py-[0.35rem] px-2.5 rounded-lg gray-border">
         <button 
-            class="date-header" 
+            class="header" 
             (click)="toggleModal('date')"
             [attr.aria-expanded]="modals().date"
             aria-controls="date-modal"
             aria-label="Filter by date range"
         >
             @if(startDate() === null || endDate() === null) {
-                <span class="material-symbols-outlined">
+                <span class="material-symbols-rounded text-xl">
                     calendar_today
                 </span>
             }
-            <p>Date</p>
+            <p class="mr-1.5">Date</p>
             @if(startDate() !== null && endDate() !== null) {
-                <div>
+                <div class="filter-label">
                     {{ startDate() }} - {{ endDate() }}
                 </div>
                 <span 
-                    class="material-symbols-outlined close" 
+                    class="material-symbols-rounded ml-1.5" 
                     role="button"
                     (click)="clearDateFilter()">
                     close
@@ -132,16 +151,23 @@
             }
         </button>
         <div 
-            class="date-modal" 
+            class="modal gray-border" 
             role="dialog"
             aria-label="Date filter options"
-            [class.open]="modals().date"
+            [class.flex]="modals().date"
+            [class.hidden]="!modals().date"
             [attr.aria-hidden]="!modals().date"
         >
-            <div class="inputs">
+            <div class="flex items-center gap-2">
                 <p>
-                    <label for="start-date">Start Date</label>
+                    <label
+                        for="start-date"
+                        class="label"
+                    >
+                        Start Date
+                    </label>
                     <input 
+                        class="input gray-border"
                         type="date" 
                         placeholder="From"
                         aria-label="Start date"
@@ -149,8 +175,14 @@
                         (input)="startDate.set(formatDate($event || null))">
                 </p>
                 <p>
-                    <label for="end-date">End Date</label>
+                    <label 
+                        for="end-date"
+                        class="label"
+                    >
+                        End Date
+                    </label>
                     <input 
+                        class="input gray-border"
                         type="date" 
                         placeholder="To"
                         aria-label="End date"
@@ -161,17 +193,21 @@
         </div>
     </div>
     @if(hasActiveFilters()) {
-        <button type="button" (click)="clearFilter()" class="clear">
-            <span class="material-symbols-outlined">
+        <button 
+            type="button" 
+            (click)="clearFilter()" 
+            class="flex items-center justify-center border-0 py-2.5 px-3 rounded-lg cursor-pointer"
+        >
+            <span class="material-symbols-rounded mr-1.5 text-xl">
                 close
             </span>
             Clear Filters
         </button>
     }
 </div>
-<div class="table-wrapper">
-    <table>
-        <thead>
+<div class="gray-border overflow-hidden">
+    <table class="w-full border-collapse">
+        <thead class="bg-[#f4f4f4] border-b border-solid border-[#c5c5c5]">
             <tr>
                 <th>Date</th>
                 <th>Type</th>
@@ -184,7 +220,7 @@
         </thead>
         <tbody>
             @for(t of transactions(); track t.transactionId) {
-                <tr>
+                <tr class="border-b border-solid border-[#cacaca]">
                     <td>
                         <p>{{ t.transactionDate }}</p>
                     </td>
@@ -208,14 +244,17 @@
                         </p>
                     </td>
                     <td>
-                        <div class="buttons">
-                            <button (click)="onDelete(t.transactionId)">
-                                <span class="material-symbols-outlined">
+                        <div class="flex justify-between items-center">
+                            <button 
+                                class="cursor-pointer border-0 bg-none text-[##111827]"
+                                (click)="onDelete(t.transactionId)"
+                            >
+                                <span class="material-symbols-rounded flex items-center justify-center">
                                     delete
                                 </span>
                             </button>
                             <button (click)="onEdit(t.transactionId)">
-                                <span class="material-symbols-outlined">
+                                <span class="material-symbols-rounded flex items-center justify-center">
                                     edit
                                 </span>
                             </button>

@@ -1,60 +1,31 @@
+@reference 'tailwindcss';
+
 :host {
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    padding: 1.2rem 1.4rem;
-    gap: 1rem;
-}
-
-:host .close-btn {
-    cursor: pointer;
-}
-
-:host form  {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    @apply bg-white flex flex-col py-5 px-5.5 gap-4
 }
 
 :host form p {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+    @apply flex flex-col gap-1.5
 }
 
 :host form p input,
 :host form p select {
-    padding: 0.8rem 0 0.8rem 0.7rem;
-    border-radius: 10px;
-    border: 1px solid #CBD5E0;
+    @apply py-[0.8rem] pr-0 pl-3 rounded-lg border border-solid border-[#cbd5e0];
 }
 
 :host form p .error-list {
-    color: red;
-    list-style-type: none;
-    font-size: 0.75rem;
-    margin-top: 0.3rem;
+    @apply text-red-600 list-none text-[0.75rem] mt-[0.3rem]
 }
 
 :host form p input.error,
 :host form p select.error {
-    border: 1px solid red;
-}
-
-:host form button {
-    background-color: #1C4532;
-    color: #fff;
-    border: none;
-    padding: 0.8rem 0;
-    border-radius: 10px;
-    cursor: pointer;
+    @apply border border-solid border-red-600
 }
 
 :host form button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6; 
+    @apply cursor-not-allowed opacity-[0.6]
 }
 
 .spinning {
-    animation: spin 1s linear infinite;
+    @apply animate-spin;
 }

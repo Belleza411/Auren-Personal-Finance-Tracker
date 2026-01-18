@@ -3,13 +3,13 @@
         Showing {{ endItem() }} out of {{ totalCount() }}
     </span>
 </div>
-<div class="pagination-controls">
+<div class="flex items-center gap-4">
     <button
         (click)="onPageChange(pageNumber() - 1)"
         [disabled]="pageNumber() === 1"
         class="pagination-btn"
     >
-        <span class="material-symbols-outlined left">
+        <span class="material-symbols-rounded mr-2">
             arrow_back
         </span>
         Previous
@@ -35,17 +35,17 @@
         class="pagination-btn"
     >
         Next
-        <span class="material-symbols-outlined right">
+        <span class="material-symbols-rounded ml-2">
             arrow_forward
         </span>
     </button>
 </div>
-<div class="per-size">
-    <label for="per-size">Showing Per Page: </label>
+<div class="flex items-center">
+    <label for="per-size" class="text-[0.9rem] mr-1.5">Showing Per Page: </label>
     <select 
         [value]="pageSize()" 
         (change)="onPageSizeChange($event)"
-        class="page-size-select"
+        class="border border-solid border-[#c5c5c5] rounded-md py-1.5 px-2"
     >
         @for (size of pageSizeOptions(); track size) {
             <option [value]="size">{{ size }}</option>

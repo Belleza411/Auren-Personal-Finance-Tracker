@@ -1,7 +1,9 @@
-<p>
+<p class="flex flex-col gap-1.5">
   <label>{{ label() }}</label>
-
-  <select [formField]="field()">
+  <select 
+    [formField]="field()" 
+    class="py-[0.3rem] pl-3 border border-solid border-[#cbd5e0] rounded-lg"
+  >
     @for (key of stringKeys; track key) {
       <option [value]="key">
         {{ getLabel(key) }}
