@@ -1,18 +1,7 @@
+@reference 'tailwindcss';
+
 :host {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-:host header .welcome {
-    font-size: 1.3rem;
-    margin-bottom: 0.2rem;
-    letter-spacing: 0.05rem;
-}
-
-:host header .message {
-    color: #999999;
-    font-size: 0.9rem;
+    @apply flex flex-col gap-6;
 }
 
 :host .dashboard-summaries {
@@ -88,48 +77,34 @@
     font-size: 1.05rem;
 }
 
-:host .dashboard-summaries .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
+:host .header {
+    @apply flex items-center justify-between mb-8
 }
 
-:host .dashboard-summaries .header p {
-    font-size: 1.05rem;
+:host .header p {
+    @apply text-[1.05rem];
 }
 
-:host .dashboard-summaries .amount {
-    font-size: 1.7rem;
+:host .amount {
+    @apply text-3xl;
 }
 
-:host .dashboard-summaries .per-change_last-month {
-    display: flex;
-    margin-top: 0.6rem;
-    align-items: flex-end;
+:host .per-change_last-month {
+    @apply flex items-end mt-[0.6rem]
 }
 
-:host .dashboard-summaries .per-change_last-month .change {
-    display: flex;
-    align-items: center;
-    margin-right: 0.5rem;
-    background: rgba(52, 199, 89, 0.48);
-    padding: 0.3rem 0.4rem;
-    border-radius: 10px;
+:host .per-change_last-month .change {
+    @apply flex items-center mr-2 py-1.5 px-2 rounded-lg bg-[#34c7597a];
 }
 
-:host .dashboard-summaries .per-change_last-month .change span {
-    font-size: 0.9rem;
-    color: #004712;;
+:host .per-change_last-month .change span {
+    @apply text-[0.9rem] text-[#004712];
 }
 
-:host .dashboard-summaries .per-change_last-month .change .percentage {
-    font-size: 0.7rem;
-    margin-left: 0.2rem;
+:host .per-change_last-month .change .percentage {
+    @apply text-[0.7rem] ml-1
 }
 
-:host .dashboard-summaries .per-change_last-month .last-month {
-    font-size: 0.75rem;
-    letter-spacing: 0.02rem;
-    margin-bottom: 0.1rem;
+:host .per-change_last-month .last-month {
+    @apply text-sm tracking-wide mb-0.5
 }
