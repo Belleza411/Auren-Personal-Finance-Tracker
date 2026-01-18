@@ -10,7 +10,7 @@ namespace Auren.Application.Specifications.Transactions
 	{
 		public override Expression<Func<Transaction, bool>> ToExpression()
 		{
-			return t => t.CreatedAt >= startDate && t.CreatedAt <= endDate;
+			return t => t.TransactionDate >= startDate && t.TransactionDate <= endDate;
 		}
 	}
 }

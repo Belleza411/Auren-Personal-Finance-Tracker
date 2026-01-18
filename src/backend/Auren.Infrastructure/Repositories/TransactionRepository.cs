@@ -31,15 +31,15 @@ namespace Auren.Infrastructure.Repositories
             var income = await _dbContext.Transactions
                 .Where(t => t.UserId == userId &&
                             t.TransactionType == TransactionType.Income &&
-                            t.CreatedAt >= start &&
-                            t.CreatedAt <= end)
+                            t.TransactionDate >= start &&
+                            t.TransactionDate <= end)
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
             var expense = await _dbContext.Transactions
                 .Where(t => t.UserId == userId &&
                             t.TransactionType == TransactionType.Expense &&
-                            t.CreatedAt >= start &&
-                            t.CreatedAt <= end)
+                            t.TransactionDate >= start &&
+                            t.TransactionDate <= end)
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
             return new BalanceSummaryResponse(
@@ -100,10 +100,10 @@ namespace Auren.Infrastructure.Repositories
             };
 
             var monthlyData = await _dbContext.Transactions
-                .Where(t => t.UserId == userId && t.CreatedAt >= endDate)
+                .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
                 .GroupBy(t => new
                 {
-                    IsCurrentMonth = t.CreatedAt >= startDate,
+                    IsCurrentMonth = t.TransactionDate >= startDate,
                     t.TransactionType
                 })
                 .Select(g => new

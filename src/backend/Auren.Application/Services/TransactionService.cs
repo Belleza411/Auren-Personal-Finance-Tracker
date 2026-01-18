@@ -16,14 +16,12 @@ namespace Auren.Application.Services
 {
 	public class TransactionService : ITransactionService
 	{
-        private readonly ILogger<TransactionService> _logger;
         private readonly IValidator<TransactionDto> _validator;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICategoryRepository _categoryRepository;
 
-		public TransactionService(ILogger<TransactionService> logger, IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository)
+		public TransactionService(IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository)
 		{
-			_logger = logger;
 			_validator = validator;
 			_transactionRepository = transactionRepository;
 			_categoryRepository = categoryRepository;
@@ -60,13 +58,6 @@ namespace Auren.Application.Services
 
                 if (currentBalance.Balance < transactionDto.Amount)
                 {
-                    _logger.LogWarning(
-                        "Insufficient funds for user {UserId}. Tried to create expense {Amount} with balance {Balance}",
-                        userId,
-                        transactionDto.Amount,
-                        currentBalance
-                    );
-
                     return Result.Failure<Transaction>(Error.NotEnoughBalance($"{currentBalance} is not enough. "));
                 }
             }
