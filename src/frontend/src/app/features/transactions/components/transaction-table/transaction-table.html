@@ -209,12 +209,13 @@
     <table class="w-full border-collapse">
         <thead class="bg-[#f4f4f4] border-b border-solid border-[#c5c5c5]">
             <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Category</th>
+                <th>Date Created</th>
                 <th>Title</th>
-                <th>Payment Method</th>
+                <th>Category</th>
+                <th>Type</th>
                 <th>Amount</th>
+                <th>Transaction Date</th>
+                <th>Payment Method</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -222,26 +223,29 @@
             @for(t of transactions(); track t.transactionId) {
                 <tr class="border-b border-solid border-[#cacaca]">
                     <td>
-                        <p>{{ t.transactionDate }}</p>
-                    </td>
-                    <td>
-                        <p>{{ TransactionTypeMap[t.transactionType] }}</p>
-                    </td>
-                    <td>
-                        <p>{{ t.category.name }}</p>
+                        <p>{{ t.createdAt }}</p>
                     </td>
                     <td>
                         <p>{{ t.name }}</p>
                     </td>
                     <td>
-                        <p>{{ PaymentTypeMap[t.paymentType] }}</p>
+                        <p>{{ t.category.name }}</p>
                     </td>
+                    <td>
+                        <p>{{ TransactionTypeMap[t.transactionType] }}</p>
+                    </td>      
                     <td>
                         <p 
                             [style.color]="t.transactionType === 1 ? 'green' : 'red'"
                         >
                             {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
                         </p>
+                    </td>     
+                    <td>
+                        <p>{{ t.transactionDate }}</p>
+                    </td>
+                    <td>
+                        <p>{{ PaymentTypeMap[t.paymentType] }}</p>
                     </td>
                     <td>
                         <div 

@@ -25,7 +25,7 @@
 }
 
 th {
-    @apply text-left text-[0.85rem] text-[#4b5563] tracking-wider py-2.5 px-3.5;
+    @apply text-left text-[0.85rem] tracking-wider py-2.5 px-3.5;
 }
 
 td {
