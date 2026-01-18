@@ -14,5 +14,6 @@ namespace Auren.Domain.Entities
         public decimal Amount { get; set; }
         public PaymentType PaymentType { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime TransactionDate { get; set; }
     }
 }

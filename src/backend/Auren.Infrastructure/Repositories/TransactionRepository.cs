@@ -72,7 +72,6 @@ namespace Auren.Infrastructure.Repositories
             var totalCount = await query.CountAsync(cancellationToken);
 
             var transactions = await query
-                .OrderByDescending(t => t.CreatedAt)
                 .Skip(skip)
                 .Take(pageSize)
                 .AsNoTracking()

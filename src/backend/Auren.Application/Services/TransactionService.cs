@@ -80,7 +80,8 @@ namespace Auren.Application.Services
                 Name = transactionDto.Name,
                 Amount = transactionDto.Amount,
                 PaymentType = transactionDto.PaymentType,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                TransactionDate = transactionDto.TransactionDate
             };
 
             var createdTransaction = await _transactionRepository.AddAsync(transaction, cancellationToken);
@@ -165,6 +166,7 @@ namespace Auren.Application.Services
             transaction.PaymentType = transactionDto.PaymentType;
             transaction.TransactionType = category.TransactionType;
             transaction.CategoryId = category.Id;
+            transaction.TransactionDate = transactionDto.TransactionDate;
 
             var updatedTransaction = await _transactionRepository.UpdateAsync(transaction, cancellationToken);
 

@@ -7,6 +7,7 @@ namespace Auren.Application.DTOs.Requests
         decimal Amount,
         string Category,
         TransactionType TransactionType,
-        PaymentType PaymentType
+        PaymentType PaymentType,
+        DateTime TransactionDate
     );
 }
