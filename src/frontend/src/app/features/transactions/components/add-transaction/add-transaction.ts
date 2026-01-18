@@ -21,7 +21,8 @@ export class AddTransaction {
     amount: 0,
     category: '',
     transactionType: 1,
-    paymentType: 2
+    paymentType: 2,
+    transactionDate: ''
   });
 
   onSave(data: NewTransaction) {

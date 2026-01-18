@@ -19,6 +19,7 @@ interface NewTransaction {
     category: string;
     transactionType: TransactionType;
     paymentType: PaymentType;
+    transactionDate: Date | string;
 }
 
 interface TransactionFilter {

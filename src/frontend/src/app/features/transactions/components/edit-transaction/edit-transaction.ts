@@ -26,7 +26,8 @@ export class EditTransaction implements OnInit {
         amount: this.transactionData.amount,
         category: this.transactionData.categoryId,
         transactionType: this.transactionData.transactionType,
-        paymentType: this.transactionData.paymentType
+        paymentType: this.transactionData.paymentType,
+        transactionDate: this.transactionData.transactionDate
       });
     }
   }
@@ -36,7 +37,8 @@ export class EditTransaction implements OnInit {
     amount: 0,
     category: '',
     transactionType: 1,
-    paymentType: 2
+    paymentType: 2,
+    transactionDate: ''
   })
 
   onSave(data: NewTransaction): void {
