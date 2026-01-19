@@ -32,10 +32,6 @@ td {
     @apply py-3 px-3.5;
 }
 
-:host table tbody tr td p {
-    @apply text-sm text-[#111827];
-}
-
 .material-symbols-rounded {
   font-variation-settings:
     "FILL" 0,

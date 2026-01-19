@@ -145,4 +145,8 @@ export class TransactionTable {
       year: 'numeric', 
     })
   }
+
+  isIncome(t: Transaction): boolean {
+    return t.transactionType === 1;
+  }
 }
