@@ -1,25 +1,29 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex items-center justify-between;
+    @apply flex items-center;
 }
 
 :host .pagination-btn {
-    @apply py-2.5 px-3.5 bg-none border-0 rounded-lg cursor-pointer flex items-center justify-center
+    @apply text-[0.8rem] py-1 px-2.5 border border-[#c5c5c5] rounded-md cursor-pointer flex items-center justify-center
 }
 
 :host .pagination-btn:hover {
     @apply bg-[#ddd];
 }
 
-:host .pagination-btn:disabled {
-    @apply cursor-not-allowed;
-}
-
 :host .pagination-btn.active {
     @apply bg-[#1c4532] text-white;
 }
 
-:host .pagination-btn span {
+:host .prev-next-btn {
+    @apply flex items-center text-[0.8rem] border border-[#c5c5c5] rounded-md px-1.5 cursor-pointer;
+}
+
+:host .prev-next-btn span {
     @apply text-lg;
+}
+
+:host .prev-next-btn:disabled {
+    @apply cursor-not-allowed text-gray-400;
 }

@@ -31,12 +31,7 @@
     (delete)="deleteTransaction($event)"
     (edit)="onEditFromTable($event)"
     (filtersChange)="onFiltersChange($event)"
-/>
-<app-pagination
-    [pageNumber]="pageNumber()"
-    [pageSize]="pageSize()"
     [totalCount]="totalCount()"
-    [pageSizeOptions]="pageSizeOptions"
-    (pageChange)="onPageChange($event)"
+    (pageNumberChange)="onPageChange($event)"
     (pageSizeChange)="onPageSizeChange($event)"
 />

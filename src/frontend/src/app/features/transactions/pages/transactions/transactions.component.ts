@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, output, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
@@ -11,11 +11,10 @@ import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
-import { PaginationComponent } from "../../components/pagination/pagination";
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, PaginationComponent],
+  imports: [TransactionTable],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -28,12 +27,11 @@ export class TransactionComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
 
-    pageNumber = signal(1);
-    pageSize = signal(10);
-    totalPage = signal(10);
     selectedRange = signal<TimePeriod>(1);
 
-    readonly pageSizeOptions: number[] = [5, 10, 15, 20, 25];
+    pageNumber = signal<number>(1);
+    pageSize = signal<number>(10);
+
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
     protected readonly dummyCategories = signal<Category[]>([
@@ -158,6 +156,9 @@ export class TransactionComponent implements OnInit {
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
 
     ngOnInit(): void {
+        console.log("Page number: ", this.pageNumber());
+        console.log("Page size: ", this.pageSize()); 
+
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {
@@ -305,7 +306,7 @@ export class TransactionComponent implements OnInit {
         }
 
         this.currentFilters.set(filters);
-        this.pageNumber.set(1)
+        this.pageNumber.set(1);
     }
 
     onPageChange(page: number): void {

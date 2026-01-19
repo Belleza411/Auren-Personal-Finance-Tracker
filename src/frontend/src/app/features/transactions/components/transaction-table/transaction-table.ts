@@ -5,10 +5,11 @@ import { CurrencyPipe } from '@angular/common';
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { PaginationComponent } from "../pagination/pagination";
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, PaginationComponent],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -28,8 +29,16 @@ export class TransactionTable {
   selectedCategories = signal<string[]>([]);
   selectedPaymentType = signal<PaymentType | null>(null);
 
+  pageNumberChange = output<number>();
+  pageSizeChange = output<number>();
+
+  pageNumber = signal(1);
+  pageSize = signal(10);
+  totalCount = input.required<number>();
+
   transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
   paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];
+  pageSizeOptions: number[] = [5, 10, 15, 20, 25];
 
   modals = signal({
     amount: false,
@@ -148,5 +157,21 @@ export class TransactionTable {
 
   isIncome(t: Transaction): boolean {
     return t.transactionType === 1;
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber.set(page);
+    this.pageNumberChange.emit(page);
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.pageNumber.set(1);
+    this.pageSizeChange.emit(size);
+    this.pageNumberChange.emit(1); 
+  }
+
+  isShowPagination(): boolean {
+    return this.transactions().length > 5;
   }
 }
