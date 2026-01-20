@@ -220,67 +220,98 @@
             </tr>
         </thead>
         <tbody>
-            @for(t of transactions(); track t.transactionId) {
-                <tr class="border-b border-solid border-[#cacaca]">
-                    <td>
-                        <p>{{ t.createdAt }}</p>
-                    </td>
-                    <td>
-                        <p>{{ t.name }}</p>
-                    </td>
-                    <td>
-                        <p>{{ t.category.name }}</p>
-                    </td>
-                    <td>
-                        <p 
-                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                            [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
-                        >
-                            {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
-                        </p>
-                    </td>      
-                    <td>
-                        <p [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'">
-                            {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
-                        </p>
-                    </td>     
-                    <td>
-                        <p>{{ t.transactionDate }}</p>
-                    </td>
-                    <td>
-                        <p>{{ PaymentTypeMap[t.paymentType] }}</p>
-                    </td>
-                    <td>
-                        <div 
-                            role="button" 
-                            class="relative flex items-center cursor-pointer"
-                            (click)="toggleModalId(t.transactionId)"
-                        >
-                            <span class="material-symbols-rounded">
-                                more_horiz
-                            </span>
-                        </div>
-
-                        @if(openModalId() === t.transactionId) {
-                            <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
-                                <button 
-                                    class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
-                                    (click)="onEdit(t.transactionId)"
-                                >
-                                    <span class="material-symbols-rounded text-sm">edit</span>
-                                    Edit
-                                </button>
-                                <button 
-                                    class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
-                                    (click)="onDelete(t.transactionId)"
-                                >
-                                    <span class="material-symbols-rounded">delete</span>
-                                    Delete
-                                </button>
+            @if(isLoading()) {
+                @for(skeleton of [1,2,3,4,5]; track skeleton) {
+                    <tr class="border-b border-solid border-[#cacaca] animate-pulse">
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-24"></div>
+                        </td>
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-32"></div>
+                        </td>
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-28"></div>
+                        </td>
+                        <td>
+                            <div class="h-6 bg-gray-200 rounded-full w-18"></div>
+                        </td>
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-24"></div>
+                        </td>
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-24"></div>
+                        </td>
+                        <td>
+                            <div class="h-4 bg-gray-200 rounded w-20"></div>
+                        </td>
+                        <td>
+                            <div class="h-6 w-6 bg-gray-200 rounded"></div>
+                        </td>
+                    </tr>
+                }
+            } @else {
+                @for(t of transactions(); track t.transactionId) {
+                    <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
+                        <td>
+                            <p>{{ t.createdAt }}</p>
+                        </td>
+                        <td>
+                            <p>{{ t.name }}</p>
+                        </td>
+                        <td>
+                            <p>{{ t.category.name }}</p>
+                        </td>
+                        <td>
+                            <p 
+                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
+                            >
+                                {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
+                            </p>
+                        </td>      
+                        <td>
+                            <p [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'">
+                                {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
+                            </p>
+                        </td>     
+                        <td>
+                            <p>{{ t.transactionDate }}</p>
+                        </td>
+                        <td>
+                            <p>{{ PaymentTypeMap[t.paymentType] }}</p>
+                        </td>
+                        <td>
+                            <div 
+                                role="button" 
+                                class="relative flex items-center cursor-pointer"
+                                (click)="toggleModalId(t.transactionId)"
+                            >
+                                <span class="material-symbols-rounded">
+                                    more_horiz
+                                </span>
                             </div>
-                        }
-                    </td>
-                </tr>
+
+                            @if(openModalId() === t.transactionId) {
+                                <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
+                                    <button 
+                                        class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
+                                        (click)="onEdit(t.transactionId)"
+                                    >
+                                        <span class="material-symbols-rounded text-sm">edit</span>
+                                        Edit
+                                    </button>
+                                    <button 
+                                        class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                                        (click)="onDelete(t.transactionId)"
+                                    >
+                                        <span class="material-symbols-rounded">delete</span>
+                                        Delete
+                                    </button>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -294,4 +325,5 @@
         (pageChange)="onPageChange($event)"
         (pageSizeChange)="onPageSizeChange($event)"
     />
+
 }

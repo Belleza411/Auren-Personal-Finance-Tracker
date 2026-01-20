@@ -19,6 +19,7 @@ export class TransactionTable {
 
   transactions = input.required<Transaction[]>();
   categories = input.required<Category[]>();
+  isLoading = input.required<boolean>();
 
   searchTerm = signal<string>('');
   selectedType = signal<TransactionType | null>(null);

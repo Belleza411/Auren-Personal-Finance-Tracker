@@ -32,6 +32,10 @@ td {
     @apply py-3 px-3.5;
 }
 
+td  p {
+    @apply text-[0.8rem];
+}
+
 .material-symbols-rounded {
   font-variation-settings:
     "FILL" 0,
