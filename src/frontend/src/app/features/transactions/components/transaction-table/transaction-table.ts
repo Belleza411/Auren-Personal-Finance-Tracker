@@ -57,11 +57,9 @@ export class TransactionTable {
   openModalId = signal<string | null>(null);
 
   toggleModalId(id: string) {
-    this.openModalId.set(id);
-  }
-
-  closeModalId() {
-    this.openModalId.set(null);
+    this.openModalId.update(current =>
+      current === id ? null : id
+    );
   }
   
   delete = output<string>();
