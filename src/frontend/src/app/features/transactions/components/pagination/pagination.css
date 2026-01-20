@@ -13,7 +13,7 @@
 }
 
 :host .pagination-btn.active {
-    @apply bg-[#1c4532] text-white;
+    @apply bg-[#1c4532] text-white border border-black;
 }
 
 :host .prev-next-btn {
