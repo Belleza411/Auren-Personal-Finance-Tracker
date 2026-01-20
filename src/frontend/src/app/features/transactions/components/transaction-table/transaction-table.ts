@@ -39,7 +39,7 @@ export class TransactionTable {
 
   transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
   paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];
-  pageSizeOptions: number[] = [5, 10, 15, 20, 25];
+  pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
   modals = signal({
     amount: false,

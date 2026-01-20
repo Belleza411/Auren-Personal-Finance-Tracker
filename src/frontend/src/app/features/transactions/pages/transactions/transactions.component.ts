@@ -154,7 +154,8 @@ export class TransactionComponent implements OnInit {
     transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
     categories = computed(() => this.categoryResource.value() ?? this.dummyCategories());
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
-    isLoading = computed(() => this.transactionResource.isLoading());
+    // isLoading = computed(() => this.transactionResource.isLoading());
+    isLoading = signal(false);
 
     ngOnInit(): void {
         console.log("Page number: ", this.pageNumber());

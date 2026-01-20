@@ -25,15 +25,19 @@
 }
 
 th {
-    @apply text-left text-[0.85rem] tracking-wider py-2.5 px-3.5;
+    @apply text-left text-[0.8rem] tracking-wider py-2 px-4;
 }
 
 td {
-    @apply py-3 px-3.5;
+    @apply py-2 px-4;
 }
 
 td  p {
     @apply text-[0.8rem];
+}
+
+.skeleton {
+    @apply h-4 bg-gray-200 rounded-full w-full;
 }
 
 .material-symbols-rounded {

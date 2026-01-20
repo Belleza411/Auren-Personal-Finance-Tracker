@@ -1,19 +1,16 @@
 <div class="w-full flex items-center gap-3">
     <div class="relative flex items-center">
-        <span class="material-symbols-rounded absolute my-0 mx-2 text-[#9ca3af]" aria-hidden="true">
-            search
-        </span>
         <input 
-            class="w-full py-2 pr-16 pl-9 gray-border"
+            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
             type="text" 
-            placeholder="Search Transactions..."
-            aria-label="Search Transactions"
+            placeholder="Search transactions..."
+            aria-label="Search transactions"
             [value]="searchTerm()"
             (input)="searchTerm.set($any($event.target).value)"
         >
     </div>
     <select 
-        class="p-2 gray-border" 
+        class="p-2 gray-border text-[0.8rem]" 
         aria-label="Filter by transaction type"
         [value]="selectedType() ?? 0"
         (change)="onChangeType($event)"
@@ -22,14 +19,14 @@
             <option [value]="$index">{{ type }}</option>
         }
     </select>
-    <div class="relative py-[0.35rem] pl-3 pr-1 gray-border">
+    <div class="relative py-1 pl-3 pr-1 gray-border">
         <button 
             class="header" 
             aria-label="Filter by categories"
             (click)="toggleModal('category')"
         >
-            <p class="mr-1.5">Categories</p>
-            <span class="material-symbols-rounded text-xl">
+            <p class="mr-1.5 text-[0.8rem]">Categories</p>
+            <span class="material-symbols-rounded">
                 keyboard_arrow_down
             </span>
         </button>
@@ -53,7 +50,7 @@
         </div>
     </div>
     <select 
-        class="p-2 gray-border" 
+        class="p-[0.46rem] gray-border text-[0.8rem]" 
         aria-label="Filter by payment method"
         [value]="selectedPaymentType() ?? 0"
         (change)="onChangePaymentType($event)"
@@ -62,9 +59,9 @@
             <option [value]="$index">{{ type }}</option>
         }
     </select>
-    <div class="relative py-[0.35rem] pr-2.5 pl-1.5 rounded-lg gray-border">
+    <div class="relative py-1 pr-0.5 pl-3 rounded-lg gray-border">
         <button class="header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
-            <p class="mr-1.5">Amount</p>
+            <p class="mr-1.5 text-[0.8rem]">Amount</p>
             @if(minAmount() === null || maxAmount() === null) {
                 <span class="material-symbols-rounded text-xl">
                     keyboard_arrow_down
@@ -124,7 +121,7 @@
             </div>
         </div>
     </div>
-    <div class="relative py-[0.35rem] px-2.5 rounded-lg gray-border">
+    <div class="relative py-1 px-2.5 rounded-lg gray-border">
         <button 
             class="header" 
             (click)="toggleModal('date')"
@@ -133,11 +130,11 @@
             aria-label="Filter by date range"
         >
             @if(startDate() === null || endDate() === null) {
-                <span class="material-symbols-rounded text-xl">
+                <span class="material-symbols-rounded mr-1">
                     calendar_today
                 </span>
             }
-            <p class="mr-1.5">Date</p>
+            <p class="mr-1.5 text-[0.8rem]">Date</p>
             @if(startDate() !== null && endDate() !== null) {
                 <div class="filter-label">
                     {{ startDate() }} - {{ endDate() }}
@@ -196,7 +193,7 @@
         <button 
             type="button" 
             (click)="clearFilter()" 
-            class="flex items-center justify-center border-0 py-2.5 px-3 rounded-lg cursor-pointer"
+            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
         >
             <span class="material-symbols-rounded mr-1.5 text-xl">
                 close
@@ -207,7 +204,7 @@
 </div>
 <div class="gray-border overflow-hidden">
     <table class="w-full border-collapse">
-        <thead class="bg-[#f4f4f4] border-b border-solid border-[#c5c5c5]">
+        <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
             <tr>
                 <th>Date Created</th>
                 <th>Title</th>
@@ -221,32 +218,13 @@
         </thead>
         <tbody>
             @if(isLoading()) {
-                @for(skeleton of [1,2,3,4,5]; track skeleton) {
+                @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
                     <tr class="border-b border-solid border-[#cacaca] animate-pulse">
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-24"></div>
-                        </td>
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-32"></div>
-                        </td>
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-28"></div>
-                        </td>
-                        <td>
-                            <div class="h-6 bg-gray-200 rounded-full w-18"></div>
-                        </td>
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-24"></div>
-                        </td>
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-24"></div>
-                        </td>
-                        <td>
-                            <div class="h-4 bg-gray-200 rounded w-20"></div>
-                        </td>
-                        <td>
-                            <div class="h-6 w-6 bg-gray-200 rounded"></div>
-                        </td>
+                        @for(i of [1,2,3,4,5,6,7,8]; track i) {
+                            <td>
+                                <div class="skeleton"></div>
+                            </td>
+                        }
                     </tr>
                 }
             } @else {
@@ -263,7 +241,7 @@
                         </td>
                         <td>
                             <p 
-                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                class="inline-flex items-center px-2 py-1 rounded-full font-medium"
                                 [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
                             >
                                 {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
