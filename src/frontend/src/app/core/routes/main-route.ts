@@ -10,5 +10,10 @@ export const mainRoutes: Routes = [
         path: 'transactions',
         loadChildren: () => import('../../features/transactions/routes/transaction-route')
             .then(m => m.transactionRoutes)
+    },
+    {
+        path: 'categories',
+        loadChildren: () => import('../../features/categories/routes/category-route')
+            .then(m => m.categoryRoutes)
     }
 ]
