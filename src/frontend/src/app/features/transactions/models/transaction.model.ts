@@ -33,19 +33,19 @@ interface TransactionFilter {
     paymentType: PaymentType | null;
 }
 
-enum TransactionType {
+export enum TransactionType {
     Income = 1,
     Expense = 2
 }
 
-enum PaymentType {
+export enum PaymentType {
     Cash = 1,
     CreditCard = 2,
     BankTransfer = 3,
     Other = 4
 }
 
-enum TimePeriod {
+export enum TimePeriod {
     AllTime = 1,
     ThisMonth = 2,
     LastMonth = 3,
@@ -71,9 +71,6 @@ export type {
     Transaction,
     NewTransaction,
     TransactionFilter,
-    TransactionType,
-    PaymentType,
-    TimePeriod,
     BalanceSummary,
     PagedResult
 }
