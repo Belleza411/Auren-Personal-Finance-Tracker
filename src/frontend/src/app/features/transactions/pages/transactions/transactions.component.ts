@@ -158,9 +158,6 @@ export class TransactionComponent implements OnInit {
     isLoading = signal(false);
 
     ngOnInit(): void {
-        console.log("Page number: ", this.pageNumber());
-        console.log("Page size: ", this.pageSize()); 
-
         this.route.params
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(params => {

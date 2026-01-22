@@ -1,9 +1,48 @@
-<div class="cursor-pointer" type="button" (click)="onCancel()">
-    <span class="material-symbols-rounded">
-        close
-    </span>
-</div>
-<form class="flex flex-col gap-8" (submit)="onSubmit($event)">
+<h1 class="font-bold text-xl">
+    {{ isEdit() ? 'Edit' : 'Add' }} Transaction
+</h1>
+<p class="mb-5 text-gray-400">
+    {{ isEdit() ? 'Edit your' : 'Add a new' }} transaction to track your finances
+</p>
+<form class="flex flex-col gap-5" (submit)="onSubmit($event)">
+    <div class="flex flex-col gap-1">
+        <label for="type">Transaction Type</label>
+        <div class="flex gap-4">    
+            <label 
+                for="income" 
+                class="flex flex-1 items-center justify-center gray-border py-2 gap-1 cursor-pointer"
+                (click)="incomeInput.checked = true"
+            >
+                <input 
+                    #incomeInput
+                    type="radio" 
+                    name="transactionType"
+                    [checked]="transactionForm.transactionType().value() === TransactionType.Income"
+                    (change)="transactionForm.transactionType().value.set(TransactionType.Income)">
+                Income
+            </label>
+            <label 
+                for="expense" 
+                class="flex flex-1 items-center justify-center gray-border py-2 gap-1 cursor-pointer"
+                (click)="expenseInput.checked = true"
+            >
+                <input 
+                    #expenseInput
+                    type="radio" 
+                    name="transactionType"
+                    [checked]="transactionForm.transactionType().value() === TransactionType.Expense"
+                    (change)="transactionForm.transactionType().value.set(TransactionType.Expense)">
+                Expense
+            </label>
+        </div>
+        @if(fieldErrors.transactionType()) {
+            <ul class="error-list">
+                @for(error of transactionForm.transactionType().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </div>
     <p>
         <label for="name">Name</label>
         <input 
@@ -52,21 +91,23 @@
             </ul>
         }
     </p>
+    <p>
+        <label for="transaction-date">Date</label>
+        <input 
+            [formField]="transactionForm.transactionDate"
+            [class.error]="fieldErrors.transactionDate()"
+            (input)="transactionForm.transactionDate()"
+            type="date">
+        @if(fieldErrors.transactionDate()) {
+            <ul class="error-list">
+                @for(error of transactionForm.transactionDate().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
     <app-enum-select
-        label="Transaction Type"
-        [map]="TransactionTypeMap"
-        [field]="transactionForm.transactionType"
-    />
-    @if(fieldErrors.transactionType()) {
-        <ul class="error-list">
-            @for(error of transactionForm.transactionType().errors(); track error.kind) {
-                <li>{{ error.message }}</li>
-            }
-        </ul>
-    }
-
-    <app-enum-select
-        label="Payment Type"
+        label="Payment Method"
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
     />

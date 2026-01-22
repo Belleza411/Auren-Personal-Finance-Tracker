@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply bg-white flex flex-col py-5 px-5.5 gap-4
+    @apply bg-white flex flex-col py-5 px-5.5
 }
 
 :host form p {

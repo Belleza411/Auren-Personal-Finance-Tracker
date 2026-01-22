@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { NewTransaction } from '../../models/transaction.model';
+import { NewTransaction, TransactionType } from '../../models/transaction.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
 import { TransactionTypeMap, PaymentTypeMap } from '../../constants/transaction-map';
@@ -20,6 +20,9 @@ export class TransactionForm {
   categories = input.required<Category[]>();
   TransactionTypeMap = TransactionTypeMap;
   PaymentTypeMap = PaymentTypeMap;
+  TransactionType = TransactionType;
+
+  formattedDate: string = '';
 
   isLoading = signal(false);
 
@@ -29,7 +32,8 @@ export class TransactionForm {
     required(schema.amount, { message: 'Amount is required' });
     required(schema.category, { message: "Category is required"});
     required(schema.transactionType, { message: 'Transaction type is required' });
-    required(schema.paymentType, { message: 'Payment type is required' });
+    required(schema.paymentType, { message: 'Payment type is required' })
+    required(schema.transactionDate, { message: 'Transaction date is required'});
 
     validate(schema.amount, ({ value }) => {
       const amount = value();
@@ -59,6 +63,8 @@ export class TransactionForm {
       category: categoryName,
     } 
 
+    console.log(updatedModel);
+    
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);
       this.save.emit(updatedModel);
@@ -74,14 +80,15 @@ export class TransactionForm {
     amount: this.createErrorSignal(() => this.transactionForm.amount()),
     category: this.createErrorSignal(() => this.transactionForm.category()),
     transactionType: this.createErrorSignal(() => this.transactionForm.transactionType()),
-    paymentType: this.createErrorSignal(() => this.transactionForm.paymentType())
+    paymentType: this.createErrorSignal(() => this.transactionForm.paymentType()),
+    transactionDate: this.createErrorSignal(() => this.transactionForm.transactionDate())
   }
 
-  private createErrorSignal(field: () => FieldState<string | number>) {
+  private createErrorSignal<T>(field: () => FieldState<T>) {
     return computed(() => this.setShowError(field()));
   };
 
-  private setShowError(field: FieldState<string | number>) {
+  private setShowError<T>(field: FieldState<T>) {
     return field.invalid() && field.touched();
   };
 }
