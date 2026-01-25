@@ -16,12 +16,6 @@ namespace Auren.Application.Interfaces.Services
         Task<Result<Category>> UpdateCategory(Guid categoryId, Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken);
         Task<Result<List<Category>>> SeedDefaultCategoryToUser(Guid userId, CancellationToken cancellationToken);
         Task<Result<Category?>> GetCategoryByName(Guid userId, CategoryDto categoryDto, CancellationToken cancellationToken);
-        Task<Result<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
-           Guid userId,
-           CategoryOverviewFilter filter,
-           int pageSize = 5,
-           int pageNumber = 1,
-           CancellationToken cancellationToken = default);
         Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken);
         Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken);
     }

@@ -130,15 +130,6 @@ namespace Auren.Application.Services
                 Result.Success<Category?>(category);
         }
 
-        public async Task<Result<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
-           Guid userId,
-           CategoryOverviewFilter filter,
-           int pageSize = 5,
-           int pageNumber = 1,
-           CancellationToken cancellationToken = default)
-            => Result.Success<IEnumerable<CategoryOverviewResponse>>(await _categoryRepository.GetCategoryOverviewAsync(userId, filter, pageSize, pageNumber, cancellationToken));
-        
-
         public async Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken)
             => Result.Success<CategorySummaryResponse>(await _categoryRepository.GetCategoriesSummaryAsync(userId, cancellationToken));
 

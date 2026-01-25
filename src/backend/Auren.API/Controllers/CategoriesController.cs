@@ -107,21 +107,6 @@ namespace Auren.API.Controllers
             return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
         }
 
-        [HttpGet("overview")]
-        public async Task<ActionResult<IEnumerable<CategoryOverviewResponse>>> GetCategoryOverview(
-            [FromQuery] CategoryOverviewFilter filter,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] int pageNumber = 1,
-            CancellationToken cancellationToken = default)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-            var overview = await categoryService.GetCategoryOverview(userId.Value, filter, pageSize, pageNumber,
-                cancellationToken);
-            return Ok(overview.Value);
-        }
-
         [HttpGet("summary")]
         public async Task<ActionResult<CategorySummaryResponse>> GetCategoriesSummary(CancellationToken cancellationToken)
         {
