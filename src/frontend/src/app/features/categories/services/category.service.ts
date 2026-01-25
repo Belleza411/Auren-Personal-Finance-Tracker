@@ -1,9 +1,10 @@
 import { inject, Injectable } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { Category, CategoryFilter, CategoryOverview, CategorySummary, NewCategory } from "../models/categories.model";
+import { HttpClient } from "@angular/common/http";
+import { Category, CategoryFilter, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
 import { createHttpParams } from "../../../shared/utils/http-params.util";
+import { PagedResult } from "../../transactions/models/transaction.model";
 
 @Injectable({
   providedIn: 'root',
@@ -16,10 +17,10 @@ export class CategoryService {
         filters?: Partial<CategoryFilter>,
         pageSize: number = 5,
         pageNumber: number = 1
-    ): Observable<Category[]> {
+    ): Observable<PagedResult<Category>> {
         const params = createHttpParams(filters, pageSize, pageNumber);
 
-        return this.http.get<Category[]>(this.baseUrl, { params });
+        return this.http.get<PagedResult<Category>>(this.baseUrl, { params });
     }
 
     getCategoryById(id: string): Observable<Category> {
@@ -36,18 +37,5 @@ export class CategoryService {
 
     deleteCategory(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}`);
-    }
-
-    getCategoriesOverview(filters?: Partial<CategoryFilter>,
-        pageSize: number = 5,
-        pageNumber: number = 1
-    ): Observable<CategoryOverview[]> {
-        const params = createHttpParams(filters, pageSize, pageNumber);
-
-        return this.http.get<CategoryOverview[]>(`${this.baseUrl}/overview`, { params });
-    }
-
-    getCategorySummary(): Observable<CategorySummary> {
-        return this.http.get<CategorySummary>(`${this.baseUrl}/summary`);
     }
 } 

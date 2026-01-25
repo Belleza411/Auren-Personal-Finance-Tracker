@@ -1,63 +1,215 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
-import { Category, CategoryOverview, CategorySummary } from '../../models/categories.model';
-import { finalize, forkJoin } from 'rxjs';
+import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
+import { filter, finalize, firstValueFrom, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { TimePeriod } from '../../../transactions/models/transaction.model';
+import { AddCategory } from '../../components/add-category/add-category';
+import { EditCategory } from '../../components/edit-category/edit-category';
+import { CategoryTable } from "../../components/category-table/category-table";
 
 @Component({
   selector: 'app-categories',
-  imports: [],
+  imports: [CategoryTable],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
 })
 export class CategoriesComponent implements OnInit {
   private readonly categorySer = inject(CategoryService);
   private destroyRef = inject(DestroyRef);
-  
-  categories = signal<Category[]>([]);
-  categoriesOverview = signal<CategoryOverview[]>([]);
-  categorySummary = signal<CategorySummary | null>(null);
-  isLoading = signal(false);
-  error = signal<string | null>(null);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+
+  pageNumber = signal<number>(1);
+  pageSize = signal<number>(10);
+
+  selectedRange = signal<TimePeriod>(1);
+
+  currentFilters = signal<CategoryFilter>({
+    searchTerm: '',
+    transactionType: null,
+  });
+
+  timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+
+  protected readonly dummyCategories = signal<Category[]>([
+    {
+        categoryId: '1',
+        userId: '1',
+        name: 'Salary',
+        transactionType: 1,
+        createdAt: "June 1, 2025"
+    },
+    {
+        categoryId: '2',
+        userId: '1',
+        name: 'Shopping',
+        transactionType: 2,
+        createdAt: "June 2, 2025"
+    },
+    {
+        categoryId: '3',
+        userId: '1',
+        name: 'Health',
+        transactionType: 2,
+        createdAt: "June 10, 2025"
+    },
+    {
+      categoryId: '4',
+      userId: '1',
+      name: 'Utilities',
+      transactionType: 2,
+      createdAt: "June 11, 2025"
+    },
+    {
+      categoryId: '5',
+      userId: '1',
+      name: 'Gifts',
+      transactionType: 2,
+      createdAt: "June 12, 2025"
+    },
+    {
+      categoryId: '5',
+      userId: '1',
+      name: 'Gas',
+      transactionType: 2,
+      createdAt: "June 12, 2025"
+    }
+  ]);
+
+  categories = computed(() => this.categoryResource.value()?.items ?? this.dummyCategories());
+  isLoading = computed(() => this.categoryResource.isLoading())
+  totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 100);
 
   ngOnInit(): void {
-    this.loadData();
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const categoryId = params['id'];
+        const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
+        const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
+
+        if(categoryId && shouldOpenEditModal) {
+          this.openEditModalById(categoryId)
+        } else if (shouldOpenAddModal) {
+          this.openAddModal();
+        }
+      })
   }
 
-  private loadData() {
-    this.isLoading.set(true);
-    this.error.set(null);
-
-    forkJoin({
-      categories: this.categorySer.getAllCategories(),
-      categoriesOverview: this.categorySer.getCategoriesOverview(),
-      categorySummary: this.categorySer.getCategorySummary()
-    })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isLoading.set(false))
-      )
-      .subscribe({
-          next: ({ categories, categoriesOverview, categorySummary }) => {
-            this.categories.set(categories),
-            this.categoriesOverview.set(categoriesOverview),
-            this.categorySummary.set(categorySummary)
-          },
-          error: err => {
-            console.error("Failed to load data: ", err);
-            this.error.set("Failed to load data. Please try again.");
-          }
-      });
-  }
+  categoryResource = resource({
+    params: () => ({
+      filters: this.currentFilters(),
+      pageSize: this.pageSize(),
+      pageNumber: this.pageNumber()
+    }),
+    loader: async ({ params }) => {
+      return firstValueFrom(this.categorySer.getAllCategories(params.filters, 50, 1))
+    }
+  })
 
   deleteCategory(id: string) {
     this.categorySer.deleteCategory(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.categories.update(list => list.filter(c => c.categoryId !== id));
-          this.loadData();
-        }
+        next: () => this.categoryResource.reload()
       })
+  }
+
+  openEditModalById(id: string): void {
+    const category = this.categories()
+      .find(c => c.categoryId === id);
+
+    if(!category) {
+      console.error('Category not found');
+      this.router.navigate(['/categories'])
+      return 
+    }
+
+    this.openEditModal(category);
+  }
+
+  openAddModal(): void {
+    const dialogRef = this.dialog.open<
+      AddCategory, 
+      Category[], 
+      NewCategory>(AddCategory, {
+        width: '30rem',
+        data: this.categories()
+      });
+
+    dialogRef.afterClosed()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => this.router.navigate(['/categories'])),
+        filter((result): result is NewCategory => !!result),
+        switchMap(result => this.categorySer.createCategory(result))
+      )
+      .subscribe({
+        next: () => this.categoryResource.reload(),
+        error: err => console.error('Created failed: ', err)
+      })
+  }
+
+  openEditModal(category: Category) {
+    const dialogRef = this.dialog.open<
+      EditCategory,
+      Category,
+      NewCategory>(EditCategory, {
+        width: '30rem',
+        data: category
+      })
+
+    dialogRef.afterClosed()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => this.router.navigate(['/categories'])),
+        filter((result): result is NewCategory => !!result),
+        switchMap(result => 
+          this.categorySer.updateCategory(
+            category.categoryId,
+            result
+          )
+        )
+      )
+      .subscribe({
+        next: () => this.categoryResource.reload(),
+        error: err => console.error('Update failed: ', err)
+      })
+  }
+
+  onEditFromTable(id: string): void {
+    this.router.navigate(['/categories', id, 'edit']);
+  }
+ 
+  onAddCategory(): void {
+    this.router.navigate(['/categories', 'create']);
+  }
+
+  onFiltersChange(filters: CategoryFilter) {
+    if(JSON.stringify(filters) === JSON.stringify(this.currentFilters())) {
+      return;
+    }
+
+    this.currentFilters.set(filters);
+    this.pageNumber.set(1);
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber.set(page);
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.pageNumber.set(1);
+  }
+
+  onRangeChange(e: Event) {
+    this.selectedRange.set(
+      Number((e.target as HTMLSelectElement).value) + 1
+    );
   }
 }

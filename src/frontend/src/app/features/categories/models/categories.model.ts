@@ -9,10 +9,8 @@ interface Category {
 }
 
 interface CategoryFilter {
-    isIncome: boolean;
-    isExpense: boolean;
-    transactions: number;
-    category: string;
+    searchTerm: string;
+    transactionType: TransactionType | null;
 }
 
 interface NewCategory {
@@ -20,25 +18,8 @@ interface NewCategory {
     transactionType: TransactionType;
 }
 
-interface CategoryOverview {
-    category: string;
-    transactionType: TransactionType;
-    totalSpending: number;
-    averageSpending: number;
-    transactionCount: number;
-    lastUsed: Date | string;
-}
-
-interface CategorySummary {
-    totalCategories: number;
-    mostUsedCategory: string;
-    highestSpendingCategory: string;
-}
-
 export type {
     Category,
     CategoryFilter,
     NewCategory,
-    CategoryOverview,
-    CategorySummary
 }
