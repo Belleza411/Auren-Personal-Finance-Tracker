@@ -77,32 +77,6 @@ namespace Auren.Infrastructure.Repositories
                     && c.TransactionType == categoryDto.TransactionType,
                     cancellationToken);
 
-        public async Task<CategorySummaryResponse> GetCategoriesSummaryAsync(Guid userId, CancellationToken cancellationToken)
-        {
-            var summary = await _dbContext.Categories
-                .Where(c => c.UserId == userId)
-                .Select(c => new
-                {
-                    c.Name,
-                    TotalCategories = _dbContext.Transactions.Count(t => t.CategoryId == c.Id),
-                    HighestSpending = _dbContext.Transactions
-                        .Where(t => t.CategoryId == c.Id && t.TransactionType == TransactionType.Expense)
-                        .Sum(t => (decimal?)t.Amount) ?? 0
-                })
-                .ToListAsync(cancellationToken);
-
-            var mostUsedCategory = summary.OrderByDescending(c => c.TotalCategories)
-                                    .FirstOrDefault()?.Name;
-            var highestSpendingCategory = summary.OrderByDescending(c => c.HighestSpending)
-                                                            .FirstOrDefault()?.Name;
-
-            return new CategorySummaryResponse(
-                TotalCategories: summary.Count,
-                MostUsedCategory: mostUsedCategory ?? "N/A",
-                HighestSpendingCategory: highestSpendingCategory ?? "N/A"
-            ); 
-        }
-
         public async Task<IReadOnlyList<Guid>> GetIdsByNamesAsync(Guid userId, IEnumerable<string> categories,  CancellationToken cancellationToken)
         {
             if (categories == null)

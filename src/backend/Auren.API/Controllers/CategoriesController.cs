@@ -106,15 +106,5 @@ namespace Auren.API.Controllers
 
             return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
         }
-
-        [HttpGet("summary")]
-        public async Task<ActionResult<CategorySummaryResponse>> GetCategoriesSummary(CancellationToken cancellationToken)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-            var summary = await categoryService.GetCategoriesSummary(userId.Value, cancellationToken);
-            return Ok(summary.Value);
-        }
     }
 }

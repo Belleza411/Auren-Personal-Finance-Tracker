@@ -130,9 +130,6 @@ namespace Auren.Application.Services
                 Result.Success<Category?>(category);
         }
 
-        public async Task<Result<CategorySummaryResponse>> GetCategoriesSummary(Guid userId, CancellationToken cancellationToken)
-            => Result.Success<CategorySummaryResponse>(await _categoryRepository.GetCategoriesSummaryAsync(userId, cancellationToken));
-
         public async Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken)
         {
             var transactionExpenses = new TransactionFilter { TransactionType = TransactionType.Expense };
