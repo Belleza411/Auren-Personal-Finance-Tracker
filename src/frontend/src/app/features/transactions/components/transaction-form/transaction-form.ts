@@ -22,8 +22,6 @@ export class TransactionForm {
   PaymentTypeMap = PaymentTypeMap;
   TransactionType = TransactionType;
 
-  formattedDate: string = '';
-
   isLoading = signal(false);
 
   private readonly modelSignal = signal({} as NewTransaction);
@@ -62,8 +60,6 @@ export class TransactionForm {
       ...this.modelSignal(),
       category: categoryName,
     } 
-
-    console.log(updatedModel);
     
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);

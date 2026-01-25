@@ -152,7 +152,7 @@ export class TransactionComponent implements OnInit {
     };
 
     transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
-    categories = computed(() => this.categoryResource.value() ?? this.dummyCategories());
+    categories = computed(() => this.categoryResource.value()?.items ?? this.dummyCategories());
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
     // isLoading = computed(() => this.transactionResource.isLoading());
     isLoading = signal(false);
@@ -180,13 +180,12 @@ export class TransactionComponent implements OnInit {
             pageNumber: this.pageNumber()
         }),
         loader: ({ params }) => {
-            const transactions = firstValueFrom(this.transactionSer.getAllTransactions(
+            return firstValueFrom(this.transactionSer.getAllTransactions(
                 params.filters,
                 params.pageSize,
                 params.pageNumber
             ));
 
-            return transactions;
         }
     });
 
@@ -245,8 +244,7 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: () => this.transactionResource.reload(),
-                error: err => console.error('Create failed', err)
-                
+                error: err => console.error('Create failed', err)            
             });
     }
 
