@@ -1,0 +1,30 @@
+@reference 'tailwindcss';
+
+:host {
+    @apply bg-white flex flex-col py-5 px-5.5
+}
+
+:host form p {
+    @apply flex flex-col gap-1.5
+}
+
+:host form p input {
+    @apply py-[0.7rem] pr-0 pl-3 rounded-lg border border-solid border-[#cbd5e0];
+}
+
+:host form p .error-list {
+    @apply text-red-600 list-none text-[0.75rem] mt-[0.3rem]
+}
+
+:host form p input.error,
+:host form p select.error {
+    @apply border border-solid border-red-600
+}
+
+:host form button:disabled {
+    @apply cursor-not-allowed opacity-[0.6]
+}
+
+.spinning {
+    @apply animate-spin;
+}

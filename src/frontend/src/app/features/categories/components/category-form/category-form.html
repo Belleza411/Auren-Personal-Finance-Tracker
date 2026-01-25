@@ -1,0 +1,72 @@
+<h1 class="text-xl font-bold mb-6">
+    {{ isEdit() ? "Edit" : "Add" }} Category
+</h1>
+<form (submit)="onSubmit($event)" class="flex flex-col gap-5">
+    <div class="flex flex-col gap-1">
+        <label for="type">Transaction Type</label>
+        <div class="flex gap-4">    
+            <label 
+                for="income" 
+                class="flex flex-1 items-center justify-center gray-border py-2 gap-1 cursor-pointer"
+                (click)="incomeInput.checked = true"
+            >
+                <input 
+                    #incomeInput
+                    type="radio" 
+                    name="transactionType"
+                    [checked]="categoryForm.transactionType().value() === TransactionType.Income"
+                    (change)="categoryForm.transactionType().value.set(TransactionType.Income)">
+                Income
+            </label>
+            <label 
+                for="expense" 
+                class="flex flex-1 items-center justify-center gray-border py-2 gap-1 cursor-pointer"
+                (click)="expenseInput.checked = true"
+            >
+                <input 
+                    #expenseInput
+                    type="radio" 
+                    name="transactionType"
+                    [checked]="categoryForm.transactionType().value() === TransactionType.Expense"
+                    (change)="categoryForm.transactionType().value.set(TransactionType.Expense)">
+                Expense
+            </label>
+        </div>
+        @if(fieldErrors.transactionType()) {
+            <ul class="error-list">
+                @for(error of categoryForm.transactionType().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </div>
+    <p>
+        <label for="name">Name</label>
+        <input 
+            type="text"
+            [formField]="categoryForm.name"
+            [class.error]="fieldErrors.name()">
+        @if(fieldErrors.name()) {
+            <ul class="error-list">
+                @for(error of categoryForm.name().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <div class="ml-auto">
+        <button 
+            class="bg-[#1c4532] text-white border-0 py-2.5 rounded-lg cursor-pointer px-4"
+            type="submit" 
+            [disabled]="isLoading() || categoryForm().invalid()"
+        >
+        @if(isLoading()) {
+                <span class="material-symbols-outlined spinning">
+                    progress_activity
+                </span>
+        } @else { 
+            <p>{{ isEdit() ? "Update" : "Create" }}</p>
+        }
+        </button>
+    </div>
+</form>

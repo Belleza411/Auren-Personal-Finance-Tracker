@@ -13,7 +13,7 @@ export const categoryRoutes: Routes = [
         data: { openAddModal: true }
     },
     {
-        path: ':id/create',
+        path: ':id/edit',
         component: CategoriesComponent,
         data: { openEditModal: true }
     }

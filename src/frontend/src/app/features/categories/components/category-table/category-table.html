@@ -1,0 +1,114 @@
+<div class="w-full flex items-center gap-3">
+    <div class="relative flex items-center">
+        <input 
+            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+            type="text" 
+            placeholder="Search categories..."
+            aria-label="Search categories"
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)"
+        >
+    </div>
+    <select 
+        class="p-1.5 gray-border text-[0.8rem]" 
+        aria-label="Filter by transaction type"
+        [value]="selectedType() ?? 0"
+        (change)="onChangeType($event)"
+    >
+        @for(type of transactionTypeOptions; track $index) {
+            <option [value]="$index">{{ type }}</option>
+        }
+    </select>
+    @if(hasActiveFilters()) {
+        <button 
+            type="button" 
+            (click)="clearFilter()" 
+            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
+        >
+            <span class="material-symbols-rounded mr-1.5 text-xl">
+                close
+            </span>
+            Clear Filters
+        </button>
+    }
+</div>
+<div class="gray-border overflow-hidden">
+    <table class="w-full border-collapse">
+        <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(!isLoading()) {
+                @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
+                    <tr class="border-b border-solid border-[#cacaca] animate-pulse">
+                        @for(i of [1,2,3]; track i) {
+                            <td>
+                                <div class="skeleton"></div>
+                            </td>
+                        }
+                    </tr>
+                }
+            } @else {
+                @for(c of categories(); track c.categoryId) {
+                    <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
+                        <td>
+                            <p>{{ c.name }}</p>
+                        </td>
+                        <td>
+                            <p 
+                                class="inline-flex items-center px-2 py-1 rounded-full font-medium"
+                                [class]="isIncome(c) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
+                            >
+                                {{ TransactionTypeMap[c.transactionType].toUpperCase() }}
+                            </p>
+                        </td>
+                        <td>
+                            <div 
+                                role="button" 
+                                class="relative flex items-center cursor-pointer"
+                                (click)="toggleModalId(c.categoryId)"
+                            >
+                                <span class="material-symbols-rounded">
+                                    more_horiz
+                                </span>
+                            </div>
+
+                            @if(openModalId() === c.categoryId) {
+                                <div class="absolute right-25 top-55 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
+                                    <button 
+                                        class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5 cursor-pointer"
+                                        (click)="onEdit(c.categoryId)"
+                                    >
+                                        <span class="material-symbols-rounded text-sm">edit</span>
+                                        Edit
+                                    </button>
+                                    <button 
+                                        class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600 cursor-pointer"
+                                        (click)="onDelete(c.categoryId)"
+                                    >
+                                        <span class="material-symbols-rounded">delete</span>
+                                        Delete
+                                    </button>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+@if(isShowPagination()) {
+    <app-pagination
+        [pageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+    />
+}
