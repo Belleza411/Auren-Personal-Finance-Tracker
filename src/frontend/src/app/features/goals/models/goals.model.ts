@@ -22,12 +22,12 @@ interface NewGoal {
 }
 
 interface GoalFilter {
-    isCompleted: boolean;
-    isOnTracker: boolean;
-    isOnHold: boolean;
-    isNotStarted: boolean;
-    isBehindSchedule: boolean;
-    isCancelled: boolean;
+    searchTerm: string;
+    status: GoalStatus | null;
+    minBudget: number | null;
+    maxBudget: number | null;
+    targetFrom: Date | string | null;
+    targetTo: Date | string | null;
 }
 
 enum GoalStatus {
