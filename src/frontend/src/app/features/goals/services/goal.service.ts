@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Goal, GoalFilter, GoalsSummary, NewGoal } from "../models/goals.model";
 import { createHttpParams } from "../../../shared/utils/http-params.util";
+import { PagedResult } from "../../transactions/models/transaction.model";
 
 @Injectable({
   providedIn: 'root',
@@ -16,10 +17,10 @@ export class GoalService {
         filters?: Partial<GoalFilter>, 
         pageNumber: number = 1, 
         pageSize: number = 5
-    ): Observable<Goal[]> {
+    ): Observable<PagedResult<Goal>> {
         const params = createHttpParams(filters, pageSize, pageNumber);
 
-        return this.http.get<Goal[]>(apiUrl, { params });
+        return this.http.get<PagedResult<Goal>>(apiUrl, { params });
     }
 
     getGoalById(id: string): Observable<Goal> {
