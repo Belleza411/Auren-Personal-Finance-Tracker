@@ -1,0 +1,91 @@
+<h1 class="font-bold text-xl">
+    {{ isEdit() ? 'Edit' : 'Add' }} Goal
+</h1>
+<p class="mb-5 text-gray-400">
+    {{ isEdit() ? 'Edit your' : 'Add a new' }} transaction to track your finances
+</p>
+<form class="flex flex-col gap-5" (submit)="onSubmit($event)">
+    <p>
+        <label for="name">Name</label>
+        <input 
+            type="text"
+            [formField]="goalForm.name"
+            [class.error]="fieldErrors.name()">
+        @if(fieldErrors.name()) {
+            <ul class="error-list">
+                @for(error of goalForm.name().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="description">Description</label>
+        <input 
+            type="text"
+            [formField]="goalForm.description"
+            [class.error]="fieldErrors.description()">
+        @if(fieldErrors.description()) {
+            <ul class="error-list">
+                @for(error of goalForm.description().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="spent">Spent</label>
+        <input 
+            type="number"
+            [formField]="goalForm.spent"
+            [class.error]="fieldErrors.spent()">
+        @if(fieldErrors.spent()) {
+            <ul class="error-list">
+                @for(error of goalForm.spent().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="budget">Budget</label>
+        <input 
+            type="number"
+            [formField]="goalForm.budget"
+            [class.error]="fieldErrors.budget()">
+        @if(fieldErrors.budget()) {
+            <ul class="error-list">
+                @for(error of goalForm.budget().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <p>
+        <label for="target-date">Target Date</label>
+        <input 
+            type="date"
+            [formField]="goalForm.targetDate"
+            [class.error]="fieldErrors.targetDate()">
+        @if(fieldErrors.targetDate()) {
+            <ul class="error-list">
+                @for(error of goalForm.targetDate().errors(); track error.kind) {
+                    <li>{{ error.message }}</li>
+                }
+            </ul>
+        }
+    </p>
+    <button 
+        class="bg-[#1c4532] text-white border-0 py-[0.8rem] rounded-lg cursor-pointer"
+        type="submit" 
+        [disabled]="isLoading() || goalForm().invalid()"
+    >
+       @if(isLoading()) {
+            <span class="material-symbols-outlined spinning">
+                progress_activity
+            </span>
+       } @else { 
+         <p>{{ isEdit() ? "Update" : "Create" }}</p>
+       }
+    </button>
+</form>
