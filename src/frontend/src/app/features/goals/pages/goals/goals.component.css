@@ -1,5 +1,33 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex flex-col overflow-hidden;
+    @apply flex flex-col;
+}
+
+.filter-label {
+    @apply text-[0.7rem] ml-1.5 rounded-lg bg-[#c1c1c1] py-1 px-2;
+}
+
+.modal {
+    @apply absolute bg-white rounded-lg p-4 flex-col top-[50px] left-0;
+}
+
+.label {
+    @apply text-[0.85rem];
+}
+
+.input {
+    @apply py-2.5 px-4;
+}
+
+.header {
+    @apply cursor-pointer flex items-center border-0 bg-none;
+}
+
+.material-symbols-rounded {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 18;
 }

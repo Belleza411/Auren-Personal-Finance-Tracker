@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
 import { GoalService } from "../../services/goal.service";
-import { Goal, GoalFilter, GoalsSummary, NewGoal } from "../../models/goals.model";
+import { Goal, GoalFilter, GoalsSummary, GoalStatus, NewGoal } from "../../models/goals.model";
 import { filter, finalize, firstValueFrom, forkJoin, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -29,16 +29,39 @@ export class GoalsComponent implements OnInit  {
   pageNumber = signal<number>(1);
   pageSize = signal<number>(10);
 
-  currentFilters = signal<GoalFilter>({
-    searchTerm: '',
-    status: null,
-    minBudget: null,
-    maxBudget: null,
-    targetFrom: null,
-    targetTo: null
+  searchTerm = signal<string>('');
+  status = signal<GoalStatus | null>(null);
+  minBudget = signal<number | null>(null);
+  maxBudget = signal<number | null>(null);
+  targetFrom = signal<string | null>(null);
+  targetTo = signal<string | null>(null);
+
+  private readonly currentFilters = signal<GoalFilter>({
+    searchTerm: this.searchTerm(),
+    status: this.status(),
+    minBudget: this.minBudget(),
+    maxBudget: this.maxBudget(),
+    targetFrom: this.targetFrom(),
+    targetTo: this.targetTo()
+  });
+
+  goalStatusOptions: string[] = ['All Status', 'Completed', 'On Track', 'On Hold', 'Not Started', 'Behind Schedule', 'Cancelled']
+
+  modals = signal({
+    budget: false,
+    targetDate: false
   })
 
+  toggleModal(modalName: 'budget' | 'targetDate') {
+    this.modals.update(modals => ({
+      ...modals,
+      [modalName]: !modals[modalName]
+    }))
+  }
+
   ngOnInit(): void {
+    console.log(this.currentFilters());
+
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -176,6 +199,49 @@ export class GoalsComponent implements OnInit  {
   onPageSizeChange(size: number): void {
     this.pageSize.set(size);
     this.pageNumber.set(1);
+  }
+
+  onChangeStatus(e: Event) {
+    const value = Number((e.target as HTMLSelectElement).value);
+    this.status.set(value === 0 ? null : value);
+  }
+
+  hasActiveFilters = computed(() => {
+    const hasSearch = this.searchTerm().trim().length !== 0;
+    const hasStatus = this.status() !== null;
+    const hasBudget = this.minBudget() !== null || this.maxBudget() !== null;
+    const hasTargetDate = this.targetFrom() !== null || this.targetTo() !== null;
+
+    return hasSearch || hasStatus || hasBudget || hasTargetDate;
+  })
+
+  clearFilter() {
+    this.searchTerm.set('');
+    this.status.set(null);
+    this.minBudget.set(null);
+    this.maxBudget.set(null);
+    this.targetFrom.set(null);
+    this.targetTo.set(null);
+  }
+
+  clearBudgetFilter() {
+    this.minBudget.set(null);
+    this.maxBudget.set(null);
+  }
+
+  clearTargetDateFilter() {
+    this.targetFrom.set(null);
+    this.targetTo.set(null);
+  }
+
+  formatDate(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    const date = new Date(value);
+    return date.toLocaleDateString('en-US', {
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric', 
+    })
   }
 }
  

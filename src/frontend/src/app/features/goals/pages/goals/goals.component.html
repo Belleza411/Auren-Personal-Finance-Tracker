@@ -15,3 +15,167 @@
         </button>
     </div>
 </header>
+<div class="w-full flex items-center gap-3">
+    <div class="relative flex items-center">
+        <input 
+            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+            type="text" 
+            placeholder="Search goals..."
+            aria-label="Search goals"
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)"
+        >
+    </div>
+    <select
+        class="p-2 gray-border text-[0.8rem]"
+        aria-label="Filter by goal status"
+        [value]="status() ?? 0"
+        (change)="onChangeStatus($event)"
+    >    
+        @for(type of goalStatusOptions; track $index) {
+            <option [value]="$index">{{ type }}</option>
+        }
+    </select>
+    <div class="relative py-[0.3rem] pr-0.5 pl-3 rounded-lg gray-border">
+        <button class="header" (click)="toggleModal('budget')" aria-label="Filter by budget range">
+            <p class="mr-1.5 text-[0.8rem]">Budget</p>
+            @if(minBudget() === null || maxBudget() === null) {
+                <span class="material-symbols-rounded text-xl">
+                    keyboard_arrow_down
+                </span>
+            }
+            @if(minBudget() !== null && maxBudget() !== null) {
+                <div class="filter-label">
+                    ${{ minBudget() }} - ${{ maxBudget() }} 
+                </div>
+                <span 
+                    class="material-symbols-rounded ml-1.5" 
+                    role="button"
+                    (click)="clearBudgetFilter()">
+                    close
+                </span>
+            }
+        </button>
+        <div 
+            class="modal gray-border" 
+            [class.flex]="modals().budget" 
+            [class.hidden]="!modals().budget"
+            role="dialog"
+            aria-label="Budget filter options"
+            [attr.aria-hidden]="!modals().budget"
+        >
+            <div class="flex items-center gap-2">
+                <p>
+                    <label 
+                        for="min-budget"
+                        class="label"
+                    >
+                        Min Budget
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="number" 
+                        placeholder="Min budget"
+                        aria-label="Minimum budget"
+                        [value]="minBudget()"
+                        (input)="minBudget.set($event.target.valueAsNumber || null)">
+                </p>
+                <p>
+                    <label 
+                        for="max-budget"
+                        class="label"
+                    >
+                        Max Budget
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="number" 
+                        placeholder="Max budget"
+                        aria-label="Maximum budget"
+                        [value]="maxBudget()"
+                        (input)="maxBudget.set($event.target.valueAsNumber || null)">
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="relative py-1 px-2.5 rounded-lg gray-border">
+        <button 
+            class="header" 
+            (click)="toggleModal('targetDate')"
+            [attr.aria-expanded]="modals().targetDate"
+            aria-controls="date-modal"
+            aria-label="Filter by date range"
+        >
+            @if(targetFrom() === null || targetTo() === null) {
+                <span class="material-symbols-rounded mr-1">
+                    calendar_today
+                </span>
+            }
+            <p class="mr-1.5 text-[0.8rem]">Date</p>
+            @if(targetFrom() !== null && targetTo() !== null) {
+                <div class="filter-label">
+                    {{ targetFrom() }} - {{ targetTo() }}
+                </div>
+                <span 
+                    class="material-symbols-rounded ml-1.5" 
+                    role="button"
+                    (click)="clearTargetDateFilter()">
+                    close
+                </span>
+            }
+        </button>
+        <div 
+            class="modal gray-border" 
+            role="dialog"
+            aria-label="Date filter options"
+            [class.flex]="modals().targetDate"
+            [class.hidden]="!modals().targetDate"
+            [attr.aria-hidden]="!modals().targetDate"
+        >
+            <div class="flex items-center gap-2">
+                <p>
+                    <label
+                        for="target-from"
+                        class="label"
+                    >
+                        Target From
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="date" 
+                        placeholder="From"
+                        aria-label="Target from"
+                        [value]="targetFrom()"
+                        (input)="targetFrom.set(formatDate($event || null))">
+                </p>
+                <p>
+                    <label 
+                        for="target-to"
+                        class="label"
+                    >
+                        Target To
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="date" 
+                        placeholder="To"
+                        aria-label="Target To"
+                        [value]="targetTo()"
+                        (input)="targetTo.set(formatDate($event || null))">
+                </p>
+            </div>
+        </div>
+    </div>
+    @if(hasActiveFilters()) {
+        <button 
+            type="button" 
+            (click)="clearFilter()" 
+            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
+        >
+            <span class="material-symbols-rounded mr-1.5 text-xl">
+                close
+            </span>
+            Clear Filters
+        </button>
+    }
+</div>
