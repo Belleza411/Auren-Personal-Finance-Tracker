@@ -7,11 +7,13 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { AddGoal } from "../../components/add-goal/add-goal";
 import { EditGoal } from "../../components/edit-goal/edit-goal";
+import { CurrencyPipe } from "@angular/common";
+import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
 
 
 @Component({
   selector: 'app-goals',
-  imports: [],
+  imports: [CurrencyPipe],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.css',
 })
@@ -22,7 +24,49 @@ export class GoalsComponent implements OnInit  {
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
 
-  goals = computed(() => this.goalResource.value()?.items ?? [])
+  dummyGoals = signal<Goal[]>([
+    {
+    goalId: 'goal-001',
+    userId: 'user-123',
+    name: 'Buy a New Laptop',
+    description: 'Save money to buy a high-performance laptop for development and studies.',
+    spent: 450,
+    budget: 1500,
+    goalStatus: 2,
+    completionPercentage: 30,
+    timeRemaining: '3 months',
+    createdAt: 'January 5, 2025',
+    targetDate: 'April 30, 2025',
+  },
+  {
+    goalId: 'goal-002',
+    userId: 'user-123',
+    name: 'Emergency Savings Fund',
+    description: 'Build an emergency fund for unexpected expenses.',
+    spent: 1200,
+    budget: 3000,
+    goalStatus: 2,
+    completionPercentage: 40,
+    timeRemaining: '6 months',
+    createdAt: 'December 1, 2024',
+    targetDate: 'August 1, 2025',
+  },
+  {
+    goalId: 'goal-003',
+    userId: 'user-123',
+    name: 'Vacation Trip',
+    description: 'Save for a short holiday trip with friends.',
+    spent: null,
+    budget: 2000,
+    goalStatus: 4,
+    completionPercentage: null,
+    timeRemaining: '9 months',
+    createdAt: 'January 20, 2025',
+    targetDate: 'October 15, 2025',
+  },
+  ])
+
+  goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
   isLoading = computed(() => this.goalResource.isLoading());
   totalCount = computed(() => this.goalResource.value()?.totalCount)
 
@@ -60,19 +104,20 @@ export class GoalsComponent implements OnInit  {
   }
 
   ngOnInit(): void {
-    console.log(this.currentFilters());
-
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
         const goalId = params['id'];
         const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
         const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
+        const shouldOpenAddMoneyModal = this.route.snapshot.data['openAddMoneyModal'];
 
         if(goalId && shouldOpenEditModal) {
           this.openEditModalById(goalId);
         } else if (shouldOpenAddModal) {
           this.openAddModal();
+        } else if(goalId && shouldOpenAddMoneyModal) {
+          this.openAddMoneyModal(goalId);
         }
       })
   }
@@ -175,12 +220,46 @@ export class GoalsComponent implements OnInit  {
       })
   }
 
+  openAddMoneyModal(id: string) {
+    const dialogRef = this.dialog.open<AddMoneyForm, null, number>(AddMoneyForm, {
+      width: '30rem'
+    })
+
+    dialogRef.afterClosed()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => this.router.navigate(['/goals'])),
+        filter(Boolean),
+        switchMap(result => this.goalSer.addMoneyToGoal(result, id)) 
+      )
+      .subscribe({
+        next: value => this.goalResource.reload(),
+        error: err => console.error('Adding money failed: ', err) 
+      })
+  }
+
   onEdit(id: string) {
     this.router.navigate(['/goals', id, 'edit']);
   }
 
+  onAddMoney(id: string) {
+    this.router.navigate(['/goals', id, 'add-money']);
+  }
+
   onAddGoal() {
     this.router.navigate(['/goals', 'create']);
+  }
+
+  onStatusChange(goal: Goal, event: Event) {
+    const value = Number((event.target as HTMLSelectElement).value);
+    if (value === goal.goalStatus) return;
+
+    this.goalSer.updateGoal(goal.goalId, { status: value })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.goalResource.reload(),
+        error: err => console.error('Failed to update status:', err)
+      })
   }
 
   onFiltersChange(filters: GoalFilter) {
