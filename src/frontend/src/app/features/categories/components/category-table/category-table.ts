@@ -4,7 +4,7 @@ import { TransactionType } from '../../../transactions/models/transaction.model'
 import { outputFromObservable, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { TransactionTypeMap } from '../../../transactions/constants/transaction-map';
-import { PaginationComponent } from "../../../transactions/components/pagination/pagination";
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 
 @Component({
   selector: 'app-category-table',

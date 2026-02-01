@@ -9,7 +9,7 @@ import { AddGoal } from "../../components/add-goal/add-goal";
 import { EditGoal } from "../../components/edit-goal/edit-goal";
 import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
-import { PaginationComponent } from "../../../transactions/components/pagination/pagination";
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 
 
 @Component({

@@ -5,7 +5,7 @@ import { CurrencyPipe } from '@angular/common';
 import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { PaginationComponent } from "../pagination/pagination";
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 
 @Component({
   selector: 'app-transaction-table',
