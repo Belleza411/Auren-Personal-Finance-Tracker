@@ -9,11 +9,12 @@ import { AddGoal } from "../../components/add-goal/add-goal";
 import { EditGoal } from "../../components/edit-goal/edit-goal";
 import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
+import { PaginationComponent } from "../../../transactions/components/pagination/pagination";
 
 
 @Component({
   selector: 'app-goals',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, PaginationComponent],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -67,12 +68,13 @@ export class GoalsComponent implements OnInit  {
   },
   ])
 
-  goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
-  isLoading = computed(() => this.goalResource.isLoading());
-  totalCount = computed(() => this.goalResource.value()?.totalCount)
-
   pageNumber = signal<number>(1);
-  pageSize = signal<number>(10);
+  pageSize = signal<number>(3);
+
+  goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
+  // isLoading = computed(() => this.goalResource.isLoading());
+  totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100)
+  isLoading = signal(false);
 
   searchTerm = signal<string>('');
   status = signal<GoalStatus | null>(null);
