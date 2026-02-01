@@ -70,7 +70,7 @@ export class GoalForm {
 
   onSubmit(event: Event) {
     event.preventDefault();
-
+    
     submit(this.goalForm, async () => {
       this.isLoading.set(true);
       this.save.emit(this.modelSignal());
