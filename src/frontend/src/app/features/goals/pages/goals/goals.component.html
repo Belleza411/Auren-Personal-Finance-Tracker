@@ -235,8 +235,10 @@
         }
     }
 </div>
-<app-pagination
-    [pageNumber]="pageNumber()"
-    [pageSize]="pageSize()"
-    [totalCount]="totalCount()"
-/>
+@if(isShowPagination()) {
+    <app-pagination
+        [pageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+    />
+}

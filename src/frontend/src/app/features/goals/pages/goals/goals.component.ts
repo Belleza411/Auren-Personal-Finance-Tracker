@@ -28,53 +28,52 @@ export class GoalsComponent implements OnInit  {
 
   dummyGoals = signal<Goal[]>([
     {
-    goalId: 'goal-001',
-    userId: 'user-123',
-    name: 'Buy a New Laptop',
-    description: 'Save money to buy a high-performance laptop for development and studies.',
-    spent: 450,
-    budget: 1500,
-    goalStatus: 2,
-    completionPercentage: 30,
-    timeRemaining: '3 months',
-    createdAt: 'January 5, 2025',
-    targetDate: 'April 30, 2025',
-  },
-  {
-    goalId: 'goal-002',
-    userId: 'user-123',
-    name: 'Emergency Savings Fund',
-    description: 'Build an emergency fund for unexpected expenses.',
-    spent: 1200,
-    budget: 3000,
-    goalStatus: 2,
-    completionPercentage: 40,
-    timeRemaining: '6 months',
-    createdAt: 'December 1, 2024',
-    targetDate: 'August 1, 2025',
-  },
-  {
-    goalId: 'goal-003',
-    userId: 'user-123',
-    name: 'Vacation Trip',
-    description: 'Save for a short holiday trip with friends.',
-    spent: null,
-    budget: 2000,
-    goalStatus: 4,
-    completionPercentage: null,
-    timeRemaining: '9 months',
-    createdAt: 'January 20, 2025',
-    targetDate: 'October 15, 2025',
-  },
+      goalId: 'goal-001',
+      userId: 'user-123',
+      name: 'Buy a New Laptop',
+      description: 'Save money to buy a high-performance laptop for development and studies.',
+      spent: 450,
+      budget: 1500,
+      goalStatus: 2,
+      completionPercentage: 30,
+      timeRemaining: '3 months',
+      createdAt: 'January 5, 2025',
+      targetDate: 'April 30, 2025',
+    },
+    {
+      goalId: 'goal-002',
+      userId: 'user-123',
+      name: 'Emergency Savings Fund',
+      description: 'Build an emergency fund for unexpected expenses.',
+      spent: 1200,
+      budget: 3000,
+      goalStatus: 2,
+      completionPercentage: 40,
+      timeRemaining: '6 months',
+      createdAt: 'December 1, 2024',
+      targetDate: 'August 1, 2025',
+    },
+    {
+      goalId: 'goal-003',
+      userId: 'user-123',
+      name: 'Vacation Trip',
+      description: 'Save for a short holiday trip with friends.',
+      spent: null,
+      budget: 2000,
+      goalStatus: 4,
+      completionPercentage: null,
+      timeRemaining: '9 months',
+      createdAt: 'January 20, 2025',
+      targetDate: 'October 15, 2025',
+    }
   ])
 
   pageNumber = signal<number>(1);
   pageSize = signal<number>(3);
 
   goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
-  // isLoading = computed(() => this.goalResource.isLoading());
+  isLoading = computed(() => this.goalResource.isLoading());
   totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100)
-  isLoading = signal(false);
 
   searchTerm = signal<string>('');
   status = signal<GoalStatus | null>(null);
@@ -324,6 +323,10 @@ export class GoalsComponent implements OnInit  {
       day: 'numeric', 
       year: 'numeric', 
     })
+  }
+
+  isShowPagination(): boolean {
+    return this.goals().length >= 3;
   }
 }
  
