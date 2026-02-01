@@ -1,0 +1,12 @@
+<h1 class="font-bold text-xl">Add Money</h1>
+<form (submit)="onSubmit($event)" class="flex flex-col gap-5">
+    <p class="flex flex-col">
+        <label for="amount">Amount</label>
+        <input 
+            type="number"
+            [formField]="modelForm"
+            class="gray-border py-3 pl-3"
+        >
+    </p>
+    <button class="bg-[#1c4532] text-white py-3 rounded-md" type="submit">Add Money</button>
+</form>

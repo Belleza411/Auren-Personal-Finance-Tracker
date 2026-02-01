@@ -15,5 +15,10 @@ export const mainRoutes: Routes = [
         path: 'categories',
         loadChildren: () => import('../../features/categories/routes/category-route')
             .then(m => m.categoryRoutes)
+    },
+    {
+        path: 'goals',
+        loadChildren: () => import('../../features/goals/routes/goal-route')
+            .then(m => m.goalRoutes)
     }
 ]

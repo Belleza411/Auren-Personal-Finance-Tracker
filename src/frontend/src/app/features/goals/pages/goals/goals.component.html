@@ -1,1 +1,244 @@
-<p>goals works!</p>
+<header class="flex items-center gap-1 mb-5">
+    <div class="flex flex-col">
+        <h2 class="mb-1 text-xl">All Goals</h2>
+        <p class="text-[#999] text-sm">It is the best time to manage your finances</p>
+    </div>
+    <div class="flex items-center justify-center gap-3 ml-auto">
+        <button 
+            class="flex items-center justify-center border-0 text-white bg-[#1c4532] text-sm py-1.5 px-4 rounded-md font-extralight cursor-pointer whitespace-nowrap"
+            (click)="onAddGoal()"
+        >
+            Add Goal
+            <span class="material-symbols-rounded text-xl ml-2">
+                add
+            </span>
+        </button>
+    </div>
+</header>
+<div class="w-full flex items-center gap-3 mb-3 b  ">
+    <div class="relative flex items-center">
+        <input 
+            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+            type="text" 
+            placeholder="Search goals..."
+            aria-label="Search goals"
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)"
+        >
+    </div>
+    <select
+        class="p-2 gray-border text-[0.8rem]"
+        aria-label="Filter by goal status"
+        [value]="status() ?? 0"
+        (change)="onChangeStatus($event)"
+    >    
+        @for(type of goalStatusOptions; track $index) {
+            <option [value]="$index">{{ type }}</option>
+        }
+    </select>
+    <div class="relative py-[0.3rem] pr-0.5 pl-3 rounded-lg gray-border">
+        <button class="header" (click)="toggleModal('budget')" aria-label="Filter by budget range">
+            <p class="mr-1.5 text-[0.8rem]">Budget</p>
+            @if(minBudget() === null || maxBudget() === null) {
+                <span class="material-symbols-rounded text-xl">
+                    keyboard_arrow_down
+                </span>
+            }
+            @if(minBudget() !== null && maxBudget() !== null) {
+                <div class="filter-label">
+                    ${{ minBudget() }} - ${{ maxBudget() }} 
+                </div>
+                <span 
+                    class="material-symbols-rounded ml-1.5" 
+                    role="button"
+                    (click)="clearBudgetFilter()">
+                    close
+                </span>
+            }
+        </button>
+        <div 
+            class="modal gray-border" 
+            [class.flex]="modals().budget" 
+            [class.hidden]="!modals().budget"
+            role="dialog"
+            aria-label="Budget filter options"
+            [attr.aria-hidden]="!modals().budget"
+        >
+            <div class="flex items-center gap-2">
+                <p>
+                    <label 
+                        for="min-budget"
+                        class="label"
+                    >
+                        Min Budget
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="number" 
+                        placeholder="Min budget"
+                        aria-label="Minimum budget"
+                        [value]="minBudget()"
+                        (input)="minBudget.set($event.target.valueAsNumber || null)">
+                </p>
+                <p>
+                    <label 
+                        for="max-budget"
+                        class="label"
+                    >
+                        Max Budget
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="number" 
+                        placeholder="Max budget"
+                        aria-label="Maximum budget"
+                        [value]="maxBudget()"
+                        (input)="maxBudget.set($event.target.valueAsNumber || null)">
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="relative py-1 px-2.5 rounded-lg gray-border">
+        <button 
+            class="header" 
+            (click)="toggleModal('targetDate')"
+            [attr.aria-expanded]="modals().targetDate"
+            aria-controls="date-modal"
+            aria-label="Filter by date range"
+        >
+            @if(targetFrom() === null || targetTo() === null) {
+                <span class="material-symbols-rounded mr-1">
+                    calendar_today
+                </span>
+            }
+            <p class="mr-1.5 text-[0.8rem]">Date</p>
+            @if(targetFrom() !== null && targetTo() !== null) {
+                <div class="filter-label">
+                    {{ targetFrom() }} - {{ targetTo() }}
+                </div>
+                <span 
+                    class="material-symbols-rounded ml-1.5" 
+                    role="button"
+                    (click)="clearTargetDateFilter()">
+                    close
+                </span>
+            }
+        </button>
+        <div 
+            class="modal gray-border" 
+            role="dialog"
+            aria-label="Date filter options"
+            [class.flex]="modals().targetDate"
+            [class.hidden]="!modals().targetDate"
+            [attr.aria-hidden]="!modals().targetDate"
+        >
+            <div class="flex items-center gap-2">
+                <p>
+                    <label
+                        for="target-from"
+                        class="label"
+                    >
+                        Target From
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="date" 
+                        placeholder="From"
+                        aria-label="Target from"
+                        [value]="targetFrom()"
+                        (input)="targetFrom.set(formatDate($event || null))">
+                </p>
+                <p>
+                    <label 
+                        for="target-to"
+                        class="label"
+                    >
+                        Target To
+                    </label>
+                    <input 
+                        class="input gray-border"
+                        type="date" 
+                        placeholder="To"
+                        aria-label="Target To"
+                        [value]="targetTo()"
+                        (input)="targetTo.set(formatDate($event || null))">
+                </p>
+            </div>
+        </div>
+    </div>
+    @if(hasActiveFilters()) {
+        <button 
+            type="button" 
+            (click)="clearFilter()" 
+            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
+        >
+            <span class="material-symbols-rounded mr-1.5 text-xl">
+                close
+            </span>
+            Clear Filters
+        </button>
+    }
+</div>
+<div class="flex flex-col w-full gap-3 mb-3">
+    @if(!isLoading()) {
+        @for(goal of goals(); track goal.goalId) {
+            <div class="gray-border w-full bg-white flex flex-col p-4.5 gap-2">
+                <div class="w-full flex items-center justify-between mb-1">
+                    <div class="w-12 h-12 rounded-xl bg-red-600"></div>
+                    <select
+                        class="gray-border py-2 pl-2 pr-10"
+                        aria-label="Change goal status"
+                        [value]="goal.goalStatus"
+                        (change)="onStatusChange(goal, $event)"
+                    >
+                        @for(type of goalStatusOptions; track $index) {
+                            @if($index !== 0) {
+                                <option [value]="$index" [selected]="$index === goal.goalStatus">{{ type }}</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <h1 class="font-medium text-[1.30rem]">{{ goal.name }}</h1>
+                <p class="text-sm text-gray-600">{{ goal.description }}</p>
+                <div class="flex items-center justify-between mt-5">
+                    <p class="font-medium">{{ goal.spent ?? 0 | currency }}</p>
+                    <p class="font-medium">of {{ goal.budget | currency }}</p>
+                </div>
+                <div class="flex h-2 w-full bg-green-50 rounded-sm">
+                    <div class="bg-green-400 rounded-l-sm" [style.width.%]="goal.completionPercentage"></div>
+                </div>
+                <div class="mb-8 flex items-center justify-between">
+                    <p>{{ goal.completionPercentage ?? 0 }}% completed</p>
+                    <p>{{ goal.targetDate }} &#183; {{ goal.timeRemaining }}</p>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <button 
+                        class="gray-border p-3 w-full cursor-pointer" 
+                        (click)="deleteGoal(goal.goalId)"
+                    >
+                        Delete Goal
+                    </button>
+                    <button 
+                        class="gray-border p-3 w-full cursor-pointer" 
+                        (click)="onEdit(goal.goalId)"
+                    >
+                        Update Goal
+                    </button>
+                    <button 
+                        class="w-full p-3 bg-[#1C4532] text-white rounded-md cursor-pointer"
+                        (click)="onAddMoney(goal.goalId)"
+                    >
+                        Add Money
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</div>
+@if(isShowPagination()) {
+    <app-pagination
+        [pageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+    />
+}
