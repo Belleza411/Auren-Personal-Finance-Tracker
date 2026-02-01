@@ -16,5 +16,10 @@ export const goalRoutes: Routes = [
         path: ':id/edit',
         component: GoalsComponent,
         data: { openEditModal: true }
+    },
+    {
+        path: ':id/add-money',
+        component: GoalsComponent,
+        data: { openAddMoneyModal: true }
     }
 ]
