@@ -17,7 +17,7 @@ interface NewGoal {
     description: string;
     spent: number;
     budget: number;
-    status: GoalStatus;
+    status: GoalStatus | null;
     targetDate: Date | string;
 }
 
