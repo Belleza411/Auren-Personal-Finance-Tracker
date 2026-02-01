@@ -1,5 +1,5 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
-import { Goal, NewGoal } from '../../models/goals.model';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { NewGoal } from '../../models/goals.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 
 @Component({
@@ -7,6 +7,7 @@ import { FieldState, form, FormField, required, submit, validate } from '@angula
   imports: [FormField],
   templateUrl: './goal-form.html',
   styleUrl: './goal-form.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GoalForm {
   isEdit = input(false);
@@ -15,6 +16,8 @@ export class GoalForm {
   cancel = output<void>();
 
   isLoading = signal(false);
+
+  goalStatusOptions: string[] = ["Completed", "On Track", "On Hold", "Not Started", "Behind Schedule", "Cancelled"];
 
   private greaterThanZero = (fieldName: string) => ({ value }: { value: () => number }) => {
     if (value() <= 0) {
@@ -47,6 +50,7 @@ export class GoalForm {
     required(schema.description, { message: "Description is required" });
     required(schema.budget, { message: "Budget is required" });
     required(schema.targetDate, { message: "Target date is required" });
+    required(schema.status, { message: "Status is required "});
 
     validate(schema.spent, this.greaterThanZero('Spent'));
     validate(schema.budget, this.greaterThanZero('Budget'));
@@ -55,8 +59,13 @@ export class GoalForm {
 
   constructor() {
     effect(() => {
-      this.modelSignal.set(this.model());
-    })
+      const model = this.model();
+
+      this.modelSignal.set({
+        ...model,
+        status: this.isEdit() ? model.status : null
+      });
+    });
   }
 
   onSubmit(event: Event) {

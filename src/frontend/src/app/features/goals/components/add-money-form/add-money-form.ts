@@ -1,5 +1,5 @@
 import { DialogRef } from '@angular/cdk/dialog';
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { form, required, submit, validate, FormField } from '@angular/forms/signals';
 
 @Component({
@@ -7,6 +7,7 @@ import { form, required, submit, validate, FormField } from '@angular/forms/sign
   imports: [FormField],
   templateUrl: './add-money-form.html',
   styleUrl: './add-money-form.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddMoneyForm {
   isLoading = signal(false);

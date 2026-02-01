@@ -1,5 +1,5 @@
 import { DialogRef } from '@angular/cdk/dialog';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Goal, NewGoal } from '../../models/goals.model';
 import { GoalForm } from "../goal-form/goal-form";
@@ -9,6 +9,7 @@ import { GoalForm } from "../goal-form/goal-form";
   imports: [GoalForm],
   templateUrl: './edit-goal.html',
   styleUrl: './edit-goal.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditGoal implements OnInit {
   protected readonly data: Goal = inject(MAT_DIALOG_DATA);

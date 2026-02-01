@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
 import { GoalService } from "../../services/goal.service";
 import { Goal, GoalFilter, GoalsSummary, GoalStatus, NewGoal } from "../../models/goals.model";
 import { filter, finalize, firstValueFrom, forkJoin, switchMap, tap } from "rxjs";
@@ -16,6 +16,7 @@ import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
   imports: [CurrencyPipe],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GoalsComponent implements OnInit  {
   private goalSer = inject(GoalService);
