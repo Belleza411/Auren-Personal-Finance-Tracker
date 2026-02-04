@@ -1,0 +1,9 @@
+@reference 'tailwindcss';
+
+:host {
+    @apply flex;
+}
+
+.profile-image {
+    @apply rounded-full size-9 flex items-center justify-center text-sm text-white;
+}

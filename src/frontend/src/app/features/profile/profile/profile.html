@@ -1,0 +1,18 @@
+@if(user()?.profilePictureUrl) {
+    <img 
+        [src]="user()?.profilePictureUrl" 
+        class="profile-image" 
+        [alt]="fullName()"
+        aria-hidden="true">
+} @else {
+    <div
+        class="profile-image"
+        [style.backgroundColor]="bgColor()"
+    >
+        {{ initials() }}
+    </div>
+}
+<div class="flex flex-col justify-center ml-3">
+    <p class="text-white text-sm">{{ fullName() }}</p>
+    <p class="text-white text-xs">{{ email() }}</p>
+</div>

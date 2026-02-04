@@ -4,8 +4,8 @@ interface User {
     firstName: string;
     lastName: string;
     profilePictureUrl: string | null;
-    createdAt: Date;
-    lastLoginAt: Date | null;
+    createdAt: Date | string;
+    lastLoginAt: Date | string;
 }
 
 interface RefreshToken {

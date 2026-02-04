@@ -3,10 +3,11 @@ import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from '../../../features/auth/service/auth-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SIDEBAR_MENU } from './sidebar-menu';
+import { ProfileComponent } from "../../../features/profile/profile/profile";
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, ProfileComponent],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
   changeDetection: ChangeDetectionStrategy.OnPush
