@@ -10,7 +10,7 @@
                 attach_money
             </span>
         </div>
-        <p class="amount">{{ totalBalance().amount }}</p>
+        <p class="amount" [countUp]="totalBalance().amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
@@ -28,7 +28,7 @@
                 trending_up
             </span>
         </div>
-        <p class="amount">{{ income().amount }}</p>
+        <p class="amount" [countUp]="income().amount" [countUpOptions]="options">0<p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
@@ -46,7 +46,7 @@
                 trending_down
             </span>
         </div>
-        <p class="amount">{{ expense().amount }}</p>
+        <p class="amount" [countUp]="expense().amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
@@ -64,7 +64,7 @@
                 attach_money
             </span>
         </div>
-        <p class="amount">{{ avgDailySpending() }}</p>
+        <p class="amount" [countUp]="avgDailySpending()" [countUpOptions]="options">0</p>
    </app-summary-card>
 </div>
 <div class="grid gap-4 grid-cols-3 grid-rows-1">

@@ -5,10 +5,12 @@ import { firstValueFrom } from 'rxjs';
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { RouterLink } from "@angular/router";
 import { GoalService } from '../../../goals/services/goal.service';
+import { CountUpDirective } from 'ngx-countup';
+
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, RouterLink],
+  imports: [SummaryCard, RouterLink, CountUpDirective],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -25,6 +27,13 @@ export class DashboardComponent {
   currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? [])
   expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
   isLoading = computed(() => this.dashboardResources.isLoading());
+
+  options = {
+    duration: 1.2,
+    separator: ',',
+    prefix: '$',
+    decimalPlaces: 2
+  };
 
   dashboardResources = resource({
     loader: async () => {
