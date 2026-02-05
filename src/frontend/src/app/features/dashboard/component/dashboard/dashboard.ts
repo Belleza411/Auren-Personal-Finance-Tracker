@@ -1,12 +1,10 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, resource } from '@angular/core';
 import { DashboardService } from '../../services/dashboard-service';
 import { TransactionService } from '../../../transactions/services/transaction.service';
-import { DashboardSummary, ExpenseCategoryChart } from '../../models/dashboard.model';
-import { Transaction } from '../../../transactions/models/transaction.model';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
 import { RouterLink } from "@angular/router";
+import { GoalService } from '../../../goals/services/goal.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,44 +12,43 @@ import { RouterLink } from "@angular/router";
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   private dashboardSer = inject(DashboardService);
   private transactionSer = inject(TransactionService);
-  private destroyRef = inject(DestroyRef);
+  private goalSer = inject(GoalService);
 
-  error = signal<string | null>(null);
-  isLoading = signal(false);
-  dashboardSummaries = signal<DashboardSummary | null>(null);
-  expenseCategoriesChart = signal<ExpenseCategoryChart[] | null>(null);
-  recentTransactions = signal<Transaction[]>([]);
+  totalBalance = computed(() => this.dashboardResources.value()?.totalBalance.totalBalance ?? { amount: 2500, percentageChange: 20 });
+  income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 2000, percentageChange: 10 });
+  expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 500, percentageChange: 2 });
+  avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
+  recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? []);
+  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? [])
+  expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
+  isLoading = computed(() => this.dashboardResources.isLoading());
 
-  ngOnInit(): void {
-    this.loadData();
-  }
+  dashboardResources = resource({
+    loader: async () => {
+      const [
+        totalBalance, 
+        avgDailySpending,
+        recentTransactions,
+        expenseCategoriesChart,
+        recentGoals
+      ] = await Promise.all([
+        firstValueFrom(this.dashboardSer.getDashboardSummary()),
+        firstValueFrom(this.transactionSer.getAvgDailySpending()),
+        firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
+        firstValueFrom(this.dashboardSer.getExpenseCategoryChart()),
+        firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))
+      ])
 
-  private loadData() {
-    this.isLoading.set(true);
-    this.error.set(null);
-
-    forkJoin({
-      dashboardSummaries: this.dashboardSer.getDashboardSummary(),
-      expenseCategoriesChart: this.dashboardSer.getExpenseCategoryChart(),
-      transactions: this.transactionSer.getAllTransactions()
-    })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isLoading.set(false))
-      )
-      .subscribe({
-        next: ({  dashboardSummaries, expenseCategoriesChart, transactions }) => {
-          this.dashboardSummaries.set(dashboardSummaries),
-          this.expenseCategoriesChart.set(expenseCategoriesChart),
-          this.recentTransactions.set(transactions.items)
-        },
-        error: err => {
-          console.error("Failed to load data: ", err);
-          this.error.set("Failed to load data. Please try again.")
-        }
-      })
-  }
+      return {
+        totalBalance,
+        avgDailySpending,
+        recentTransactions,
+        expenseCategoriesChart,
+        recentGoals
+      }
+    }
+  })
 }
