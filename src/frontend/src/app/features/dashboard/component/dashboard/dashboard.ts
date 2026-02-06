@@ -1,4 +1,4 @@
-import { Component, computed, inject, resource } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, resource } from '@angular/core';
 import { DashboardService } from '../../services/dashboard-service';
 import { TransactionService } from '../../../transactions/services/transaction.service';
 import { firstValueFrom } from 'rxjs';
@@ -7,12 +7,12 @@ import { RouterLink } from "@angular/router";
 import { GoalService } from '../../../goals/services/goal.service';
 import { CountUpDirective } from 'ngx-countup';
 
-
 @Component({
   selector: 'app-dashboard',
   imports: [SummaryCard, RouterLink, CountUpDirective],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
   private dashboardSer = inject(DashboardService);
