@@ -15,12 +15,10 @@ namespace Auren.Application.Specifications.Categories
 	{
 		private readonly Guid _userId;
 		private readonly CategoriesFilter _filter;
-        private readonly IEnumerable<Guid> _categoryIds;
-        public CategoryFilterSpecification(Guid userId, CategoriesFilter filter, IEnumerable<Guid> categoryIds)
+        public CategoryFilterSpecification(Guid userId, CategoriesFilter filter)
 		{
 			_userId = userId;
 			_filter = filter ?? new CategoriesFilter();
-            _categoryIds = categoryIds;
         }
         public override Expression<Func<Category, bool>> ToExpression()
 		{
@@ -48,11 +46,6 @@ namespace Auren.Application.Specifications.Categories
             if (_filter.TransactionType.HasValue)
             {
 				spec = spec.And(new TransactionTypeFilterSpecification<Category>(_filter.TransactionType.Value));
-            }
-            
-			if(_filter.Categories?.Any() == true)
-			{
-				spec = spec.And(new CategoriesFilterSpec(_categoryIds));
             }
 
             if (!string.IsNullOrEmpty(_filter.SearchTerm))

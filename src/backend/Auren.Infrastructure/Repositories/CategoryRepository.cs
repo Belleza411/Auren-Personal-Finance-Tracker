@@ -35,14 +35,7 @@ namespace Auren.Infrastructure.Repositories
 		{
             var skip = (pageNumber - 1) * pageSize;
 
-            IEnumerable<Guid> categoryIds = [];
-
-            if (filter.Categories?.Any() == true)
-            {
-                categoryIds = await GetIdsByNamesAsync(userId, filter.Categories, cancellationToken);
-            }
-
-            var spec = new CategoryFilterSpecification(userId, filter, categoryIds);
+            var spec = new CategoryFilterSpecification(userId, filter);
             var query = _dbContext.Categories
                 .Where(spec.ToExpression());
 
