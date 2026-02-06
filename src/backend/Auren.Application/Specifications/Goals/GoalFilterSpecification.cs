@@ -41,8 +41,6 @@ namespace Auren.Application.Specifications.Goals
 				   filter.GoalStatus.HasValue ||
 				   filter.MinBudget > 0 ||
 				   filter.MaxBudget > 0 ||
-				   filter.MinCompletionPercentage.HasValue ||
-				   filter.MaxCompletionPercentage.HasValue ||
 				   filter.TargetFrom.HasValue ||
 				   filter.TargetTo.HasValue;
         }
@@ -58,11 +56,6 @@ namespace Auren.Application.Specifications.Goals
 			{
 				spec = spec.And(new GoalBudgetRangeSpecification(_goalFilter.MinBudget.Value, _goalFilter.MaxBudget.Value));
             }
-
-			if(_goalFilter.MinCompletionPercentage.HasValue && _goalFilter.MaxCompletionPercentage.HasValue)
-			{
-				spec = spec.And(new GoalCompletionPercentageRangeSpecification(_goalFilter.MinCompletionPercentage.Value, _goalFilter.MaxCompletionPercentage.Value));
-			}
 
 			if(_goalFilter.TargetFrom.HasValue && _goalFilter.TargetTo.HasValue)
 			{

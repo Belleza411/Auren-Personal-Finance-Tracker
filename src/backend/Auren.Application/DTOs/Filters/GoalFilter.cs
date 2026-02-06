@@ -8,8 +8,6 @@ namespace Auren.Application.DTOs.Filters
         public GoalStatus? GoalStatus { get; set; }
 		public decimal? MinBudget { get; set; }
 		public decimal? MaxBudget { get; set; }
-        public int? MinCompletionPercentage { get; set; }
-        public int? MaxCompletionPercentage { get; set; }
         public DateTime? TargetFrom { get; set; }
         public DateTime? TargetTo { get; set; }
 
