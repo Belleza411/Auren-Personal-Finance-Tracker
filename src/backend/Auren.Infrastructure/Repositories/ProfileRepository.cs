@@ -51,7 +51,6 @@ namespace Auren.Infrastructure.Repositories
 		private static UserResponse MapToUserResponse(ApplicationUser user)
 		{
 			return new UserResponse(
-				user.UserId,
 				user.Email!,
 				user.FirstName,
 				user.LastName,
