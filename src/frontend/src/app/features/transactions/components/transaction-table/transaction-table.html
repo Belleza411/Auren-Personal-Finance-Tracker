@@ -208,15 +208,8 @@
     <table class="w-full border-collapse">
         <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
             <tr>
-                <th>Date Created</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Transaction Date</th>
-                <th>Payment Method</th>
-                @if(showActions()) {
-                    <th>&nbsp;</th>
+                @for(column of columns(); track column.key) {
+                    <th>{{ column.label }}</th>
                 }
             </tr>
         </thead>
@@ -224,79 +217,89 @@
             @if(isLoading()) {
                 @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
                     <tr class="border-b border-solid border-[#cacaca] animate-pulse">
-                        @for(i of [1,2,3,4,5,6,7,8]; track i) {
-                            <td>
-                                <div class="skeleton"></div>
-                            </td>
+                        @for(column of columns(); track column.key) {
+                            <td><div class="skeleton"></div></td>
                         }
+
                     </tr>
                 }
             } @else {
                 @for(t of transactions(); track t.transactionId) {
                     <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
-                        <td>
-                            <p class="text-[0.8rem]">{{ t.createdAt }}</p>
-                        </td>
-                        <td>
-                            <p class="text-[0.8rem]">{{ t.name }}</p>
-                        </td>
-                        <td>
-                            <p class="text-[0.8rem]">{{ t.category.name }}</p>
-                        </td>
-                        <td>
-                            <p 
-                                class="inline-flex items-center px-2 py-1 rounded-full font-medium text-xs"
-                                [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
-                            >
-                                {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
-                            </p>
-                        </td>      
-                        <td>
-                            <p 
-                                class="text-[0.8rem]" 
-                                [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'"
-                            >
-                                {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
-                            </p>
-                        </td>     
-                        <td>
-                            <p class="text-[0.8rem]">{{ t.transactionDate }}</p>
-                        </td>
-                        <td>
-                            <p class="text-[0.8rem]">{{ PaymentTypeMap[t.paymentType] }}</p>
-                        </td>
-                        @if(showActions()) {
+                        @for(column of columns(); track column.key) {
                             <td>
-                                <div 
-                                    role="button" 
-                                    class="relative flex items-center cursor-pointer"
-                                    (click)="toggleModalId(t.transactionId)"
-                                >
-                                    <span class="material-symbols-rounded">
-                                        more_horiz
-                                    </span>
-                                </div>
+                                @switch (column.key) {
+                                    @case ('transactionDate') {
+                                        <p class="text-[0.8rem]">{{ t.transactionDate }}</p>
+                                    }
 
-                                @if(openModalId() === t.transactionId) {
-                                    <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
-                                        <button 
-                                            class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
-                                            (click)="onEdit(t.transactionId)"
+                                    @case ('dateCreated') {
+                                        <p class="text-[0.8rem]">{{ t.createdAt }}</p>
+                                    }
+
+                                    @case ('title') {
+                                        <p class="text-[0.8rem]">{{ t.name }}</p>
+                                    }
+
+                                    @case ('category') {
+                                        <p class="text-[0.8rem]">{{ t.category.name }}</p>
+                                    }
+
+                                    @case ('type') {
+                                        <p 
+                                            class="inline-flex items-center px-2 py-1 rounded-full font-medium text-xs"
+                                            [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
                                         >
-                                            <span class="material-symbols-rounded text-sm">edit</span>
-                                            Edit
-                                        </button>
-                                        <button 
-                                            class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
-                                            (click)="onDelete(t.transactionId)"
+                                            {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
+                                        </p>
+                                    }
+
+                                    @case ('amount') {
+                                        <p 
+                                            class="text-[0.8rem]" 
+                                            [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'"
                                         >
-                                            <span class="material-symbols-rounded">delete</span>
-                                            Delete
-                                        </button>
-                                    </div>
+                                            {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
+                                        </p>
+                                    }
+
+                                    @case ('paymentMethod') {
+                                        <p class="text-[0.8rem]">{{ PaymentTypeMap[t.paymentType] }}</p>
+                                    }
+
+                                    @case ('actions') {
+                                        <div 
+                                            role="button" 
+                                            class="relative flex items-center cursor-pointer"
+                                            (click)="toggleModalId(t.transactionId)"
+                                        >
+                                            <span class="material-symbols-rounded">
+                                                more_horiz
+                                            </span>
+                                        </div>
+
+                                        @if(openModalId() === t.transactionId) {
+                                            <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
+                                                <button 
+                                                    class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
+                                                    (click)="onEdit(t.transactionId)"
+                                                >
+                                                    <span class="material-symbols-rounded text-sm">edit</span>
+                                                    Edit
+                                                </button>
+                                                <button 
+                                                    class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                                                    (click)="onDelete(t.transactionId)"
+                                                >
+                                                    <span class="material-symbols-rounded">delete</span>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        }
+                                    }
                                 }
-                             </td>
-                        }
+                            </td>
+                        } 
                     </tr>
                 }
             }
