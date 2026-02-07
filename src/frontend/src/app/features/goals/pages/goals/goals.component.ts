@@ -72,7 +72,8 @@ export class GoalsComponent implements OnInit  {
   pageSize = signal<number>(3);
 
   goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
-  isLoading = computed(() => this.goalResource.isLoading());
+  // isLoading = computed(() => this.goalResource.isLoading());
+  isLoading = signal(false);
   totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100)
 
   searchTerm = signal<string>('');
