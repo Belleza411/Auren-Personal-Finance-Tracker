@@ -32,10 +32,6 @@ export class TransactionTable {
       : FULL_TRANSACTION_COLUMNS
   );
 
-  hasActions = computed(() => 
-    this.columns().some(c => c.key == 'actions')
-  );
-
   showFilters = computed(() => this.variant() === 'full');
   showPagination = computed(() => this.variant() === 'full');
 

@@ -18,7 +18,7 @@ export interface TransactionColumn {
 export const COMPACT_TRANSACTION_COLUMNS: TransactionColumn[] = [
   {
     key: 'transactionDate',
-    label: 'Date',
+    label: 'Transaction Date',
   },
   {
     key: 'title',
