@@ -1,7 +1,11 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex flex-col bg-white border border-solid border-[#e5e5e5] rounded-xl pt-6 pb-3 px-4 gap-4
+    @apply flex flex-col bg-white border border-solid border-[#e5e5e5] rounded-md pt-6 pb-3 px-4 gap-4
+}
+
+:host(.compact) {
+    @apply border-0 p-0 bg-transparent rounded-none;
 }
 
 .header {
@@ -30,10 +34,6 @@ th {
 
 td {
     @apply py-2 px-4;
-}
-
-td  p {
-    @apply text-[0.8rem];
 }
 
 .skeleton {

@@ -12,14 +12,22 @@ import { PaginationComponent } from "../../../../shared/components/pagination/pa
   imports: [CurrencyPipe, PaginationComponent],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.compact]': "variant() === 'compact'"
+  }
 })
 export class TransactionTable {
   private destroyRef = inject(DestroyRef);
 
   transactions = input.required<Transaction[]>();
-  categories = input.required<Category[]>();
-  isLoading = input.required<boolean>();
+  categories = input<Category[]>();
+  isLoading = input<boolean>();
+  variant = input<'full' | 'compact'>('full');
+
+  showFilters = computed(() => this.variant() === 'full');
+  showActions = computed(() => this.variant() === 'full');
+  showPagination = computed(() => this.variant() === 'full');
 
   searchTerm = signal<string>('');
   selectedType = signal<TransactionType | null>(null);
@@ -35,7 +43,7 @@ export class TransactionTable {
 
   pageNumber = signal(1);
   pageSize = signal(10);
-  totalCount = input.required<number>();
+  totalCount = input<number>();
 
   transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
   paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];

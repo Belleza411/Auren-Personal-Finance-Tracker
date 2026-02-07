@@ -1,207 +1,209 @@
-<div class="w-full flex items-center gap-3">
-    <div class="relative flex items-center">
-        <input 
-            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
-            type="text" 
-            placeholder="Search transactions..."
-            aria-label="Search transactions"
-            [value]="searchTerm()"
-            (input)="searchTerm.set($any($event.target).value)"
-        >
-    </div>
-    <select 
-        class="p-2 gray-border text-[0.8rem]" 
-        aria-label="Filter by transaction type"
-        [value]="selectedType() ?? 0"
-        (change)="onChangeType($event)"
-    >
-        @for(type of transactionTypeOptions; track $index) {
-            <option [value]="$index">{{ type }}</option>
-        }
-    </select>
-    <div class="relative py-1 pl-3 pr-1 gray-border">
-        <button 
-            class="header" 
-            aria-label="Filter by categories"
-            (click)="toggleModal('category')"
-        >
-            <p class="mr-1.5 text-[0.8rem]">Categories</p>
-            <span class="material-symbols-rounded">
-                keyboard_arrow_down
-            </span>
-        </button>
-        <div 
-            class="modal gray-border" 
-            [class.flex]="modals().category"
-            [class.hidden]="!modals().category"
-        >
-            @for (c of categories(); track c.categoryId) {
-                <label class="flex items-center">
-                    <input
-                        class="mr-2"
-                        type="checkbox"
-                        [value]="c.name"
-                        [checked]="selectedCategories().includes(c.name)"
-                        (change)="onCategoryToggle(c.name, $event.target.checked)"
-                    />
-                    {{ c.name }}
-                </label>
-            }
+@if(showFilters()) {
+    <div class="w-full flex items-center gap-3">
+        <div class="relative flex items-center">
+            <input 
+                class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+                type="text" 
+                placeholder="Search transactions..."
+                aria-label="Search transactions"
+                [value]="searchTerm()"
+                (input)="searchTerm.set($any($event.target).value)"
+            >
         </div>
-    </div>
-    <select 
-        class="p-[0.46rem] gray-border text-[0.8rem]" 
-        aria-label="Filter by payment method"
-        [value]="selectedPaymentType() ?? 0"
-        (change)="onChangePaymentType($event)"
-    >
-        @for(type of paymentTypeOptions; track $index) {
-            <option [value]="$index">{{ type }}</option>
-        }
-    </select>
-    <div class="relative py-1 pr-0.5 pl-3 rounded-lg gray-border">
-        <button class="header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
-            <p class="mr-1.5 text-[0.8rem]">Amount</p>
-            @if(minAmount() === null || maxAmount() === null) {
-                <span class="material-symbols-rounded text-xl">
+        <select 
+            class="p-2 gray-border text-[0.8rem]" 
+            aria-label="Filter by transaction type"
+            [value]="selectedType() ?? 0"
+            (change)="onChangeType($event)"
+        >
+            @for(type of transactionTypeOptions; track $index) {
+                <option [value]="$index">{{ type }}</option>
+            }
+        </select>
+        <div class="relative py-1 pl-3 pr-1 gray-border">
+            <button 
+                class="header" 
+                aria-label="Filter by categories"
+                (click)="toggleModal('category')"
+            >
+                <p class="mr-1.5 text-[0.8rem]">Categories</p>
+                <span class="material-symbols-rounded">
                     keyboard_arrow_down
                 </span>
-            }
-            @if(minAmount() !== null && maxAmount() !== null) {
-                <div class="filter-label">
-                    ${{ minAmount() }} - ${{ maxAmount() }} 
-                </div>
-                <span 
-                    class="material-symbols-rounded ml-1.5" 
-                    role="button"
-                    (click)="clearAmountFilter()">
-                    close
-                </span>
-            }
-        </button>
-        <div 
-            class="modal gray-border" 
-            [class.flex]="modals().amount" 
-            [class.hidden]="!modals().amount"
-            role="dialog"
-            aria-label="Amount filter options"
-            [attr.aria-hidden]="!modals().amount"]
-        >
-            <div class="flex items-center gap-2">
-                <p>
-                    <label 
-                        for="min-amount"
-                        class="label"
-                    >
-                        Min Amount
+            </button>
+            <div 
+                class="modal gray-border" 
+                [class.flex]="modals().category"
+                [class.hidden]="!modals().category"
+            >
+                @for (c of categories(); track c.categoryId) {
+                    <label class="flex items-center">
+                        <input
+                            class="mr-2"
+                            type="checkbox"
+                            [value]="c.name"
+                            [checked]="selectedCategories().includes(c.name)"
+                            (change)="onCategoryToggle(c.name, $event.target.checked)"
+                        />
+                        {{ c.name }}
                     </label>
-                    <input 
-                        class="input gray-border"
-                        type="number" 
-                        placeholder="Min Amount"
-                        aria-label="Minimum amount"
-                        [value]="minAmount()"
-                        (input)="minAmount.set($event.target.valueAsNumber || null)">
-                </p>
-                <p>
-                    <label 
-                        for="max-amount"
-                        class="label"
-                    >
-                        Max Amount
-                    </label>
-                    <input 
-                        class="input gray-border"
-                        type="number" 
-                        placeholder="Max Amount"
-                        aria-label="Maximum amount"
-                        [value]="maxAmount()"
-                        (input)="maxAmount.set($event.target.valueAsNumber || null)">
-                </p>
+                }
             </div>
         </div>
-    </div>
-    <div class="relative py-1 px-2.5 rounded-lg gray-border">
-        <button 
-            class="header" 
-            (click)="toggleModal('date')"
-            [attr.aria-expanded]="modals().date"
-            aria-controls="date-modal"
-            aria-label="Filter by date range"
+        <select 
+            class="p-[0.46rem] gray-border text-[0.8rem]" 
+            aria-label="Filter by payment method"
+            [value]="selectedPaymentType() ?? 0"
+            (change)="onChangePaymentType($event)"
         >
-            @if(startDate() === null || endDate() === null) {
-                <span class="material-symbols-rounded mr-1">
-                    calendar_today
-                </span>
+            @for(type of paymentTypeOptions; track $index) {
+                <option [value]="$index">{{ type }}</option>
             }
-            <p class="mr-1.5 text-[0.8rem]">Date</p>
-            @if(startDate() !== null && endDate() !== null) {
-                <div class="filter-label">
-                    {{ startDate() }} - {{ endDate() }}
+        </select>
+        <div class="relative py-1 pr-0.5 pl-3 rounded-lg gray-border">
+            <button class="header" (click)="toggleModal('amount')" aria-label="Filter by amount range">
+                <p class="mr-1.5 text-[0.8rem]">Amount</p>
+                @if(minAmount() === null || maxAmount() === null) {
+                    <span class="material-symbols-rounded text-xl">
+                        keyboard_arrow_down
+                    </span>
+                }
+                @if(minAmount() !== null && maxAmount() !== null) {
+                    <div class="filter-label">
+                        ${{ minAmount() }} - ${{ maxAmount() }} 
+                    </div>
+                    <span 
+                        class="material-symbols-rounded ml-1.5" 
+                        role="button"
+                        (click)="clearAmountFilter()">
+                        close
+                    </span>
+                }
+            </button>
+            <div 
+                class="modal gray-border" 
+                [class.flex]="modals().amount" 
+                [class.hidden]="!modals().amount"
+                role="dialog"
+                aria-label="Amount filter options"
+                [attr.aria-hidden]="!modals().amount"]
+            >
+                <div class="flex items-center gap-2">
+                    <p>
+                        <label 
+                            for="min-amount"
+                            class="label"
+                        >
+                            Min Amount
+                        </label>
+                        <input 
+                            class="input gray-border"
+                            type="number" 
+                            placeholder="Min Amount"
+                            aria-label="Minimum amount"
+                            [value]="minAmount()"
+                            (input)="minAmount.set($event.target.valueAsNumber || null)">
+                    </p>
+                    <p>
+                        <label 
+                            for="max-amount"
+                            class="label"
+                        >
+                            Max Amount
+                        </label>
+                        <input 
+                            class="input gray-border"
+                            type="number" 
+                            placeholder="Max Amount"
+                            aria-label="Maximum amount"
+                            [value]="maxAmount()"
+                            (input)="maxAmount.set($event.target.valueAsNumber || null)">
+                    </p>
                 </div>
-                <span 
-                    class="material-symbols-rounded ml-1.5" 
-                    role="button"
-                    (click)="clearDateFilter()">
-                    close
-                </span>
-            }
-        </button>
-        <div 
-            class="modal gray-border" 
-            role="dialog"
-            aria-label="Date filter options"
-            [class.flex]="modals().date"
-            [class.hidden]="!modals().date"
-            [attr.aria-hidden]="!modals().date"
-        >
-            <div class="flex items-center gap-2">
-                <p>
-                    <label
-                        for="start-date"
-                        class="label"
-                    >
-                        Start Date
-                    </label>
-                    <input 
-                        class="input gray-border"
-                        type="date" 
-                        placeholder="From"
-                        aria-label="Start date"
-                        [value]="startDate()"
-                        (input)="startDate.set(formatDate($event || null))">
-                </p>
-                <p>
-                    <label 
-                        for="end-date"
-                        class="label"
-                    >
-                        End Date
-                    </label>
-                    <input 
-                        class="input gray-border"
-                        type="date" 
-                        placeholder="To"
-                        aria-label="End date"
-                        [value]="endDate()"
-                        (input)="endDate.set(formatDate($event || null))">
-                </p>
             </div>
         </div>
+        <div class="relative py-1 px-2.5 rounded-lg gray-border">
+            <button 
+                class="header" 
+                (click)="toggleModal('date')"
+                [attr.aria-expanded]="modals().date"
+                aria-controls="date-modal"
+                aria-label="Filter by date range"
+            >
+                @if(startDate() === null || endDate() === null) {
+                    <span class="material-symbols-rounded mr-1">
+                        calendar_today
+                    </span>
+                }
+                <p class="mr-1.5 text-[0.8rem]">Date</p>
+                @if(startDate() !== null && endDate() !== null) {
+                    <div class="filter-label">
+                        {{ startDate() }} - {{ endDate() }}
+                    </div>
+                    <span 
+                        class="material-symbols-rounded ml-1.5" 
+                        role="button"
+                        (click)="clearDateFilter()">
+                        close
+                    </span>
+                }
+            </button>
+            <div 
+                class="modal gray-border" 
+                role="dialog"
+                aria-label="Date filter options"
+                [class.flex]="modals().date"
+                [class.hidden]="!modals().date"
+                [attr.aria-hidden]="!modals().date"
+            >
+                <div class="flex items-center gap-2">
+                    <p>
+                        <label
+                            for="start-date"
+                            class="label"
+                        >
+                            Start Date
+                        </label>
+                        <input 
+                            class="input gray-border"
+                            type="date" 
+                            placeholder="From"
+                            aria-label="Start date"
+                            [value]="startDate()"
+                            (input)="startDate.set(formatDate($event || null))">
+                    </p>
+                    <p>
+                        <label 
+                            for="end-date"
+                            class="label"
+                        >
+                            End Date
+                        </label>
+                        <input 
+                            class="input gray-border"
+                            type="date" 
+                            placeholder="To"
+                            aria-label="End date"
+                            [value]="endDate()"
+                            (input)="endDate.set(formatDate($event || null))">
+                    </p>
+                </div>
+            </div>
+        </div>
+        @if(hasActiveFilters()) {
+            <button 
+                type="button" 
+                (click)="clearFilter()" 
+                class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
+            >
+                <span class="material-symbols-rounded mr-1.5 text-xl">
+                    close
+                </span>
+                Clear Filters
+            </button>
+        }
     </div>
-    @if(hasActiveFilters()) {
-        <button 
-            type="button" 
-            (click)="clearFilter()" 
-            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
-        >
-            <span class="material-symbols-rounded mr-1.5 text-xl">
-                close
-            </span>
-            Clear Filters
-        </button>
-    }
-</div>
+}
 <div class="gray-border overflow-hidden">
     <table class="w-full border-collapse">
         <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
@@ -213,7 +215,9 @@
                 <th>Amount</th>
                 <th>Transaction Date</th>
                 <th>Payment Method</th>
-                <th>&nbsp;</th>
+                @if(showActions()) {
+                    <th>&nbsp;</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -231,74 +235,79 @@
                 @for(t of transactions(); track t.transactionId) {
                     <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
                         <td>
-                            <p>{{ t.createdAt }}</p>
+                            <p class="text-[0.8rem]">{{ t.createdAt }}</p>
                         </td>
                         <td>
-                            <p>{{ t.name }}</p>
+                            <p class="text-[0.8rem]">{{ t.name }}</p>
                         </td>
                         <td>
-                            <p>{{ t.category.name }}</p>
+                            <p class="text-[0.8rem]">{{ t.category.name }}</p>
                         </td>
                         <td>
                             <p 
-                                class="inline-flex items-center px-2 py-1 rounded-full font-medium"
+                                class="inline-flex items-center px-2 py-1 rounded-full font-medium text-xs"
                                 [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
                             >
                                 {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
                             </p>
                         </td>      
                         <td>
-                            <p [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'">
+                            <p 
+                                class="text-[0.8rem]" 
+                                [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'"
+                            >
                                 {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
                             </p>
                         </td>     
                         <td>
-                            <p>{{ t.transactionDate }}</p>
+                            <p class="text-[0.8rem]">{{ t.transactionDate }}</p>
                         </td>
                         <td>
-                            <p>{{ PaymentTypeMap[t.paymentType] }}</p>
+                            <p class="text-[0.8rem]">{{ PaymentTypeMap[t.paymentType] }}</p>
                         </td>
-                        <td>
-                            <div 
-                                role="button" 
-                                class="relative flex items-center cursor-pointer"
-                                (click)="toggleModalId(t.transactionId)"
-                            >
-                                <span class="material-symbols-rounded">
-                                    more_horiz
-                                </span>
-                            </div>
-
-                            @if(openModalId() === t.transactionId) {
-                                <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
-                                    <button 
-                                        class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
-                                        (click)="onEdit(t.transactionId)"
-                                    >
-                                        <span class="material-symbols-rounded text-sm">edit</span>
-                                        Edit
-                                    </button>
-                                    <button 
-                                        class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
-                                        (click)="onDelete(t.transactionId)"
-                                    >
-                                        <span class="material-symbols-rounded">delete</span>
-                                        Delete
-                                    </button>
+                        @if(showActions()) {
+                            <td>
+                                <div 
+                                    role="button" 
+                                    class="relative flex items-center cursor-pointer"
+                                    (click)="toggleModalId(t.transactionId)"
+                                >
+                                    <span class="material-symbols-rounded">
+                                        more_horiz
+                                    </span>
                                 </div>
-                            }
-                        </td>
+
+                                @if(openModalId() === t.transactionId) {
+                                    <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
+                                        <button 
+                                            class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
+                                            (click)="onEdit(t.transactionId)"
+                                        >
+                                            <span class="material-symbols-rounded text-sm">edit</span>
+                                            Edit
+                                        </button>
+                                        <button 
+                                            class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                                            (click)="onDelete(t.transactionId)"
+                                        >
+                                            <span class="material-symbols-rounded">delete</span>
+                                            Delete
+                                        </button>
+                                    </div>
+                                }
+                             </td>
+                        }
                     </tr>
                 }
             }
         </tbody>
     </table>
 </div>
-@if (isShowPagination()) {
+@if (isShowPagination() && showPagination()) {
     <app-pagination
         [pageNumber]="pageNumber()"
         [pageSize]="pageSize()"
-        [totalCount]="totalCount()"
+        [totalCount]="totalCount() ?? 0"
         [pageSizeOptions]="pageSizeOptions"
         (pageChange)="onPageChange($event)"
         (pageSizeChange)="onPageSizeChange($event)"

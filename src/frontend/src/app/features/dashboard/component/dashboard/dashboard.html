@@ -77,11 +77,23 @@
 </div>
 <div class="grid gap-4 grid-cols-3 grid-rows-1">
     <app-summary-card class="col-span-2">
-        <div>
+        <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-                <p>Recent Transaction</p>
-                <a routerLink="/transactions">View More</a>
+                <p class="text-[1.15rem] font-medium">Recent Transaction</p>
+                <a 
+                    routerLink="/transactions"
+                    class="bg-[#1c4532] text-white rounded-sm py-1 pl-3 pr-1 flex items-center text-[0.75rem]"
+                >
+                    View More
+                    <span class="material-symbols-rounded text-xs ml-0.5">
+                        chevron_right
+                    </span>
+                </a>
             </div>
+            <app-transaction-table
+                [transactions]="recentTransactions()"
+                variant="compact"
+            />
         </div>
     </app-summary-card>
     <app-summary-card>
