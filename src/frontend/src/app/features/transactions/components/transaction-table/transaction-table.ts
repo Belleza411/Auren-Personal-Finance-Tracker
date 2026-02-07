@@ -6,20 +6,38 @@ import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
 
 @Component({
   selector: 'app-transaction-table',
   imports: [CurrencyPipe, PaginationComponent],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.compact]': "variant() === 'compact'"
+  }
 })
 export class TransactionTable {
   private destroyRef = inject(DestroyRef);
 
   transactions = input.required<Transaction[]>();
-  categories = input.required<Category[]>();
-  isLoading = input.required<boolean>();
+  categories = input<Category[]>();
+  isLoading = input<boolean>();
+  variant = input<'full' | 'compact'>('full');
+
+  columns = computed(() =>
+    this.variant() === 'compact'
+      ? COMPACT_TRANSACTION_COLUMNS
+      : FULL_TRANSACTION_COLUMNS
+  );
+
+  hasActions = computed(() => 
+    this.columns().some(c => c.key == 'actions')
+  );
+
+  showFilters = computed(() => this.variant() === 'full');
+  showPagination = computed(() => this.variant() === 'full');
 
   searchTerm = signal<string>('');
   selectedType = signal<TransactionType | null>(null);
@@ -35,7 +53,7 @@ export class TransactionTable {
 
   pageNumber = signal(1);
   pageSize = signal(10);
-  totalCount = input.required<number>();
+  totalCount = input<number>();
 
   transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
   paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];

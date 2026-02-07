@@ -1,7 +1,7 @@
 interface DashboardSummary {
     totalBalance: Metric;
-    Income: Metric;
-    Expense: Metric;
+    income: Metric;
+    expense: Metric;
 }
 
 interface Metric {

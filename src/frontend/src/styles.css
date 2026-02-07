@@ -25,6 +25,6 @@ body {
 
 @layer components {
   .gray-border {
-    @apply border border-solid border-[#c5c5c5] rounded-lg;
+    @apply border border-solid border-[#c5c5c5] rounded-md;
   }
 }
