@@ -10,10 +10,12 @@ import { TransactionTable } from "../../../transactions/components/transaction-t
 import { signal } from '@angular/core';
 import { Transaction } from '../../../transactions/models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
+import { Goal } from '../../../goals/models/goals.model';
+import { CurrentGoals } from "../current-goals/current-goals";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable],
+  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -122,6 +124,48 @@ export class DashboardComponent {
         }
   ]);
 
+  dummyGoals = signal<Goal[]>([
+    {
+      goalId: 'goal-001',
+      userId: 'user-123',
+      name: 'Buy a New Laptop',
+      description: 'Save money to buy a high-performance laptop for development and studies.',
+      spent: 450,
+      budget: 1500,
+      goalStatus: 2,
+      completionPercentage: 30,
+      timeRemaining: '3 months',
+      createdAt: 'January 5, 2025',
+      targetDate: 'April 30, 2025',
+    },
+    {
+      goalId: 'goal-002',
+      userId: 'user-123',
+      name: 'Emergency Savings Fund',
+      description: 'Build an emergency fund for unexpected expenses.',
+      spent: 1200,
+      budget: 3000,
+      goalStatus: 2,
+      completionPercentage: 40,
+      timeRemaining: '6 months',
+      createdAt: 'December 1, 2024',
+      targetDate: 'August 1, 2025',
+    },
+    {
+      goalId: 'goal-003',
+      userId: 'user-123',
+      name: 'Vacation Trip',
+      description: 'Save for a short holiday trip with friends.',
+      spent: null,
+      budget: 2000,
+      goalStatus: 4,
+      completionPercentage: null,
+      timeRemaining: '9 months',
+      createdAt: 'January 20, 2025',
+      targetDate: 'October 15, 2025',
+    }
+  ])
+
   selectedTimePeriod: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
   
   totalBalance = computed(() => this.dashboardResources.value()?.totalBalance.totalBalance ?? { amount: 2500, percentageChange: 20 });
@@ -129,7 +173,7 @@ export class DashboardComponent {
   expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 500, percentageChange: 2 });
   avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
-  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? [])
+  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals())
   expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
   isLoading = computed(() => this.dashboardResources.isLoading());
 
