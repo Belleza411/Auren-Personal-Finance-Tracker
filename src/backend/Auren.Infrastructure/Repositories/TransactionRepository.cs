@@ -129,9 +129,9 @@ namespace Auren.Infrastructure.Repositories
             var currentBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
             var lastMonthBalance = await GetBalanceAsync(userId, startDate, endDate, cancellationToken);
 
-            var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance, true);
-            var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome, false);
-            var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense, false);
+            var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance);
+            var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
+            var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense);
 
             return new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
@@ -149,12 +149,10 @@ namespace Auren.Infrastructure.Repositories
             );
         }
 
-        private static decimal CalculatePercentageChange(decimal current, decimal previous, bool isTotalBalance)
+        private static decimal CalculatePercentageChange(decimal current, decimal previous)
         {
             if (previous == 0) return current > 0 ? 100 : 0;
-            var change = isTotalBalance
-                ? ((current - previous) / Math.Abs(previous)) * 100
-                : ((current - previous) / previous) * 100;
+            var change = ((current - previous) / previous) * 100;
 
             return Math.Round(change, 2);
         }
