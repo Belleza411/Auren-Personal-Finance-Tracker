@@ -14,47 +14,36 @@ using Microsoft.Extensions.Logging;
 
 namespace Auren.Application.Services
 {
-	public class TransactionService : ITransactionService
-	{
-        private readonly IValidator<TransactionDto> _validator;
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly ICategoryRepository _categoryRepository;
-
-		public TransactionService(IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository)
-		{
-			_validator = validator;
-			_transactionRepository = transactionRepository;
-			_categoryRepository = categoryRepository;
-		}
-
-		public async Task<Result<Transaction>> CreateTransaction(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
-		{
+    public class TransactionService(IValidator<TransactionDto> validator, ITransactionRepository transactionRepository, ICategoryRepository categoryRepository) : ITransactionService
+    {
+        public async Task<Result<Transaction>> CreateTransaction(TransactionDto transactionDto, Guid userId, CancellationToken cancellationToken)
+        {
             if (transactionDto == null)
                 return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
-            
-            var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
-			if(!validationResult.IsValid)
-			{
-				var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
-				return Result.Failure<Transaction>(Error.ValidationFailed(errors));
+
+            var validationResult = await validator.ValidateAsync(transactionDto, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
+                return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
-            var category = await _categoryRepository.GetCategoryByNameAsync(
+            var category = await categoryRepository.GetCategoryByNameAsync(
                 userId,
                 new CategoryDto(transactionDto.Category, transactionDto.TransactionType),
                 cancellationToken
             );
 
-            if (category == null)    
+            if (category == null)
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));
 
             if (transactionDto.TransactionType != category.TransactionType)
                 return Result.Failure<Transaction>(Error.TypeMismatch("Transaction type does not match category type."));
-            
+
 
             if (transactionDto.TransactionType == TransactionType.Expense)
             {
-                var currentBalance = await _transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
+                var currentBalance = await transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
 
                 if (currentBalance.Balance < transactionDto.Amount)
                 {
@@ -75,41 +64,32 @@ namespace Auren.Application.Services
                 TransactionDate = transactionDto.TransactionDate
             };
 
-            var createdTransaction = await _transactionRepository.AddAsync(transaction, cancellationToken);
-            return createdTransaction != null 
+            var createdTransaction = await transactionRepository.AddAsync(transaction, cancellationToken);
+            return createdTransaction != null
                 ? Result.Success<Transaction>(transaction)
                 : Result.Failure<Transaction>(Error.CreateFailed("Failed to create transaction. "));
         }
 
         public async Task<Result<bool>> DeleteTransaction(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {
-            var deletedTransaction = await _transactionRepository.DeleteAsync(transactionId, userId, cancellationToken);
+            var deletedTransaction = await transactionRepository.DeleteAsync(transactionId, userId, cancellationToken);
 
             return deletedTransaction
                 ? Result.Success(true)
                 : Result.Failure<bool>(Error.NotFound("Transaction not found. "));
         }
-        
+
         public async Task<Result<BalanceSummaryResponse>> GetBalance(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
-            var balance = await _transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
+            var balance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
             return Result.Success<BalanceSummaryResponse>(balance);
         }
 
         public async Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken)
         {
-            var transaction = await _transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
+            var transaction = await transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
             return transaction != null
                 ? Result.Success<Transaction?>(transaction)
                 : Result.Failure<Transaction?>(Error.NotFound("Transaction not found. "));
@@ -117,29 +97,29 @@ namespace Auren.Application.Services
 
         public async Task<Result<PagedResult<Transaction>>> GetAllTransactions(Guid userId,
             TransactionFilter filter,
-            int pageSize = 5, int pageNumber = 1,
-            CancellationToken cancellationToken = default) 
-                => Result.Success(await _transactionRepository.GetTransactionsAsync(userId, filter, pageSize, pageNumber, cancellationToken));
+            int pageSize = 10, int pageNumber = 1,
+            CancellationToken cancellationToken = default)
+                => Result.Success(await transactionRepository.GetTransactionsAsync(userId, filter, pageSize, pageNumber, cancellationToken));
 
         public async Task<Result<Transaction>> UpdateTransaction(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken)
         {
             if (transactionDto == null)
                 return Result.Failure<Transaction>(Error.InvalidInput("All fields are required. "));
-            
 
-            var validationResult = await _validator.ValidateAsync(transactionDto, cancellationToken);
+
+            var validationResult = await validator.ValidateAsync(transactionDto, cancellationToken);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
                 return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
 
-            var transaction = await _transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
+            var transaction = await transactionRepository.GetByIdAsync(transactionId, userId, cancellationToken);
 
             if (transaction == null)
                 return Result.Failure<Transaction>(Error.NotFound("Transaction not found. "));
 
-            var category = await _categoryRepository.GetCategoryByNameAsync(
+            var category = await categoryRepository.GetCategoryByNameAsync(
                 userId,
                 new CategoryDto(transactionDto.Category, transactionDto.TransactionType),
                 cancellationToken
@@ -147,11 +127,11 @@ namespace Auren.Application.Services
 
             if (category == null)
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));
-            
+
 
             if (transactionDto.TransactionType != category.TransactionType)
                 return Result.Failure<Transaction>(Error.TypeMismatch("Transaction type does not match category type."));
-            
+
             transaction.Name = transactionDto.Name;
             transaction.Amount = transactionDto.Amount;
             transaction.PaymentType = transactionDto.PaymentType;
@@ -159,7 +139,7 @@ namespace Auren.Application.Services
             transaction.CategoryId = category.Id;
             transaction.TransactionDate = transactionDto.TransactionDate;
 
-            var updatedTransaction = await _transactionRepository.UpdateAsync(transaction, cancellationToken);
+            var updatedTransaction = await transactionRepository.UpdateAsync(transaction, cancellationToken);
 
             return updatedTransaction != null
                 ? Result.Success<Transaction>(updatedTransaction)
@@ -167,27 +147,20 @@ namespace Auren.Application.Services
         }
 
         public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
-            => Result.Success(await _transactionRepository.GetDashboardSummaryAsync(userId, timePeriod, cancellationToken));
+            => Result.Success(await transactionRepository.GetDashboardSummaryAsync(userId, timePeriod, cancellationToken));
 
         public async Task<Result<decimal>> GetAvgDailySpending(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
-            var filter = new TransactionFilter { 
+            var filter = new TransactionFilter
+            {
                 TransactionType = TransactionType.Expense,
                 StartDate = startDate,
                 EndDate = endDate,
             };
-            var expenses = await _transactionRepository.GetTransactionsAsync(userId, filter, int.MaxValue, 1, cancellationToken);
+
+            var expenses = await transactionRepository.GetTransactionsAsync(userId, filter, int.MaxValue, 1, cancellationToken);
 
             if (expenses is null)
                 return Result.Success(0m);
@@ -201,6 +174,20 @@ namespace Auren.Application.Services
             var avg = Math.Round(totalSpending / (decimal)totalDays, 2);
 
             return Result.Success(avg);
+        }
+
+        private static (DateTime StartDate, DateTime EndDate) GetTimePeriodRange(TimePeriod timePeriod)
+        {
+            return timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
         }
     }
 }

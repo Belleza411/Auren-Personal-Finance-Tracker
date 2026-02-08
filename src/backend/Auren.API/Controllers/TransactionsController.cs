@@ -25,7 +25,7 @@ namespace Auren.API.Controllers
 		[HttpGet]
 		public async Task<ActionResult<PagedResult<Transaction>>> GetAllTransaction(
             [FromQuery] TransactionFilter transactionFilter,
-            [FromQuery] int pageSize = 5,
+            [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 1,
             CancellationToken cancellationToken = default)
 		{

@@ -52,7 +52,7 @@ namespace Auren.Infrastructure.Repositories
         public async Task<PagedResult<Transaction>> GetTransactionsAsync(
             Guid userId,
             TransactionFilter filter,
-            int pageSize = 5, int pageNumber = 1,
+            int pageSize = 10, int pageNumber = 1,
             CancellationToken cancellationToken = default)
 		{
             IEnumerable<Guid> categoryIds = [];
