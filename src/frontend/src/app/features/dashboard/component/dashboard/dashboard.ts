@@ -8,7 +8,7 @@ import { GoalService } from '../../../goals/services/goal.service';
 import { CountUpDirective } from 'ngx-countup';
 import { TransactionTable } from "../../../transactions/components/transaction-table/transaction-table";
 import { signal } from '@angular/core';
-import { Transaction } from '../../../transactions/models/transaction.model';
+import { TimePeriod, Transaction } from '../../../transactions/models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { Goal } from '../../../goals/models/goals.model';
 import { CurrentGoals } from "../current-goals/current-goals";
@@ -166,7 +166,9 @@ export class DashboardComponent {
     }
   ])
 
-  selectedTimePeriod: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+  selectedTimePeriod = signal<TimePeriod>(1);
+
+  timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
   
   totalBalance = computed(() => this.dashboardResources.value()?.totalBalance.totalBalance ?? { amount: 2500, percentageChange: 20 });
   income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 2000, percentageChange: 10 });
@@ -193,8 +195,8 @@ export class DashboardComponent {
         expenseCategoriesChart,
         recentGoals
       ] = await Promise.all([
-        firstValueFrom(this.dashboardSer.getDashboardSummary()),
-        firstValueFrom(this.transactionSer.getAvgDailySpending()),
+        firstValueFrom(this.dashboardSer.getDashboardSummary(this.selectedTimePeriod())),
+        firstValueFrom(this.transactionSer.getAvgDailySpending(this.selectedTimePeriod())),
         firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
         firstValueFrom(this.dashboardSer.getExpenseCategoryChart()),
         firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))
@@ -208,5 +210,11 @@ export class DashboardComponent {
         recentGoals
       }
     }
-  })
+  });
+
+  onRangeChange(e: Event) {
+      this.selectedTimePeriod.set(
+        Number((e.target as HTMLSelectElement).value) + 1
+      );
+    }
 }
