@@ -15,7 +15,14 @@ interface ExpenseCategoryChart {
     percentage: number;
 }
 
+interface IncomeVsExpenseResponse {
+    labels: string[];
+    incomes: number[];
+    expenses: string[];
+}
+
 export type {
     DashboardSummary,
-    ExpenseCategoryChart
+    ExpenseCategoryChart,
+    IncomeVsExpenseResponse
 }

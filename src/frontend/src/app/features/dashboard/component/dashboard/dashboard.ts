@@ -12,10 +12,11 @@ import { TimePeriod, Transaction } from '../../../transactions/models/transactio
 import { Category } from '../../../categories/models/categories.model';
 import { Goal } from '../../../goals/models/goals.model';
 import { CurrentGoals } from "../current-goals/current-goals";
+import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals],
+  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals, IncomeVsExpenseGraph],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -174,6 +175,7 @@ export class DashboardComponent {
   income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 2000, percentageChange: 10 });
   expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 500, percentageChange: 2 });
   avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
+  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? [])
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
   currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals())
   expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
@@ -192,12 +194,14 @@ export class DashboardComponent {
         totalBalance, 
         avgDailySpending,
         recentTransactions,
+        incomeVsExpenseData,
         expenseCategoriesChart,
         recentGoals
       ] = await Promise.all([
         firstValueFrom(this.dashboardSer.getDashboardSummary(this.selectedTimePeriod())),
         firstValueFrom(this.transactionSer.getAvgDailySpending(this.selectedTimePeriod())),
         firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
+        firstValueFrom(this.dashboardSer.getIncomeVsExpense(this.selectedTimePeriod())),
         firstValueFrom(this.dashboardSer.getExpenseCategoryChart()),
         firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))
       ])
@@ -206,6 +210,7 @@ export class DashboardComponent {
         totalBalance,
         avgDailySpending,
         recentTransactions,
+        incomeVsExpenseData,
         expenseCategoriesChart,
         recentGoals
       }
