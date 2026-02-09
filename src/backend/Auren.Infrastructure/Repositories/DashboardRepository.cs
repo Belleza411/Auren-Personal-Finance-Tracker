@@ -1,9 +1,10 @@
-﻿using Auren.Application.DTOs.Responses;
+﻿using Auren.Application.DTOs.Responses.Dashboard;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
+using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace Auren.Infrastructure.Repositories
 {
     public class DashboardRepository(AurenDbContext dbContext, ITransactionRepository transactionRepository) : IDashboardRepository
     {
+        private sealed record AggregatedData(DateTime? Date, TransactionType TransactionType, decimal Total);
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var (startDate, endDate) = timePeriod switch
@@ -76,12 +78,136 @@ namespace Auren.Infrastructure.Repositories
             );
         }
 
+        public async Task<IncomesVsExpenseResponse> GetIncomesVsExpensesAsync(
+            Guid userId,
+            TimePeriod? timePeriod,
+            CancellationToken cancellationToken)
+        {
+            var (startDate, endDate) = timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+
+            bool isDailyHybrid = timePeriod is TimePeriod.ThisMonth or TimePeriod.LastMonth;
+
+            var rawData = await dbContext.Transactions
+                .Where(t =>
+                    t.UserId == userId &&
+                    t.TransactionDate >= startDate &&
+                    t.TransactionDate <= endDate)
+                .GroupBy(t => new
+                {
+                    Date = t.TransactionDate.Date,
+                    t.TransactionType
+                })
+                .Select(g => new AggregatedData(
+                    g.Key.Date,
+                    g.Key.TransactionType,
+                    g.Sum(t => t.Amount))
+                )
+                .ToListAsync(cancellationToken);
+
+                return isDailyHybrid
+                    ? BuildDailyHybridData(rawData, endDate)
+                    : BuildMonthlyHybridData(rawData);
+        }
+
+
         private static decimal CalculatePercentageChange(decimal current, decimal previous)
         {
             if (previous == 0) return current > 0 ? 100 : 0;
             var change = ((current - previous) / previous) * 100;
 
             return Math.Round(change, 2);
+        }
+
+        private static IncomesVsExpenseResponse BuildDailyHybridData(
+            IEnumerable<AggregatedData> data,
+            DateTime referenceDate)
+        {
+            var firstDay = new DateTime(referenceDate.Year, referenceDate.Month, 1);
+            var lastDay = firstDay.AddMonths(1).AddDays(-1);
+
+            var activeDays = data
+                .Select(x => x.Date)
+                .Where(d => d.HasValue)
+                .Select(d => d!.Value.Date)
+                .Distinct();
+
+            var days = new SortedSet<DateTime> { firstDay, lastDay };
+            foreach (var d in activeDays)
+                days.Add(d);
+
+
+            List<string> labels = [];
+            List<decimal> incomes = [];
+            List<decimal> expenses = [];
+
+            foreach (var day in days)
+            {
+                labels.Add(day.ToString("MMM d"));
+
+                incomes.Add(
+                    data.Where(x => x.Date == day && x.TransactionType == TransactionType.Income)
+                        .Sum(x => x.Total)
+                );
+
+                expenses.Add(
+                    data.Where(x => x.Date == day && x.TransactionType == TransactionType.Expense)
+                        .Sum(x => x.Total)
+                );
+            }
+
+            return new IncomesVsExpenseResponse(labels, incomes, expenses);
+        }
+
+        private static IncomesVsExpenseResponse BuildMonthlyHybridData(IEnumerable<AggregatedData> data)
+        {
+            var labels = new List<string>();
+            var incomes = new List<decimal>();
+            var expenses = new List<decimal>();
+
+            var groupedByMonth = data
+                .GroupBy(x => new { x.Date!.Value.Year, x.Date!.Value.Month })
+                .OrderBy(g => g.Key.Year)
+                .ThenBy(g => g.Key.Month);
+
+            foreach (var monthGroup in groupedByMonth)
+            {
+                var monthStart = new DateTime(monthGroup.Key.Year, monthGroup.Key.Month, 1);
+
+                labels.Add(monthStart.ToString("MMM"));
+                incomes.Add(0);
+                expenses.Add(0);
+
+                var activeDays = monthGroup
+                    .Select(x => x.Date!.Value)
+                    .Distinct()
+                    .OrderBy(d => d);
+
+                foreach (var day in activeDays)
+                {
+                    labels.Add(day.ToString("MMM d"));
+
+                    incomes.Add(
+                        data.Where(x => x.Date == day && x.TransactionType == TransactionType.Income)
+                            .Sum(x => x.Total)
+                    );
+
+                    expenses.Add(
+                        data.Where(x => x.Date == day && x.TransactionType == TransactionType.Expense)
+                            .Sum(x => x.Total)
+                    );
+                }
+            }
+
+            return new IncomesVsExpenseResponse(labels, incomes, expenses);
         }
     }
 }
