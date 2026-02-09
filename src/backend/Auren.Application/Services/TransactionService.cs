@@ -146,9 +146,6 @@ namespace Auren.Application.Services
                 : Result.Failure<Transaction>(Error.UpdateFailed("Failed to update transaction. "));
         }
 
-        public async Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
-            => Result.Success(await transactionRepository.GetDashboardSummaryAsync(userId, timePeriod, cancellationToken));
-
         public async Task<Result<decimal>> GetAvgDailySpending(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
         {
             var (startDate, endDate) = GetTimePeriodRange(timePeriod);
