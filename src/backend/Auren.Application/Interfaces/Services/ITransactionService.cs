@@ -18,7 +18,6 @@ namespace Auren.Application.Interfaces.Services
         Task<Result<Transaction?>> GetTransactionById(Guid transactionId, Guid userId, CancellationToken cancellationToken);
         Task<Result<PagedResult<Transaction>>> GetAllTransactions(Guid userId, TransactionFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default);
         Task<Result<Transaction>> UpdateTransaction(Guid transactionId, Guid userId, TransactionDto transactionDto, CancellationToken cancellationToken);
-        Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default);
         Task<Result<decimal>> GetAvgDailySpending(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken);
     }
 }

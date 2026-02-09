@@ -16,7 +16,7 @@ namespace Auren.API.Controllers
 	[Route("api/dashboard")]
 	[ApiController]
     public class DashboardController(
-         ITransactionService transactionService,
+         IDashboardService dashboardService,
 		 ICategoryService categoryService
         ) : ControllerBase
 	{
@@ -28,7 +28,7 @@ namespace Auren.API.Controllers
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			var summary = await transactionService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
+			var summary = await dashboardService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
             return Ok(summary.Value);
         }
 
