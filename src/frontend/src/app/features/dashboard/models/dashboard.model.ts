@@ -18,7 +18,7 @@ interface ExpenseCategoryChart {
 interface IncomeVsExpenseResponse {
     labels: string[];
     incomes: number[];
-    expenses: string[];
+    expenses: number[];
 }
 
 export type {
