@@ -203,12 +203,12 @@ export class DashboardComponent {
         expenseCategoriesChart,
         recentGoals
       ] = await Promise.all([
-        this.dashboardSer.getDashboardSummary(period),
-        this.transactionSer.getAvgDailySpending(period),
-        this.transactionSer.getAllTransactions({}, 5, 1),
-        this.dashboardSer.getIncomeVsExpense(period),
-        this.dashboardSer.getExpenseCategoryChart(),
-        this.goalSer.getAllGoals({}, 3, 1)
+        firstValueFrom(this.dashboardSer.getDashboardSummary(period)),
+        firstValueFrom(this.transactionSer.getAvgDailySpending(period)),
+        firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
+        firstValueFrom(this.dashboardSer.getIncomeVsExpense(period)),
+        firstValueFrom(this.dashboardSer.getExpenseCategoryChart()),
+        firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))
       ])
 
       return {
