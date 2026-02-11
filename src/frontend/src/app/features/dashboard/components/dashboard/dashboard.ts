@@ -14,6 +14,7 @@ import { Goal } from '../../../goals/models/goals.model';
 import { CurrentGoals } from "../current-goals/current-goals";
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
 import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
+import { TimePeriodMap } from '../../../../shared/utils/enum-mapper.util';
 
 @Component({
   selector: 'app-dashboard',
@@ -175,6 +176,8 @@ export class DashboardComponent {
       expenses: [0, 50, 80, 0, 200, 0, 90, 60, 50]
     }
   )
+
+  TimePeriodMap = TimePeriodMap;
 
   selectedTimePeriod = signal<TimePeriod>(1);
 
