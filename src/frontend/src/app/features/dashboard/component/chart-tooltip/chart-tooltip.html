@@ -1,0 +1,21 @@
+@if(visible()) {
+    <div 
+        class="gray-border tooltip" 
+        [style.left.px]="x()"
+        [style.top.px]="y()"
+    >
+        <p class="font-bold mb-1.5 text-[0.8rem]">{{ date() }}</p>
+        @for (item of items(); track item.label) {
+            <div class="flex justify-between items-center gap-5">
+                <span 
+                    [class]="getValueColorByLabel(item.label)"
+                    class="text-[0.8rem]"
+                >
+                    {{ getArithmeticByLabel(item.label) }}{{ item.value | currency }}
+                </span>
+                <span class="text-[0.8rem]">{{ item.label }}</span>
+            </div>
+        }
+    </div>
+
+}

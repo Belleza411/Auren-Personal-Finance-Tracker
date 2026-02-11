@@ -1,0 +1,15 @@
+@reference 'tailwindcss';
+
+.tooltip {
+    @apply absolute
+        -translate-x-1/2
+        -translate-y-[120%]
+        bg-white
+        px-2.5
+        py-2
+        rounded-lg
+        text-xs
+        pointer-events-none
+        min-w-35
+        z-100
+}

@@ -1,6 +1,9 @@
-<canvas baseChart
-    [data]="chartJsData"
-    [options]="chartOptions"
-    [type]="'line'"
-    class="w-full">
-</canvas>
+<div class="relative">
+    <canvas baseChart
+        [data]="chartJsData"
+        [options]="chartOptions"
+        [type]="'line'"
+        class="w-full">
+    </canvas>
+    <app-chart-tooltip #tooltip />
+</div>

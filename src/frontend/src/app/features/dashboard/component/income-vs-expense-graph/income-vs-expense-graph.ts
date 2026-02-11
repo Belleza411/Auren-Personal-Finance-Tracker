@@ -2,39 +2,33 @@ import { AfterViewInit, Component, input, OnChanges, viewChild } from '@angular/
 import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { ChartData, ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
+import { ChartTooltip } from "../chart-tooltip/chart-tooltip";
 
 @Component({
   selector: 'app-income-vs-expense-graph',
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, ChartTooltip],
   templateUrl: './income-vs-expense-graph.html',
   styleUrl: './income-vs-expense-graph.css',
 })
 export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
   readonly chartData = input.required<IncomeVsExpenseResponse>();
   chart = viewChild<BaseChartDirective>('baseChart');
+  tooltipCmp = viewChild<ChartTooltip>('tooltip');
 
   protected chartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false
+    },
     plugins: {
       legend: {
         display: false
       },
       tooltip: { 
-        mode: 'index', 
-        intersect: false,
-        borderColor: '#c5c5c5',
-        backgroundColor: '#fff',
-        displayColors: false,
-        padding: 10,
-        cornerRadius: 8,
-        bodyColor: '#000',
-        callbacks: {
-          label: (ctx) => {
-            const value = ctx.parsed.y;
-            return `$${value} ${ctx.dataset.label}`;
-          }
-        }
+        enabled: false,
+        external: (ctx) => this.handleTooltip(ctx)
       },
     },
     scales: {
@@ -77,7 +71,7 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
             if (!chartArea) return;
 
             const gradient = c.createLinearGradient(0, 0, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(191, 230, 201, 0.35)');
+            gradient.addColorStop(0, 'rgba(191, 230, 201, 0.3)');
             gradient.addColorStop(1, 'rgba(57, 179, 90, 0.6)');
             return gradient;
           },
@@ -115,5 +109,33 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => this.chart()?.update(), 0);
+  }
+
+  private handleTooltip(context: any) {
+    const tooltip = context.tooltip;
+    const chart = context.chart;
+
+    if(!this.tooltipCmp()) return;
+
+    if(tooltip.opacity === 0) {
+      this.tooltipCmp()?.visible.set(false);
+      return;
+    }
+
+    this.tooltipCmp()?.visible.set(true);
+    this.tooltipCmp()?.date.set(tooltip.title?.[0] ?? '');
+
+    this.tooltipCmp()?.items.set(
+      tooltip.dataPoints.map((dp: any) => ({
+        label: dp.dataset.label,
+        value: dp.parsed.y,
+        color: dp.dataset.borderColor
+      }))
+    );
+
+    const rect = chart.canvas.getBoundingClientRect();
+
+    this.tooltipCmp()?.x.set(tooltip.caretX);
+    this.tooltipCmp()?.y.set(tooltip.caretY);
   }
 }
