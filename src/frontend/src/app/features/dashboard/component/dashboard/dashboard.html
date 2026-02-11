@@ -83,7 +83,8 @@
 </div>
 <div class="grid gap-4 grid-cols-3 grid-rows-1">
     <app-summary-card class="col-span-2">
-        <p>Income vs Expense</p>
+        <p class="text-[1.15rem] font-medium">Income vs Expense</p>
+        <app-income-vs-expense-graph [chartData]="incomeVsExpenseData()" />
     </app-summary-card>
     <app-summary-card>
         <p>Expense By Categories</p>

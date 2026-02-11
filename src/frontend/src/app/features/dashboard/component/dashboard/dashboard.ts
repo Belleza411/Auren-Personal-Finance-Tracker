@@ -13,6 +13,7 @@ import { Category } from '../../../categories/models/categories.model';
 import { Goal } from '../../../goals/models/goals.model';
 import { CurrentGoals } from "../current-goals/current-goals";
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
+import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -167,6 +168,14 @@ export class DashboardComponent {
     }
   ])
 
+  dummyChartData = signal<IncomeVsExpenseResponse>(
+    {
+      labels: ['Jan', 'Jan 1', 'Jan 2', 'Jan 10', 'Feb', 'Feb 14', 'Mar', 'Mar 20', 'Mar 21'],
+      incomes: [0, 200, 150, 0, 300, 0, 400, 120, 200],
+      expenses: [0, 50, 80, 0, 200, 0, 90, 60, 50]
+    }
+  )
+
   selectedTimePeriod = signal<TimePeriod>(1);
 
   timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
@@ -175,7 +184,7 @@ export class DashboardComponent {
   income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 2000, percentageChange: 10 });
   expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 500, percentageChange: 2 });
   avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
-  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? null)  
+  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? this.dummyChartData())  
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
   currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals())
   expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
