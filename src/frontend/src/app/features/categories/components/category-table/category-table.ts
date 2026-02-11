@@ -3,8 +3,8 @@ import { Category, CategoryFilter } from '../../models/categories.model';
 import { TransactionType } from '../../../transactions/models/transaction.model';
 import { outputFromObservable, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { TransactionTypeMap } from '../../../transactions/constants/transaction-map';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
 
 @Component({
   selector: 'app-category-table',

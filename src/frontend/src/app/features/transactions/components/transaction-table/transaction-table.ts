@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input
 import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { CurrencyPipe } from '@angular/common';
-import { PaymentTypeMap, TransactionTypeMap } from '../../constants/transaction-map';
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
+import { PaymentTypeMap, TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
 
 @Component({
   selector: 'app-transaction-table',
