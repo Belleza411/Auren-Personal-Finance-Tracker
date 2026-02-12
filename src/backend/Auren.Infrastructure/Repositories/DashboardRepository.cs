@@ -17,16 +17,7 @@ namespace Auren.Infrastructure.Repositories
         private sealed record AggregatedData(DateTime? Date, TransactionType TransactionType, decimal Total);
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
             var monthlyData = await dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
@@ -83,16 +74,7 @@ namespace Auren.Infrastructure.Repositories
             TimePeriod? timePeriod,
             CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
             bool isDailyHybrid = timePeriod is TimePeriod.ThisMonth or TimePeriod.LastMonth;
 
@@ -113,9 +95,9 @@ namespace Auren.Infrastructure.Repositories
                 )
                 .ToListAsync(cancellationToken);
 
-                return isDailyHybrid
-                    ? BuildDailyHybridData(rawData, endDate)
-                    : BuildMonthlyHybridData(rawData);
+            return isDailyHybrid
+                ? BuildDailyHybridData(rawData, endDate)
+                : BuildMonthlyHybridData(rawData);
         }
 
         public async Task<ExpenseBreakdownResponse> GetExpenseBreakdownAsync(
@@ -123,16 +105,7 @@ namespace Auren.Infrastructure.Repositories
             TimePeriod? timePeriod,
             CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
             var data = await dbContext.Transactions
                 .Where(t =>
@@ -248,6 +221,20 @@ namespace Auren.Infrastructure.Repositories
             }
 
             return new IncomesVsExpenseResponse(labels, incomes, expenses);
+        }
+
+        private static (DateTime start, DateTime end) GetTimePeriodRange(TimePeriod? timePeriod)
+        {
+            return timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
         }
     }
 }
