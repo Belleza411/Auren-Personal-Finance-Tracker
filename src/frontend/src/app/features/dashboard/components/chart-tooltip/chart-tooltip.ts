@@ -13,7 +13,7 @@ export class ChartTooltip {
   y = signal(0);
   date = signal<string>('');
   items = signal<{
-    label: 'Incomes' | 'Expenses';
+    label: 'Incomes' | 'Expenses' | string;
     value: number;
     color: string;
   }[]>([]);

@@ -118,6 +118,46 @@ namespace Auren.Infrastructure.Repositories
                     : BuildMonthlyHybridData(rawData);
         }
 
+        public async Task<ExpenseBreakdownResponse> GetExpenseBreakdownAsync(
+            Guid userId,
+            TimePeriod? timePeriod,
+            CancellationToken cancellationToken)
+        {
+            var (startDate, endDate) = timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+
+            var data = await dbContext.Transactions
+                .Where(t =>
+                    t.UserId == userId &&
+                    t.TransactionType == TransactionType.Expense &&
+                    t.TransactionDate >= startDate &&
+                    t.TransactionDate <= endDate)
+                .GroupBy(t => t.Category)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .OrderByDescending(x => x.Total)
+                .ToListAsync(cancellationToken);
+
+
+            var totalSpent = data.Sum(x => x.Total);
+            var labels = data.Select(x => x.Category.Name).ToList();
+            var amounts = data.Select(x => x.Total).ToList();
+            var percentages = data.Select(x => totalSpent > 0 ? Math.Round((x.Total / totalSpent) * 100, 2) : 0).ToList();
+
+            return new ExpenseBreakdownResponse(labels, amounts, percentages, totalSpent);
+        }
+
 
         private static decimal CalculatePercentageChange(decimal current, decimal previous)
         {

@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Auren.Domain\Auren.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Responses\Category\" />
+  </ItemGroup>
+
 </Project>

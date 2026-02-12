@@ -10,5 +10,9 @@ namespace Auren.Application.Interfaces.Repositories
     {
         Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken);
         Task<IncomesVsExpenseResponse> GetIncomesVsExpensesAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken);
+        Task<ExpenseBreakdownResponse> GetExpenseBreakdownAsync(
+            Guid userId,
+            TimePeriod? timePeriod,
+            CancellationToken cancellationToken);
     }
 }
