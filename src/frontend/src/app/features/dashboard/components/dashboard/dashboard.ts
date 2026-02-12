@@ -13,12 +13,13 @@ import { Category } from '../../../categories/models/categories.model';
 import { Goal } from '../../../goals/models/goals.model';
 import { CurrentGoals } from "../current-goals/current-goals";
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
-import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
+import { ExpenseBreakdown, IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { TimePeriodMap } from '../../../../shared/utils/enum-mapper.util';
+import { ExpenseBreakdownChart } from "../expense-breakdown-chart/expense-breakdown-chart";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals, IncomeVsExpenseGraph],
+  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals, IncomeVsExpenseGraph, ExpenseBreakdownChart],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -177,6 +178,13 @@ export class DashboardComponent {
     }
   )
 
+  dummyExpenseBreakdown = signal<ExpenseBreakdown>({
+    labels: ['Shopping', 'Health', 'Entertainment', 'Bills'],  
+    data: [300, 150, 100, 50],
+    percentage: [50, 25, 16.67, 8.33],
+    totalSpent: 600
+  });
+
   TimePeriodMap = TimePeriodMap;
 
   selectedTimePeriod = signal<TimePeriod>(1);
@@ -190,7 +198,7 @@ export class DashboardComponent {
   incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? this.dummyChartData())  
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
   currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals())
-  expenseCategoriesChart = computed(() => this.dashboardResources.value()?.expenseCategoriesChart ?? []);
+  expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? this.dummyExpenseBreakdown());
   isLoading = computed(() => this.dashboardResources.isLoading());
 
   options = {
@@ -212,14 +220,14 @@ export class DashboardComponent {
         avgDailySpending,
         recentTransactions,
         incomeVsExpenseData,
-        expenseCategoriesChart,
+        expenseBreakdown,
         recentGoals
       ] = await Promise.all([
         firstValueFrom(this.dashboardSer.getDashboardSummary(period)),
         firstValueFrom(this.transactionSer.getAvgDailySpending(period)),
         firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
         firstValueFrom(this.dashboardSer.getIncomeVsExpense(period)),
-        firstValueFrom(this.dashboardSer.getExpenseCategoryChart()),
+        firstValueFrom(this.dashboardSer.getExpenseBreakdown(period)),
         firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))
       ])
 
@@ -228,7 +236,7 @@ export class DashboardComponent {
         avgDailySpending,
         recentTransactions,
         incomeVsExpenseData,
-        expenseCategoriesChart,
+        expenseBreakdown,
         recentGoals
       }
     }
