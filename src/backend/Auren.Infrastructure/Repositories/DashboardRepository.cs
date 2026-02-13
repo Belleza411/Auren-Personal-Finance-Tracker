@@ -8,6 +8,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Auren.Infrastructure.Repositories
@@ -127,8 +128,9 @@ namespace Auren.Infrastructure.Repositories
             var labels = data.Select(x => x.Category.Name).ToList();
             var amounts = data.Select(x => x.Total).ToList();
             var percentages = data.Select(x => totalSpent > 0 ? Math.Round((x.Total / totalSpent) * 100, 2) : 0).ToList();
+            var backgroundColors = percentages.Select(p => GetColorFromPercent(p)).ToList();
 
-            return new ExpenseBreakdownResponse(labels, amounts, percentages, totalSpent);
+            return new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent);
         }
 
 
@@ -236,5 +238,16 @@ namespace Auren.Infrastructure.Repositories
                 _ => (DateTime.MinValue, DateTime.Today)
             };
         }
+
+        private static string GetColorFromPercent(decimal percent, double alpha = 1)
+        {
+            percent = Math.Clamp(percent, 0.0m, 100.0m);
+
+            var r = (int)Math.Round(255 - (percent * 2.55m));
+            var g = (int)Math.Round(percent * 2.55m);
+
+            return $"rgba({r}, {g}, 0, {alpha.ToString(CultureInfo.InvariantCulture)})";
+        }
+
     }
 }
