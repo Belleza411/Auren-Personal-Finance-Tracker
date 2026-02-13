@@ -9,20 +9,21 @@ interface Metric {
     percentageChange: number;
 }
 
-interface ExpenseCategoryChart {
-    category: string;
-    amount: number;
-    percentage: number;
-}
-
 interface IncomeVsExpenseResponse {
     labels: string[];
     incomes: number[];
     expenses: number[];
 }
 
+interface ExpenseBreakdown {
+    labels: string[];
+    data: number[];
+    percentage: number[];
+    backgroundColor: string[];
+    totalSpent: number;
+}
 export type {
     DashboardSummary,
-    ExpenseCategoryChart,
-    IncomeVsExpenseResponse
+    IncomeVsExpenseResponse,
+    ExpenseBreakdown 
 }

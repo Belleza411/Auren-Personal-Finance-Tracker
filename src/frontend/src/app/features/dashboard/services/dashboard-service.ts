@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { apiUrl } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import { DashboardSummary, ExpenseCategoryChart, IncomeVsExpenseResponse } from '../models/dashboard.model';
+import { DashboardSummary, ExpenseBreakdown, IncomeVsExpenseResponse } from '../models/dashboard.model';
 import { TimePeriod } from '../../transactions/models/transaction.model';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
@@ -20,8 +20,11 @@ export class DashboardService {
     return this.http.get<DashboardSummary>(`${this.baseUrl}/summary`, { params });
   }
 
-  getExpenseCategoryChart(): Observable<ExpenseCategoryChart[]> {
-    return this.http.get<ExpenseCategoryChart[]>(`${this.baseUrl}/categories-expense`);
+  getExpenseBreakdown(timePeriod?: TimePeriod): Observable<ExpenseBreakdown> {
+    const filters = timePeriod !== undefined ? { timePeriod } : {};
+    const params = createHttpParams(filters);
+
+    return this.http.get<ExpenseBreakdown>(`${this.baseUrl}/expense-breakdown`, { params });
   }
 
   getIncomeVsExpense(timePeriod?: TimePeriod): Observable<IncomeVsExpenseResponse> {

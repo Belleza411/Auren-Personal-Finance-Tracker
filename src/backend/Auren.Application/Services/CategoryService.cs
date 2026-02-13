@@ -3,7 +3,7 @@ using Auren.Application.Constants;
 using Auren.Application.DTOs.Filters;
 using Auren.Application.DTOs.Requests;
 using Auren.Application.DTOs.Responses;
-using Auren.Application.DTOs.Responses.Category;
+using Auren.Application.DTOs.Responses.Dashboard;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
@@ -128,38 +128,6 @@ namespace Auren.Application.Services
             return category == null ?
                 Result.Failure<Category?>(Error.NotFound($"Category with name {categoryDto.Name} not found")) :
                 Result.Success<Category?>(category);
-        }
-
-        public async Task<Result<IEnumerable<ExpenseCategoryChartResponse>>> GetExpenseCategoryChart(Guid userId, CancellationToken cancellationToken)
-        {
-            var transactionExpenses = new TransactionFilter { TransactionType = TransactionType.Expense };
-            var expenses = await _transactionRepository.GetTransactionsAsync(
-                userId, transactionExpenses, 5, 1, cancellationToken);
-
-            var categories = await _categoryRepository.GetCategoriesAsync(userId, null!, int.MaxValue, 1, cancellationToken);
-
-            var categoryLookup = categories.Items.ToDictionary(c => c.Id, c => c.Name);
-
-            var totalAmount = expenses.Items.Sum(e => e.Amount);
-            var chartData = expenses.Items
-                .GroupBy(e => e.CategoryId)
-                .Select(g =>
-                {
-                    var categoryName = categoryLookup.TryGetValue(g.Key, out var name)
-                        ? name
-                        : "Unknown";
-
-                    return new ExpenseCategoryChartResponse(
-                        Category: categoryName,
-                        Amount: g.Sum(t => t.Amount),
-                        Percentage: totalAmount == 0 ? 0 :
-                            Math.Round((g.Sum(t => t.Amount) / totalAmount) * 100, 2)
-                    );
-                })
-                .OrderByDescending(c => c.Amount)
-                .ToList();
-
-            return Result.Success<IEnumerable<ExpenseCategoryChartResponse>>(chartData);
         }
     }
 }

@@ -12,5 +12,7 @@ namespace Auren.Application.Interfaces.Services
         Task<Result<DashboardSummaryResponse>> GetDashboardSummary(Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default);
         Task<Result<IncomesVsExpenseResponse>> GetIncomesVsExpenses(
             Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default);
+        Task<Result<ExpenseBreakdownResponse>> GetExpenseBreakdown(
+            Guid userId, TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default);
     }
 }

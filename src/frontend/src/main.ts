@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
-import { CategoryScale, Chart, Filler, Legend, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
+import { ArcElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
 
 Chart.register(
   LineController,
@@ -9,6 +9,8 @@ Chart.register(
   PointElement,
   LinearScale,
   CategoryScale,
+  DoughnutController,
+  ArcElement,
   Tooltip,
   Legend,
   Filler

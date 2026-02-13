@@ -8,6 +8,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Auren.Infrastructure.Repositories
@@ -17,16 +18,7 @@ namespace Auren.Infrastructure.Repositories
         private sealed record AggregatedData(DateTime? Date, TransactionType TransactionType, decimal Total);
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
             var monthlyData = await dbContext.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
@@ -83,16 +75,7 @@ namespace Auren.Infrastructure.Repositories
             TimePeriod? timePeriod,
             CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
             bool isDailyHybrid = timePeriod is TimePeriod.ThisMonth or TimePeriod.LastMonth;
 
@@ -113,9 +96,41 @@ namespace Auren.Infrastructure.Repositories
                 )
                 .ToListAsync(cancellationToken);
 
-                return isDailyHybrid
-                    ? BuildDailyHybridData(rawData, endDate)
-                    : BuildMonthlyHybridData(rawData);
+            return isDailyHybrid
+                ? BuildDailyHybridData(rawData, endDate)
+                : BuildMonthlyHybridData(rawData);
+        }
+
+        public async Task<ExpenseBreakdownResponse> GetExpenseBreakdownAsync(
+            Guid userId,
+            TimePeriod? timePeriod,
+            CancellationToken cancellationToken)
+        {
+            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
+
+            var data = await dbContext.Transactions
+                .Where(t =>
+                    t.UserId == userId &&
+                    t.TransactionType == TransactionType.Expense &&
+                    t.TransactionDate >= startDate &&
+                    t.TransactionDate <= endDate)
+                .GroupBy(t => t.Category)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .OrderByDescending(x => x.Total)
+                .ToListAsync(cancellationToken);
+
+
+            var totalSpent = data.Sum(x => x.Total);
+            var labels = data.Select(x => x.Category.Name).ToList();
+            var amounts = data.Select(x => x.Total).ToList();
+            var percentages = data.Select(x => totalSpent > 0 ? Math.Round((x.Total / totalSpent) * 100, 2) : 0).ToList();
+            var backgroundColors = percentages.Select(p => GetColorFromPercent(p)).ToList();
+
+            return new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent);
         }
 
 
@@ -209,5 +224,30 @@ namespace Auren.Infrastructure.Repositories
 
             return new IncomesVsExpenseResponse(labels, incomes, expenses);
         }
+
+        private static (DateTime start, DateTime end) GetTimePeriodRange(TimePeriod? timePeriod)
+        {
+            return timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
+                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+        }
+
+        private static string GetColorFromPercent(decimal percent, double alpha = 1)
+        {
+            percent = Math.Clamp(percent, 0.0m, 100.0m);
+
+            var r = (int)Math.Round(255 - (percent * 2.55m));
+            var g = (int)Math.Round(percent * 2.55m);
+
+            return $"rgba({r}, {g}, 0, {alpha.ToString(CultureInfo.InvariantCulture)})";
+        }
+
     }
 }
