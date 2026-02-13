@@ -181,7 +181,8 @@ export class DashboardComponent {
   dummyExpenseBreakdown = signal<ExpenseBreakdown>({
     labels: ['Shopping', 'Health', 'Entertainment', 'Bills'],  
     data: [300, 150, 100, 50],
-    percentage: [50, 25, 16.67, 8.33],
+    percentage: [50, 25, 16, 8],
+    backgroundColor: ['rgba(14, 165, 233, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)', 'rgba(239, 68, 68, 1)'],
     totalSpent: 600
   });
 

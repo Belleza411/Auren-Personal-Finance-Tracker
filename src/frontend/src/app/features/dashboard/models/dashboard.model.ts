@@ -19,6 +19,7 @@ interface ExpenseBreakdown {
     labels: string[];
     data: number[];
     percentage: number[];
+    backgroundColor: string[];
     totalSpent: number;
 }
 export type {
