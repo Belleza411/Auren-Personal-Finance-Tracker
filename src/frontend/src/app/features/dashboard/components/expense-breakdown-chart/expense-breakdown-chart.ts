@@ -27,9 +27,6 @@ export class ExpenseBreakdownChart implements OnChanges {
     }));
   });
 
-  protected percentages = signal<number[]>([]);
-  protected totalSpent = signal<number>(0);
-
   protected chartOptions: ChartOptions<'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -68,8 +65,5 @@ export class ExpenseBreakdownChart implements OnChanges {
       }],
       
     }
-
-    this.percentages.set(this.data().percentage);
-    this.totalSpent.set(this.data().totalSpent);
   }
 }
