@@ -3,6 +3,7 @@ interface Goal {
     userId: string;
     name: string;
     description: string;
+    emoji: string;
     spent: number | null;
     budget: number;
     goalStatus: GoalStatus,
@@ -15,6 +16,7 @@ interface Goal {
 interface NewGoal {
     name: string;
     description: string;
+    emoji: string;
     spent: number;
     budget: number;
     status: GoalStatus | null;
