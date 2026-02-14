@@ -2,6 +2,8 @@ import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component,
 import { NewGoal } from '../../models/goals.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { greaterThanZero } from '../../utils/greaterThanZero';
+import { futureDate } from '../../utils/futureDate';
 
 @Component({
   selector: 'app-goal-form',
@@ -29,39 +31,6 @@ export class GoalForm implements OnInit {
     this.isEmojiPicker.update(v => !v);
   }
 
-  private greaterThanZero = (fieldName: string) => ({ value }: { value: () => number }) => {
-    const v = value();
-    if(v == null) return null;
-
-    if (v <= 0) {
-      return {
-        kind: 'invalidInput',
-        message: `${fieldName} must be greater than 0`
-      };
-    }
-    return null;
-  };
-
-  private futureDate = ({ value }: { value: () => string | Date }) => {
-    if(!value()) return null;
-
-    const inputDate = new Date(value());
-
-    if(isNaN(inputDate.getTime())) return null;
-
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    if (inputDate <= today) {
-      return {
-        kind: 'invalidInput',
-        message: 'Target date must be after today'
-      };
-    }
-    return null;
-  };
-
   private readonly modelSignal = signal<NewGoal>({
     name: '',
     description: '',
@@ -80,8 +49,9 @@ export class GoalForm implements OnInit {
     required(schema.targetDate, { message: "Target date is required" });
     required(schema.status, { message: "Status is required "});
 
-    validate(schema.budget, this.greaterThanZero('Budget'));
-    validate(schema.targetDate, this.futureDate);
+    validate(schema.spent, greaterThanZero('Spent'));
+    validate(schema.budget, greaterThanZero('Budget'));
+    validate(schema.targetDate, futureDate);
   });
 
   ngOnInit(): void {

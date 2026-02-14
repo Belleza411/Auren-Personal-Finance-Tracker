@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
 import { GoalService } from "../../services/goal.service";
-import { Goal, GoalFilter, GoalsSummary, GoalStatus, NewGoal } from "../../models/goals.model";
-import { filter, finalize, firstValueFrom, forkJoin, switchMap, tap } from "rxjs";
+import { Goal, GoalFilter, GoalStatus, NewGoal } from "../../models/goals.model";
+import { filter, firstValueFrom, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
@@ -10,7 +10,7 @@ import { EditGoal } from "../../components/edit-goal/edit-goal";
 import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
-
+import { generateBgColorByEmoji } from "../../utils/generateBgColorByEmoji";
 
 @Component({
   selector: 'app-goals',
@@ -77,8 +77,15 @@ export class GoalsComponent implements OnInit  {
   goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
   // isLoading = computed(() => this.goalResource.isLoading());
   isLoading = signal(false);
-  totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100)
+  totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100);
 
+  goalsWithColor = computed(() =>
+    this.goals().map(goal => ({
+      ...goal,
+      bgColor: generateBgColorByEmoji(goal.emoji)
+    }))
+  );
+  
   searchTerm = signal<string>('');
   status = signal<GoalStatus | null>(null);
   minBudget = signal<number | null>(null);
