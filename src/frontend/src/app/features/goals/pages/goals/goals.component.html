@@ -184,7 +184,9 @@
         @for(goal of goals(); track goal.goalId) {
             <div class="gray-border w-full bg-white flex flex-col p-4.5 gap-2">
                 <div class="w-full flex items-center justify-between mb-1">
-                    <div class="w-12 h-12 rounded-xl bg-red-600"></div>
+                    <div class="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center">
+                        <span class="text-xl">{{ goal.emoji }}</span>
+                    </div>
                     <select
                         class="gray-border py-2 pl-2 pr-10"
                         aria-label="Change goal status"
