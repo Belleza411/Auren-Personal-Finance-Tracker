@@ -5,12 +5,32 @@
     {{ isEdit() ? 'Edit your' : 'Add a new' }} transaction to track your finances
 </p>
 <form class="flex flex-col gap-5" (submit)="onSubmit($event)">
-    <p>
-        <label for="name">Name</label>
-        <input 
-            type="text"
-            [formField]="goalForm.name"
-            [class.error]="fieldErrors.name()">
+    <div class="relative">
+        <label for="name" class="block mb-1">Name</label>
+        
+        <div class="relative py-[0.8rem] pr-0 pl-3 rounded-lg border border-solid border-[#cbd5e0]">
+            <button 
+                (click)="showEmojiPicker()"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-xl"
+                type="button">
+                {{ emoji() }}
+            </button>
+            
+            <input 
+                type="text"
+                [formField]="goalForm.name"
+                [class.error]="fieldErrors.name()"
+                class="pl-10 w-full">
+            
+            @if(isEmojiPicker()) {
+                <div class="absolute left-0 top-full mt-1 z-50">
+                    <emoji-mart 
+                        (emojiClick)="selectEmoji($event)" 
+                    ></emoji-mart>
+                </div>
+            }
+        </div>
+        
         @if(fieldErrors.name()) {
             <ul class="error-list">
                 @for(error of goalForm.name().errors(); track error.kind) {
@@ -18,7 +38,7 @@
                 }
             </ul>
         }
-    </p>
+    </div>
     <p>
         <label for="description">Description</label>
         <input 

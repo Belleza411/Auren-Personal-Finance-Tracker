@@ -20,6 +20,7 @@ export class EditGoal implements OnInit {
       this.model.set({
         name: this.data.name,
         description: this.data.description,
+        emoji: this.data.emoji,
         spent: this.data.spent ?? 0,
         budget: this.data.budget,
         status: this.data.goalStatus,
@@ -31,6 +32,7 @@ export class EditGoal implements OnInit {
   protected model = signal<NewGoal>({
     name: '',
     description: '',
+    emoji: '',
     spent: 0,
     budget: 0,
     status: 4,
