@@ -3,6 +3,7 @@ interface Goal {
     userId: string;
     name: string;
     description: string;
+    emoji: string;
     spent: number | null;
     budget: number;
     goalStatus: GoalStatus,
@@ -12,9 +13,14 @@ interface Goal {
     targetDate: Date | string;
 }
 
+interface GoalWithBgColor extends Goal {
+    bgColor: string;
+}
+
 interface NewGoal {
     name: string;
     description: string;
+    emoji: string;
     spent: number;
     budget: number;
     status: GoalStatus | null;
@@ -50,5 +56,6 @@ export type {
     GoalStatus,
     GoalFilter,
     NewGoal,
-    GoalsSummary
+    GoalsSummary,
+    GoalWithBgColor
 }

@@ -73,7 +73,8 @@ namespace Auren.Application.Services
 				UserId = userId,
 				Name = goalDto.Name,
 				Description = goalDto.Description,
-				Spent = spent,
+				Emoji = goalDto.Emoji,
+                Spent = spent,
 				Budget = budget,
 				TargetDate = goalDto.TargetDate,
 				Status = goalDto.Status,
@@ -110,6 +111,7 @@ namespace Auren.Application.Services
 			existingGoal.UserId = userId;
 			existingGoal.Name = goalDto.Name;
 			existingGoal.Description = goalDto.Description;
+			existingGoal.Emoji = goalDto.Emoji;
 			existingGoal.Spent = goalDto.Spent;
 			existingGoal.Budget = goalDto.Budget;
 			existingGoal.TargetDate = goalDto.TargetDate;

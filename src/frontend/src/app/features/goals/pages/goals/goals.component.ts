@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit, resource, signal } from "@angular/core";
 import { GoalService } from "../../services/goal.service";
-import { Goal, GoalFilter, GoalsSummary, GoalStatus, NewGoal } from "../../models/goals.model";
-import { filter, finalize, firstValueFrom, forkJoin, switchMap, tap } from "rxjs";
+import { Goal, GoalFilter, GoalStatus, GoalWithBgColor, NewGoal } from "../../models/goals.model";
+import { filter, firstValueFrom, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
@@ -10,11 +10,12 @@ import { EditGoal } from "../../components/edit-goal/edit-goal";
 import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
-
+import { generateBgColorByEmoji } from "../../utils/generateBgColorByEmoji";
+import { GoalComponent } from "../../components/goal/goal";
 
 @Component({
   selector: 'app-goals',
-  imports: [CurrencyPipe, PaginationComponent],
+  imports: [PaginationComponent, GoalComponent],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,12 +27,15 @@ export class GoalsComponent implements OnInit  {
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
 
+  variant = input<'full' | 'compact'>('full');
+
   dummyGoals = signal<Goal[]>([
     {
       goalId: 'goal-001',
       userId: 'user-123',
       name: 'Buy a New Laptop',
       description: 'Save money to buy a high-performance laptop for development and studies.',
+      emoji: '💻',
       spent: 450,
       budget: 1500,
       goalStatus: 2,
@@ -45,6 +49,7 @@ export class GoalsComponent implements OnInit  {
       userId: 'user-123',
       name: 'Emergency Savings Fund',
       description: 'Build an emergency fund for unexpected expenses.',
+      emoji: '💰',
       spent: 1200,
       budget: 3000,
       goalStatus: 2,
@@ -58,6 +63,7 @@ export class GoalsComponent implements OnInit  {
       userId: 'user-123',
       name: 'Vacation Trip',
       description: 'Save for a short holiday trip with friends.',
+      emoji: '🌴',
       spent: null,
       budget: 2000,
       goalStatus: 4,
@@ -74,22 +80,22 @@ export class GoalsComponent implements OnInit  {
   goals = computed(() => this.goalResource.value()?.items ?? this.dummyGoals())
   // isLoading = computed(() => this.goalResource.isLoading());
   isLoading = signal(false);
-  totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100)
+  totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100);
 
-  searchTerm = signal<string>('');
-  status = signal<GoalStatus | null>(null);
-  minBudget = signal<number | null>(null);
-  maxBudget = signal<number | null>(null);
-  targetFrom = signal<string | null>(null);
-  targetTo = signal<string | null>(null);
+  goalsWithColor = computed<GoalWithBgColor[]>(() =>
+    this.goals().map(goal => ({
+      ...goal,
+      bgColor: generateBgColorByEmoji(goal.emoji)
+    }))
+  );
 
   private readonly currentFilters = signal<GoalFilter>({
-    searchTerm: this.searchTerm(),
-    status: this.status(),
-    minBudget: this.minBudget(),
-    maxBudget: this.maxBudget(),
-    targetFrom: this.targetFrom(),
-    targetTo: this.targetTo()
+    searchTerm: '',
+    status: null,
+    minBudget: null,
+    maxBudget: null,
+    targetFrom: null,
+    targetTo: null
   });
 
   goalStatusOptions: string[] = ['All Status', 'Completed', 'On Track', 'On Hold', 'Not Started', 'Behind Schedule', 'Cancelled']
@@ -253,11 +259,10 @@ export class GoalsComponent implements OnInit  {
     this.router.navigate(['/goals', 'create']);
   }
 
-  onStatusChange(goal: Goal, event: Event) {
-    const value = Number((event.target as HTMLSelectElement).value);
-    if (value === goal.goalStatus) return;
+  onStatusChange(status: number, id: string) {
+    const value = status === 0 ? null : status;
 
-    this.goalSer.updateGoal(goal.goalId, { status: value })
+    this.goalSer.updateGoal(id, { status: value })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.goalResource.reload(),
@@ -285,35 +290,48 @@ export class GoalsComponent implements OnInit  {
 
   onChangeStatus(e: Event) {
     const value = Number((e.target as HTMLSelectElement).value);
-    this.status.set(value === 0 ? null : value);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      status: value === 0 ? null : value
+    }));
   }
 
   hasActiveFilters = computed(() => {
-    const hasSearch = this.searchTerm().trim().length !== 0;
-    const hasStatus = this.status() !== null;
-    const hasBudget = this.minBudget() !== null || this.maxBudget() !== null;
-    const hasTargetDate = this.targetFrom() !== null || this.targetTo() !== null;
+    const filters = this.currentFilters();
+
+    const hasSearch = filters.searchTerm.trim().length !== 0;
+    const hasStatus = filters.status !== null;
+    const hasBudget = filters.minBudget !== null || filters.maxBudget !== null;
+    const hasTargetDate = filters.targetFrom !== null || filters.targetTo !== null;
 
     return hasSearch || hasStatus || hasBudget || hasTargetDate;
   })
 
   clearFilter() {
-    this.searchTerm.set('');
-    this.status.set(null);
-    this.minBudget.set(null);
-    this.maxBudget.set(null);
-    this.targetFrom.set(null);
-    this.targetTo.set(null);
+    this.currentFilters.set({
+      searchTerm: '',
+      status: null,
+      minBudget: null,
+      maxBudget: null,
+      targetFrom: null,
+      targetTo: null
+    })
   }
 
   clearBudgetFilter() {
-    this.minBudget.set(null);
-    this.maxBudget.set(null);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      minBudget: null,
+      maxBudget: null
+    }));
   }
 
   clearTargetDateFilter() {
-    this.targetFrom.set(null);
-    this.targetTo.set(null);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      targetFrom: null,
+      targetTo: null
+    }));
   }
 
   formatDate(event: Event) {

@@ -125,6 +125,8 @@
                 </span>
             </a>
         </div>
-        <app-current-goals [currentGoals]="dummyGoals()" />
+        @for(goal of currentGoalsWithBgColor(); track goal.goalId) {
+            <app-goal [goal]="goal"  variant="compact" />
+        }
     </app-summary-card>
 </div>

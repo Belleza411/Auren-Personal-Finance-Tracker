@@ -13,7 +13,7 @@
     @apply py-[0.8rem] pr-0 pl-3 rounded-lg border border-solid border-[#cbd5e0];
 }
 
-:host form p .error-list {
+:host .error-list {
     @apply text-red-600 list-none text-[0.75rem] mt-[0.3rem]
 }
 

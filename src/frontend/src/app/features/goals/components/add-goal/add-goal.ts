@@ -18,6 +18,7 @@ export class AddGoal {
   protected model = signal<NewGoal>({
     name: '',
     description: '',
+    emoji: '',
     spent: 0,
     budget: 0,
     status: 4,
