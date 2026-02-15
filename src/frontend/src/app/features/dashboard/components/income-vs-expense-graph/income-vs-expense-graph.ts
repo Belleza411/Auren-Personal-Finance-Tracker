@@ -18,9 +18,27 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
   protected chartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1500,
+      easing: 'easeOutQuart',
+    },
+    animations: {
+      y: {
+        type: 'number',
+        easing: 'easeOutQuart',
+        duration: 1800,
+        from: (ctx) => {
+          if (ctx.type === 'data') {
+            return ctx.chart.scales['y'].getPixelForValue(0);
+          }
+
+          return 0;
+        },
+      },
+    },
     interaction: {
       mode: 'index',
-      intersect: false
+      intersect: false,
     },
     plugins: {
       legend: {
@@ -41,7 +59,7 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
         grid: { display: false },
         border: { display: false }
       }
-    }
+    },
   } 
 
   protected chartJsData: ChartData<'line'> = {
