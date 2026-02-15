@@ -89,20 +89,13 @@ export class GoalsComponent implements OnInit  {
     }))
   );
 
-  searchTerm = signal<string>('');
-  status = signal<GoalStatus | null>(null);
-  minBudget = signal<number | null>(null);
-  maxBudget = signal<number | null>(null);
-  targetFrom = signal<string | null>(null);
-  targetTo = signal<string | null>(null);
-
   private readonly currentFilters = signal<GoalFilter>({
-    searchTerm: this.searchTerm(),
-    status: this.status(),
-    minBudget: this.minBudget(),
-    maxBudget: this.maxBudget(),
-    targetFrom: this.targetFrom(),
-    targetTo: this.targetTo()
+    searchTerm: '',
+    status: null,
+    minBudget: null,
+    maxBudget: null,
+    targetFrom: null,
+    targetTo: null
   });
 
   goalStatusOptions: string[] = ['All Status', 'Completed', 'On Track', 'On Hold', 'Not Started', 'Behind Schedule', 'Cancelled']
@@ -297,35 +290,48 @@ export class GoalsComponent implements OnInit  {
 
   onChangeStatus(e: Event) {
     const value = Number((e.target as HTMLSelectElement).value);
-    this.status.set(value === 0 ? null : value);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      status: value === 0 ? null : value
+    }));
   }
 
   hasActiveFilters = computed(() => {
-    const hasSearch = this.searchTerm().trim().length !== 0;
-    const hasStatus = this.status() !== null;
-    const hasBudget = this.minBudget() !== null || this.maxBudget() !== null;
-    const hasTargetDate = this.targetFrom() !== null || this.targetTo() !== null;
+    const filters = this.currentFilters();
+
+    const hasSearch = filters.searchTerm.trim().length !== 0;
+    const hasStatus = filters.status !== null;
+    const hasBudget = filters.minBudget !== null || filters.maxBudget !== null;
+    const hasTargetDate = filters.targetFrom !== null || filters.targetTo !== null;
 
     return hasSearch || hasStatus || hasBudget || hasTargetDate;
   })
 
   clearFilter() {
-    this.searchTerm.set('');
-    this.status.set(null);
-    this.minBudget.set(null);
-    this.maxBudget.set(null);
-    this.targetFrom.set(null);
-    this.targetTo.set(null);
+    this.currentFilters.set({
+      searchTerm: '',
+      status: null,
+      minBudget: null,
+      maxBudget: null,
+      targetFrom: null,
+      targetTo: null
+    })
   }
 
   clearBudgetFilter() {
-    this.minBudget.set(null);
-    this.maxBudget.set(null);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      minBudget: null,
+      maxBudget: null
+    }));
   }
 
   clearTargetDateFilter() {
-    this.targetFrom.set(null);
-    this.targetTo.set(null);
+    this.currentFilters.update(prev => ({
+      ...prev,
+      targetFrom: null,
+      targetTo: null
+    }));
   }
 
   formatDate(event: Event) {
