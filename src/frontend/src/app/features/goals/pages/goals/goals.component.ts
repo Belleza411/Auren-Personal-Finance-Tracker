@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { AddGoal } from "../../components/add-goal/add-goal";
 import { EditGoal } from "../../components/edit-goal/edit-goal";
-import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { generateBgColorByEmoji } from "../../utils/generateBgColorByEmoji";
@@ -89,7 +88,7 @@ export class GoalsComponent implements OnInit  {
     }))
   );
 
-  private readonly currentFilters = signal<GoalFilter>({
+  readonly currentFilters = signal<GoalFilter>({
     searchTerm: '',
     status: null,
     minBudget: null,
@@ -97,6 +96,13 @@ export class GoalsComponent implements OnInit  {
     targetFrom: null,
     targetTo: null
   });
+
+  searchTerm = signal<string>('');
+  status = signal<number | null>(null);
+  minBudget = signal<number | null>(null);
+  maxBudget = signal<number | null>(null);
+  targetFrom = signal<string | null>(null);
+  targetTo = signal<string | null>(null);
 
   goalStatusOptions: string[] = ['All Status', 'Completed', 'On Track', 'On Hold', 'Not Started', 'Behind Schedule', 'Cancelled']
 
@@ -290,10 +296,27 @@ export class GoalsComponent implements OnInit  {
 
   onChangeStatus(e: Event) {
     const value = Number((e.target as HTMLSelectElement).value);
-    this.currentFilters.update(prev => ({
-      ...prev,
-      status: value === 0 ? null : value
-    }));
+    this.status.set(value === 0 ? null : value);
+  }
+
+  onSearchChange(term: string) {
+    this.searchTerm.set(term);
+  }
+
+  onMinBudgetChange(value: number | null) {
+    this.minBudget.set(value);
+  }
+
+  onMaxBudgetChange(value: number | null) {
+    this.maxBudget.set(value);
+  }
+
+  onTargetFromChange(value: string | null) {
+    this.targetFrom.set(value);
+  }
+
+  onTargetToChange(value: string | null) {
+    this.targetTo.set(value);
   }
 
   hasActiveFilters = computed(() => {
@@ -308,30 +331,22 @@ export class GoalsComponent implements OnInit  {
   })
 
   clearFilter() {
-    this.currentFilters.set({
-      searchTerm: '',
-      status: null,
-      minBudget: null,
-      maxBudget: null,
-      targetFrom: null,
-      targetTo: null
-    })
+    this.searchTerm.set('');
+    this.status.set(null);
+    this.minBudget.set(null);
+    this.maxBudget.set(null);
+    this.targetFrom.set(null);
+    this.targetTo.set(null);
   }
 
   clearBudgetFilter() {
-    this.currentFilters.update(prev => ({
-      ...prev,
-      minBudget: null,
-      maxBudget: null
-    }));
+    this.minBudget.set(null);
+    this.maxBudget.set(null);
   }
 
   clearTargetDateFilter() {
-    this.currentFilters.update(prev => ({
-      ...prev,
-      targetFrom: null,
-      targetTo: null
-    }));
+    this.targetFrom.set(null);
+    this.targetTo.set(null);
   }
 
   formatDate(event: Event) {

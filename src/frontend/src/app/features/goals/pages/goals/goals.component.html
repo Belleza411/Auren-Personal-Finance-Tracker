@@ -23,7 +23,7 @@
             placeholder="Search goals..."
             aria-label="Search goals"
             [value]="searchTerm()"
-            (input)="searchTerm.set($any($event.target).value)"
+            (input)="onSearchChange($any($event.target).value)"
         >
     </div>
     <select
@@ -78,7 +78,7 @@
                         placeholder="Min budget"
                         aria-label="Minimum budget"
                         [value]="minBudget()"
-                        (input)="minBudget.set($event.target.valueAsNumber || null)">
+                        (input)="onMinBudgetChange($event.target.valueAsNumber || null)">
                 </p>
                 <p>
                     <label 
@@ -93,7 +93,7 @@
                         placeholder="Max budget"
                         aria-label="Maximum budget"
                         [value]="maxBudget()"
-                        (input)="maxBudget.set($event.target.valueAsNumber || null)">
+                        (input)="onMaxBudgetChange($event.target.valueAsNumber || null)">
                 </p>
             </div>
         </div>
@@ -146,7 +146,7 @@
                         placeholder="From"
                         aria-label="Target from"
                         [value]="targetFrom()"
-                        (input)="targetFrom.set(formatDate($event || null))">
+                        (input)="onTargetFromChange(formatDate($event || null))">
                 </p>
                 <p>
                     <label 
@@ -161,7 +161,7 @@
                         placeholder="To"
                         aria-label="Target To"
                         [value]="targetTo()"
-                        (input)="targetTo.set(formatDate($event || null))">
+                        (input)="onTargetToChange(formatDate($event || null))">
                 </p>
             </div>
         </div>
