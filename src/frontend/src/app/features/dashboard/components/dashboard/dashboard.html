@@ -7,7 +7,7 @@
         <div>
             <select 
                 class="p-2 rounded-md border border-[#c5c5c5] border-solid"
-                (change)="onRangeChange($event)"
+                (change)="onTimePeriodChange($event)"
             >
                 @for(range of timePeriodOptions; track $index) {
                     <option [value]="$index">{{ range }}</option>
@@ -85,7 +85,7 @@
     <app-summary-card class="col-span-2">
         <p class="text-[1.15rem] font-medium mb-1">Income vs Expense</p>
         <p class="text-[0.85rem] text-gray-500">Showing your incomes and expenses for {{ TimePeriodMap[selectedTimePeriod()] }}</p>
-        <app-income-vs-expense-graph [chartData]="incomeVsExpenseData()" />
+        <app-income-vs-expense-graph [chartData]="incomeVsExpenseData()" [timePeriod]="selectedTimePeriod()" />
     </app-summary-card>
     <app-summary-card>
         <p class="text-[1.15rem] font-medium mb-1">Expenses Breadown</p>

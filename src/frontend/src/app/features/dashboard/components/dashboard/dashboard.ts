@@ -253,9 +253,9 @@ export class DashboardComponent {
     }
   });
 
-  onRangeChange(e: Event) {
-      this.selectedTimePeriod.set(
-        Number((e.target as HTMLSelectElement).value) + 1
-      );
-    }
+  onTimePeriodChange(e: Event) {
+    this.selectedTimePeriod.set(
+      Number((e.target as HTMLSelectElement).value) + 1
+    );
+  }
 }

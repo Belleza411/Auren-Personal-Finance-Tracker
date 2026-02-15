@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, input, OnChanges, viewChild } from '@angular/core';
+import { AfterViewInit, Component, input, OnChanges, SimpleChanges, viewChild } from '@angular/core';
 import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { ChartData, ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { ChartTooltip } from "../chart-tooltip/chart-tooltip";
+import { TimePeriod } from '../../../transactions/models/transaction.model';
 
 @Component({
   selector: 'app-income-vs-expense-graph',
@@ -12,8 +13,11 @@ import { ChartTooltip } from "../chart-tooltip/chart-tooltip";
 })
 export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
   readonly chartData = input.required<IncomeVsExpenseResponse>();
+  readonly timePeriod = input.required<TimePeriod>();
   chart = viewChild<BaseChartDirective>('baseChart');
   tooltipCmp = viewChild<ChartTooltip>('tooltip');
+
+  private lastTimePeriod?: TimePeriod;
 
   protected chartOptions: ChartOptions<'line'> = {
     responsive: true,
@@ -67,7 +71,7 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
     datasets: []
   };
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     if(!this.chartData()) return;
 
     const totalIncomes = this.chartData().incomes.reduce((a, b) => a + b, 0);
@@ -77,11 +81,11 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
     const expenseOrder = totalIncomes >= totalExpenses ? 1 : 2;
 
     this.chartJsData = {
-      labels: this.chartData().labels,
+      labels: [...this.chartData().labels],
       datasets: [
         {
           label: "Incomes",
-          data: this.chartData().incomes,
+          data: [...this.chartData().incomes],
           borderColor: '#0d7818',
           backgroundColor: (ctx) => {
             const chart = ctx.chart;
@@ -101,9 +105,9 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
         },
         {
           label: "Expenses",
-          data: this.chartData().expenses,
+          data: [...this.chartData().expenses],
           borderColor: '#ba1616',
-           backgroundColor: (ctx) => {
+          backgroundColor: (ctx) => {
             const chart = ctx.chart;
             const { ctx: c, chartArea } = chart;
             if (!chartArea) return;
@@ -122,7 +126,14 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
       ]
     };
 
-    setTimeout(() => this.chart()?.update(), 0);
+    if(this.lastTimePeriod && this.lastTimePeriod !== this.timePeriod()) {
+      this.chart()?.chart?.reset();
+      this.chart()?.chart?.update()
+    }
+
+    this.lastTimePeriod = this.timePeriod();
+
+    queueMicrotask(() => this.chart()?.update());
   }
 
   ngAfterViewInit(): void {
