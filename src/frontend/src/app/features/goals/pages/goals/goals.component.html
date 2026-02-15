@@ -18,7 +18,7 @@
 <div class="w-full flex items-center gap-3 mb-3 b  ">
     <div class="relative flex items-center">
         <input 
-            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium bg-white"
             type="text" 
             placeholder="Search goals..."
             aria-label="Search goals"
@@ -27,7 +27,7 @@
         >
     </div>
     <select
-        class="p-2 gray-border text-[0.8rem]"
+        class="p-2 gray-border text-[0.8rem] bg-white"
         aria-label="Filter by goal status"
         [value]="status() ?? 0"
         (change)="onChangeStatus($event)"
@@ -36,7 +36,7 @@
             <option [value]="$index">{{ type }}</option>
         }
     </select>
-    <div class="relative py-[0.3rem] pr-0.5 pl-3 rounded-lg gray-border">
+    <div class="relative py-[0.3rem] pr-0.5 pl-3 rounded-lg gray-border bg-white">
         <button class="header" (click)="toggleModal('budget')" aria-label="Filter by budget range">
             <p class="mr-1.5 text-[0.8rem]">Budget</p>
             @if(minBudget() === null || maxBudget() === null) {
@@ -98,7 +98,7 @@
             </div>
         </div>
     </div>
-    <div class="relative py-1 px-2.5 rounded-lg gray-border">
+    <div class="relative py-1 px-2.5 rounded-lg gray-border bg-white">
         <button 
             class="header" 
             (click)="toggleModal('targetDate')"
