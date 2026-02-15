@@ -90,7 +90,7 @@
     <app-summary-card>
         <p class="text-[1.15rem] font-medium mb-1">Expenses Breadown</p>
         <p class="text-[0.85rem] text-gray-500 mb-4">Total expenses for {{ TimePeriodMap[selectedTimePeriod()] }}</p>
-        <app-expense-breakdown-chart [data]="expenseBreakdown()" />
+        <app-expense-breakdown-chart [data]="expenseBreakdown()" [timePeriod]="selectedTimePeriod()" />
     </app-summary-card>
 </div>
 <div class="grid gap-4 grid-cols-3 grid-rows-1">

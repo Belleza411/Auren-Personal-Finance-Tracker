@@ -1,9 +1,10 @@
-import { Component, computed, input, OnChanges, signal } from '@angular/core';
+import { Component, computed, input, OnChanges, signal, viewChild } from '@angular/core';
 import { ExpenseBreakdown } from '../../models/dashboard.model';
 import { Chart, ChartData, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from "ng2-charts";
 import { CurrencyPipe } from '@angular/common';
 import { centerTextPlugin } from '../constants/center-text-plugin';
+import { TimePeriod } from '../../../transactions/models/transaction.model';
 
 Chart.register(centerTextPlugin);
 
@@ -15,6 +16,10 @@ Chart.register(centerTextPlugin);
 })
 export class ExpenseBreakdownChart implements OnChanges {
   data = input.required<ExpenseBreakdown>();
+  timePeriod = input.required<TimePeriod>();
+  chart = viewChild<BaseChartDirective>('baseChart');
+
+  lastTimePeriod?: TimePeriod;
 
   items = computed(() => {
     const breakdown = this.data();
@@ -31,6 +36,18 @@ export class ExpenseBreakdownChart implements OnChanges {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '70%',
+    animations: {
+      circumference: {
+        from: 0,
+        duration: 1200,
+        easing: 'easeOutQuart',
+      },
+      rotate: {
+        from: -90,
+        duration: 1200,
+        easing: 'easeOutQuart',
+      },
+    },
     plugins: {
       legend: {
         display: false
@@ -58,12 +75,18 @@ export class ExpenseBreakdownChart implements OnChanges {
     if(!this.data()) return;
 
     this.doughnutData = {
-      labels: this.data().labels,
+      labels: [...this.data().labels],
       datasets: [{
-        data: this.data().data,
-        backgroundColor: this.data().backgroundColor
+        data: [...this.data().data],
+        backgroundColor: [...this.data().backgroundColor]
       }],
-      
     }
+
+    if (this.lastTimePeriod && this.lastTimePeriod !== this.timePeriod()) {
+      this.chart()?.chart?.reset();
+      this.chart()?.chart?.update('active');
+    }
+
+    this.lastTimePeriod = this.timePeriod();
   }
 }
