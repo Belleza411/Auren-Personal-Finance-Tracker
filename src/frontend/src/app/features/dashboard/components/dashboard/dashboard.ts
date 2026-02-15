@@ -10,16 +10,17 @@ import { TransactionTable } from "../../../transactions/components/transaction-t
 import { signal } from '@angular/core';
 import { TimePeriod, Transaction } from '../../../transactions/models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
-import { Goal } from '../../../goals/models/goals.model';
-import { CurrentGoals } from "../current-goals/current-goals";
+import { Goal, GoalWithBgColor } from '../../../goals/models/goals.model';
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
 import { ExpenseBreakdown, IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { TimePeriodMap } from '../../../../shared/utils/enum-mapper.util';
 import { ExpenseBreakdownChart } from "../expense-breakdown-chart/expense-breakdown-chart";
+import { GoalComponent } from "../../../goals/components/goal/goal";
+import { generateBgColorByEmoji } from '../../../goals/utils/generateBgColorByEmoji';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, CurrentGoals, IncomeVsExpenseGraph, ExpenseBreakdownChart],
+  imports: [SummaryCard, RouterLink, CountUpDirective, TransactionTable, IncomeVsExpenseGraph, ExpenseBreakdownChart, GoalComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -201,7 +202,13 @@ export class DashboardComponent {
   avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
   incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? this.dummyChartData())  
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
-  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals())
+  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals());
+  currentGoalsWithBgColor = computed<GoalWithBgColor[]>(() => {
+    return this.currentGoals().map(g => ({
+      ...g,
+      bgColor: generateBgColorByEmoji(g.emoji)
+    }))
+  })
   expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? this.dummyExpenseBreakdown());
   isLoading = computed(() => this.dashboardResources.isLoading());
 

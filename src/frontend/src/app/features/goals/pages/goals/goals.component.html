@@ -182,61 +182,14 @@
 <div class="flex flex-col w-full gap-3 mb-3">
     @if(!isLoading()) {
         @for(goal of goalsWithColor();track goal.goalId) {
-            <div class="gray-border w-full bg-white flex flex-col p-4.5 gap-2">
-                <div class="w-full flex items-center justify-between mb-1">
-                    <div 
-                        class="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center"
-                        [style.background-color]="goal.bgColor"
-                    >
-                        <span class="text-xl">{{ goal.emoji }}</span>
-                    </div>
-                    <select
-                        class="gray-border py-2 pl-2 pr-10"
-                        aria-label="Change goal status"
-                        [value]="goal.goalStatus"
-                        (change)="onStatusChange(goal, $event)"
-                    >
-                        @for(type of goalStatusOptions; track $index) {
-                            @if($index !== 0) {
-                                <option [value]="$index" [selected]="$index === goal.goalStatus">{{ type }}</option>
-                            }
-                        }
-                    </select>
-                </div>
-                <h1 class="font-medium text-[1.30rem]">{{ goal.name }}</h1>
-                <p class="text-sm text-gray-600">{{ goal.description }}</p>
-                <div class="flex items-center justify-between mt-5">
-                    <p class="font-medium">{{ goal.spent ?? 0 | currency }}</p>
-                    <p class="font-medium">of {{ goal.budget | currency }}</p>
-                </div>
-                <div class="flex h-2 w-full bg-green-50 rounded-sm">
-                    <div class="bg-green-400 rounded-l-sm" [style.width.%]="goal.completionPercentage"></div>
-                </div>
-                <div class="mb-8 flex items-center justify-between">
-                    <p>{{ goal.completionPercentage ?? 0 }}% completed</p>
-                    <p>{{ goal.targetDate }} &#183; {{ goal.timeRemaining }} remaining</p>
-                </div>
-                <div class="flex items-center justify-between gap-2">
-                    <button 
-                        class="gray-border p-3 w-full cursor-pointer" 
-                        (click)="deleteGoal(goal.goalId)"
-                    >
-                        Delete Goal
-                    </button>
-                    <button 
-                        class="gray-border p-3 w-full cursor-pointer" 
-                        (click)="onEdit(goal.goalId)"
-                    >
-                        Update Goal
-                    </button>
-                    <button 
-                        class="w-full p-3 bg-[#1C4532] text-white rounded-md cursor-pointer"
-                        (click)="onAddMoney(goal.goalId)"
-                    >
-                        Add Money
-                    </button>
-                </div>
-            </div>
+            <app-goal 
+                [goal]="goal"
+                variant="full" 
+                (edit)="onEdit($event)"
+                (delete)="deleteGoal($event)"
+                (addMoney)="onAddMoney($event)"
+                (status)="onStatusChange($event, goal.goalId)"
+            />
         }
     }
 </div>

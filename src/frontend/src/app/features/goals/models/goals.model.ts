@@ -13,6 +13,10 @@ interface Goal {
     targetDate: Date | string;
 }
 
+interface GoalWithBgColor extends Goal {
+    bgColor: string;
+}
+
 interface NewGoal {
     name: string;
     description: string;
@@ -52,5 +56,6 @@ export type {
     GoalStatus,
     GoalFilter,
     NewGoal,
-    GoalsSummary
+    GoalsSummary,
+    GoalWithBgColor
 }

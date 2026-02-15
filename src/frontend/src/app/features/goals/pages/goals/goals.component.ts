@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit, resource, signal } from "@angular/core";
 import { GoalService } from "../../services/goal.service";
-import { Goal, GoalFilter, GoalStatus, NewGoal } from "../../models/goals.model";
+import { Goal, GoalFilter, GoalStatus, GoalWithBgColor, NewGoal } from "../../models/goals.model";
 import { filter, firstValueFrom, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -11,10 +11,11 @@ import { CurrencyPipe } from "@angular/common";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { generateBgColorByEmoji } from "../../utils/generateBgColorByEmoji";
+import { GoalComponent } from "../../components/goal/goal";
 
 @Component({
   selector: 'app-goals',
-  imports: [CurrencyPipe, PaginationComponent],
+  imports: [PaginationComponent, GoalComponent],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,6 +26,8 @@ export class GoalsComponent implements OnInit  {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
+
+  variant = input<'full' | 'compact'>('full');
 
   dummyGoals = signal<Goal[]>([
     {
@@ -79,13 +82,13 @@ export class GoalsComponent implements OnInit  {
   isLoading = signal(false);
   totalCount = computed(() => this.goalResource.value()?.totalCount ?? 100);
 
-  goalsWithColor = computed(() =>
+  goalsWithColor = computed<GoalWithBgColor[]>(() =>
     this.goals().map(goal => ({
       ...goal,
       bgColor: generateBgColorByEmoji(goal.emoji)
     }))
   );
-  
+
   searchTerm = signal<string>('');
   status = signal<GoalStatus | null>(null);
   minBudget = signal<number | null>(null);
@@ -263,11 +266,10 @@ export class GoalsComponent implements OnInit  {
     this.router.navigate(['/goals', 'create']);
   }
 
-  onStatusChange(goal: Goal, event: Event) {
-    const value = Number((event.target as HTMLSelectElement).value);
-    if (value === goal.goalStatus) return;
+  onStatusChange(status: number, id: string) {
+    const value = status === 0 ? null : status;
 
-    this.goalSer.updateGoal(goal.goalId, { status: value })
+    this.goalSer.updateGoal(id, { status: value })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.goalResource.reload(),
