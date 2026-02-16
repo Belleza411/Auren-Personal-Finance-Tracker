@@ -4,20 +4,24 @@ import { DashboardComponent } from "../../features/dashboard/components/dashboar
 export const mainRoutes: Routes = [
     {
         path: 'dashboard',
+        canActivate: [() => import('../auth/guards/auth-guard').then(m => m.authGuard)],
         component: DashboardComponent
     },
     {
         path: 'transactions',
+        canActivate: [() => import('../auth/guards/auth-guard').then(m => m.authGuard)],
         loadChildren: () => import('../../features/transactions/routes/transaction-route')
             .then(m => m.transactionRoutes)
     },
     {
         path: 'categories',
+        canActivate: [() => import('../auth/guards/auth-guard').then(m => m.authGuard)],
         loadChildren: () => import('../../features/categories/routes/category-route')
             .then(m => m.categoryRoutes)
     },
     {
         path: 'goals',
+        canActivate: [() => import('../auth/guards/auth-guard').then(m => m.authGuard)],
         loadChildren: () => import('../../features/goals/routes/goal-route')
             .then(m => m.goalRoutes)
     }

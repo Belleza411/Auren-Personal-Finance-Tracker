@@ -6,12 +6,13 @@ namespace Auren.Application.Interfaces.Repositories
 {
 	public interface ITokenRepository
 	{
-		Task<RefreshToken> GenerateRefreshTokenAsync(ApplicationUser user);
-		string GenerateAccessTokenAsync(ApplicationUser user);
+        Task<RefreshToken?> GetRefreshTokenAsync(Guid userId, string token);
+        Task<RefreshToken> GenerateRefreshTokenAsync(Guid userId);
+		string GenerateAccessTokenAsync();
         Task<bool> ValidateRefreshTokenAsync(CookieValidatePrincipalContext context);
         Task RevokeRefreshTokenAsync(string token, string reason);
         Task RevokeAllUserRefreshTokensAsync(Guid userId);
         Task CleanupExpiredTokensAsync();
-        Task RotateRefreshTokenAsync(Guid userId);
+        Task<RefreshToken> RotateRefreshTokenAsync(RefreshToken token);
     }
 }

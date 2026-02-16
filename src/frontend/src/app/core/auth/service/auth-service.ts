@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { apiUrl } from '../../../../environments/environment';
 import { AuthResponse, Login, Register } from '../models/user.model';
@@ -11,6 +11,8 @@ import { AuthResponse, Login, Register } from '../models/user.model';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${apiUrl}/api/auth`;
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   register(request: Register): Observable<AuthResponse> {
     const formData = this.buildRegistrationFormData(request);
@@ -23,7 +25,15 @@ export class AuthService {
   }
 
   logout(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {});
+    return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {}, { withCredentials: true });
+  }
+
+  refresh(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/refresh`, {}, { withCredentials: true });
+  }
+
+  markAuthenticated() {
+    this.isAuthenticatedSubject.next(true);
   }
 
   private buildRegistrationFormData(request: Register): FormData {

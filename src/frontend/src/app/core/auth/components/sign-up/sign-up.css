@@ -1,0 +1,38 @@
+@reference 'tailwindcss';
+
+:host {
+    @apply flex flex-col mx-16 my-10
+}
+
+:host form .field,
+:host form p {
+    @apply flex flex-col
+}
+
+:host form .field label,
+:host form p label {
+    @apply text-[#718096] mb-2;
+}
+
+:host .toggle-icon {
+    @apply absolute right-[0.9rem] cursor-pointer select-none opacity-[0.7] text-[1.2rem]
+}
+
+:host form .field input,
+:host form p input {
+    @apply py-4 pr-40 pl-2 rounded-lg border border-solid border-gray-400 w-full;
+}
+
+:host form .field input.error,
+:host form p input.error {
+    @apply border border-solid border-red-600;
+}
+
+:host form .field .error-list,
+:host form p .error-list {
+    @apply text-red-600 list-none text-[0.9rem] mt-2;
+}
+
+:host form button:disabled { 
+    @apply cursor-not-allowed opacity-[0.6]
+}

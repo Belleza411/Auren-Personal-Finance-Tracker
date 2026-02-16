@@ -15,7 +15,7 @@ namespace Auren.API.Controllers
 	[Route("api/[controller]")]
 	[ApiController]
     [EnableRateLimiting("fixed")]
-    public class ProfilesController(IProfileService profileService, ITransactionService transactionService) : ControllerBase
+    public class ProfilesController(IProfileService profileService) : ControllerBase
 	{
 		[HttpGet("me")]
 		public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken cancellationToken)

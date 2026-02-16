@@ -17,7 +17,7 @@ namespace Auren.API.Controllers
 {
 	[Route("api/auth")]
 	[ApiController]
-	public class AuthController(ITokenRepository tokenRepository, IUserService userService) : ControllerBase
+	public class AuthController(ITokenService tokenService, IUserService userService) : ControllerBase
 	{
 
 		[HttpPost("register")]
@@ -65,12 +65,10 @@ namespace Auren.API.Controllers
 		{
 			var userId = User.GetCurrentUserId();
 
-			if (userId == null)
-			{
+			if (userId == null)			
 				return BadRequest("Logout attempted without valid user session");
-            }
-
-            await tokenRepository.RevokeAllUserRefreshTokensAsync(userId.Value);
+            
+            await tokenService.RevokeAllUserRefreshTokens(userId.Value);
 
 			var logoutResult  = await userService.LogoutAsync(cancellationToken);
 
@@ -89,6 +87,49 @@ namespace Auren.API.Controllers
 				Success = true,
 				Message = "Logged out successfully"
 			});
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var refreshToken = Request.Cookies["Auren.Session"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized();
+
+            var storedToken = await tokenService.GetRefreshToken(userId.Value, refreshToken);
+
+            if (!storedToken.IsSuccess)
+                return Unauthorized();
+
+            var newToken = await tokenService.RotateRefreshToken(storedToken.Value);
+
+            if (!newToken.IsSuccess)
+                return Unauthorized();
+
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, userId.Value.ToString()),
+                new(ClaimTypes.Email, storedToken.Value.User.Email!)
+            };
+
+            var principal = new ClaimsPrincipal(
+                new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10)
+                });
+
+            return Ok();
         }
     }
 }

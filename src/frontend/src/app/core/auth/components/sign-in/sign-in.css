@@ -1,0 +1,37 @@
+@reference 'tailwindcss';
+
+:host {
+    @apply flex flex-col mx-20;
+}
+
+:host form .field {
+    @apply flex flex-col
+}
+
+:host form .field label {
+    @apply text-[#718096] mb-2
+}
+
+:host form .field input {
+    @apply py-4 pr-40 pl-2 rounded-lg border border-solid border-gray-400 w-full;
+}
+
+:host form .field input.error {
+    @apply border border-solid border-red-600;
+}
+
+:host form .field .error-list {
+    @apply text-red-600 list-none text-[0.9rem] mt-2;
+}
+
+:host form .forgot-password {
+    @apply flex items-end justify-end font-semibold;
+}
+
+:host .toggle-icon {
+    @apply absolute right-3.5 cursor-pointer select-none opacity-[0.7] text-xl;
+}
+
+:host form button:disabled {
+    @apply cursor-not-allowed opacity-[0.6]
+}

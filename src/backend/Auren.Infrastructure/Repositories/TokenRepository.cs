@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -15,6 +16,13 @@ namespace Auren.Infrastructure.Repositories
 		UserManager<ApplicationUser> userManager) 
 		: ITokenRepository
 	{
+        public async Task<RefreshToken?> GetRefreshTokenAsync(Guid userId, string token)
+        {
+            return await dbContext.RefreshTokens
+                .Where(rt => rt.UserId == userId && rt.Token == token && rt.IsActive)
+                .FirstOrDefaultAsync();
+        }
+
 		public async Task CleanupExpiredTokensAsync()
 		{
 			var expiredTokens = await dbContext.RefreshTokens
@@ -25,7 +33,7 @@ namespace Auren.Infrastructure.Repositories
 			await dbContext.SaveChangesAsync();
         }
 
-		public string GenerateAccessTokenAsync(ApplicationUser user)
+		public string GenerateAccessTokenAsync()
 		{
 			var tokenBytes = new byte[32];
 			using var rng = RandomNumberGenerator.Create();
@@ -34,9 +42,9 @@ namespace Auren.Infrastructure.Repositories
 			return token;
         }
 
-		public async Task<RefreshToken> GenerateRefreshTokenAsync(ApplicationUser user)
+		public async Task<RefreshToken> GenerateRefreshTokenAsync(Guid userId)
 		{
-			await RevokeAllUserRefreshTokensAsync(user.UserId);
+			await RevokeAllUserRefreshTokensAsync(userId);
 
             var tokenBytes = new byte[64];
             using var rng = RandomNumberGenerator.Create();
@@ -47,7 +55,7 @@ namespace Auren.Infrastructure.Repositories
 			{
 				Token = token,
 				ExpiryDate = DateTime.UtcNow.AddDays(14),
-				UserId = user.UserId
+				UserId = userId
             };
 
 			await dbContext.RefreshTokens.AddAsync(refreshToken);
@@ -83,29 +91,29 @@ namespace Auren.Infrastructure.Repositories
 				refreshToken.IsRevoked = true;
 				refreshToken.RevokedAt = DateTime.UtcNow;
 				refreshToken.ReasonRevoked = reason;
-
-				await dbContext.SaveChangesAsync();
             }
+
+			await dbContext.SaveChangesAsync();
 		}
 
-		public async Task RotateRefreshTokenAsync(Guid userId)
+		public async Task<RefreshToken> RotateRefreshTokenAsync(RefreshToken token)
 		{
-			var currentToken = await dbContext.RefreshTokens
-				.FirstOrDefaultAsync(rt => rt.UserId == userId && rt.IsActive);
+            await RevokeRefreshTokenAsync(token.Token, "Rotated");
 
-			if (currentToken != null)
-			{
-				var user = await userManager.Users
-					.FirstOrDefaultAsync(u => u.UserId == userId);
+            var newToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
-                if (user != null)
-				{
-					var newToken = await GenerateRefreshTokenAsync(user);
+            var refreshToken = new RefreshToken
+            {
+                Token = newToken,
+                ExpiryDate = DateTime.UtcNow.AddDays(14),
+                UserId = token.UserId
+            };
 
-                    await dbContext.SaveChangesAsync();
-                }
-            }
-		}
+            await dbContext.RefreshTokens.AddAsync(refreshToken);
+            await dbContext.SaveChangesAsync();
+
+            return refreshToken;
+        }
 
         public async Task<bool> ValidateRefreshTokenAsync(CookieValidatePrincipalContext context)
         {
@@ -147,23 +155,21 @@ namespace Auren.Infrastructure.Repositories
                 }
 
                 var expiresUtc = context.Properties.ExpiresUtc;
-                var shouldRenew = expiresUtc.HasValue && DateTime.UtcNow > expiresUtc.Value.AddMinutes(-2);
+                var shouldRenew = expiresUtc.HasValue && DateTime.UtcNow > expiresUtc.Value;
 
                 if (shouldRenew)
                 {
-                    var newAccessToken = GenerateAccessTokenAsync(user);
+                    var isRefreshTokenExists = await dbContext.RefreshTokens
+                        .AnyAsync(rt => 
+                            rt.UserId == userId 
+                            && rt.IsActive
+                            && rt.ExpiryDate > DateTime.UtcNow);
 
-                    var identity = (ClaimsIdentity)context.Principal?.Identity!;
-                    var existingTokenClaim = identity.FindFirst("AccessToken");
-
-                    if (existingTokenClaim != null)
+                    if(!isRefreshTokenExists)
                     {
-                        identity.RemoveClaim(existingTokenClaim);
+                        context.RejectPrincipal();
+                        return false;
                     }
-
-                    identity.AddClaim(new Claim("AccessToken", newAccessToken));
-
-                    await RotateRefreshTokenAsync(userId);
 
                     context.Properties.IssuedUtc = DateTimeOffset.UtcNow;
                     context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10);

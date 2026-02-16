@@ -17,6 +17,7 @@ namespace Auren.Application.Extensions
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
         }
     }
 }
