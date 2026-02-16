@@ -1,159 +1,38 @@
+@reference 'tailwindcss';
+
 :host {
-    display: flex;
-    flex-direction: column;
-    margin: 0 4rem;
-}
-
-:host h1 {
-    font-size: 2.5rem;
-}
-
-:host .no-account {
-    margin: 2rem 0;
-    color: #718096;
-}
-
-:host .no-account a {
-    color: #1C4532;
-    text-decoration: underline;
-}
-
-:host form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-:host form .upload-profile {
-    display: inline-block;
-}
-
-:host form .upload-profile .profile-image-wrapper {
-    border-radius: 100%;
-    height: 6rem;
-    width: 6rem;
-    position: relative;
-}
-
-:host form .upload-profile .profile-image-wrapper .profile-image {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    overflow: hidden;
-    background-color: gray;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-:host form .upload-profile .profile-image-wrapper .profile-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-:host form .upload-profile .profile-image-wrapper .upload-icon {
-    position: absolute;
-    bottom: -5px;
-    right: -10px;
-    width: 40px;
-    height: 40px;
-    background-color: #000;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 3.5px solid white;
-}
-
-:host form .upload-profile .profile-image-wrapper .upload-icon span {
-    color: #fff;
-    font-size: 1.2rem;
-}
-
-:host form .upload-profile .profile-image-wrapper input {
-    display: none;
-}
-
-:host form .name {
-    display: flex;
-    gap: 1rem;
+    @apply flex flex-col mx-16 my-10
 }
 
 :host form .field,
 :host form p {
-    display: flex;
-    flex-direction: column;
+    @apply flex flex-col
 }
 
 :host form .field label,
 :host form p label {
-    color: #718096;
-    margin-bottom: 0.5rem;
+    @apply text-[#718096] mb-2;
 }
 
-:host form .field .password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-:host form .field .password-wrapper input {
-    width: 100%;
-    padding-right: 2.5rem;
-}
-
-:host form .field .password-wrapper .toggle-icon {
-    position: absolute;
-    right: 0.9rem;
-    cursor: pointer;
-    user-select: none;
-    opacity: 0.7;
-    font-size: 1.2em;
+:host .toggle-icon {
+    @apply absolute right-[0.9rem] cursor-pointer select-none opacity-[0.7] text-[1.2rem]
 }
 
 :host form .field input,
 :host form p input {
-    padding: 1rem 10rem 1rem 0.5rem;
-    border-radius: 10px;
-    border: 1px solid #CBD5E0;
-    width: 100%;
+    @apply py-4 pr-40 pl-2 rounded-lg border border-solid border-gray-400 w-full;
 }
 
 :host form .field input.error,
 :host form p input.error {
-    border: 1px solid red;
+    @apply border border-solid border-red-600;
 }
 
 :host form .field .error-list,
 :host form p .error-list {
-    color: red;
-    list-style-type: none;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    @apply text-red-600 list-none text-[0.9rem] mt-2;
 }
 
-:host form button {
-    font-weight: bold;
-    background-color: #1C4532;
-    color: #fff;
-    border: none;
-    padding: 1rem 0;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-}
-
-:host form button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6; 
-}
-
-.spinning {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+:host form button:disabled { 
+    @apply cursor-not-allowed opacity-[0.6]
 }

@@ -1,8 +1,13 @@
-<h1>Sign In</h1>
-<p class="no-account">Don't have an account?
-    <a routerLink="/auth/sign-up">Create Now</a>
+<h1 class="text-[2.5rem]">Sign In</h1>
+<p class="my-8 text-[#718096]">Don't have an account?
+    <a 
+        routerLink="/auth/sign-up"
+        class="text-[#1c4532] underline"
+    >
+        Create Now
+    </a>
 </p>
-<form (submit)="onSubmit($event)">
+<form (submit)="onSubmit($event)" class="flex flex-col gap-9">
     <div class="field">
         <label for="email">Email</label>
         <input 
@@ -20,22 +25,7 @@
     </div>
     <div class="field">
         <label for="password">Password</label>
-        <div class="password-wrapper">
-            <!-- @if (showPassword()) {
-                <input
-                    type="text"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.password()"
-                    [field]="loginForm.password"
-                />
-            } @else {
-                <input
-                    type="password"
-                    placeholder="&@^ncq2"
-                    [class.error]="fieldErrors.password()"
-                    [field]="loginForm.password"
-                />
-            } -->
+        <div class="relative flex items-center">
                 <input
                     [type]="showPassword() ? 'text' : 'password'"
                     placeholder="&@^ncq2"
@@ -43,7 +33,7 @@
                     [formField]="loginForm.password"
                 />
             <span
-                class="material-symbols-outlined toggle-icon"
+                class="material-symbols-rounded toggle-icon"
                 (click)="togglePassword()"
             >
                 {{ showPassword() ? 'visibility_off' : 'visibility' }}
@@ -58,14 +48,15 @@
         }
     </div>
     <div class="forgot-password">
-        <a routerLink="/auth/forgot-password">Forgot Password?</a>
+        <a routerLink="/auth/forgot-password" class="text-[#1c4532] underline">Forgot Password?</a>
     </div>
     <button 
         type="submit"
+        class="font-bold bg-[#1c4532] text-white border-none py-4 text-[0.9rem] rounded-lg"
         [disabled]="isLoading() || loginForm().invalid"
     >
         @if(isLoading()) {
-            <span class="material-symbols-outlined spinning">
+            <span class="material-symbols-outlined animate-spin">
                 progress_activity
             </span>
         } @else {
