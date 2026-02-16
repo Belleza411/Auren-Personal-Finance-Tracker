@@ -28,7 +28,7 @@ namespace Auren.Application.Services
         private readonly IProfileRepository _profileRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ILogger<UserService> _logger;
-        private readonly ITokenRepository _tokenRepository;
+        private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 		public UserService(IUserRepository userRepository,
@@ -37,7 +37,7 @@ namespace Auren.Application.Services
             IProfileRepository profileRepository,
             ICategoryRepository categoryRepository,
             ILogger<UserService> logger,
-            ITokenRepository tokenRepository,
+            ITokenService tokenService,
             IHttpContextAccessor httpContextAccessor)
 		{
 			_userRepository = userRepository;
@@ -46,7 +46,7 @@ namespace Auren.Application.Services
 			_profileRepository = profileRepository;
 			_categoryRepository = categoryRepository;
 			_logger = logger;
-			_tokenRepository = tokenRepository;
+            _tokenService = tokenService;
 			_httpContextAccessor = httpContextAccessor;
 		}
 
@@ -139,7 +139,7 @@ namespace Auren.Application.Services
                     return Result.Failure<bool>(Error.InvalidInput("No active session or invalid user id"));
 
                 if(!string.IsNullOrEmpty(userId) && !Guid.TryParse(userId, out var parsedUserId))
-                    await _tokenRepository.RevokeAllUserRefreshTokensAsync(parsedUserId);
+                    await _tokenService.RevokeAllUserRefreshTokens(parsedUserId);
 
                 await _httpContextAccessor.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -286,7 +286,7 @@ namespace Auren.Application.Services
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var refreshToken = await _tokenRepository.GenerateRefreshTokenAsync(user);
+            await _tokenService.GenerateRefreshToken(user.UserId);
 
             await _httpContextAccessor.HttpContext!.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
