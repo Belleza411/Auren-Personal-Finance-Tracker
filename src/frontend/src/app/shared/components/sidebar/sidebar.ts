@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
-import { AuthService } from '../../../features/auth/service/auth-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SIDEBAR_MENU } from './sidebar-menu';
 import { ProfileComponent } from "../../../features/profile/profile/profile";
+import { AuthService } from '../../../core/auth/service/auth-service';
 
 @Component({
   selector: 'app-sidebar',

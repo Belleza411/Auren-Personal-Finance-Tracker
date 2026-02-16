@@ -1,6 +1,6 @@
-import { Route, Routes } from "@angular/router";
-import { SignInFormComponent } from "../../features/auth/components/sign-in/sign-in";
-import { SignUpFormComponent } from "../../features/auth/components/sign-up/sign-up";
+import { Routes } from "@angular/router";
+import { SignInFormComponent } from "../auth/components/sign-in/sign-in";
+import { SignUpFormComponent } from "../auth/components/sign-up/sign-up";
 
 export const authRoutes: Routes = [
     {
