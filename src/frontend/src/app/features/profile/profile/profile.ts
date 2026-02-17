@@ -13,14 +13,7 @@ export class ProfileComponent implements OnInit {
   private profileService = inject(ProfileService);
   private destroyRef = inject(DestroyRef);
 
-  user = signal<UserResponse | null>({
-    email: "aevanazelleb@gmail.com",
-    firstName: "Aevan",
-    lastName: "Belleza",
-    profilePictureUrl: null,
-    createdAt: "June 3, 2006",
-    lastLoginAt: "February 2, 2026"
-  });
+  user = signal<UserResponse | null>(null);
 
   readonly email = computed(() => this.user()?.email)
   readonly fullName = computed(() => {

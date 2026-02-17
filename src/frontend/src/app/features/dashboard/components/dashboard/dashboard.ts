@@ -30,165 +30,165 @@ export class DashboardComponent {
   private transactionSer = inject(TransactionService);
   private goalSer = inject(GoalService);
 
-  protected readonly dummyCategories = signal<Category[]>([
-        {
-            categoryId: '1',
-            userId: '1',
-            name: 'Salary',
-            transactionType: 1,
-            createdAt: "June 1, 2025"
-        },
-        {
-            categoryId: '2',
-            userId: '1',
-            name: 'Shopping',
-            transactionType: 2,
-            createdAt: "June 2, 2025"
-        },
-        {
-            categoryId: '3',
-            userId: '1',
-            name: 'Health',
-            transactionType: 2,
-            createdAt: "June 10, 2025"
-        }
-  ]);
+  // protected readonly dummyCategories = signal<Category[]>([
+  //       {
+  //           categoryId: '1',
+  //           userId: '1',
+  //           name: 'Salary',
+  //           transactionType: 1,
+  //           createdAt: "June 1, 2025"
+  //       },
+  //       {
+  //           categoryId: '2',
+  //           userId: '1',
+  //           name: 'Shopping',
+  //           transactionType: 2,
+  //           createdAt: "June 2, 2025"
+  //       },
+  //       {
+  //           categoryId: '3',
+  //           userId: '1',
+  //           name: 'Health',
+  //           transactionType: 2,
+  //           createdAt: "June 10, 2025"
+  //       }
+  // ]);
 
-  protected dummyTransactions = signal<Transaction[]>([
-        {
-            transactionId: '1',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.0,
-            paymentType: 3,
-            transactionDate: 'June 1, 2025',
-            createdAt: 'June 1, 2025'
-        },
-        {
-            transactionId: '2',
-            userId: '1',
-            categoryId: '2',
-            category: this.dummyCategories()[1],
-            transactionType: 2,
-            name: 'Groceries',
-            amount: 100.0,
-            paymentType: 3,
-            transactionDate: 'June 2, 2025',
-            createdAt: 'June 2, 2025'
-        },
-        {
-            transactionId: '3',
-            userId: '1',
-            categoryId: '3',
-            category: this.dummyCategories()[2],
-            transactionType: 2,
-            name: 'Health Insurance',
-            amount: 55.0,
-            paymentType: 3,
-            transactionDate: 'June 10, 2025',
-            createdAt: 'June 10, 2025'
-        },
-        {
-            transactionId: '1',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.0,
-            paymentType: 3,
-            transactionDate: 'June 1, 2025',
-            createdAt: 'June 1, 2025'
-        },
-        {
-            transactionId: '2',
-            userId: '1',
-            categoryId: '2',
-            category: this.dummyCategories()[1],
-            transactionType: 2,
-            name: 'Groceries',
-            amount: 100.0,
-            paymentType: 3,
-            transactionDate: 'June 2, 2025',
-            createdAt: 'June 2, 2025'
-        },
-        {
-            transactionId: '3',
-            userId: '1',
-            categoryId: '3',
-            category: this.dummyCategories()[2],
-            transactionType: 2,
-            name: 'Health Insurance',
-            amount: 55.0,
-            paymentType: 3,
-            transactionDate: 'June 10, 2025',
-            createdAt: 'June 10, 2025'
-        }
-  ]);
+  // protected dummyTransactions = signal<Transaction[]>([
+  //       {
+  //           transactionId: '1',
+  //           userId: '1',
+  //           categoryId: '1',
+  //           category: this.dummyCategories()[0],
+  //           transactionType: 1,
+  //           name: 'Freelance Payment',
+  //           amount: 2000.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 1, 2025',
+  //           createdAt: 'June 1, 2025'
+  //       },
+  //       {
+  //           transactionId: '2',
+  //           userId: '1',
+  //           categoryId: '2',
+  //           category: this.dummyCategories()[1],
+  //           transactionType: 2,
+  //           name: 'Groceries',
+  //           amount: 100.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 2, 2025',
+  //           createdAt: 'June 2, 2025'
+  //       },
+  //       {
+  //           transactionId: '3',
+  //           userId: '1',
+  //           categoryId: '3',
+  //           category: this.dummyCategories()[2],
+  //           transactionType: 2,
+  //           name: 'Health Insurance',
+  //           amount: 55.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 10, 2025',
+  //           createdAt: 'June 10, 2025'
+  //       },
+  //       {
+  //           transactionId: '1',
+  //           userId: '1',
+  //           categoryId: '1',
+  //           category: this.dummyCategories()[0],
+  //           transactionType: 1,
+  //           name: 'Freelance Payment',
+  //           amount: 2000.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 1, 2025',
+  //           createdAt: 'June 1, 2025'
+  //       },
+  //       {
+  //           transactionId: '2',
+  //           userId: '1',
+  //           categoryId: '2',
+  //           category: this.dummyCategories()[1],
+  //           transactionType: 2,
+  //           name: 'Groceries',
+  //           amount: 100.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 2, 2025',
+  //           createdAt: 'June 2, 2025'
+  //       },
+  //       {
+  //           transactionId: '3',
+  //           userId: '1',
+  //           categoryId: '3',
+  //           category: this.dummyCategories()[2],
+  //           transactionType: 2,
+  //           name: 'Health Insurance',
+  //           amount: 55.0,
+  //           paymentType: 3,
+  //           transactionDate: 'June 10, 2025',
+  //           createdAt: 'June 10, 2025'
+  //       }
+  // ]);
 
-  dummyGoals = signal<Goal[]>([
-    {
-      goalId: 'goal-001',
-      userId: 'user-123',
-      name: 'Buy a New Laptop',
-      description: 'Save money to buy a high-performance laptop for development and studies.',
-      emoji: '💻',
-      spent: 450,
-      budget: 1500,
-      goalStatus: 2,
-      completionPercentage: 30,
-      timeRemaining: '3 months',
-      createdAt: 'January 5, 2025',
-      targetDate: 'April 30, 2025',
-    },
-    {
-      goalId: 'goal-002',
-      userId: 'user-123',
-      name: 'Emergency Savings Fund',
-      description: 'Build an emergency fund for unexpected expenses.',
-      emoji: '💰',
-      spent: 1200,
-      budget: 3000,
-      goalStatus: 2,
-      completionPercentage: 40,
-      timeRemaining: '6 months',
-      createdAt: 'December 1, 2024',
-      targetDate: 'August 1, 2025',
-    },
-    {
-      goalId: 'goal-003',
-      userId: 'user-123',
-      name: 'Vacation Trip',
-      description: 'Save for a short holiday trip with friends.',
-      emoji: '🌴',
-      spent: null,
-      budget: 2000,
-      goalStatus: 4,
-      completionPercentage: null,
-      timeRemaining: '9 months',
-      createdAt: 'January 20, 2025',
-      targetDate: 'October 15, 2025',
-    }
-  ])
+  // dummyGoals = signal<Goal[]>([
+  //   {
+  //     goalId: 'goal-001',
+  //     userId: 'user-123',
+  //     name: 'Buy a New Laptop',
+  //     description: 'Save money to buy a high-performance laptop for development and studies.',
+  //     emoji: '💻',
+  //     spent: 450,
+  //     budget: 1500,
+  //     goalStatus: 2,
+  //     completionPercentage: 30,
+  //     timeRemaining: '3 months',
+  //     createdAt: 'January 5, 2025',
+  //     targetDate: 'April 30, 2025',
+  //   },
+  //   {
+  //     goalId: 'goal-002',
+  //     userId: 'user-123',
+  //     name: 'Emergency Savings Fund',
+  //     description: 'Build an emergency fund for unexpected expenses.',
+  //     emoji: '💰',
+  //     spent: 1200,
+  //     budget: 3000,
+  //     goalStatus: 2,
+  //     completionPercentage: 40,
+  //     timeRemaining: '6 months',
+  //     createdAt: 'December 1, 2024',
+  //     targetDate: 'August 1, 2025',
+  //   },
+  //   {
+  //     goalId: 'goal-003',
+  //     userId: 'user-123',
+  //     name: 'Vacation Trip',
+  //     description: 'Save for a short holiday trip with friends.',
+  //     emoji: '🌴',
+  //     spent: null,
+  //     budget: 2000,
+  //     goalStatus: 4,
+  //     completionPercentage: null,
+  //     timeRemaining: '9 months',
+  //     createdAt: 'January 20, 2025',
+  //     targetDate: 'October 15, 2025',
+  //   }
+  // ])
 
-  dummyChartData = signal<IncomeVsExpenseResponse>(
-    {
-      labels: ['Jan', 'Jan 1', 'Jan 2', 'Jan 10', 'Feb', 'Feb 14', 'Mar', 'Mar 20', 'Mar 21'],
-      incomes: [0, 200, 150, 0, 300, 0, 400, 120, 200],
-      expenses: [0, 50, 80, 0, 200, 0, 90, 60, 50]
-    }
-  )
+  // dummyChartData = signal<IncomeVsExpenseResponse>(
+  //   {
+  //     labels: ['Jan', 'Jan 1', 'Jan 2', 'Jan 10', 'Feb', 'Feb 14', 'Mar', 'Mar 20', 'Mar 21'],
+  //     incomes: [0, 200, 150, 0, 300, 0, 400, 120, 200],
+  //     expenses: [0, 50, 80, 0, 200, 0, 90, 60, 50]
+  //   }
+  // )
 
-  dummyExpenseBreakdown = signal<ExpenseBreakdown>({
-    labels: ['Shopping', 'Health', 'Entertainment', 'Bills'],  
-    data: [300, 150, 100, 50],
-    percentage: [50, 25, 16, 8],
-    backgroundColor: ['rgba(14, 165, 233, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)', 'rgba(239, 68, 68, 1)'],
-    totalSpent: 600
-  });
+  // dummyExpenseBreakdown = signal<ExpenseBreakdown>({
+  //   labels: ['Shopping', 'Health', 'Entertainment', 'Bills'],  
+  //   data: [300, 150, 100, 50],
+  //   percentage: [50, 25, 16, 8],
+  //   backgroundColor: ['rgba(14, 165, 233, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)', 'rgba(239, 68, 68, 1)'],
+  //   totalSpent: 600
+  // });
 
   TimePeriodMap = TimePeriodMap;
 
@@ -196,20 +196,20 @@ export class DashboardComponent {
 
   timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
   
-  totalBalance = computed(() => this.dashboardResources.value()?.totalBalance.totalBalance ?? { amount: 2500, percentageChange: 20 });
-  income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 2000, percentageChange: 10 });
-  expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 500, percentageChange: 2 });
-  avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 50.11);
-  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? this.dummyChartData())  
-  recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? this.dummyTransactions());
-  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? this.dummyGoals());
+  totalBalance = computed(() => this.dashboardResources.value()?.totalBalance.totalBalance ?? { amount: 0, percentageChange: 0 });
+  income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 0, percentageChange: 0 });
+  expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 0, percentageChange: 0 });
+  avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 0);
+  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? [])  
+  recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? []);
+  currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? []);
   currentGoalsWithBgColor = computed<GoalWithBgColor[]>(() => {
     return this.currentGoals().map(g => ({
       ...g,
       bgColor: generateBgColorByEmoji(g.emoji)
     }))
   })
-  expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? this.dummyExpenseBreakdown());
+  expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? []);
   isLoading = computed(() => this.dashboardResources.isLoading());
 
   options = {
