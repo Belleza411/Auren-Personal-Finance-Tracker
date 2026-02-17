@@ -24,6 +24,10 @@
     @apply cursor-pointer flex items-center border-0 bg-none;
 }
 
+:host .no-result {
+    @apply text-[1rem] text-center;
+}
+
 .material-symbols-rounded {
   font-variation-settings:
     "FILL" 0,

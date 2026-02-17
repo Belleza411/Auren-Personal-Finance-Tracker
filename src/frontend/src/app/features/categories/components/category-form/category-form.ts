@@ -33,9 +33,6 @@ export class CategoryForm {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    console.log(this.modelSignal());
-    
-
     submit(this.categoryForm, async () => {
       this.isLoading.set(true);
       this.save.emit(this.modelSignal());

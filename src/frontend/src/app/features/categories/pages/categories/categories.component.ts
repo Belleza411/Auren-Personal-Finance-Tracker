@@ -9,6 +9,7 @@ import { TimePeriod } from '../../../transactions/models/transaction.model';
 import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
 import { CategoryTable } from "../../components/category-table/category-table";
+import { dummyCategories } from '../../../../shared/fake-data';
 
 @Component({
   selector: 'app-categories',
@@ -35,54 +36,30 @@ export class CategoriesComponent implements OnInit {
 
   timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-  protected readonly dummyCategories = signal<Category[]>([
-    {
-        categoryId: '1',
-        userId: '1',
-        name: 'Salary',
-        transactionType: 1,
-        createdAt: "June 1, 2025"
-    },
-    {
-        categoryId: '2',
-        userId: '1',
-        name: 'Shopping',
-        transactionType: 2,
-        createdAt: "June 2, 2025"
-    },
-    {
-        categoryId: '3',
-        userId: '1',
-        name: 'Health',
-        transactionType: 2,
-        createdAt: "June 10, 2025"
-    },
-    {
-      categoryId: '4',
-      userId: '1',
-      name: 'Utilities',
-      transactionType: 2,
-      createdAt: "June 11, 2025"
-    },
-    {
-      categoryId: '5',
-      userId: '1',
-      name: 'Gifts',
-      transactionType: 2,
-      createdAt: "June 12, 2025"
-    },
-    {
-      categoryId: '5',
-      userId: '1',
-      name: 'Gas',
-      transactionType: 2,
-      createdAt: "June 12, 2025"
-    }
-  ]);
+  protected readonly dummyCategories = signal<Category[]>(dummyCategories);
 
-  categories = computed(() => this.categoryResource.value()?.items ?? this.dummyCategories());
+  categories = computed(() => this.categoryResource.value()?.items ?? []);
   isLoading = computed(() => this.categoryResource.isLoading())
-  totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 100);
+  totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 0);
+
+  hasActiveFilters = computed(() => {
+    const hasSearch = this.currentFilters().searchTerm.trim().length !== 0;
+    const hasType = this.currentFilters().transactionType !== null;
+
+    return hasSearch || hasType;
+  })
+
+  hasNoCategories = computed(() =>
+    !this.isLoading() &&
+    this.totalCount() === 0 &&
+    !this.hasActiveFilters()
+  )
+
+  hasNoFilterResults = computed(() =>
+      !this.isLoading() &&
+      this.totalCount() === 0 &&
+      this.hasActiveFilters()
+  )
 
   ngOnInit(): void {
     this.route.params

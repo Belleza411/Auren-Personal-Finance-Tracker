@@ -15,10 +15,20 @@
         </button>
     </div>
 </header>
-<app-category-table
-    [categories]="categories()"
-    [isLoading]="isLoading()"
-    [totalCount]="totalCount()"
-    (edit)="onEditFromTable($event)"
-    (delete)="deleteCategory($event)"
-/>
+@if(categories().length > 0) {
+    <app-category-table
+        [categories]="categories()"
+        [isLoading]="isLoading()"
+        [totalCount]="totalCount()"
+        (edit)="onEditFromTable($event)"
+        (delete)="deleteCategory($event)"
+    />
+}
+
+@if(hasNoCategories()) {
+    <p class="no-result">No categories yet</p>
+} 
+
+@if(hasNoFilterResults()) {
+    <p class="no-result">No results found</p>
+}

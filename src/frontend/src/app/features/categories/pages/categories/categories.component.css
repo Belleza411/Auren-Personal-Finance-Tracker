@@ -3,3 +3,7 @@
 :host {
     @apply flex flex-col overflow-hidden;
 }
+
+:host .no-result {
+    @apply text-[1rem] text-center;
+}
