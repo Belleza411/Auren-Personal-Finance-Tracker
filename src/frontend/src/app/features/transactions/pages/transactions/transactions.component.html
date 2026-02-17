@@ -25,14 +25,24 @@
         </button>
     </div>
 </header>
-<app-transaction-table 
-    [transactions]="transactions()" 
-    [categories]="categories()"
-    (delete)="deleteTransaction($event)"
-    (edit)="onEditFromTable($event)"
-    (filtersChange)="onFiltersChange($event)"
-    [totalCount]="totalCount()"
-    (pageNumberChange)="onPageChange($event)"
-    (pageSizeChange)="onPageSizeChange($event)"
-    [isLoading]="isLoading()"
-/>
+@if(transactions().length !== 0) {
+    <app-transaction-table 
+        [transactions]="transactions()" 
+        [categories]="categories()"
+        (delete)="deleteTransaction($event)"
+        (edit)="onEditFromTable($event)"
+        (filtersChange)="onFiltersChange($event)"
+        [totalCount]="totalCount()"
+        (pageNumberChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        [isLoading]="isLoading()"
+    />
+} 
+
+@if(hasNoTransactions()) {
+    <p class="no-result">No transactions yet</p>
+} 
+
+@if(hasNoFilterResults()) {
+    <p class="no-result">No results found</p>
+}

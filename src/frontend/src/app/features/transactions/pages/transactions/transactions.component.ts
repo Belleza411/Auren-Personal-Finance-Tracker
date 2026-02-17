@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, output, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, output, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
@@ -11,6 +11,7 @@ import { Category } from '../../../categories/models/categories.model';
 import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
+import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data';
 
 @Component({
   selector: 'app-transaction',
@@ -34,104 +35,9 @@ export class TransactionComponent implements OnInit {
 
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-    protected readonly dummyCategories = signal<Category[]>([
-        {
-            categoryId: '1',
-            userId: '1',
-            name: 'Salary',
-            transactionType: 1,
-            createdAt: "June 1, 2025"
-        },
-        {
-            categoryId: '2',
-            userId: '1',
-            name: 'Shopping',
-            transactionType: 2,
-            createdAt: "June 2, 2025"
-        },
-        {
-            categoryId: '3',
-            userId: '1',
-            name: 'Health',
-            transactionType: 2,
-            createdAt: "June 10, 2025"
-        }
-    ]);
+    protected readonly dummyCategories = signal<Category[]>(dummyCategories);
 
-    protected dummyTransactions = signal<Transaction[]>([
-        {
-            transactionId: '1',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.0,
-            paymentType: 3,
-            transactionDate: 'June 1, 2025',
-            createdAt: 'June 1, 2025'
-        },
-        {
-            transactionId: '2',
-            userId: '1',
-            categoryId: '2',
-            category: this.dummyCategories()[1],
-            transactionType: 2,
-            name: 'Groceries',
-            amount: 100.0,
-            paymentType: 3,
-            transactionDate: 'June 2, 2025',
-            createdAt: 'June 2, 2025'
-        },
-        {
-            transactionId: '3',
-            userId: '1',
-            categoryId: '3',
-            category: this.dummyCategories()[2],
-            transactionType: 2,
-            name: 'Health Insurance',
-            amount: 55.0,
-            paymentType: 3,
-            transactionDate: 'June 10, 2025',
-            createdAt: 'June 10, 2025'
-        },
-        {
-            transactionId: '1',
-            userId: '1',
-            categoryId: '1',
-            category: this.dummyCategories()[0],
-            transactionType: 1,
-            name: 'Freelance Payment',
-            amount: 2000.0,
-            paymentType: 3,
-            transactionDate: 'June 1, 2025',
-            createdAt: 'June 1, 2025'
-        },
-        {
-            transactionId: '2',
-            userId: '1',
-            categoryId: '2',
-            category: this.dummyCategories()[1],
-            transactionType: 2,
-            name: 'Groceries',
-            amount: 100.0,
-            paymentType: 3,
-            transactionDate: 'June 2, 2025',
-            createdAt: 'June 2, 2025'
-        },
-        {
-            transactionId: '3',
-            userId: '1',
-            categoryId: '3',
-            category: this.dummyCategories()[2],
-            transactionType: 2,
-            name: 'Health Insurance',
-            amount: 55.0,
-            paymentType: 3,
-            transactionDate: 'June 10, 2025',
-            createdAt: 'June 10, 2025'
-        }
-    ]);
+    protected dummyTransactions = signal<Transaction[]>(dummyTransactions);
     
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
@@ -151,11 +57,22 @@ export class TransactionComponent implements OnInit {
         decimalPlaces: 2
     };
 
-    transactions = computed(() => this.transactionResource.value()?.items ?? this.dummyTransactions());
-    categories = computed(() => this.categoryResource.value()?.items ?? this.dummyCategories());
-    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 100);
-    // isLoading = computed(() => this.transactionResource.isLoading());
-    isLoading = signal(false);
+    transactions = computed(() => this.transactionResource.value()?.items ?? []);
+    categories = computed(() => this.categoryResource.value()?.items ?? []);
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
+    isLoading = computed(() => this.transactionResource.isLoading());
+    
+    hasNoTransactions = computed(() => 
+        !this.isLoading() &&
+        this.totalCount() === 0 &&
+        !this.hasActiveFilters()
+    );
+
+    hasNoFilterResults = computed(() =>
+        !this.isLoading() &&
+        this.totalCount() === 0 &&
+        this.hasActiveFilters()
+    )
 
     ngOnInit(): void {
         this.route.params
@@ -191,8 +108,21 @@ export class TransactionComponent implements OnInit {
 
     categoryResource = resource({
         loader: () => 
-            firstValueFrom(this.categorySer.getAllCategories({}, Number.MAX_SAFE_INTEGER))
+            firstValueFrom(this.categorySer.getAllCategories({}, 50, 1))
     })
+
+    hasActiveFilters = computed(() => {
+        const filter = this.currentFilters();
+
+        const hasSearch = filter.searchTerm.trim().length !== 0;
+        const hasType = filter.transactionType !== null;
+        const hasCategory = filter.category.length !== 0;
+        const hasPayment = filter.paymentType !== null;
+        const hasAmount = filter.minAmount !== null|| filter.maxAmount !== null;
+        const hasDate = filter.startDate !== null || filter.endDate !== null;
+
+        return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
+    });
 
     deleteTransaction(id: string) {
         this.transactionSer.deleteTransaction(id)
