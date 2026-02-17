@@ -200,7 +200,7 @@ export class DashboardComponent {
   income = computed(() => this.dashboardResources.value()?.totalBalance.income ?? { amount: 0, percentageChange: 0 });
   expense = computed(() => this.dashboardResources.value()?.totalBalance.expense ?? { amount: 0, percentageChange: 0 });
   avgDailySpending = computed(() => this.dashboardResources.value()?.avgDailySpending ?? 0);
-  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? [])  
+  incomeVsExpenseData = computed(() => this.dashboardResources.value()?.incomeVsExpenseData ?? { labels: [], expenses: [], incomes: []})  
   recentTransactions = computed(() => this.dashboardResources.value()?.recentTransactions.items ?? []);
   currentGoals = computed(() => this.dashboardResources.value()?.recentGoals.items ?? []);
   currentGoalsWithBgColor = computed<GoalWithBgColor[]>(() => {
@@ -209,7 +209,7 @@ export class DashboardComponent {
       bgColor: generateBgColorByEmoji(g.emoji)
     }))
   })
-  expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? []);
+  expenseBreakdown = computed(() => this.dashboardResources.value()?.expenseBreakdown ?? { labels: [], data: [], percentage: [], backgroundColor: [], totalSpent: 0});
   isLoading = computed(() => this.dashboardResources.isLoading());
 
   options = {
