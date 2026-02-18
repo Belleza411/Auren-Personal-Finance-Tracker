@@ -1,26 +1,32 @@
 import { HttpParams } from '@angular/common/http';
+import { TimePeriod } from '../../features/transactions/models/transaction.model';
 
-export function createHttpParams(
-  filters: Record<string, any> = {},
+export function createHttpParams<T extends Record<string, any>>(
+  filters: T = {} as T,
   pageSize?: number,
-  pageNumber?: number
+  pageNumber?: number,
+  enumMap?: Partial<Record<keyof T, any>>
 ): HttpParams {
   const cleaned: Record<string, string | string[]> = {};
 
-  for (const [key, value] of Object.entries(filters)) {
-    if (value === undefined || value === null || value === '') {
+  for (const [key, value] of Object.entries(filters) as [keyof T, any][]) {
+    if (value === null || value === '') {
       continue;
     }
+
     if (Array.isArray(value)) {
       if (value.length > 0) {
-        cleaned[key] = value.map(v => String(v));
+        cleaned[key as string] = value.map(v => String(v));
       }
     }
     else if (value instanceof Date) {
-      cleaned[key] = value.toISOString();
+      cleaned[key as string] = value.toISOString();
+    }
+    else if (enumMap && key in enumMap && isEnumValue(enumMap[key]!, value)) {
+      cleaned[key as string] = value;
     }
     else {
-      cleaned[key] = String(value);
+      cleaned[key as string] = String(value);
     }
   }
 
@@ -29,3 +35,8 @@ export function createHttpParams(
 
   return new HttpParams({ fromObject: cleaned });
 }
+
+function isEnumValue<T>(enumObj: T, value: unknown): value is T[keyof T] {
+  return Object.values(enumObj as Record<string, unknown>).includes(value as any);
+}
+
