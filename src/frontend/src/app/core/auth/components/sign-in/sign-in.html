@@ -28,7 +28,6 @@
         <div class="relative flex items-center">
                 <input
                     [type]="showPassword() ? 'text' : 'password'"
-                    placeholder="&@^ncq2"
                     [class.error]="fieldErrors.password()"
                     [formField]="loginForm.password"
                 />
@@ -53,7 +52,7 @@
     <button 
         type="submit"
         class="font-bold bg-[#1c4532] text-white border-none py-4 text-[0.9rem] rounded-lg"
-        [disabled]="isLoading() || loginForm().invalid"
+        [disabled]="isLoading() || loginForm().invalid()"
     >
         @if(isLoading()) {
             <span class="material-symbols-outlined animate-spin">
