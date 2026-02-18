@@ -28,6 +28,17 @@ namespace Auren.API.Extensions
             });
 
             builder.Services.AddExceptionHandler<GlobalExceptionMiddleware>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Auren", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowCredentials()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
         }
     }
 }

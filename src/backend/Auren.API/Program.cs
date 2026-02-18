@@ -34,6 +34,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.EnsureCreated();
 }
 
+app.UseCors("Auren");
+
 app.MapControllers();
 
 app.Run();
