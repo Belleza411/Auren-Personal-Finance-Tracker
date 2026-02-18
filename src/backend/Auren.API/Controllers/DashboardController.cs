@@ -50,7 +50,7 @@ namespace Auren.API.Controllers
 
             var incomesVsExpensesData = await dashboardService.GetIncomesVsExpenses(userId.Value, timePeriod, cancellationToken);
 
-            return Ok(incomesVsExpensesData);
+            return Ok(incomesVsExpensesData.Value);
         }
     }
 }

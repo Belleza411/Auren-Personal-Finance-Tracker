@@ -124,10 +124,10 @@ namespace Auren.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
 
 
-            var totalSpent = data.Sum(x => x.Total);
+            var totalSpent = data.Sum(x => Math.Round(x.Total, 2));
             var labels = data.Select(x => x.Category.Name).ToList();
             var amounts = data.Select(x => x.Total).ToList();
-            var percentages = data.Select(x => totalSpent > 0 ? Math.Round((x.Total / totalSpent) * 100, 2) : 0).ToList();
+            var percentages = data.Select(x => totalSpent > 0 ? Math.Round((Math.Round(x.Total, 2) / totalSpent) * 100, 2) : 0).ToList();
             var backgroundColors = percentages.Select(p => GetColorFromPercent(p)).ToList();
 
             return new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent);
