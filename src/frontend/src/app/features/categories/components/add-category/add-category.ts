@@ -17,7 +17,7 @@ export class AddCategory {
 
   protected model = signal<NewCategory>({
     name: '',
-    transactionType: 1
+    transactionType: "Income"
   })
 
   onSave(data: NewCategory) {

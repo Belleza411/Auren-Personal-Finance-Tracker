@@ -16,8 +16,6 @@ export class CategoryForm {
   cancel = output<void>();
   isLoading = signal(false);
 
-  TransactionType = TransactionType;
-
   constructor() {
     effect(() => {
       this.modelSignal.set(this.model());

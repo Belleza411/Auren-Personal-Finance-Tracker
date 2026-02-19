@@ -17,8 +17,8 @@
                     #incomeInput
                     type="radio" 
                     name="transactionType"
-                    [checked]="transactionForm.transactionType().value() === TransactionType.Income"
-                    (change)="transactionForm.transactionType().value.set(TransactionType.Income)">
+                    [checked]="transactionForm.transactionType().value() === 'Income'"
+                    (change)="transactionForm.transactionType().value.set('Income')">
                 Income
             </label>
             <label 
@@ -30,8 +30,8 @@
                     #expenseInput
                     type="radio" 
                     name="transactionType"
-                    [checked]="transactionForm.transactionType().value() === TransactionType.Expense"
-                    (change)="transactionForm.transactionType().value.set(TransactionType.Expense)">
+                    [checked]="transactionForm.transactionType().value() === 'Expense'"
+                    (change)="transactionForm.transactionType().value.set('Expense')">
                 Expense
             </label>
         </div>
@@ -106,7 +106,7 @@
             </ul>
         }
     </p>
-    <app-enum-select
+    <!-- <app-enum-select
         label="Payment Method"
         [map]="PaymentTypeMap"
         [field]="transactionForm.paymentType"
@@ -117,7 +117,7 @@
                     <li>{{ error.message }}</li>
                 }
             </ul>
-        }
+        } -->
     <button 
         class="bg-[#1c4532] text-white border-0 py-[0.8rem] rounded-lg cursor-pointer"
         type="submit" 

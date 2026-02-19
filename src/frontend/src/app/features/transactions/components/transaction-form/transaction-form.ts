@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { NewTransaction, TransactionType } from '../../models/transaction.model';
+import { NewTransaction } from '../../models/transaction.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
 import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
-import { PaymentTypeMap, TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
 
 @Component({
   selector: 'app-transaction-form',
@@ -18,9 +17,6 @@ export class TransactionForm {
   save = output<NewTransaction>();
   cancel = output<void>();
   categories = input.required<Category[]>();
-  TransactionTypeMap = TransactionTypeMap;
-  PaymentTypeMap = PaymentTypeMap;
-  TransactionType = TransactionType;
 
   isLoading = signal(false);
 

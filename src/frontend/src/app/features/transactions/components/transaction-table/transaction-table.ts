@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
-import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
-import { Category } from '../../../categories/models/categories.model';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, UpperCasePipe } from '@angular/common';
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+
+import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
+import { Category } from '../../../categories/models/categories.model';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
-import { PaymentTypeMap, TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [CurrencyPipe, PaginationComponent],
+  imports: [CurrencyPipe, PaginationComponent, UpperCasePipe],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,10 +105,7 @@ export class TransactionTable {
   onEdit(id: string) {
     this.edit.emit(id);
   }
-
-  protected TransactionTypeMap = TransactionTypeMap;
-  protected PaymentTypeMap = PaymentTypeMap;
-
+  
   onCategoryToggle(category: string, checked: boolean) {
     this.selectedCategories.update(categories =>
       checked
@@ -118,13 +115,13 @@ export class TransactionTable {
   }
 
   onChangeType(e: Event) {
-    const value = Number((e.target as HTMLSelectElement).value);
-    this.selectedType.set(value === 0 ? null : value);
+    const value = (e.target as HTMLSelectElement).value;
+    this.selectedType.set(value === "All Types" ? null : value as TransactionType);
   }
 
   onChangePaymentType(e: Event) {
-    const value = Number((e.target as HTMLSelectElement).value);
-    this.selectedPaymentType.set(value === 0 ? null : value);
+    const value = (e.target as HTMLSelectElement).value;
+    this.selectedPaymentType.set(value === "All Payment Method" ? null : value as PaymentType);
   }
 
   clearFilter() {
@@ -169,7 +166,7 @@ export class TransactionTable {
   }
 
   isIncome(t: Transaction): boolean {
-    return t.transactionType === 1;
+    return t.transactionType === "Income";
   }
 
   onPageChange(page: number): void {

@@ -36,8 +36,8 @@ export class EditTransaction implements OnInit {
     name: '',
     amount: 0,
     category: '',
-    transactionType: 1,
-    paymentType: 2,
+    transactionType: "Income",
+    paymentType: "CreditCard",
     transactionDate: ''
   })
 

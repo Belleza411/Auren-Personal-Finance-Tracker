@@ -4,11 +4,11 @@ import { TransactionType } from '../../../transactions/models/transaction.model'
 import { outputFromObservable, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
-import { TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
+import { UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-category-table',
-  imports: [PaginationComponent],
+  imports: [PaginationComponent, UpperCasePipe],
   templateUrl: './category-table.html',
   styleUrl: './category-table.css',
 })
@@ -42,8 +42,6 @@ export class CategoryTable {
     );
   }
 
-  protected TransactionTypeMap = TransactionTypeMap;
-
   private readonly filters = computed<CategoryFilter>(() => ({
     searchTerm: this.searchTerm(),
     transactionType: this.selectedType()
@@ -66,8 +64,8 @@ export class CategoryTable {
   }
 
   onChangeType(e: Event) {
-    const value = Number((e.target as HTMLSelectElement).value);
-    this.selectedType.set(value === 0 ? null : value);
+    const value = (e.target as HTMLSelectElement).value;
+    this.selectedType.set(value === 'All Types' ? null : value as TransactionType);
   }
 
   clearFilter() {
@@ -99,6 +97,6 @@ export class CategoryTable {
   }
 
   isIncome(c: Category): boolean {
-    return c.transactionType === 1;
+    return c.transactionType === "Income";
   }
 }

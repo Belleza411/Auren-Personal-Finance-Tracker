@@ -4,16 +4,6 @@
         <p class="text-[#999] text-sm">It is the best time to manage your finances</p>
     </div>
     <div class="flex items-center justify-center gap-3 ml-auto">
-        <div>
-            <select 
-                class="p-2 rounded-md border border-[#c5c5c5] border-solid"
-                (change)="onRangeChange($event)"
-            >
-                @for(range of timePeriodOptions; track $index) {
-                    <option [value]="$index">{{ range }}</option>
-                }
-            </select>
-        </div>
         <button 
             class="flex items-center justify-center border-0 text-white bg-[#1c4532] text-sm py-1.5 px-4 rounded-md font-extralight cursor-pointer whitespace-nowrap"
             (click)="onAddTransaction()"

@@ -8,15 +8,13 @@ import { GoalService } from '../../../goals/services/goal.service';
 import { CountUpDirective } from 'ngx-countup';
 import { TransactionTable } from "../../../transactions/components/transaction-table/transaction-table";
 import { signal } from '@angular/core';
-import { TimePeriod, Transaction } from '../../../transactions/models/transaction.model';
-import { Category } from '../../../categories/models/categories.model';
-import { Goal, GoalWithBgColor } from '../../../goals/models/goals.model';
+import { TimePeriod } from '../../../transactions/models/transaction.model';
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
-import { ExpenseBreakdown, IncomeVsExpenseResponse } from '../../models/dashboard.model';
-import { TimePeriodMap } from '../../../../shared/utils/enum-mapper.util';
 import { ExpenseBreakdownChart } from "../expense-breakdown-chart/expense-breakdown-chart";
 import { GoalComponent } from "../../../goals/components/goal/goal";
 import { generateBgColorByEmoji } from '../../../goals/utils/generateBgColorByEmoji';
+import { TransactionStateService } from '../../../transactions/services/transaction-state.service';
+import { GoalWithBgColor } from '../../../goals/models/goals.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,9 +26,8 @@ import { generateBgColorByEmoji } from '../../../goals/utils/generateBgColorByEm
 export class DashboardComponent {
   private dashboardSer = inject(DashboardService);
   private transactionSer = inject(TransactionService);
+  private transactionStateSer = inject(TransactionStateService);
   private goalSer = inject(GoalService);
-
-  TimePeriodMap = TimePeriodMap;
 
   selectedTimePeriod = signal<TimePeriod>(1);
 
@@ -76,7 +73,7 @@ export class DashboardComponent {
       ] = await Promise.all([
         firstValueFrom(this.dashboardSer.getDashboardSummary(period)),
         firstValueFrom(this.transactionSer.getAvgDailySpending(period)),
-        firstValueFrom(this.transactionSer.getAllTransactions({}, 5, 1)),
+        firstValueFrom(this.transactionStateSer.getTransactions({}, 5, 1)),
         firstValueFrom(this.dashboardSer.getIncomeVsExpense(period)),
         firstValueFrom(this.dashboardSer.getExpenseBreakdown(period)),
         firstValueFrom(this.goalSer.getAllGoals({}, 3, 1))

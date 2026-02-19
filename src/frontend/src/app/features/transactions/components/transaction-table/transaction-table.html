@@ -214,7 +214,7 @@
             </tr>
         </thead>
         <tbody>
-            @if(isLoading()) {
+            @if(!isLoading()) {
                 @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
                     <tr class="border-b border-solid border-[#cacaca] animate-pulse">
                         @for(column of columns(); track column.key) {
@@ -249,7 +249,7 @@
                                             class="inline-flex items-center px-2 py-1 rounded-full font-medium text-xs"
                                             [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
                                         >
-                                            {{ TransactionTypeMap[t.transactionType].toUpperCase() }}
+                                            {{ t.transactionType | uppercase }}
                                         </p>
                                     }
 
@@ -258,12 +258,12 @@
                                             class="text-[0.8rem]" 
                                             [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'"
                                         >
-                                            {{ t.transactionType == 1 ? '+' : '-'}}{{ t.amount | currency }}
+                                            {{ t.transactionType === "Income" ? '+' : '-' }}{{ t.amount | currency }}
                                         </p>
                                     }
 
                                     @case ('paymentMethod') {
-                                        <p class="text-[0.8rem]">{{ PaymentTypeMap[t.paymentType] }}</p>
+                                        <p class="text-[0.8rem]">{{ t.paymentType }}</p>
                                     }
 
                                     @case ('actions') {

@@ -63,7 +63,7 @@
                                 class="inline-flex items-center px-2 py-1 rounded-full font-medium"
                                 [class]="isIncome(c) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
                             >
-                                {{ TransactionTypeMap[c.transactionType].toUpperCase() }}
+                                {{ c.transactionType | uppercase }}
                             </p>
                         </td>
                         <td>

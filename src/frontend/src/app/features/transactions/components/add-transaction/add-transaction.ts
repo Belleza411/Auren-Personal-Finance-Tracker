@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { NewTransaction } from '../../models/transaction.model';
+import { NewTransaction, Transaction } from '../../models/transaction.model';
 import { DialogRef } from '@angular/cdk/dialog';
 import { TransactionForm } from "../transaction-form/transaction-form";
 import { Category } from '../../../categories/models/categories.model';
@@ -20,8 +20,8 @@ export class AddTransaction {
     name: '',
     amount: 0,
     category: '',
-    transactionType: 1,
-    paymentType: 2,
+    transactionType: "Income",
+    paymentType: "CreditCard",
     transactionDate: ''
   });
 

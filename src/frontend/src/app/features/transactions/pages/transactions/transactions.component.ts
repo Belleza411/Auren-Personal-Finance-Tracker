@@ -1,16 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, output, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
+import {  filter, firstValueFrom, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
 import { TransactionService } from '../../services/transaction.service';
-import { NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../../models/transaction.model';
+import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { Category } from '../../../categories/models/categories.model';
-import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
+import { TransactionStateService } from '../../services/transaction-state.service';
 import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data';
 
 @Component({
@@ -22,23 +22,17 @@ import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data
 })
 export class TransactionComponent implements OnInit {
     private transactionSer = inject(TransactionService);
-    private categorySer = inject(CategoryService);
+    private transactionStateSer = inject(TransactionStateService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
-
-    selectedRange = signal<TimePeriod>(1);
 
     pageNumber = signal<number>(1);
     pageSize = signal<number>(10);
 
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-    protected readonly dummyCategories = signal<Category[]>(dummyCategories);
-
-    protected dummyTransactions = signal<Transaction[]>(dummyTransactions);
-    
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
@@ -50,15 +44,11 @@ export class TransactionComponent implements OnInit {
         paymentType: null
     });
 
-    options = {
-        duration: 1.2,
-        separator: ',',
-        prefix: '$',
-        decimalPlaces: 2
-    };
-
-    transactions = computed(() => this.transactionResource.value()?.items ?? []);
-    categories = computed(() => this.categoryResource.value()?.items ?? []);
+    transactions = computed(() => this.transactionResource.value()?.items ?? dummyTransactions);
+    categories = computed(() => this.transactions()
+        .map(t => t.category)
+        .filter(Boolean) as Category[] ?? dummyCategories
+    )
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionResource.isLoading());
     
@@ -97,7 +87,7 @@ export class TransactionComponent implements OnInit {
             pageNumber: this.pageNumber()
         }),
         loader: ({ params }) => {
-            return firstValueFrom(this.transactionSer.getAllTransactions(
+            return firstValueFrom(this.transactionStateSer.getTransactions(
                 params.filters,
                 params.pageSize,
                 params.pageNumber
@@ -105,11 +95,6 @@ export class TransactionComponent implements OnInit {
 
         }
     });
-
-    categoryResource = resource({
-        loader: () => 
-            firstValueFrom(this.categorySer.getAllCategories({}, 50, 1))
-    })
 
     hasActiveFilters = computed(() => {
         const filter = this.currentFilters();
@@ -128,7 +113,10 @@ export class TransactionComponent implements OnInit {
         this.transactionSer.deleteTransaction(id)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
-                next: () => this.transactionResource.reload(),
+                next: () => {
+                    this.transactionResource.reload();
+                    this.transactionStateSer.clearCache();
+                },
                 error: err => {
                     console.error('Failed to delete transaction:', err);
                 }
@@ -151,7 +139,7 @@ export class TransactionComponent implements OnInit {
     openAddModal(): void {
         const dialogRef = this.dialog.open<
             AddTransaction,
-            Category[] | null,
+            Category[],
             NewTransaction
         >(AddTransaction, {
             width: '30rem',
@@ -173,7 +161,10 @@ export class TransactionComponent implements OnInit {
                 switchMap(result => this.transactionSer.createTransaction(result))
             )
             .subscribe({
-                next: () => this.transactionResource.reload(),
+                next: () => {
+                    this.transactionResource.reload();
+                    this.transactionStateSer.clearCache();
+                },
                 error: err => console.error('Create failed', err)            
             });
     }
@@ -214,7 +205,10 @@ export class TransactionComponent implements OnInit {
                 )
             )
             .subscribe({
-                next: () => this.transactionResource.reload(),
+                next: () => {
+                    this.transactionResource.reload();
+                    this.transactionStateSer.clearCache();
+                },
                 error: err => console.error('Update failed', err)
         });
     }
@@ -243,11 +237,5 @@ export class TransactionComponent implements OnInit {
     onPageSizeChange(size: number): void {
         this.pageSize.set(size);
         this.pageNumber.set(1);
-    }
-
-    onRangeChange(e: Event) {
-        this.selectedRange.set(
-            Number((e.target as HTMLSelectElement).value) + 1
-        );
     }
 }
