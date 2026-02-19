@@ -14,12 +14,8 @@ export class TransactionService {
 	private http = inject(HttpClient);
 
 	getAllTransactions(
-		filters?: Partial<TransactionFilter>,
-		pageSize: number = 5,
-		pageNumber: number = 1
-	) : Observable<PagedResult<Transaction>> {
-		const params = createHttpParams(filters, pageSize, pageNumber);
-		
+		params: HttpParams
+	) : Observable<PagedResult<Transaction>> {		
 		return this.http.get<PagedResult<Transaction>>(this.baseUrl, { params });
 	}
 
