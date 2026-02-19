@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, output, si
 import { NewTransaction } from '../../models/transaction.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
-import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
 
 @Component({
   selector: 'app-transaction-form',
-  imports: [EnumSelect, FormField],
+  imports: [FormField],
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,6 +18,13 @@ export class TransactionForm {
   categories = input.required<Category[]>();
 
   isLoading = signal(false);
+
+  paymentTypes = [
+    { value: 'Cash', label: 'Cash' },
+    { value: 'CreditCard', label: 'Credit Card' },
+    { value: 'BankTransfer', label: 'Bank Transfer' },
+    { value: 'Other', label: 'Other' }
+  ];
 
   private readonly modelSignal = signal({} as NewTransaction);
   protected readonly transactionForm = form(this.modelSignal, schema => {

@@ -106,18 +106,24 @@
             </ul>
         }
     </p>
-    <!-- <app-enum-select
-        label="Payment Method"
-        [map]="PaymentTypeMap"
-        [field]="transactionForm.paymentType"
-    />
+    <p>
+       <label for="payment-type">Payment Method</label>
+       <select 
+            [formField]="transactionForm.paymentType"
+            [class.error]="fieldErrors.paymentType()"
+       >
+        @for(type of paymentTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+        }
+       </select> 
+    </p>
     @if(fieldErrors.paymentType()) {
-            <ul class="error-list">
-                @for(error of transactionForm.paymentType().errors(); track error.kind) {
-                    <li>{{ error.message }}</li>
-                }
-            </ul>
-        } -->
+        <ul class="error-list">
+            @for(error of transactionForm.paymentType().errors(); track error.kind) {
+                <li>{{ error.message }}</li>
+            }
+        </ul>
+    }
     <button 
         class="bg-[#1c4532] text-white border-0 py-[0.8rem] rounded-lg cursor-pointer"
         type="submit" 
