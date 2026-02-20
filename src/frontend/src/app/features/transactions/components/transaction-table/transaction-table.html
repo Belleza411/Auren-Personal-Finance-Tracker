@@ -247,7 +247,7 @@
                                     @case ('type') {
                                         <p 
                                             class="inline-flex items-center px-2 py-1 rounded-full font-medium text-xs"
-                                            [class]="isIncome(t) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
+                                            [class]="t.transactionType | transactionTypeColor:true"
                                         >
                                             {{ t.transactionType | uppercase }}
                                         </p>
@@ -256,9 +256,9 @@
                                     @case ('amount') {
                                         <p 
                                             class="text-[0.8rem]" 
-                                            [class]="isIncome(t) ? 'text-green-500' : 'text-red-500'"
+                                            [class]="t.transactionType | transactionTypeColor:false"
                                         >
-                                            {{ t.transactionType === "Income" ? '+' : '-' }}{{ t.amount | currency }}
+                                            {{ t.transactionType | transactionAmountSign }}{{ t.amount | currency }}
                                         </p>
                                     }
 

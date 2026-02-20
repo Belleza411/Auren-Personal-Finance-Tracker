@@ -7,10 +7,12 @@ import { PaymentType, Transaction, TransactionFilter, TransactionType } from '..
 import { Category } from '../../../categories/models/categories.model';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
+import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.pipe';
+import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [CurrencyPipe, PaginationComponent, UpperCasePipe],
+  imports: [CurrencyPipe, PaginationComponent, UpperCasePipe, TransactionAmountSignPipe, TransactionTypeColorPipe],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
