@@ -32,8 +32,20 @@ export interface TransactionFilter {
     category: string[];
     paymentType: PaymentType | null;
 }
-export type TransactionType = 'Income' | 'Expense';
-export type PaymentType = 'Cash' | 'CreditCard' | 'BankTransfer' | 'Other';
+
+export const TRANSACTION_TYPE = ['Income', 'Expense'] as const;
+export const PAYMENT_TYPE = ['Cash', 'CreditCard', 'BankTransfer', 'Other'] as const;
+
+export type TransactionType = typeof TRANSACTION_TYPE[number];
+export type PaymentType = typeof PAYMENT_TYPE[number];
+
+export type TransactionTypeFilterOption = TransactionType | 'All Types';
+export type PaymentTypeFilterOption = PaymentType | 'All Payment Method';
+
+export interface FilterTypeOption<T> {
+    value: T;
+    label: string;
+}
 
 export enum TimePeriod {
     AllTime = 1,
