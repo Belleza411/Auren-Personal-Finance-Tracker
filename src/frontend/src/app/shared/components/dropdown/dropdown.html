@@ -1,0 +1,9 @@
+<select
+    class="p-2 gray-border text-[0.8rem]"
+    [value]="selected()"
+    (change)="onSelectionChange($event)"
+>   
+    @for(option of options(); track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+    }
+</select>
