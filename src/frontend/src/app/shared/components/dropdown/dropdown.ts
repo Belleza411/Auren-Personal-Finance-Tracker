@@ -15,8 +15,6 @@ export class Dropdown<T> {
 
   onSelectionChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as T;
-    console.log(value);
-    
     this.selectedChange.emit(value);
   }
 }
