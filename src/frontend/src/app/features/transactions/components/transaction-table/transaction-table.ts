@@ -1,18 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { CurrencyPipe, UpperCasePipe } from '@angular/common';
 import { outputFromObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { PaymentType, Transaction, TransactionFilter, TransactionType } from '../../models/transaction.model';
+import { PaymentType, PaymentTypeFilterOption, Transaction, TransactionFilter, TransactionType, TransactionTypeFilterOption } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
 import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.pipe';
 import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
+import { AMOUNT_FILTER_LABEL_OPTION, DATE_FILTER_LABEL_OPTION, paymentTypeOptions, transactionTypeOptions } from '../../../../shared/constants/type-options';
+import { AddWhitespacePipe } from '../../pipes/add-whitespace.pipe';
+import { Dropdown } from "../../../../shared/components/dropdown/dropdown";
+import { DropdownWithModal } from "../../../../shared/components/dropdown-with-modal/dropdown-with-modal";
 
 @Component({
   selector: 'app-transaction-table',
-  imports: [CurrencyPipe, PaginationComponent, UpperCasePipe, TransactionAmountSignPipe, TransactionTypeColorPipe],
+  imports: [
+    CurrencyPipe,
+    PaginationComponent,
+    UpperCasePipe,
+    TransactionAmountSignPipe,
+    TransactionTypeColorPipe,
+    AddWhitespacePipe,
+    Dropdown,
+    DropdownWithModal
+],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,18 +46,9 @@ export class TransactionTable {
       ? COMPACT_TRANSACTION_COLUMNS
       : FULL_TRANSACTION_COLUMNS
   );
-
+  
   showFilters = computed(() => this.variant() === 'full');
   showPagination = computed(() => this.variant() === 'full');
-
-  searchTerm = signal<string>('');
-  selectedType = signal<TransactionType | null>(null);
-  minAmount = signal<number | null>(null);
-  maxAmount = signal<number | null>(null);
-  startDate = signal<string | null>(null);
-  endDate = signal<string | null>(null);
-  selectedCategories = signal<string[]>([]);
-  selectedPaymentType = signal<PaymentType | null>(null);
 
   pageNumberChange = output<number>();
   pageSizeChange = output<number>();
@@ -53,8 +57,14 @@ export class TransactionTable {
   pageSize = signal(10);
   totalCount = input<number>();
 
-  transactionTypeOptions: string[] = ['All Types', 'Income', 'Expense'];
-  paymentTypeOptions: string[] = ['All Payment Method', 'Cash', 'Credit Card', 'Bank Transfer', 'Other'];
+  selectedTransactionType: TransactionTypeFilterOption = "All Types";
+  selectedPaymentType: PaymentTypeFilterOption = "All Payment Method";
+  transactionTypeOptions = transactionTypeOptions;
+  paymentTypeOptions = paymentTypeOptions;
+
+  amountFilterLabelOption = AMOUNT_FILTER_LABEL_OPTION;
+  dateFilterLabelOption = DATE_FILTER_LABEL_OPTION;
+ 
   pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
   modals = signal({
@@ -81,16 +91,16 @@ export class TransactionTable {
   delete = output<string>();
   edit = output<string>(); 
 
-  private readonly filters = computed<TransactionFilter>(() => ({
-    searchTerm: this.searchTerm(),
-    transactionType: this.selectedType(),
-    minAmount: this.minAmount(),
-    maxAmount: this.maxAmount(),
-    startDate: this.startDate(),
-    endDate: this.endDate(),
-    category: this.selectedCategories(),
-    paymentType: this.selectedPaymentType()
-  }));
+  filters = signal<TransactionFilter>({
+    searchTerm: '',
+    transactionType: null,
+    minAmount: null,
+    maxAmount: null,
+    startDate: null,
+    endDate: null,
+    category: [],
+    paymentType: null
+  });
 
   filtersChange = outputFromObservable(
     toObservable(this.filters).pipe(
@@ -100,6 +110,10 @@ export class TransactionTable {
     )
   );
 
+  setFilter<K extends keyof TransactionFilter>(key: K, value: TransactionFilter[K]) {
+    this.filters.update(f => ({ ...f, [key]: value }));
+  }
+
   onDelete(id: string) {
     this.delete.emit(id);
   }
@@ -107,53 +121,75 @@ export class TransactionTable {
   onEdit(id: string) {
     this.edit.emit(id);
   }
+
+  onSearchChange(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
+    this.setFilter('searchTerm', value);
+  }
   
   onCategoryToggle(category: string, checked: boolean) {
-    this.selectedCategories.update(categories =>
-      checked
-        ? [...categories, category]
-        : categories.filter(c => c !== category)
-    );  
+    this.setFilter('category', checked
+      ? [...this.filters().category, category]
+      : this.filters().category.filter(c => c !== category)
+    );
   }
 
-  onChangeType(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this.selectedType.set(value === "All Types" ? null : value as TransactionType);
+  onChangeTransactionType(value: TransactionTypeFilterOption) {
+    this.setFilter('transactionType', value === "All Types" 
+      ? null 
+      : value as TransactionType);
   }
 
-  onChangePaymentType(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this.selectedPaymentType.set(value === "All Payment Method" ? null : value as PaymentType);
+  onChangePaymentType(value: PaymentTypeFilterOption) {
+    this.setFilter('paymentType', value === "All Payment Method" 
+      ? null 
+      : value as PaymentType);
+  }
+
+  onMinAmountChange(value: number | null) {
+    this.setFilter('minAmount', Number.isNaN(value) ? null : value);
+  }
+
+  onMaxAmountChange(value: number | null) {
+    this.setFilter('maxAmount', Number.isNaN(value) ? null : value);
+  }
+
+  onStartDateChange(value: string | Date | null) {
+    this.setFilter('startDate', value ?? null);
+  }
+
+  onEndDateChange(value: string | Date | null) {
+    this.setFilter('endDate', value ?? null);
   }
 
   clearFilter() {
-    this.searchTerm.set('');
-    this.selectedType.set(null);
-    this.minAmount.set(null);
-    this.maxAmount.set(null);
-    this.startDate.set(null);
-    this.endDate.set(null);
-    this.selectedCategories.set([]);
-    this.selectedPaymentType.set(null);
+    this.filters.set({
+      searchTerm: '',
+      transactionType: null,
+      minAmount: null,
+      maxAmount: null,
+      startDate: null,
+      endDate: null,
+      category: [],
+      paymentType: null
+    })
   }
 
   clearDateFilter() {
-    this.startDate.set(null);
-    this.endDate.set(null);
+    this.filters.update(f => ({ ...f, startDate: null, endDate: null }));
   }
 
   clearAmountFilter() {
-    this.minAmount.set(null);
-    this.maxAmount.set(null);
+    this.filters.update(f => ({ ...f, minAmount: null, maxAmount: null }));
   }
 
   hasActiveFilters = computed(() => {
-    const hasSearch = this.searchTerm().trim().length !== 0;
-    const hasType = this.selectedType() !== null;
-    const hasCategory = this.selectedCategories().length !== 0;
-    const hasPayment = this.selectedPaymentType() !== null;
-    const hasAmount = this.minAmount() !== null|| this.maxAmount() !== null;
-    const hasDate = this.startDate() !== null || this.endDate() !== null;
+    const hasSearch = this.filters().searchTerm.trim().length !== 0;
+    const hasType = this.filters().transactionType !== null;
+    const hasCategory = this.filters().category.length !== 0;
+    const hasPayment = this.filters().paymentType !== null;
+    const hasAmount = this.filters().minAmount !== null || this.filters().maxAmount !== null;
+    const hasDate = this.filters().startDate !== null || this.filters().endDate !== null;
     return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
   });
 
@@ -184,6 +220,6 @@ export class TransactionTable {
   }
 
   isShowPagination(): boolean {
-    return this.transactions().length > 5;
+    return this.transactions().length > 10;
   }
-}
+}  

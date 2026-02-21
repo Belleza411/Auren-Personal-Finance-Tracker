@@ -47,6 +47,17 @@ export interface FilterTypeOption<T> {
     label: string;
 }
 
+export interface DropdownLabelOption {
+    label: string;
+    startLabel: string;
+    endLabel: string;
+    startPlaceholder: string;
+    endPlaceholder: string;
+    icon: string;
+}
+
+export type FilterKind = 'number' | 'date' | 'string';
+
 export enum TimePeriod {
     AllTime = 1,
     ThisMonth = 2,

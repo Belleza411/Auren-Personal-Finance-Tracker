@@ -1,0 +1,36 @@
+import { Component, computed, input, output, signal } from '@angular/core';
+import { DropdownLabelOption, FilterKind } from '../../../features/transactions/models/transaction.model';
+
+@Component({
+  selector: 'app-dropdown-with-modal',
+  imports: [],
+  templateUrl: './dropdown-with-modal.html',
+  styleUrl: './dropdown-with-modal.css',
+})
+export class DropdownWithModal<T> {
+  kind = input.required<FilterKind>();
+  start = input.required<T | null>();
+  end = input.required<T | null>();
+  labelOption = input.required<DropdownLabelOption>();
+
+  isOpen = signal(false);
+  onToggle() { 
+    this.isOpen.update(v => !v); 
+  }
+
+  startChange = output<T | null>();
+  endChange = output<T | null>();
+  clear = output<void>();
+
+  hasValue = computed(() => this.start() !== null && this.end() !== null);
+
+  onStartChange(e: Event) {
+    const value = (e.target as HTMLInputElement).value as T; 
+    this.startChange.emit(value);
+  }
+
+  onEndChange(e: Event) {
+    const value = (e.target as HTMLInputElement).value as T;
+    this.endChange.emit(value);
+  }
+}

@@ -1,0 +1,85 @@
+<div class="relative py-1.5 pr-0.5 pl-3 rounded-lg gray-border">
+    <button 
+        class="cursor-pointer flex items-center border-0 bg-none" 
+        (click)="onToggle()"
+    >
+        @switch (kind()) {
+            @case ('number') {
+                <p class="mr-1.5 text-[0.8rem]">{{ labelOption().label }}</p>
+                @if(!hasValue()) {
+                    <span class="material-symbols-rounded text-xl">
+                        {{ labelOption().icon }}
+                    </span>
+                }
+                @else { 
+                    <div 
+                        class="text-[0.7rem] ml-1.5 rounded-md bg-[#c1c1c1] py-0.5 px-2.5"
+                    >
+                        ${{ end() }} - ${{ start() }} 
+                    </div>
+                    <span 
+                        class="material-symbols-rounded ml-1.5 text-[1.4rem]!" 
+                        role="button"
+                        (click)="clear.emit()">
+                        close
+                    </span>
+                }
+            }
+
+            @case ('date') {
+                @if(!hasValue()) {
+                    <span class="material-symbols-rounded mr-1">
+                        {{ labelOption().icon }}
+                    </span>
+                } @else {
+                    <div
+                        class="text-[0.7rem] ml-1.5 rounded-md bg-[#c1c1c1] py-0.5 px-2.5"
+                    >
+                        {{ end() }} - {{ start() }} 
+                    </div>
+                    <span 
+                        class="material-symbols-rounded ml-1.5" 
+                        role="button"
+                        (click)="clear.emit()">
+                        close
+                    </span>
+                }
+                <p class="mr-1.5 text-[0.8rem]">{{ labelOption().label }}</p>
+            }
+        }
+    </button>
+    <div 
+        class="absolute bg-white rounded-lg p-4 flex-col top-12.5 left-0 gray-border" 
+        [class.flex]="isOpen()" 
+        [class.hidden]="!isOpen()"
+    >
+        <div class="flex items-center gap-2">
+            <p>
+                <label 
+                    class="text-[0.8rem]"
+                >
+                    {{ labelOption().startLabel }}
+                </label>
+                <input 
+                    class="py-2 px-4 gray-border"
+                    [type]="kind()"  
+                    [placeholder]="labelOption().startPlaceholder"
+                    [value]="start()"
+                    (input)="onStartChange($event)">
+            </p>
+            <p>
+                <label 
+                    class="text-[0.8rem]"
+                >
+                    {{ labelOption().endLabel }}
+                </label>
+                <input 
+                    class="py-2 px-4 gray-border"
+                    [type]="kind()"
+                    [placeholder]="labelOption().endPlaceholder"
+                    [value]="end()"
+                    (input)="onEndChange($event)">
+            </p>
+        </div>
+    </div>
+</div>
