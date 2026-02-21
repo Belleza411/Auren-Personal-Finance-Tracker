@@ -9,7 +9,7 @@ import { PaginationComponent } from "../../../../shared/components/pagination/pa
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
 import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.pipe';
 import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
-import { AMOUNT_FILTER_LABEL_OPTION, DATE_FILTER_LABEL_OPTION, paymentTypeOptions, transactionTypeOptions } from '../../../../shared/constants/type-options';
+import { DATE_FILTER_LABEL_OPTION, paymentTypeOptions, transactionTypeOptions } from '../../../../shared/constants/type-options';
 import { AddWhitespacePipe } from '../../pipes/add-whitespace.pipe';
 import { Dropdown } from "../../../../shared/components/dropdown/dropdown";
 import { DropdownWithModal } from "../../../../shared/components/dropdown-with-modal/dropdown-with-modal";
@@ -62,24 +62,16 @@ export class TransactionTable {
   transactionTypeOptions = transactionTypeOptions;
   paymentTypeOptions = paymentTypeOptions;
 
-  amountFilterLabelOption = AMOUNT_FILTER_LABEL_OPTION;
   dateFilterLabelOption = DATE_FILTER_LABEL_OPTION;
  
   pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
-  modals = signal({
-    amount: false,
-    date: false,
-    category: false
-  });
-  
-  toggleModal(modalName: 'amount' | 'date' | 'category') {
-    this.modals.update(modals => ({
-      ...modals,
-      [modalName]: !modals[modalName]
-    }));
-  }
+  isCategoryOpen = signal(false);
 
+  toogleCategoryModal() {
+    this.isCategoryOpen.update(open => !open);
+  }
+  
   openModalId = signal<string | null>(null);
 
   toggleModalId(id: string) {
@@ -94,8 +86,6 @@ export class TransactionTable {
   filters = signal<TransactionFilter>({
     searchTerm: '',
     transactionType: null,
-    minAmount: null,
-    maxAmount: null,
     startDate: null,
     endDate: null,
     category: [],
@@ -146,14 +136,6 @@ export class TransactionTable {
       : value as PaymentType);
   }
 
-  onMinAmountChange(value: number | null) {
-    this.setFilter('minAmount', Number.isNaN(value) ? null : value);
-  }
-
-  onMaxAmountChange(value: number | null) {
-    this.setFilter('maxAmount', Number.isNaN(value) ? null : value);
-  }
-
   onStartDateChange(value: string | Date | null) {
     this.setFilter('startDate', value ?? null);
   }
@@ -166,8 +148,6 @@ export class TransactionTable {
     this.filters.set({
       searchTerm: '',
       transactionType: null,
-      minAmount: null,
-      maxAmount: null,
       startDate: null,
       endDate: null,
       category: [],
@@ -188,24 +168,9 @@ export class TransactionTable {
     const hasType = this.filters().transactionType !== null;
     const hasCategory = this.filters().category.length !== 0;
     const hasPayment = this.filters().paymentType !== null;
-    const hasAmount = this.filters().minAmount !== null || this.filters().maxAmount !== null;
     const hasDate = this.filters().startDate !== null || this.filters().endDate !== null;
-    return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
+    return hasSearch || hasType || hasCategory || hasPayment || hasDate;
   });
-
-  formatDate(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    const date = new Date(value);
-    return date.toLocaleDateString('en-US', {
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric', 
-    })
-  }
-
-  isIncome(t: Transaction): boolean {
-    return t.transactionType === "Income";
-  }
 
   onPageChange(page: number): void {
     this.pageNumber.set(page);

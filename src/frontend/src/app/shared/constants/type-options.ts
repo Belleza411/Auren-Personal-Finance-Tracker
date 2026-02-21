@@ -30,15 +30,6 @@ export const paymentTypeOptions: FilterTypeOption<PaymentTypeFilterOption>[] = [
     }))
 ];
 
-export const AMOUNT_FILTER_LABEL_OPTION: DropdownLabelOption = {
-    label: 'Amount',
-    startLabel: 'Min Amount',
-    endLabel: 'Max Amount',
-    startPlaceholder: 'Enter minimum amount',
-    endPlaceholder: 'Enter maximum amount',
-    icon: 'keyboard_arrow_down'
-}
-
 export const DATE_FILTER_LABEL_OPTION: DropdownLabelOption = {
     label: 'Date',
     startLabel: 'Start Date',

@@ -2,7 +2,7 @@
     <div class="w-full flex items-center gap-3">
         <div class="relative flex items-center">
             <input 
-                class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
+                class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium min-w-56"
                 type="text" 
                 placeholder="Search transactions..."
                 aria-label="Search transactions"
@@ -19,7 +19,7 @@
             <button 
                 class="header" 
                 aria-label="Filter by categories"
-                (click)="toggleModal('category')"
+                (click)="toogleCategoryModal()"
             >
                 <p class="mr-1.5 text-[0.8rem]">Categories</p>
                 <span class="material-symbols-rounded">
@@ -28,8 +28,8 @@
             </button>
             <div 
                 class="modal gray-border overflow-y-scroll" 
-                [class.flex]="modals().category"
-                [class.hidden]="!modals().category"
+                [class.flex]="isCategoryOpen()"
+                [class.hidden]="!isCategoryOpen()"
             >
                 @for (c of categories(); track c.categoryId) {
                     <label class="flex items-center">
@@ -49,15 +49,6 @@
             [options]="paymentTypeOptions"
             [selected]="selectedPaymentType"
             (selectedChange)="onChangePaymentType($event)"
-        />
-        <app-dropdown-with-modal 
-            kind="number"
-            [labelOption]="amountFilterLabelOption"
-            [start]="filters().minAmount"
-            [end]="filters().maxAmount"
-            (startChange)="onMinAmountChange($event)"
-            (endChange)="onMaxAmountChange($event)"
-            (clear)="clearAmountFilter()"
         />
         <app-dropdown-with-modal 
             kind="date"
