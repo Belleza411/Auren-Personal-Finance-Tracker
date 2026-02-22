@@ -25,8 +25,6 @@ export interface NewTransaction {
 export interface TransactionFilter {
     searchTerm: string;
     transactionType: TransactionType | null;
-    minAmount: number | null;
-    maxAmount: number | null;
     startDate: Date | string | null;
     endDate: Date | string | null;
     category: string[];

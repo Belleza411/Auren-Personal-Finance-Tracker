@@ -36,8 +36,6 @@ export class TransactionComponent implements OnInit {
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
-        minAmount: null,
-        maxAmount: null,
         startDate: null,
         endDate: null,
         category: [],
@@ -51,18 +49,6 @@ export class TransactionComponent implements OnInit {
     )
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionResource.isLoading());
-    
-    hasNoTransactions = computed(() => 
-        !this.isLoading() &&
-        this.totalCount() === 0 &&
-        !this.hasActiveFilters()
-    );
-
-    hasNoFilterResults = computed(() =>
-        !this.isLoading() &&
-        this.totalCount() === 0 &&
-        this.hasActiveFilters()
-    )
 
     ngOnInit(): void {
         this.route.params
@@ -94,19 +80,6 @@ export class TransactionComponent implements OnInit {
             ));
 
         }
-    });
-
-    hasActiveFilters = computed(() => {
-        const filter = this.currentFilters();
-
-        const hasSearch = filter.searchTerm.trim().length !== 0;
-        const hasType = filter.transactionType !== null;
-        const hasCategory = filter.category.length !== 0;
-        const hasPayment = filter.paymentType !== null;
-        const hasAmount = filter.minAmount !== null|| filter.maxAmount !== null;
-        const hasDate = filter.startDate !== null || filter.endDate !== null;
-
-        return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
     });
 
     deleteTransaction(id: string) {
@@ -172,9 +145,9 @@ export class TransactionComponent implements OnInit {
     openEditModal(transaction: Transaction): void {
         const dialogRef = this.dialog.open<
             EditTransaction,
-            { transaction: Transaction; categories: Category[] } | null,
-            NewTransaction>
-        (EditTransaction,
+            { transaction: Transaction; categories: Category[] },
+            NewTransaction
+        >(EditTransaction,
             {
                 width: '30rem',
                 height: '100%',

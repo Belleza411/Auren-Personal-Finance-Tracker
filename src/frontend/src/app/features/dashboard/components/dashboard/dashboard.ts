@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, resource 
 import { DashboardService } from '../../services/dashboard-service';
 import { TransactionService } from '../../../transactions/services/transaction.service';
 import { firstValueFrom } from 'rxjs';
-import { SummaryCard } from "../../../../shared/components/summary-card/summary-card";
+import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
 import { RouterLink } from "@angular/router";
 import { GoalService } from '../../../goals/services/goal.service';
 import { CountUpDirective } from 'ngx-countup';

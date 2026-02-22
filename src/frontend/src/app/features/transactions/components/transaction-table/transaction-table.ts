@@ -5,14 +5,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { PaymentType, PaymentTypeFilterOption, Transaction, TransactionFilter, TransactionType, TransactionTypeFilterOption } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
 import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.pipe';
 import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
 import { DATE_FILTER_LABEL_OPTION, paymentTypeOptions, transactionTypeOptions } from '../../../../shared/constants/type-options';
 import { AddWhitespacePipe } from '../../pipes/add-whitespace.pipe';
-import { Dropdown } from "../../../../shared/components/dropdown/dropdown";
-import { DropdownWithModal } from "../../../../shared/components/dropdown-with-modal/dropdown-with-modal";
+import { Dropdown } from "../../../../shared/ui/filters/components/dropdown/dropdown";
+import { DropdownWithModal } from "../../../../shared/ui/filters/components/dropdown-with-modal/dropdown-with-modal";
 
 @Component({
   selector: 'app-transaction-table',

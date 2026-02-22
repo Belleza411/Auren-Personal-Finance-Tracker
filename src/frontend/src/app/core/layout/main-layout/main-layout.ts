@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Sidebar } from "../../../shared/components/sidebar/sidebar";
+import { Sidebar } from "../../../shared/ui/sidebar/sidebar";
 import { RouterOutlet } from '@angular/router';
 
 @Component({

@@ -8,7 +8,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { AddGoal } from "../../components/add-goal/add-goal";
 import { EditGoal } from "../../components/edit-goal/edit-goal";
 import { AddMoneyForm } from "../../components/add-money-form/add-money-form";
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { generateBgColorByEmoji } from "../../utils/generateBgColorByEmoji";
 import { GoalComponent } from "../../components/goal/goal";
 import { DUMMY_GOALS } from "../../../../shared/fake-data";

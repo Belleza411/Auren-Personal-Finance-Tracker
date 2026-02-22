@@ -4,47 +4,24 @@
         (click)="onToggle()"
     >
         @switch (kind()) {
-            @case ('number') {
-                <p class="mr-1.5 text-[0.8rem]">{{ labelOption().label }}</p>
-                @if(!hasValue()) {
-                    <span class="material-symbols-rounded text-xl">
-                        {{ labelOption().icon }}
-                    </span>
-                }
-                @else { 
-                    <div 
-                        class="text-[0.7rem] ml-1.5 rounded-md bg-[#c1c1c1] py-0.5 px-2.5"
-                    >
-                        ${{ end() }} - ${{ start() }} 
-                    </div>
-                    <span 
-                        class="material-symbols-rounded ml-1.5 text-[1.4rem]!" 
-                        role="button"
-                        (click)="clear.emit()">
-                        close
-                    </span>
-                }
-            }
-
             @case ('date') {
                 @if(!hasValue()) {
-                    <span class="material-symbols-rounded mr-1">
+                    <span class="material-symbols-rounded ml-0 mr-1 text-[1.4rem]!">
                         {{ labelOption().icon }}
                     </span>
                 } @else {
-                    <div
-                        class="text-[0.7rem] ml-1.5 rounded-md bg-[#c1c1c1] py-0.5 px-2.5"
-                    >
+                    <div class="filter-value">
                         {{ end() }} - {{ start() }} 
                     </div>
                     <span 
                         class="material-symbols-rounded ml-1.5" 
                         role="button"
-                        (click)="clear.emit()">
+                        (click)="clear.emit()"
+                    >
                         close
                     </span>
                 }
-                <p class="mr-1.5 text-[0.8rem]">{{ labelOption().label }}</p>
+                <p class="filter-name">{{ labelOption().label }}</p>
             }
         }
     </button>

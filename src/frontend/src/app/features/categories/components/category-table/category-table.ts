@@ -3,7 +3,7 @@ import { Category, CategoryFilter } from '../../models/categories.model';
 import { TransactionType } from '../../../transactions/models/transaction.model';
 import { outputFromObservable, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { UpperCasePipe } from '@angular/common';
 
 @Component({

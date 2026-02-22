@@ -1,5 +1,5 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { DropdownLabelOption, FilterKind } from '../../../features/transactions/models/transaction.model';
+import { DropdownLabelOption, FilterKind } from '../../../../../features/transactions/models/transaction.model';
 
 @Component({
   selector: 'app-dropdown-with-modal',
