@@ -38,6 +38,8 @@ export class TransactionComponent implements OnInit {
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
     pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
+    editTransactionId = signal<string | null>(null);
+
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
@@ -49,13 +51,32 @@ export class TransactionComponent implements OnInit {
 
     config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
 
-    transactions = computed(() => this.transactionResource.value()?.items ?? []);
+    transactions = computed(() => this.transactionResource.value().items);
     categories = computed(() => this.transactions()
         .map(t => t.category)
         .filter(Boolean) as Category[] ?? []
-    )
-    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
+    );
+    totalCount = computed(() => this.transactionResource.value().totalCount);
     isLoading = computed(() => this.transactionResource.isLoading());
+
+    selectedTransaction = computed(() => {
+        const id = this.editTransactionId();
+        const transactions = this.transactions();
+
+        if (!id || !transactions) return undefined;
+
+        return transactions.find(t => t.id === id);
+    });
+
+    constructor() {
+        effect(() => {
+            const transaction = this.selectedTransaction();
+
+            if (!transaction) return;
+
+            this.openEditModal(transaction);
+        })
+    }
 
     ngOnInit(): void {
         this.route.params
@@ -66,7 +87,7 @@ export class TransactionComponent implements OnInit {
                 const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
 
                 if (transactionId && shouldOpenEditModal) {
-                    this.openEditModalById(transactionId);  
+                    this.editTransactionId.set(transactionId);
                 } else if (shouldOpenAddModal) {
                     this.openAddModal();
                 }
@@ -85,6 +106,12 @@ export class TransactionComponent implements OnInit {
                 params.pageSize,
                 params.pageNumber
             ));
+        },
+        defaultValue: {
+            items: [],
+            pageNumber: 1,
+            pageSize: 10,
+            totalCount: 0
         }
     });
 
@@ -100,19 +127,6 @@ export class TransactionComponent implements OnInit {
                     console.error('Failed to delete transaction:', err);
                 }
             })
-    }
-
-    openEditModalById(id: string): void {
-        const transaction = this.transactions()
-            .find(t => t.id === id);
-
-        if (!transaction) {
-            console.error('Transaction not found');
-            this.router.navigate(['/transactions']);
-            return;
-        }
-
-        this.openEditModal(transaction);
     }
 
     openAddModal(): void {
