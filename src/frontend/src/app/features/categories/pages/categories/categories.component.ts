@@ -98,7 +98,7 @@ export class CategoriesComponent implements OnInit {
 
   openEditModalById(id: string): void {
     const category = this.categories()
-      .find(c => c.categoryId === id);
+      .find(c => c.id === id);
 
     if(!category) {
       console.error('Category not found');
@@ -147,7 +147,7 @@ export class CategoriesComponent implements OnInit {
         filter((result): result is NewCategory => !!result),
         switchMap(result => 
           this.categorySer.updateCategory(
-            category.categoryId,
+            category.id,
             result
           )
         )
