@@ -1,11 +1,15 @@
 import { 
-    DropdownLabelOption,
-    FilterTypeOption,
     PAYMENT_TYPE,
     PaymentTypeFilterOption,
     TRANSACTION_TYPE,
+    TransactionFilter,
     TransactionTypeFilterOption } 
 from "../../features/transactions/models/transaction.model";
+import { 
+    DropdownLabelOption, 
+    FilterKindConfig, 
+    FilterTypeOption 
+} from "../ui/filters/models/filter.model";
 
 export const transactionTypeOptions
     : FilterTypeOption<TransactionTypeFilterOption>[] = [
@@ -38,3 +42,29 @@ export const DATE_FILTER_LABEL_OPTION: DropdownLabelOption = {
     endPlaceholder: 'Select end date',
     icon: 'calendar_today'
 }
+
+export const TRANSACTION_FILTER_KIND_CONFIG: FilterKindConfig<TransactionFilter>[] = [
+    {
+        kind: 'searchTerm',
+        key: 'searchTerm',
+        placeholder: 'Search transactions...'
+    },
+    {
+        kind: 'transactionType',
+        key: 'transactionType',
+        options: transactionTypeOptions
+    },
+    {
+        kind: 'dateRange',
+        key: 'startDate',
+    },
+    {
+        kind: 'categories',
+        key: 'category',
+    },
+    {
+        kind: 'paymentType',
+        key: 'paymentType',
+        options: paymentTypeOptions
+    }
+]

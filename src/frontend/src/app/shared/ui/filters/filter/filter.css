@@ -1,0 +1,9 @@
+@reference 'tailwindcss';
+
+:host {
+    @apply bg-white border border-solid border-[#c5c5c5] rounded-md p-3 flex flex-col gap-3;
+}
+
+.modal {
+    @apply absolute bg-white rounded-lg p-4 flex-col top-[50px] left-0 h-24;
+}

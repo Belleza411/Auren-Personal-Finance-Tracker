@@ -1,0 +1,107 @@
+<div class="flex flex-col gap-2">
+    @for(f of config(); track f.key) {
+        @if(f.kind === "searchTerm") {
+            <div class="flex lg:flex-col gap-2 flex-wrap sm:flex-nowrap w-full">
+                <input 
+                    type="text"
+                    class="w-full py-2 pr-16 pl-3 gray-border text-[0.8rem] font-medium bg-gray-50"
+                    [placeholder]="f.placeholder"
+                    [value]="searchInput()"
+                    (input)="searchInput.set($event.target.value)"
+                >
+                <button
+                    type="button"
+                    class="flex items-center gray-border px-2 py-2 text-[0.8rem] lg:hidden cursor-pointer"
+                    (click)="toggleFilter()"
+                    [ariaExpanded]="isFilterOpen()"
+                >
+                    <span class="material-symbols-rounded mr-1">
+                        filter_list
+                    </span>
+                    Filters
+                </button>
+            </div>
+        }
+    }
+</div>
+<div 
+    class="gap-3 lg:flex lg:flex-row flex-wrap"
+    [class.flex]="isFilterOpen()"
+    [class.hidden]="!isFilterOpen()"
+>
+    @for(f of config(); track f.key) {
+        @switch (f.kind) {
+            @case ('transactionType') {
+                <app-dropdown 
+                    [options]="transactionTypeOptions" 
+                    [selected]="selectedTransactionType" 
+                    (selectedChange)="onChangeTransactionType($event)"
+                />
+            }
+
+            @case ('categories') {
+                <div class="relative py-1 pl-2 pr-1 gray-border bg-gray-50 flex items-center z-50">
+                    <button 
+                        class="cursor-pointer flex items-center" 
+                        aria-label="Filter by categories"
+                        (click)="toggleCategoryModal()"
+                    >
+                        <p class="text-[0.8rem]">Categories</p>
+                        <span class="material-symbols-rounded">
+                            keyboard_arrow_down
+                        </span>
+                    </button>
+                    <div 
+                        class="modal gray-border overflow-y-scroll" 
+                        [class.flex]="isCategoryOpen()"
+                        [class.hidden]="!isCategoryOpen()"
+                    >
+                        @for (c of categories(); track c.id) {
+                            <label class="flex items-center">
+                                <input
+                                    class="mr-2"
+                                    type="checkbox"
+                                    [value]="c.name"
+                                    (change)="onCategoryToggle(c.name, $event.target.checked)"
+                                />
+                                {{ c.name }}
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+                
+            @case ('paymentType') {
+                <app-dropdown
+                    [options]="paymentTypeOptions"
+                    [selected]="selectedPaymentType"
+                    (selectedChange)="onChangePaymentType($event)"
+                />
+            }
+
+            @case ('dateRange') {
+                <app-dropdown-with-modal 
+                    kind="date"
+                    [start]="startDate()"
+                    [end]="endDate()"
+                    [labelOption]="dateFilterLabelOption"
+                    (startChange)="onStartDateChange($event)"
+                    (endChange)="onEndDateChange($event)"
+                    (clear)="clearDateFilter()"
+                />
+            }
+        }
+    }
+    @if(hasActiveFilters()) {
+        <button 
+            type="button" 
+            (click)="clearFilter()" 
+            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
+        >
+            <span class="material-symbols-rounded mr-1.5 text-xl">
+                close
+            </span>
+            Clear Filters
+        </button>
+    }
+</div>
