@@ -1,4 +1,4 @@
-<header class="flex items-center gap-1 mb-5">
+<header class="flex items-center gap-1">
     <div class="flex flex-col">
         <h2 class="mb-1 text-xl">All Transactions</h2>
         <p class="text-[#999] text-sm">It is the best time to manage your finances</p>
@@ -15,16 +15,28 @@
         </button>
     </div>
 </header>
+<app-filter 
+    [categories]="categories()" 
+    [filters]="currentFilters()"
+    [config]="config()"
+    (filtersChange)="onFiltersChange($event)"
+/>
 @if(transactions().length !== 0) {
     <app-transaction-table 
         [transactions]="transactions()" 
-        [categories]="categories()"
         (delete)="deleteTransaction($event)"
         (edit)="onEditFromTable($event)"
-        (filtersChange)="onFiltersChange($event)"
         [totalCount]="totalCount()"
         (pageNumberChange)="onPageChange($event)"
         (pageSizeChange)="onPageSizeChange($event)"
         [isLoading]="isLoading()"
     />
 } 
+<app-pagination
+    [pageNumber]="pageNumber()"
+    [pageSize]="pageSize()"
+    [totalCount]="totalCount()"
+    [pageSizeOptions]="pageSizeOptions"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+/>

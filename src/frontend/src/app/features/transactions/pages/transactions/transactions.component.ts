@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {  filter, firstValueFrom, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
@@ -12,10 +12,14 @@ import { EditTransaction } from '../../components/edit-transaction/edit-transact
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
 import { TransactionStateService } from '../../services/transaction-state.service';
 import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data';
+import { Filter } from "../../../../shared/ui/filters/filter/filter";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
+import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
+import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable],
+  imports: [TransactionTable, Filter, PaginationComponent],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,6 +36,7 @@ export class TransactionComponent implements OnInit {
     pageSize = signal<number>(10);
 
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+    pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
     currentFilters = signal<TransactionFilter>({
         searchTerm: '',
@@ -42,10 +47,12 @@ export class TransactionComponent implements OnInit {
         paymentType: null
     });
 
-    transactions = computed(() => this.transactionResource.value()?.items ?? dummyTransactions);
+    config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
+
+    transactions = computed(() => this.transactionResource.value()?.items ?? []);
     categories = computed(() => this.transactions()
         .map(t => t.category)
-        .filter(Boolean) as Category[] ?? dummyCategories
+        .filter(Boolean) as Category[] ?? []
     )
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionResource.isLoading());
@@ -78,7 +85,6 @@ export class TransactionComponent implements OnInit {
                 params.pageSize,
                 params.pageNumber
             ));
-
         }
     });
 
@@ -98,7 +104,7 @@ export class TransactionComponent implements OnInit {
 
     openEditModalById(id: string): void {
         const transaction = this.transactions()
-            .find(t => t.transactionId === id);
+            .find(t => t.id === id);
 
         if (!transaction) {
             console.error('Transaction not found');
@@ -172,7 +178,7 @@ export class TransactionComponent implements OnInit {
                 filter((result): result is NewTransaction => !!result),
                 switchMap(result =>
                     this.transactionSer.updateTransaction(
-                        transaction.transactionId,
+                        transaction.id,
                         result
                     )             
                 )

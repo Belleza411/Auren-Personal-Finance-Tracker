@@ -1,79 +1,6 @@
-@if(showFilters()) {
-    <div class="w-full flex items-center gap-3">
-        <div class="relative flex items-center">
-            <input 
-                class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium min-w-56"
-                type="text" 
-                placeholder="Search transactions..."
-                aria-label="Search transactions"
-                [value]="filters().searchTerm"
-                (input)="onSearchChange($event)"
-            >
-        </div>
-        <app-dropdown 
-            [options]="transactionTypeOptions" 
-            [selected]="selectedTransactionType" 
-            (selectedChange)="onChangeTransactionType($event)"
-        />
-        <div class="relative py-1 pl-3 pr-1 gray-border">
-            <button 
-                class="header" 
-                aria-label="Filter by categories"
-                (click)="toogleCategoryModal()"
-            >
-                <p class="mr-1.5 text-[0.8rem]">Categories</p>
-                <span class="material-symbols-rounded">
-                    keyboard_arrow_down
-                </span>
-            </button>
-            <div 
-                class="modal gray-border overflow-y-scroll" 
-                [class.flex]="isCategoryOpen()"
-                [class.hidden]="!isCategoryOpen()"
-            >
-                @for (c of categories(); track c.categoryId) {
-                    <label class="flex items-center">
-                        <input
-                            class="mr-2"
-                            type="checkbox"
-                            [value]="c.name"
-                            [checked]="filters().category.includes(c.name)"
-                            (change)="onCategoryToggle(c.name, $event.target.checked)"
-                        />
-                        {{ c.name }}
-                    </label>
-                }
-            </div>
-        </div>
-        <app-dropdown
-            [options]="paymentTypeOptions"
-            [selected]="selectedPaymentType"
-            (selectedChange)="onChangePaymentType($event)"
-        />
-        <app-dropdown-with-modal 
-            kind="date"
-            [start]="filters().startDate"
-            [end]="filters().endDate"
-            [labelOption]="dateFilterLabelOption"
-            (startChange)="onStartDateChange($event)"
-            (endChange)="onEndDateChange($event)"
-            (clear)="clearDateFilter()"
-        />
-        @if(hasActiveFilters()) {
-            <button 
-                type="button" 
-                (click)="clearFilter()" 
-                class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
-            >
-                <span class="material-symbols-rounded mr-1.5 text-xl">
-                    close
-                </span>
-                Clear Filters
-            </button>
-        }
-    </div>
-}
-<div class="w-full gray-border overflow-x-scroll xl:overflow-hidden">
+<div 
+    class="w-full gray-border overflow-x-scroll xl:overflow-hidden flex flex-col rounded-md bg-white"
+>
     <table class="w-full border-collapse">
         <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
             <tr>
@@ -83,7 +10,7 @@
             </tr>
         </thead>
         <tbody>
-            @if(!isLoading()) {
+            @if(isLoading()) {
                 @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
                     <tr class="border-b border-solid border-[#cacaca] animate-pulse">
                         @for(column of columns(); track column.key) {
@@ -92,7 +19,7 @@
                     </tr>
                 }
             } @else {
-                @for(t of transactions(); track t.transactionId) {
+                @for(t of transactions(); track t.id) {
                     <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
                         @for(column of columns(); track column.key) {
                             <td>
@@ -106,7 +33,7 @@
                                     }
 
                                     @case ('title') {
-                                        <p>{{ t.name }}</p>
+                                        <p class="font-medium">{{ t.name }}</p>
                                     }
 
                                     @case ('category') {
@@ -138,25 +65,25 @@
                                         <div 
                                             role="button" 
                                             class="relative flex items-center cursor-pointer"
-                                            (click)="toggleModalId(t.transactionId)"
+                                            (click)="toggleModalId(t.id)"
                                         >
                                             <span class="material-symbols-rounded">
                                                 more_horiz
                                             </span>
                                         </div>
 
-                                        @if(openModalId() === t.transactionId) {
+                                        @if(openModalId() === t.id) {
                                             <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
                                                 <button 
                                                     class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
-                                                    (click)="onEdit(t.transactionId)"
+                                                    (click)="onEdit(t.id)"
                                                 >
                                                     <span class="material-symbols-rounded text-sm">edit</span>
                                                     Edit
                                                 </button>
                                                 <button 
                                                     class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
-                                                    (click)="onDelete(t.transactionId)"
+                                                    (click)="onDelete(t.id)"
                                                 >
                                                     <span class="material-symbols-rounded">delete</span>
                                                     Delete
@@ -173,13 +100,3 @@
         </tbody>
     </table>
 </div>
-@if (isShowPagination() && showPagination()) {
-    <app-pagination
-        [pageNumber]="pageNumber()"
-        [pageSize]="pageSize()"
-        [totalCount]="totalCount() ?? 0"
-        [pageSizeOptions]="pageSizeOptions"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
-    />
-}

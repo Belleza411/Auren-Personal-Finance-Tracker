@@ -5,19 +5,11 @@
 }
 
 :host {
-    @apply flex flex-col bg-white border border-solid border-[#e5e5e5] rounded-md pt-6 pb-3 px-4 gap-4
+    @apply flex flex-col gap-4
 }
 
 :host(.compact) {
     @apply border-0 p-0 bg-transparent rounded-none;
-}
-
-.header {
-    @apply cursor-pointer flex items-center border-0 bg-none;
-}
-
-.modal {
-    @apply absolute bg-white rounded-lg p-4 flex-col top-[50px] left-0 h-24;
 }
 
 th {

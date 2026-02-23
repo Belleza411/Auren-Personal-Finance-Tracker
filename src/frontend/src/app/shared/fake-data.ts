@@ -4,70 +4,70 @@ import { Transaction } from "../features/transactions/models/transaction.model";
 
 export const dummyCategories: Category[] = [
   {
-    categoryId: '1',
+    id: '1',
     userId: '1',
     name: 'Salary',
     transactionType: 'Income',
     createdAt: 'June 1, 2025'
   },
   {
-    categoryId: '2',
+    id: '2',
     userId: '1',
     name: 'Freelance',
     transactionType: 'Income',
     createdAt: 'June 3, 2025'
   },
   {
-    categoryId: '3',
+    id: '3',
     userId: '1',
     name: 'Investments',
     transactionType: 'Income',
     createdAt: 'June 5, 2025'
   },
   {
-    categoryId: '4',
+    id: '4',
     userId: '1',
     name: 'Groceries',
     transactionType: 'Expense',
     createdAt: 'June 2, 2025'
   },
   {
-    categoryId: '5',
+    id: '5',
     userId: '1',
     name: 'Rent',
     transactionType: 'Expense',
     createdAt: 'June 1, 2025'
   },
   {
-    categoryId: '6',
+    id: '6',
     userId: '1',
     name: 'Transport',
     transactionType: 'Expense',
     createdAt: 'June 4, 2025'
   },
   {
-    categoryId: '7',
+    id: '7',
     userId: '1',
     name: 'Health',
     transactionType: 'Expense',
     createdAt: 'June 6, 2025'
   },
   {
-    categoryId: '8',
+    id: '8',
     userId: '1',
     name: 'Entertainment',
     transactionType: 'Expense',
     createdAt: 'June 7, 2025'
   },
   {
-    categoryId: '9',
+    id: '9',
     userId: '1',
     name: 'Utilities',
     transactionType: 'Expense',
     createdAt: 'June 8, 2025'
   },
   {
-    categoryId: '10',
+    id: '10',
     userId: '1',
     name: 'Savings',
     transactionType: 'Income',
@@ -77,7 +77,7 @@ export const dummyCategories: Category[] = [
 
 export const dummyTransactions: Transaction[] = [
   {
-    transactionId: '1',
+    id: '1',
     userId: '1',
     categoryId: '1',
     category: dummyCategories[0],
@@ -89,7 +89,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 1, 2025'
   },
   {
-    transactionId: '2',
+    id: '2',
     userId: '1',
     categoryId: '2',
     category: dummyCategories[1],
@@ -101,7 +101,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 3, 2025'
   },
   {
-    transactionId: '3',
+    id: '3',
     userId: '1',
     categoryId: '3',
     category: dummyCategories[2],
@@ -113,7 +113,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 5, 2025'
   },
   {
-    transactionId: '4',
+    id: '4',
     userId: '1',
     categoryId: '4',
     category: dummyCategories[3],
@@ -125,7 +125,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 2, 2025'
   },
   {
-    transactionId: '5',
+    id: '5',
     userId: '1',
     categoryId: '5',
     category: dummyCategories[4],
@@ -137,7 +137,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 1, 2025'
   },
   {
-    transactionId: '6',
+    id: '6',
     userId: '1',
     categoryId: '6',
     category: dummyCategories[5],
@@ -149,7 +149,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 4, 2025'
   },
   {
-    transactionId: '7',
+    id: '7',
     userId: '1',
     categoryId: '7',
     category: dummyCategories[6],
@@ -161,7 +161,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 6, 2025'
   },
   {
-    transactionId: '8',
+    id: '8',
     userId: '1',
     categoryId: '8',
     category: dummyCategories[7],
@@ -173,7 +173,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 7, 2025'
   },
   {
-    transactionId: '9',
+    id: '9',
     userId: '1',
     categoryId: '9',
     category: dummyCategories[8],
@@ -185,7 +185,7 @@ export const dummyTransactions: Transaction[] = [
     createdAt: 'June 8, 2025'
   },
   {
-    transactionId: '10',
+    id: '10',
     userId: '1',
     categoryId: '10',
     category: dummyCategories[9],
