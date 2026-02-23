@@ -53,7 +53,7 @@
                     </tr>
                 }
             } @else {
-                @for(c of categories(); track c.categoryId) {
+                @for(c of categories(); track c.id) {
                     <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
                         <td>
                             <p>{{ c.name }}</p>
@@ -70,25 +70,25 @@
                             <div 
                                 role="button" 
                                 class="relative flex items-center cursor-pointer"
-                                (click)="toggleModalId(c.categoryId)"
+                                (click)="toggleModalId(c.id)"
                             >
                                 <span class="material-symbols-rounded">
                                     more_horiz
                                 </span>
                             </div>
 
-                            @if(openModalId() === c.categoryId) {
+                            @if(openModalId() === c.id) {
                                 <div class="absolute right-25 top-55 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
                                     <button 
                                         class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5 cursor-pointer"
-                                        (click)="onEdit(c.categoryId)"
+                                        (click)="onEdit(c.id)"
                                     >
                                         <span class="material-symbols-rounded text-sm">edit</span>
                                         Edit
                                     </button>
                                     <button 
                                         class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600 cursor-pointer"
-                                        (click)="onDelete(c.categoryId)"
+                                        (click)="onDelete(c.id)"
                                     >
                                         <span class="material-symbols-rounded">delete</span>
                                         Delete
