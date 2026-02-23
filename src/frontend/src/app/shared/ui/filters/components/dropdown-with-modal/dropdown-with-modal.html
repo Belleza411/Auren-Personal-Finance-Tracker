@@ -1,4 +1,4 @@
-<div class="relative py-1.5 pr-0.5 pl-3 rounded-lg gray-border">
+<div class="relative py-1.5 pr-1 pl-2 rounded-md gray-border bg-gray-50">
     <button 
         class="cursor-pointer flex items-center border-0 bg-none" 
         (click)="onToggle()"
@@ -6,7 +6,7 @@
         @switch (kind()) {
             @case ('date') {
                 @if(!hasValue()) {
-                    <span class="material-symbols-rounded ml-0 mr-1 text-[1.4rem]!">
+                    <span class="material-symbols-rounded mr-1 text-[1.4rem]!">
                         {{ labelOption().icon }}
                     </span>
                 } @else {

@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { FilterTypeOption } from '../../../../../features/transactions/models/transaction.model';
+import { FilterTypeOption } from '../../models/filter.model';
 
 @Component({
   selector: 'app-dropdown',

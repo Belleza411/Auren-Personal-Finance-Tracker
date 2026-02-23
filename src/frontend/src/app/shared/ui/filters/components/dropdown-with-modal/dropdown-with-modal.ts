@@ -1,5 +1,5 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { DropdownLabelOption, FilterKind } from '../../../../../features/transactions/models/transaction.model';
+import { DropdownKind, DropdownLabelOption } from '../../models/filter.model';
 
 @Component({
   selector: 'app-dropdown-with-modal',
@@ -8,7 +8,7 @@ import { DropdownLabelOption, FilterKind } from '../../../../../features/transac
   styleUrl: './dropdown-with-modal.css',
 })
 export class DropdownWithModal<T> {
-  kind = input.required<FilterKind>();
+  kind = input.required<DropdownKind>();
   start = input.required<T | null>();
   end = input.required<T | null>();
   labelOption = input.required<DropdownLabelOption>();
