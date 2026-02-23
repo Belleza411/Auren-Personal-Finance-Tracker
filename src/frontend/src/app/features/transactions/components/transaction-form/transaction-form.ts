@@ -56,7 +56,7 @@ export class TransactionForm {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    const categoryName = this.categories().find(c => c.categoryId === this.modelSignal().category)?.name ?? '';
+    const categoryName = this.categories().find(c => c.id === this.modelSignal().category)?.name ?? '';
 
     const updatedModel: NewTransaction = {
       ...this.modelSignal(),

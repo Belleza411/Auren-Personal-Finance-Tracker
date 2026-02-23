@@ -77,8 +77,8 @@
             @if(!isEdit()) {
                 <option value="" disabled>Select a category</option>
             }
-            @for(category of categories(); track category.categoryId) {
-                <option [value]="category.categoryId">
+            @for(category of categories(); track category.id) {
+                <option [value]="category.id">
                     {{ category.name }}
                 </option>
             }

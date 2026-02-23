@@ -1,7 +1,7 @@
 import { Category } from "../../categories/models/categories.model";
 
 export interface Transaction {
-    transactionId: string;
+    id: string;
     userId: string;
     categoryId: string;
     category: Category;
@@ -39,22 +39,6 @@ export type PaymentType = typeof PAYMENT_TYPE[number];
 
 export type TransactionTypeFilterOption = TransactionType | 'All Types';
 export type PaymentTypeFilterOption = PaymentType | 'All Payment Method';
-
-export interface FilterTypeOption<T> {
-    value: T;
-    label: string;
-}
-
-export interface DropdownLabelOption {
-    label: string;
-    startLabel: string;
-    endLabel: string;
-    startPlaceholder: string;
-    endPlaceholder: string;
-    icon: string;
-}
-
-export type FilterKind = 'number' | 'date' | 'string';
 
 export enum TimePeriod {
     AllTime = 1,
