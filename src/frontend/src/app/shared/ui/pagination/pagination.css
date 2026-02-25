@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex items-center;
+    @apply flex items-center justify-between gap-2 flex-wrap md:flex-nowrap;
 }
 
 :host .pagination-btn {

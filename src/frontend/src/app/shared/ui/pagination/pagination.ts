@@ -17,7 +17,7 @@ export class PaginationComponent {
   pageSizeChange = output<number>();
 
   totalPages = computed(() => {
-      return Math.ceil(this.totalCount() / this.pageSize());
+    return Math.ceil(this.totalCount() / this.pageSize());
   });
 
   startItem = computed(() => 

@@ -1,54 +1,56 @@
-<div class="mr-auto">
-    <span class="text-gray-500 text-[0.8rem] font-medium">
+<div>
+    <p class="text-gray-500 text-[0.8rem] font-medium whitespace-nowrap">
         Showing {{ startItem() }}-{{ endItem() }} of {{ totalCount() }}
-    </span>
+    </p>
 </div>
-<div class="flex items-center mr-4">
-    <label for="per-size" class="text-[0.8rem] mr-1.5 font-medium">Rows Per Page: </label>
-    <select 
-        [value]="pageSize()" 
-        (change)="onPageSizeChange($event)"
-        class="border border-solid border-[#c5c5c5] rounded-md py-1 px-2"
-    >
-        @for (size of pageSizeOptions(); track size) {
-            <option [value]="size">{{ size }}</option>
+<div class="flex flex-col lg:w-full lg:ml-auto lg:justify-end sm:flex-row gap-3">
+    <div class="flex items-center mr-4">
+        <label for="per-size" class="text-[0.8rem] mr-1.5 font-medium whitespace-nowrap">Rows Per Page: </label>
+        <select 
+            [value]="pageSize()" 
+            (change)="onPageSizeChange($event)"
+            class="border border-solid border-[#c5c5c5] rounded-md py-1 px-2"
+        >
+            @for (size of pageSizeOptions(); track size) {
+                <option [value]="size">{{ size }}</option>
+                }
+        </select>
+    </div>
+    <div class="flex gap-2">
+        <button
+            (click)="onPageChange(pageNumber() - 1)"
+            [disabled]="pageNumber() === 1"
+            class="prev-next-btn"
+        >
+            <span class="material-symbols-rounded mr-2">
+                chevron_left
+            </span>
+            Previous
+        </button>
+    
+        @for (page of pageNumbers(); track $index) {
+            @if (isNumber(page)) {
+                <button
+                    (click)="onPageChange(page)"
+                    [class.active]="page === pageNumber()"
+                    class="pagination-btn"
+                >
+                    {{ page }}
+                </button>
+            } @else {
+                <span class="pagination-ellipsis">...</span>
             }
-    </select>
-</div>
-<div class="flex gap-2">
-    <button
-        (click)="onPageChange(pageNumber() - 1)"
-        [disabled]="pageNumber() === 1"
-        class="prev-next-btn"
-    >
-        <span class="material-symbols-rounded mr-2">
-            chevron_left
-        </span>
-        Previous
-    </button>
-
-    @for (page of pageNumbers(); track $index) {
-        @if (isNumber(page)) {
-            <button
-                (click)="onPageChange(page)"
-                [class.active]="page === pageNumber()"
-                class="pagination-btn"
-            >
-                {{ page }}
-            </button>
-        } @else {
-            <span class="pagination-ellipsis">...</span>
         }
-    }
-
-    <button
-        (click)="onPageChange(pageNumber() + 1)"
-        [disabled]="pageNumber() === totalPages()"
-        class="prev-next-btn"
-    >
-        Next
-        <span class="material-symbols-rounded ml-2">
-            chevron_right
-        </span>
-    </button>
+    
+        <button
+            (click)="onPageChange(pageNumber() + 1)"
+            [disabled]="pageNumber() === totalPages()"
+            class="prev-next-btn"
+        >
+            Next
+            <span class="material-symbols-rounded ml-2">
+                chevron_right
+            </span>
+        </button>
+    </div>
 </div>
