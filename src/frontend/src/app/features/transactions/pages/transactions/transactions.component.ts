@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {  filter, firstValueFrom, switchMap, take, tap } from 'rxjs';
+import { filter, firstValueFrom, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
@@ -11,7 +11,6 @@ import { Category } from '../../../categories/models/categories.model';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
 import { TransactionStateService } from '../../services/transaction-state.service';
-import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data';
 import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
