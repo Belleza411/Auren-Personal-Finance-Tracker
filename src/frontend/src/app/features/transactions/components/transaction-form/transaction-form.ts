@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, output, si
 import { NewTransaction } from '../../models/transaction.model';
 import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
+import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-transaction-form',
@@ -73,20 +74,12 @@ export class TransactionForm {
     this.cancel.emit();
   }
 
-  protected readonly fieldErrors = {
-    name: this.createErrorSignal(() => this.transactionForm.name()),
-    amount: this.createErrorSignal(() => this.transactionForm.amount()),
-    category: this.createErrorSignal(() => this.transactionForm.category()),
-    transactionType: this.createErrorSignal(() => this.transactionForm.transactionType()),
-    paymentType: this.createErrorSignal(() => this.transactionForm.paymentType()),
-    transactionDate: this.createErrorSignal(() => this.transactionForm.transactionDate())
-  }
-
-  private createErrorSignal<T>(field: () => FieldState<T>) {
-    return computed(() => this.setShowError(field()));
-  };
-
-  private setShowError<T>(field: FieldState<T>) {
-    return field.invalid() && field.touched();
-  };
+  protected readonly fieldErrors = createFieldErrors({
+    name:            () => this.transactionForm.name(),
+    amount:          () => this.transactionForm.amount(),
+    category:        () => this.transactionForm.category(),
+    transactionType: () => this.transactionForm.transactionType(),
+    paymentType:     () => this.transactionForm.paymentType(),
+    transactionDate: () => this.transactionForm.transactionDate()
+  });
 }
