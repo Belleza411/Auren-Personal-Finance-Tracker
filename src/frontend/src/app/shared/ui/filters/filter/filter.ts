@@ -42,6 +42,9 @@ export class Filter<T extends object> {
   constructor() {
     effect(() => {
       const searchTerm = this.debouncedSearch();
+
+      if (searchTerm === '' && !this.getFilter('searchTerm' as keyof T)) return;
+
       this.setFilter('searchTerm' as keyof T, searchTerm as T[keyof T]);
     })
   }
@@ -59,14 +62,21 @@ export class Filter<T extends object> {
 
   transactionTypeOptions = transactionTypeOptions;
   paymentTypeOptions = paymentTypeOptions;
-  selectedTransactionType: TransactionTypeFilterOption = "All Types";
-  selectedPaymentType: PaymentTypeFilterOption = "All Payment Method";
+  readonly selectedTransactionType = computed<TransactionTypeFilterOption>(() => 
+    this.transactionType() ?? transactionTypeOptions[0].value
+  );
+  readonly selectedPaymentType = computed<PaymentTypeFilterOption>(() => 
+    this.paymentType() ?? paymentTypeOptions[0].value
+  );
+  
   dateFilterLabelOption = DATE_FILTER_LABEL_OPTION;
 
   readonly hasActiveFilters = computed(() =>
-    Object.values(this.currentFilters() ?? {}).some(v =>
-      Array.isArray(v) ? v.length > 0 : v !== null && v !== ''
-    )
+    Object.values(this.currentFilters() ?? {}).some(v => {
+      if (Array.isArray(v)) return v.length > 0;
+      if (v === null || v === undefined || v === '') return false;
+      return true;
+    })
   );
 
   readonly transactionType = computed(() => this.getFilter('transactionType' as keyof T) as TransactionType | null);
@@ -121,8 +131,8 @@ export class Filter<T extends object> {
       })
     ) as T;
 
-    const clearedSearchTerm = this.searchInput.set('');
-    this.filtersChange.emit({ ...cleared, clearedSearchTerm});
+    this.searchInput.set('');
+    this.filtersChange.emit(cleared);
   }
 
   clearDateFilter() {

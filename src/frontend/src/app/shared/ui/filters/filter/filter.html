@@ -34,8 +34,8 @@
             @case ('transactionType') {
                 <app-dropdown 
                     [options]="transactionTypeOptions" 
-                    [selected]="selectedTransactionType" 
-                    (selectedChange)="onChangeTransactionType($event)"
+                    [selected]="selectedTransactionType()" 
+                    (selectedChange)="$event && onChangeTransactionType($event)"
                 />
             }
 
@@ -62,6 +62,7 @@
                                     class="mr-2"
                                     type="checkbox"
                                     [value]="c.name"
+                                    [checked]="categoriesSelected().includes(c.name)"
                                     (change)="onCategoryToggle(c.name, $event.target.checked)"
                                 />
                                 {{ c.name }}
@@ -74,8 +75,8 @@
             @case ('paymentType') {
                 <app-dropdown
                     [options]="paymentTypeOptions"
-                    [selected]="selectedPaymentType"
-                    (selectedChange)="onChangePaymentType($event)"
+                    [selected]="selectedPaymentType()"
+                    (selectedChange)="$event && onChangePaymentType($event)"
                 />
             }
 

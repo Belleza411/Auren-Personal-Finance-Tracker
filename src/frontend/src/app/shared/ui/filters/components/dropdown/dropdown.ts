@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FilterTypeOption } from '../../models/filter.model';
 
 @Component({
@@ -10,6 +10,15 @@ import { FilterTypeOption } from '../../models/filter.model';
 export class Dropdown<T> {
   readonly options = input.required<FilterTypeOption<T>[]>();
   selected = input.required<T>();
+
+  constructor() {
+    effect(() => {
+      const selectedOption = this.options().find(option => option.value === this.selected());
+      if (!selectedOption) {
+        this.selectedChange.emit(this.options()[0].value);
+      }
+    })
+  }
 
   selectedChange = output<T>();
 

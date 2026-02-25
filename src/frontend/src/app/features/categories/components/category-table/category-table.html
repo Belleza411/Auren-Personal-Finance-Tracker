@@ -42,7 +42,7 @@
             </tr>
         </thead>
         <tbody>
-            @if(!isLoading()) {
+            @if(isLoading()) {
                 @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
                     <tr class="border-b border-solid border-[#cacaca] animate-pulse">
                         @for(i of [1,2,3]; track i) {
