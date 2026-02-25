@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {  filter, firstValueFrom, switchMap, tap } from 'rxjs';
+import {  filter, firstValueFrom, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
@@ -34,10 +34,7 @@ export class TransactionComponent implements OnInit {
 
     pageNumber = signal<number>(1);
     pageSize = signal<number>(10);
-
-    timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
-    pageSizeOptions: number[] = [10, 20, 30, 40, 50];
-
+    config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
     editTransactionId = signal<string | null>(null);
 
     currentFilters = signal<TransactionFilter>({
@@ -49,14 +46,15 @@ export class TransactionComponent implements OnInit {
         paymentType: null
     });
 
-    config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
+    timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+    pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
-    transactions = computed(() => this.transactionResource.value().items);
+    transactions = computed(() => this.transactionResource.value()?.items ?? []);
     categories = computed(() => this.transactions()
         .map(t => t.category)
         .filter(Boolean) as Category[] ?? []
     );
-    totalCount = computed(() => this.transactionResource.value().totalCount);
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionResource.isLoading());
 
     selectedTransaction = computed(() => {
@@ -72,7 +70,7 @@ export class TransactionComponent implements OnInit {
         effect(() => {
             const transaction = this.selectedTransaction();
 
-            if (!transaction) return;
+            if (!transaction || this.dialog.openDialogs.length > 0) return;
 
             this.openEditModal(transaction);
         })
@@ -116,17 +114,16 @@ export class TransactionComponent implements OnInit {
     });
 
     deleteTransaction(id: string) {
-        this.transactionSer.deleteTransaction(id)
-            .pipe(takeUntilDestroyed(this.destroyRef))
+        this.transactionStateSer.deleteTransaction(id)
+            .pipe(take(1), takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
                     this.transactionResource.reload();
-                    this.transactionStateSer.clearCache();
                 },
                 error: err => {
                     console.error('Failed to delete transaction:', err);
                 }
-            })
+            });
     }
 
     openAddModal(): void {
@@ -148,6 +145,7 @@ export class TransactionComponent implements OnInit {
 
         dialogRef.afterClosed()
             .pipe(
+                take(1),
                 takeUntilDestroyed(this.destroyRef),
                 tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
@@ -155,8 +153,8 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: () => {
-                    this.transactionResource.reload();
                     this.transactionStateSer.clearCache();
+                    this.transactionResource.reload();
                 },
                 error: err => console.error('Create failed', err)            
             });
@@ -187,6 +185,7 @@ export class TransactionComponent implements OnInit {
 
         dialogRef.afterClosed()
             .pipe(
+                take(1),
                 takeUntilDestroyed(this.destroyRef),
                 tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
@@ -199,8 +198,9 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: () => {
-                    this.transactionResource.reload();
+                    this.editTransactionId.set(null);
                     this.transactionStateSer.clearCache();
+                    this.transactionResource.reload();
                 },
                 error: err => console.error('Update failed', err)
         });
@@ -215,10 +215,9 @@ export class TransactionComponent implements OnInit {
     }
 
     onFiltersChange(filters: TransactionFilter) {
-        if (JSON.stringify(filters) === JSON.stringify(this.currentFilters())) {
-            return;
-        }
-
+        const normalize = (f: TransactionFilter) => JSON.stringify(f, Object.keys(f).sort());
+        if (normalize(filters) === normalize(this.currentFilters())) return;
+        
         this.currentFilters.set(filters);
         this.pageNumber.set(1);
     }
