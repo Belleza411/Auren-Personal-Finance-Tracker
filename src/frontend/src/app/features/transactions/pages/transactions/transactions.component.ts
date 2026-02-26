@@ -29,8 +29,6 @@ export class TransactionComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
 
-    pageNumber = signal<number>(1);
-    pageSize = signal<number>(10);
     config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
     editTransactionId = signal<string | null>(null);
     private pagination = signal({ pageNumber: 1, pageSize: 10});
@@ -83,6 +81,8 @@ export class TransactionComponent implements OnInit {
     );
     totalCount = computed(() => this.transactionData()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionData() === null);
+    pageSize = toSignal(this.pageSize$, { initialValue: 10 })
+    pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 
     selectedTransaction = computed(() => {
         const id = this.editTransactionId();
@@ -216,11 +216,11 @@ export class TransactionComponent implements OnInit {
 
     onFiltersChange(filters: TransactionFilter) {
         this.rawFilters.set(filters);
-        this.pageNumber.set(1);
+        this.onPageChange(1);
     }
 
     onPageSizeChange(size: number) {
-        this.pagination.set({ pageNumber: 1, pageSize: size }); // single atomic update
+        this.pagination.set({ pageNumber: 1, pageSize: size }); 
     }
 
     onPageChange(page: number) {

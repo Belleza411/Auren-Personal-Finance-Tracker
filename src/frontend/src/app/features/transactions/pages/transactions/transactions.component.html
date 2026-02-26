@@ -17,7 +17,7 @@
 </header>
 <app-filter 
     [categories]="categories()" 
-    [filters]="currentFilters()"
+    [filters]="rawFilters()"
     [config]="config()"
     (filtersChange)="onFiltersChange($event)"
 />
