@@ -1,4 +1,4 @@
-import { Component, effect, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { FilterTypeOption } from '../../models/filter.model';
 
 @Component({
@@ -6,6 +6,7 @@ import { FilterTypeOption } from '../../models/filter.model';
   imports: [],
   templateUrl: './dropdown.html',
   styleUrl: './dropdown.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Dropdown<T> {
   readonly options = input.required<FilterTypeOption<T>[]>();

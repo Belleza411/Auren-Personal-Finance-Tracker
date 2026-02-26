@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { 
   TransactionTypeFilterOption,
   PaymentTypeFilterOption,
@@ -19,6 +19,7 @@ import { distinctUntilChanged } from 'rxjs';
   imports: [Dropdown, DropdownWithModal],
   templateUrl: './filter.html',
   styleUrl: './filter.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Filter<T extends object> {
   filters = input.required<T>();

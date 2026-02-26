@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { DropdownKind, DropdownLabelOption } from '../../models/filter.model';
 
 @Component({
@@ -6,6 +6,7 @@ import { DropdownKind, DropdownLabelOption } from '../../models/filter.model';
   imports: [],
   templateUrl: './dropdown-with-modal.html',
   styleUrl: './dropdown-with-modal.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DropdownWithModal<T> {
   kind = input.required<DropdownKind>();
