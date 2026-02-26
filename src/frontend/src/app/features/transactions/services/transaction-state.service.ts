@@ -1,7 +1,7 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { TransactionService } from './transaction.service';
 import { Observable, of, shareReplay, tap } from 'rxjs';
-import { PagedResult, Transaction, TransactionFilter } from '../models/transaction.model';
+import { NewTransaction, PagedResult, Transaction, TransactionFilter } from '../models/transaction.model';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 import { CacheEntry } from '../../../shared/models/cache.model';
 
@@ -60,6 +60,18 @@ export class TransactionStateService implements OnDestroy {
       return this.transactionService.deleteTransaction(id).pipe(
         tap(() => this.clearCache())
       );
+  }
+
+  createTransaction(data: NewTransaction): Observable<Transaction> {
+    return this.transactionService.createTransaction(data).pipe(
+        tap(() => this.clearCache())
+    );
+  }
+
+  updateTransaction(id: string, data: NewTransaction): Observable<Transaction> {
+      return this.transactionService.updateTransaction(id, data).pipe(
+        tap(() => this.clearCache())
+    );
   }
 
   clearCache() {
