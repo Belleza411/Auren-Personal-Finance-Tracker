@@ -1,15 +1,15 @@
-import { Component, computed, DestroyRef, inject, OnInit, resource, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
-import { filter, finalize, firstValueFrom, switchMap, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, startWith, Subject, switchMap, take, tap } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { TimePeriod } from '../../../transactions/models/transaction.model';
 import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
 import { CategoryTable } from "../../components/category-table/category-table";
-import { dummyCategories } from '../../../../shared/fake-data';
+import { CategoryStateService } from '../../services/category-state.service';
 
 @Component({
   selector: 'app-categories',
@@ -19,47 +19,76 @@ import { dummyCategories } from '../../../../shared/fake-data';
 })
 export class CategoriesComponent implements OnInit {
   private readonly categorySer = inject(CategoryService);
+  private categoryStateSer = inject(CategoryStateService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
 
-  pageNumber = signal<number>(1);
-  pageSize = signal<number>(10);
-
   selectedRange = signal<TimePeriod>(1);
+  timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
 
-  currentFilters = signal<CategoryFilter>({
+  rawFilters = signal<CategoryFilter>({
     searchTerm: '',
     transactionType: null,
   });
 
-  timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+  editCategoryId = signal<string | null>(null);
+  private pagination = signal({ pageNumber: 1, pageSize: 10});
 
-  protected readonly dummyCategories = signal<Category[]>(dummyCategories);
+  private debouncedFilter$ = toObservable(this.rawFilters).pipe(
+    debounceTime(300),
+    distinctUntilChanged((a, b) =>
+      JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
+    )
+  );
+  private pageNumber$ = toObservable(computed(() => this.pagination().pageNumber));
+  private pageSize$ = toObservable(computed(() => this.pagination().pageSize));
+  private reload$ = new Subject<void>();
 
-  categories = computed(() => this.categoryResource.value()?.items ?? []);
-  isLoading = computed(() => this.categoryResource.isLoading())
-  totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 0);
-
-  hasActiveFilters = computed(() => {
-    const hasSearch = this.currentFilters().searchTerm.trim().length !== 0;
-    const hasType = this.currentFilters().transactionType !== null;
-
-    return hasSearch || hasType;
-  })
-
-  hasNoCategories = computed(() =>
-    !this.isLoading() &&
-    this.totalCount() === 0 &&
-    !this.hasActiveFilters()
+  private categoryData$ = combineLatest([
+    this.debouncedFilter$,
+    this.pageNumber$,
+    this.pageSize$,
+    this.reload$.pipe(startWith(null))
+  ]).pipe(
+    debounceTime(300),
+    distinctUntilChanged((a, b) =>
+        JSON.stringify(a) === JSON.stringify(b)
+    ),
+    switchMap(([filters, pageNumber, pageSize]) =>
+      this.categoryStateSer.getCategories(filters, pageSize, pageNumber).pipe(
+        startWith(null)
+      )
+    )
   )
 
-  hasNoFilterResults = computed(() =>
-      !this.isLoading() &&
-      this.totalCount() === 0 &&
-      this.hasActiveFilters()
-  )
+  categoryData = toSignal(this.categoryData$, { initialValue: null });
+  categories = computed(() => this.categoryData()?.items ?? [])
+  totalCount = computed(() => this.categoryData()?.totalCount ?? 0);
+  isLoading = computed(() => this.categoryData() === null);
+
+  pageSize = toSignal(this.pageSize$, { initialValue: 10 })
+  pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
+
+  selectedCategory = computed(() => {
+    const id = this.editCategoryId();
+    const categories = this.categories();
+
+    if (!id || !categories) return undefined;
+
+    return categories.find(c => c.id === id);
+  });
+
+  constructor() {
+    effect(() => {
+      const category = this.selectedCategory();
+
+      if(!category || this.dialog.openDialogs.length > 0) return;
+
+      this.openEditModal(category)
+    })
+  }
 
   ngOnInit(): void {
     this.route.params
@@ -70,43 +99,20 @@ export class CategoriesComponent implements OnInit {
         const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
 
         if(categoryId && shouldOpenEditModal) {
-          this.openEditModalById(categoryId)
+          this.editCategoryId.set(categoryId);
         } else if (shouldOpenAddModal) {
           this.openAddModal();
         }
       })
   }
 
-  categoryResource = resource({
-    params: () => ({
-      filters: this.currentFilters(),
-      pageSize: this.pageSize(),
-      pageNumber: this.pageNumber()
-    }),
-    loader: async ({ params }) => {
-      return firstValueFrom(this.categorySer.getAllCategories(params.filters, 50, 1))
-    }
-  })
-
   deleteCategory(id: string) {
-    this.categorySer.deleteCategory(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.categoryResource.reload()
-      })
-  }
-
-  openEditModalById(id: string): void {
-    const category = this.categories()
-      .find(c => c.id === id);
-
-    if(!category) {
-      console.error('Category not found');
-      this.router.navigate(['/categories'])
-      return 
-    }
-
-    this.openEditModal(category);
+    this.categoryStateSer.deleteCategory(id)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => this.reload$.next())
+      )
   }
 
   openAddModal(): void {
@@ -126,7 +132,10 @@ export class CategoriesComponent implements OnInit {
         switchMap(result => this.categorySer.createCategory(result))
       )
       .subscribe({
-        next: () => this.categoryResource.reload(),
+        next: () => {
+          this.categoryStateSer.clearCache();
+          this.reload$.next()
+        },
         error: err => console.error('Created failed: ', err)
       })
   }
@@ -146,14 +155,14 @@ export class CategoriesComponent implements OnInit {
         tap(() => this.router.navigate(['/categories'])),
         filter((result): result is NewCategory => !!result),
         switchMap(result => 
-          this.categorySer.updateCategory(
-            category.id,
-            result
-          )
+          this.categoryStateSer.updateCategory(category.id, result)
         )
       )
       .subscribe({
-        next: () => this.categoryResource.reload(),
+        next: () => {
+          this.categoryStateSer.clearCache();
+          this.reload$.next()
+        },
         error: err => console.error('Update failed: ', err)
       })
   }
@@ -167,21 +176,16 @@ export class CategoriesComponent implements OnInit {
   }
 
   onFiltersChange(filters: CategoryFilter) {
-    if(JSON.stringify(filters) === JSON.stringify(this.currentFilters())) {
-      return;
-    }
-
-    this.currentFilters.set(filters);
-    this.pageNumber.set(1);
+    this.rawFilters.set(filters);
+    this.onPageChange(1);
   }
 
-  onPageChange(page: number): void {
-    this.pageNumber.set(page);
+  onPageSizeChange(size: number) {
+    this.pagination.set({ pageNumber: 1, pageSize: size }); 
   }
 
-  onPageSizeChange(size: number): void {
-    this.pageSize.set(size);
-    this.pageNumber.set(1);
+  onPageChange(page: number) {
+    this.pagination.update(p => ({ ...p, pageNumber: page }));
   }
 
   onRangeChange(e: Event) {

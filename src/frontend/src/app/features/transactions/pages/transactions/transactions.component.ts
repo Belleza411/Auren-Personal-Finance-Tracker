@@ -14,6 +14,7 @@ import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
 import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
+import { CategoryStateService } from '../../../categories/services/category-state.service';
 
 @Component({
   selector: 'app-transaction',
@@ -24,6 +25,7 @@ import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.mo
 })
 export class TransactionComponent implements OnInit {
     private transactionStateSer = inject(TransactionStateService);
+    private categoryStateService = inject(CategoryStateService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
@@ -71,16 +73,20 @@ export class TransactionComponent implements OnInit {
             )
         ),
         shareReplay(1)
-    )
-
-    transactionData = toSignal(this.transactionData$, { initialValue: null });
-    transactions = computed(() => this.transactionData()?.items ?? []);
-    categories = computed(() => this.transactions()
-        .map(t => t.category)
-        .filter(Boolean) as Category[] ?? []
     );
+
+    private categoryData$ = this.categoryStateService.getCategories({}, 30, 1)
+        .pipe(
+            shareReplay(1)
+        );
+        
+    transactionData = toSignal(this.transactionData$, { initialValue: null });
+    categoryData = toSignal(this.categoryData$, { initialValue: null })
+    transactions = computed(() => this.transactionData()?.items ?? []);
+    categories = computed(() => this.categoryData()?.items ?? [])
     totalCount = computed(() => this.transactionData()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionData() === null);
+    
     pageSize = toSignal(this.pageSize$, { initialValue: 10 })
     pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 

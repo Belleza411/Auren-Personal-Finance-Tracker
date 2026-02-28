@@ -24,11 +24,3 @@
         (delete)="deleteCategory($event)"
     />
 }
-
-@if(hasNoCategories()) {
-    <p class="no-result">No categories yet</p>
-} 
-
-@if(hasNoFilterResults()) {
-    <p class="no-result">No results found</p>
-}
