@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { form, FormField, required, submit, validate } from '@angular/forms/signals';
+
 import { NewTransaction } from '../../models/transaction.model';
-import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Category } from '../../../categories/models/categories.model';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
@@ -57,16 +58,26 @@ export class TransactionForm {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    const categoryName = this.categories().find(c => c.id === this.modelSignal().category)?.name ?? '';
-
-    const updatedModel: NewTransaction = {
-      ...this.modelSignal(),
-      category: categoryName,
-    } 
-    
     submit(this.transactionForm, async () => {
+      const categoryName = this.categories().find(c => c.id === this.modelSignal().category)?.name ?? '';
+  
+      console.log(categoryName);
+      
+
+      const updatedModel: NewTransaction = {
+        ...this.modelSignal(),
+        category: categoryName,
+      } 
+
       this.isLoading.set(true);
-      this.save.emit(updatedModel);
+
+      console.log(updatedModel);
+      
+      try {
+        this.save.emit(updatedModel);
+      } finally {
+        this.isLoading.set(false)
+      }
     })
   }
 

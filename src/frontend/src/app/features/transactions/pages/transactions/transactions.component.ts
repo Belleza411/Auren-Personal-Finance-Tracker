@@ -64,9 +64,6 @@ export class TransactionComponent implements OnInit {
         this.reload$.pipe(startWith(null))
     ]).pipe(
         debounceTime(300),
-        distinctUntilChanged((a, b) =>
-            JSON.stringify(a) === JSON.stringify(b)
-        ),
         switchMap(([filters, pageNumber, pageSize]) =>
             this.transactionStateSer.getTransactions(filters, pageSize, pageNumber).pipe(
                 startWith(null)
@@ -156,7 +153,6 @@ export class TransactionComponent implements OnInit {
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
-                tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
                 switchMap(result => this.transactionStateSer.createTransaction(result))
             )
@@ -196,8 +192,8 @@ export class TransactionComponent implements OnInit {
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
-                tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
+                tap(() => this.router.navigate(['/transactions'])),
                 switchMap(result =>
                     this.transactionStateSer.updateTransaction(transaction.id, result)           
                 )

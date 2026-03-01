@@ -42,10 +42,6 @@ export abstract class CacheStateService<T, TFilter extends object = object> impl
     return data$;
   }
 
-  protected invalidateOnSuccess<R>(source$: Observable<R>): Observable<R> {
-    return source$.pipe(tap(() => this.clearCache()));
-  }
-
   clearCache(): void {
     this.cache.clear();
   }

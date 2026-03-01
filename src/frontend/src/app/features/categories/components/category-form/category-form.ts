@@ -1,7 +1,6 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { NewCategory } from '../../models/categories.model';
 import { FieldState, form, required, submit, FormField } from '@angular/forms/signals';
-import { TransactionType } from '../../../transactions/models/transaction.model';
 
 @Component({
   selector: 'app-category-form',
@@ -33,7 +32,11 @@ export class CategoryForm {
 
     submit(this.categoryForm, async () => {
       this.isLoading.set(true);
-      this.save.emit(this.modelSignal());
+      try {
+        this.save.emit(this.modelSignal());
+      } finally {
+        this.isLoading.set(false)
+      }
     })
   }
 

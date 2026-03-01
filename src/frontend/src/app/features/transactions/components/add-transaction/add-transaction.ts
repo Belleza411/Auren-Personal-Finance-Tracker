@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { NewTransaction, Transaction } from '../../models/transaction.model';
-import { DialogRef } from '@angular/cdk/dialog';
+import { NewTransaction } from '../../models/transaction.model';
 import { TransactionForm } from "../transaction-form/transaction-form";
 import { Category } from '../../../categories/models/categories.model';
 import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-transaction',
@@ -14,7 +14,7 @@ import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
 })
 export class AddTransaction {
   protected readonly data: Category[] = inject(MAT_DIALOG_DATA);
-  protected dialogRef = inject(DialogRef<NewTransaction>);
+  protected dialogRef = inject(MatDialogRef<NewTransaction>);
 
   protected model = signal<NewTransaction>({
     name: '',
@@ -26,6 +26,7 @@ export class AddTransaction {
   });
 
   onSave(data: NewTransaction) {
+    console.log(data);
     this.dialogRef.close(data);
   }
 }

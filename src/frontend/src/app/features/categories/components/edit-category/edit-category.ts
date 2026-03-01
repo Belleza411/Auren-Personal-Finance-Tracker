@@ -1,6 +1,6 @@
-import { DialogRef } from '@angular/cdk/dialog';
 import { Component, inject, signal } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
 import { Category, NewCategory } from '../../models/categories.model';
 import { CategoryForm } from "../category-form/category-form";
 
@@ -12,7 +12,7 @@ import { CategoryForm } from "../category-form/category-form";
 })
 export class EditCategory {
   protected readonly data: Category = inject(MAT_DIALOG_DATA);
-  protected dialogRef = inject(DialogRef<NewCategory>);
+  protected dialogRef = inject(MatDialogRef<NewCategory>);
 
   ngOnInit(): void {
     this.model.set({

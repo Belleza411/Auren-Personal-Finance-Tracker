@@ -24,14 +24,20 @@ export class TransactionStateService extends CacheStateService<PagedResult<Trans
   }
 
   deleteTransaction(id: string): Observable<void> {
-    return this.invalidateOnSuccess(this.transactionService.deleteTransaction(id));
+    return this.transactionService.deleteTransaction(id).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   createTransaction(data: NewTransaction): Observable<Transaction> {
-    return this.invalidateOnSuccess(this.transactionService.createTransaction(data));
+    return this.transactionService.createTransaction(data).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   updateTransaction(id: string, data: NewTransaction): Observable<Transaction> {
-    return this.invalidateOnSuccess(this.transactionService.updateTransaction(id, data));
+    return this.transactionService.updateTransaction(id, data).pipe(
+      tap(() => this.clearCache())
+    );
   }
 }

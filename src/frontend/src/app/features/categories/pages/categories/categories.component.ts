@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
-import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, startWith, Subject, switchMap, take, tap } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -52,15 +52,12 @@ export class CategoriesComponent implements OnInit {
     this.pageSize$,
     this.reload$.pipe(startWith(null))
   ]).pipe(
-    debounceTime(300),
-    distinctUntilChanged((a, b) =>
-        JSON.stringify(a) === JSON.stringify(b)
-    ),
     switchMap(([filters, pageNumber, pageSize]) =>
       this.categoryStateSer.getCategories(filters, pageSize, pageNumber).pipe(
         startWith(null)
       )
-    )
+    ),
+    shareReplay(1)
   )
 
   categoryData = toSignal(this.categoryData$, { initialValue: null });

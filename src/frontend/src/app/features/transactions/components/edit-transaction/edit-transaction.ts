@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef  } from '@angular/material/dialog';
+
 import { NewTransaction, Transaction } from '../../models/transaction.model';
-import { MAT_DIALOG_DATA  } from '@angular/material/dialog';
-import { DialogRef } from '@angular/cdk/dialog';
 import { Category } from '../../../categories/models/categories.model';
 import { TransactionForm } from "../transaction-form/transaction-form";
 
@@ -14,7 +14,7 @@ import { TransactionForm } from "../transaction-form/transaction-form";
 })
 export class EditTransaction implements OnInit {
   protected readonly data = inject(MAT_DIALOG_DATA);
-  protected dialogRef = inject(DialogRef<NewTransaction>);
+  protected dialogRef = inject(MatDialogRef<NewTransaction>);
 
   private readonly transactionData: Transaction = this.data.transaction;
   protected readonly categoriesData: Category[] = this.data.categories;

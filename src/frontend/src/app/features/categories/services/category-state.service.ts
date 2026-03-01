@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { CacheStateService } from '../../../core/services/cache-state.service';
 import { PagedResult } from '../../transactions/models/transaction.model';
 import { Category, CategoryFilter, NewCategory } from '../models/categories.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 import { CategoryService } from './category.service';
 
@@ -26,14 +26,20 @@ export class CategoryStateService extends CacheStateService<PagedResult<Category
   }
 
   deleteCategory(id: string): Observable<void> {
-    return this.invalidateOnSuccess(this.categoryService.deleteCategory(id));
+    return this.categoryService.deleteCategory(id).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   createCategory(data: NewCategory): Observable<Category> {
-    return this.invalidateOnSuccess(this.categoryService.createCategory(data))
+    return this.categoryService.createCategory(data).pipe(
+      tap(() => this.clearCache())
+    )
   }
 
   updateCategory(id: string, data: NewCategory): Observable<Category> {
-    return this.invalidateOnSuccess(this.categoryService.updateCategory(id, data))
+    return this.categoryService.updateCategory(id, data).pipe(
+      tap(() => this.clearCache())
+    )
   }
 }
