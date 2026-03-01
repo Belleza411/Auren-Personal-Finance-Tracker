@@ -1,18 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { 
-  TransactionTypeFilterOption,
-  PaymentTypeFilterOption,
-  TransactionType,
-  PaymentType 
-  } from '../../../../features/transactions/models/transaction.model';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, untracked } from '@angular/core';
+import { debounceTime } from 'rxjs/internal/operators/debounceTime';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged } from 'rxjs';
+
 import { Dropdown } from "../components/dropdown/dropdown";
 import { DATE_FILTER_LABEL_OPTION, paymentTypeOptions, transactionTypeOptions } from '../../../constants/type-options';
 import { Category } from '../../../../features/categories/models/categories.model';
 import { DropdownWithModal } from "../components/dropdown-with-modal/dropdown-with-modal";
 import { FilterKindConfig } from '../models/filter.model';
-import { debounceTime } from 'rxjs/internal/operators/debounceTime';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged } from 'rxjs';
+import { 
+  TransactionTypeFilterOption,
+  PaymentTypeFilterOption,
+  TransactionType,
+  PaymentType 
+} from '../../../../features/transactions/models/transaction.model';
 
 @Component({
   selector: 'app-filter',
@@ -43,11 +44,14 @@ export class Filter<T extends object> {
   constructor() {
     effect(() => {
       const searchTerm = this.debouncedSearch();
+      const current = untracked(() =>
+        this.getFilter('searchTerm' as keyof T)
+      );
 
-      if (searchTerm === '' && !this.getFilter('searchTerm' as keyof T)) return;
+      if (searchTerm === current) return;
 
       this.setFilter('searchTerm' as keyof T, searchTerm as T[keyof T]);
-    })
+    });
   }
 
   isFilterOpen = signal(false);
