@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, debounceTime, distinctUntilChanged, filter, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
@@ -23,7 +23,7 @@ import { CategoryStateService } from '../../../categories/services/category-stat
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransactionComponent implements OnInit {
+export class TransactionComponent {
     private transactionStateSer = inject(TransactionStateService);
     private categoryStateService = inject(CategoryStateService);
     private destroyRef = inject(DestroyRef);
@@ -31,8 +31,9 @@ export class TransactionComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
 
+    id = input<string | null>(null);
+    
     config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
-    editTransactionId = signal<string | null>(null);
     private pagination = signal({ pageNumber: 1, pageSize: 10});
 
     rawFilters = signal<TransactionFilter>({
@@ -88,39 +89,27 @@ export class TransactionComponent implements OnInit {
     pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 
     selectedTransaction = computed(() => {
-        const id = this.editTransactionId();
-        const transactions = this.transactions();
-
-        if (!id || !transactions) return undefined;
-
-        return transactions.find(t => t.id === id);
+        return this.transactions().find(t => t.id === this.id());
     });
 
     constructor() {
         effect(() => {
+            const id = this.id();
             const transaction = this.selectedTransaction();
+            const { openEditModal, openAddModal } = this.route.snapshot.data;
 
-            if (!transaction || this.dialog.openDialogs.length > 0) return;
+            if (this.dialog.openDialogs.length > 0) return;
+           
+            if (id && openEditModal && transaction) {
+                this.openEditModal(transaction);
+                return;
+            }
 
-            this.openEditModal(transaction);
-        })
+            if (openAddModal) {
+                this.openAddModal();
+            }
+        });
     }
-
-    ngOnInit(): void {
-        this.route.params
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(params => {
-                const transactionId = params['id'];
-                const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
-                const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
-
-                if (transactionId && shouldOpenEditModal) {
-                    this.editTransactionId.set(transactionId);
-                } else if (shouldOpenAddModal) {
-                    this.openAddModal();
-                }
-            });
-    }  
 
     deleteTransaction(id: string) {
         this.transactionStateSer.deleteTransaction(id)
@@ -200,7 +189,6 @@ export class TransactionComponent implements OnInit {
             )
             .subscribe({
                 next: () => {
-                    this.editTransactionId.set(null);
                     this.transactionStateSer.clearCache();
                     this.reload$.next();
                 },
