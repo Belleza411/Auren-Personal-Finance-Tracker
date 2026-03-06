@@ -12,7 +12,6 @@ namespace Auren.Application.Extensions
         {
             builder.Services.AddValidatorsFromAssembly(typeof(ApplicationService).Assembly);
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<IGoalService, GoalService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<IUserService, UserService>();

@@ -10,7 +10,6 @@ namespace Auren.Infrastructure.Persistence
         }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Goal> Goals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -25,17 +24,6 @@ namespace Auren.Infrastructure.Persistence
             });
                 
             builder.Entity<Category>().HasKey(c => c.Id);
-
-            builder.Entity<Goal>().HasKey(g => g.Id);
-
-            builder.Entity<Goal>(entity =>
-            {
-                entity.Property(g => g.Spent)
-                    .HasPrecision(12, 2);
-
-                entity.Property(g => g.Budget)
-                    .HasPrecision(12, 2);
-            });
         }
     }
 }
