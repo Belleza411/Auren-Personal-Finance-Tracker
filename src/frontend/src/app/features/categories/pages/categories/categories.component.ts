@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, effect, inject, OnInit, resource, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, OnInit, resource, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
 import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
@@ -17,7 +17,7 @@ import { CategoryStateService } from '../../services/category-state.service';
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
 })
-export class CategoriesComponent implements OnInit {
+export class CategoriesComponent {
   private readonly categorySer = inject(CategoryService);
   private categoryStateSer = inject(CategoryStateService);
   private destroyRef = inject(DestroyRef);
@@ -33,7 +33,7 @@ export class CategoriesComponent implements OnInit {
     transactionType: null,
   });
 
-  editCategoryId = signal<string | null>(null);
+  id = input<string | null>(null);
   private pagination = signal({ pageNumber: 1, pageSize: 10});
 
   private debouncedFilter$ = toObservable(this.rawFilters).pipe(
@@ -68,39 +68,34 @@ export class CategoriesComponent implements OnInit {
   pageSize = toSignal(this.pageSize$, { initialValue: 10 })
   pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 
-  selectedCategory = computed(() => {
-    const id = this.editCategoryId();
-    const categories = this.categories();
-
-    if (!id || !categories) return undefined;
-
-    return categories.find(c => c.id === id);
-  });
+  selectedCategory = computed(() => 
+    this.categories().find(c => c.id === this.id())
+  );
 
   constructor() {
     effect(() => {
+      const id = this.id();
       const category = this.selectedCategory();
 
-      if(!category || this.dialog.openDialogs.length > 0) return;
+      const { openEditModal, openAddModal } = this.route.snapshot.data;
 
-      this.openEditModal(category)
+      if (this.dialog.openDialogs.length > 0) return;
+
+      if(this.isLoading()) return;
+
+      if(id && openEditModal && category) {
+        this.openEditModal(category)
+        return;
+      }
+
+      if(id && openEditModal && !category) {
+        this.router.navigate(['/categories']);
+        return;
+      }
+
+      if(openAddModal) 
+        openAddModal();
     })
-  }
-
-  ngOnInit(): void {
-    this.route.params
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => {
-        const categoryId = params['id'];
-        const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
-        const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
-
-        if(categoryId && shouldOpenEditModal) {
-          this.editCategoryId.set(categoryId);
-        } else if (shouldOpenAddModal) {
-          this.openAddModal();
-        }
-      })
   }
 
   deleteCategory(id: string) {
@@ -110,6 +105,7 @@ export class CategoriesComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         tap(() => this.reload$.next())
       )
+      .subscribe()
   }
 
   openAddModal(): void {

@@ -88,9 +88,9 @@ export class TransactionComponent {
     pageSize = toSignal(this.pageSize$, { initialValue: 10 })
     pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 
-    selectedTransaction = computed(() => {
-        return this.transactions().find(t => t.id === this.id());
-    });
+    selectedTransaction = computed(() => 
+        this.transactions().find(t => t.id === this.id())
+    );
 
     constructor() {
         effect(() => {
@@ -113,9 +113,9 @@ export class TransactionComponent {
                 return;
             }
 
-            if (openAddModal) {
+            if (openAddModal) 
                 this.openAddModal();
-            }
+            
         });
     }
 

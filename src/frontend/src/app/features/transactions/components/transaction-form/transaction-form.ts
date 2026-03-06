@@ -59,20 +59,14 @@ export class TransactionForm {
     event.preventDefault();
 
     submit(this.transactionForm, async () => {
+      this.isLoading.set(true);
       const categoryName = this.categories().find(c => c.id === this.modelSignal().category)?.name ?? '';
-  
-      console.log(categoryName);
-      
 
       const updatedModel: NewTransaction = {
         ...this.modelSignal(),
         category: categoryName,
       } 
 
-      this.isLoading.set(true);
-
-      console.log(updatedModel);
-      
       try {
         this.save.emit(updatedModel);
       } finally {
