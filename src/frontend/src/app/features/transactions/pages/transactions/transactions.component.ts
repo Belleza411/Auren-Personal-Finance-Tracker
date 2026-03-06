@@ -96,12 +96,20 @@ export class TransactionComponent {
         effect(() => {
             const id = this.id();
             const transaction = this.selectedTransaction();
+
             const { openEditModal, openAddModal } = this.route.snapshot.data;
 
             if (this.dialog.openDialogs.length > 0) return;
+
+            if(this.isLoading()) return;
            
             if (id && openEditModal && transaction) {
                 this.openEditModal(transaction);
+                return;
+            }
+
+            if(id && openEditModal && !transaction) {
+                this.router.navigate(['/transactions']);
                 return;
             }
 
@@ -142,6 +150,7 @@ export class TransactionComponent {
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
+                tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
                 switchMap(result => this.transactionStateSer.createTransaction(result))
             )
@@ -181,8 +190,8 @@ export class TransactionComponent {
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
-                filter((result): result is NewTransaction => !!result),
                 tap(() => this.router.navigate(['/transactions'])),
+                filter((result): result is NewTransaction => !!result),
                 switchMap(result =>
                     this.transactionStateSer.updateTransaction(transaction.id, result)           
                 )
