@@ -14,9 +14,4 @@ export const SIDEBAR_MENU = [
         icon: 'category', 
         route: '/categories' 
     },
-    { 
-        label: 'Goals', 
-        icon: 'target', 
-        route: '/goals' 
-    }
 ];
