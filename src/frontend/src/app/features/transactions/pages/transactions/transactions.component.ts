@@ -92,6 +92,18 @@ export class TransactionComponent {
         this.transactions().find(t => t.id === this.id())
     );
 
+    hasActiveFilters = computed(() => {
+        const f = this.rawFilters();
+        return (
+            f.searchTerm !== '' ||
+            f.transactionType !== null ||
+            f.startDate !== null ||
+            f.endDate !== null ||
+            f.category.length > 0 ||
+            f.paymentType !== null
+        );
+    });
+
     constructor() {
         effect(() => {
             const id = this.id();
