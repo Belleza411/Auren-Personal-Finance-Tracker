@@ -1,17 +1,14 @@
-export const SIDEBAR_MENU = [
+export const NAVBAR_MENU = [
     { 
         label: 'Dashboard', 
-        icon: 'dashboard', 
         route: '/dashboard' 
     },
     { 
         label: 'Transactions',
-        icon: 'compare_arrows',
         route: '/transactions' 
     },
     { 
         label: 'Categories', 
-        icon: 'category', 
         route: '/categories' 
     },
 ];

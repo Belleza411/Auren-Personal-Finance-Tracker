@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Sidebar } from "../../../shared/ui/sidebar/sidebar";
+import { Navbar } from "../../../shared/ui/navbar/navbar.component";
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, RouterOutlet],
+  imports: [RouterOutlet, Navbar],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
   changeDetection: ChangeDetectionStrategy.OnPush
