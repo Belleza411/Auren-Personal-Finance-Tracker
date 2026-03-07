@@ -1,3 +1,4 @@
+import { CategoryFilter } from "../../features/categories/models/categories.model";
 import { 
     PAYMENT_TYPE,
     PaymentTypeFilterOption,
@@ -67,4 +68,17 @@ export const TRANSACTION_FILTER_KIND_CONFIG: FilterKindConfig<TransactionFilter>
         key: 'paymentType',
         options: paymentTypeOptions
     }
+]
+
+export const CATEGORY_FILTER_KIND_CONFIG: FilterKindConfig<CategoryFilter>[] = [
+    {
+        kind: 'searchTerm',
+        key: 'searchTerm',
+        placeholder: 'Search categories...'
+    },
+    {
+        kind: 'transactionType',
+        key: 'transactionType',
+        options: transactionTypeOptions
+    },
 ]

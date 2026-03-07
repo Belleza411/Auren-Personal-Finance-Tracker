@@ -1,37 +1,3 @@
-<div class="w-full flex items-center gap-3">
-    <div class="relative flex items-center">
-        <input 
-            class="w-full py-1.5 pr-16 pl-3 gray-border text-[0.8rem] font-medium"
-            type="text" 
-            placeholder="Search categories..."
-            aria-label="Search categories"
-            [value]="searchTerm()"
-            (input)="searchTerm.set($any($event.target).value)"
-        >
-    </div>
-    <select 
-        class="p-1.5 gray-border text-[0.8rem]" 
-        aria-label="Filter by transaction type"
-        [value]="selectedType() ?? 0"
-        (change)="onChangeType($event)"
-    >
-        @for(type of transactionTypeOptions; track $index) {
-            <option [value]="$index">{{ type }}</option>
-        }
-    </select>
-    @if(hasActiveFilters()) {
-        <button 
-            type="button" 
-            (click)="clearFilter()" 
-            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
-        >
-            <span class="material-symbols-rounded mr-1.5 text-xl">
-                close
-            </span>
-            Clear Filters
-        </button>
-    }
-</div>
 <div class="gray-border overflow-hidden">
     <table class="w-full border-collapse">
         <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
@@ -61,7 +27,7 @@
                         <td>
                             <p 
                                 class="inline-flex items-center px-2 py-1 rounded-full font-medium"
-                                [class]="isIncome(c) ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'"
+                                [class]="c.transactionType | transactionTypeColor:true"
                             >
                                 {{ c.transactionType | uppercase }}
                             </p>
@@ -102,13 +68,3 @@
         </tbody>
     </table>
 </div>
-@if(isShowPagination()) {
-    <app-pagination
-        [pageNumber]="pageNumber()"
-        [pageSize]="pageSize()"
-        [totalCount]="totalCount()"
-        [pageSizeOptions]="pageSizeOptions"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
-    />
-}

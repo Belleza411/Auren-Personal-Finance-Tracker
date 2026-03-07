@@ -1,5 +1,5 @@
-<header class="flex gap-1 mb-5">
-    <div class="flex flex-col">
+<header class="flex gap-1 flex-wrap">
+    <div class="flex flex-col mb-3">
         <h2 class="mb-1 text-3xl text-white">All Categories</h2>
         <p class="text-white text-sm">It is the best time to manage your finances</p>
     </div>
@@ -15,12 +15,45 @@
         </button>
     </div>
 </header>
-@if(categories().length > 0) {
+<app-filter 
+    [categories]="categories()" 
+    [filters]="rawFilters()"
+    [config]="config()"
+    (filtersChange)="onFiltersChange($event)"
+/>
+@if(isLoading() || categories().length !== 0) {
     <app-category-table
         [categories]="categories()"
         [isLoading]="isLoading()"
-        [totalCount]="totalCount()"
         (edit)="onEditFromTable($event)"
         (delete)="deleteCategory($event)"
+    />
+} @else if(hasActiveFilters()) {
+    <div class="flex flex-col items-center justify-center py-10">
+        <p class="text-gray-500 text-lg">No categories found</p>
+        <p class="text-sm text-gray-400">Try adjusting or clearing your filters</p>
+    </div>
+} @else {
+    <div class="flex flex-col items-center justify-center py-10">
+        <p class="text-gray-500 text-lg">No categoriesyet</p>
+        <p class="text-sm text-gray-400">Start tracking your income and expenses</p>
+        <button 
+            class="mt-4 bg-[#1c4532] text-white px-4 py-2 rounded flex items-center"
+            (click)="onAddCategory()"
+        >
+            Add Category
+            <span class="material-symbols-rounded text-xl ml-2">add</span>
+        </button>
+    </div>
+}
+
+@if(totalCount() > 0) {
+    <app-pagination
+        [pageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
     />
 }

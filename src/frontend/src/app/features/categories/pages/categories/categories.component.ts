@@ -10,10 +10,14 @@ import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
 import { CategoryTable } from "../../components/category-table/category-table";
 import { CategoryStateService } from '../../services/category-state.service';
+import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
+import { CATEGORY_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
+import { Filter } from "../../../../shared/ui/filters/filter/filter";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 
 @Component({
   selector: 'app-categories',
-  imports: [CategoryTable],
+  imports: [CategoryTable, Filter, PaginationComponent],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
 })
@@ -35,6 +39,8 @@ export class CategoriesComponent {
 
   id = input<string | null>(null);
   private pagination = signal({ pageNumber: 1, pageSize: 10});
+  config = signal<FilterKindConfig<CategoryFilter>[]>(CATEGORY_FILTER_KIND_CONFIG);
+  pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
   private debouncedFilter$ = toObservable(this.rawFilters).pipe(
     debounceTime(300),
@@ -71,6 +77,15 @@ export class CategoriesComponent {
   selectedCategory = computed(() => 
     this.categories().find(c => c.id === this.id())
   );
+
+  hasActiveFilters = computed(() => {
+    const f = this.rawFilters();
+
+    return (
+        f.searchTerm !== '' ||
+        f.transactionType !== null
+    );
+  })
 
   constructor() {
     effect(() => {
