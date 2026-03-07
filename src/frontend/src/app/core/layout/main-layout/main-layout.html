@@ -1,4 +1,4 @@
-<app-sidebar/>
-<main>
-    <router-outlet></router-outlet>
+<app-navbar />
+<main class="bg-[#1c4532] relative pt-2" [class]="isDashboard() ? 'h-75' : 'h-30'"> 
+    <router-outlet class="absolute"></router-outlet>
 </main>

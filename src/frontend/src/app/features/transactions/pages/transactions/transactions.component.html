@@ -1,21 +1,11 @@
-<header class="flex items-center gap-1 mb-5">
-    <div class="flex flex-col">
-        <h2 class="mb-1 text-xl">All Transactions</h2>
-        <p class="text-[#999] text-sm">It is the best time to manage your finances</p>
+ <header class="flex gap-1 flex-wrap">
+    <div class="flex flex-col mr-auto mb-3">
+        <h2 class="mb-1 text-3xl text-white">All Transactions</h2>
+        <p class="text-white text-sm">It is the best time to manage your finances</p>
     </div>
-    <div class="flex items-center justify-center gap-3 ml-auto">
-        <div>
-            <select 
-                class="p-2 rounded-md border border-[#c5c5c5] border-solid"
-                (change)="onRangeChange($event)"
-            >
-                @for(range of timePeriodOptions; track $index) {
-                    <option [value]="$index">{{ range }}</option>
-                }
-            </select>
-        </div>
+    <div class="flex items-center justify-center">
         <button 
-            class="flex items-center justify-center border-0 text-white bg-[#1c4532] text-sm py-1.5 px-4 rounded-md font-extralight cursor-pointer whitespace-nowrap"
+            class="flex items-center justify-center border-0 text-white bg-[#00753f] text-sm py-1.5 px-4 rounded-md font-extralight cursor-pointer whitespace-nowrap"
             (click)="onAddTransaction()"
         >
             Add Transaction
@@ -25,24 +15,45 @@
         </button>
     </div>
 </header>
-@if(transactions().length !== 0) {
+<app-filter 
+    [categories]="categories()" 
+    [filters]="rawFilters()"
+    [config]="config()"
+    (filtersChange)="onFiltersChange($event)"
+/>
+@if(isLoading() || transactions().length !== 0) {
     <app-transaction-table 
         [transactions]="transactions()" 
-        [categories]="categories()"
         (delete)="deleteTransaction($event)"
         (edit)="onEditFromTable($event)"
-        (filtersChange)="onFiltersChange($event)"
-        [totalCount]="totalCount()"
-        (pageNumberChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
         [isLoading]="isLoading()"
     />
-} 
+} @else if(hasActiveFilters()) {
+    <div class="flex flex-col items-center justify-center py-10">
+        <p class="text-gray-500 text-lg">No transactions found</p>
+        <p class="text-sm text-gray-400">Try adjusting or clearing your filters</p>
+    </div>
+} @else {
+    <div class="flex flex-col items-center justify-center py-10">
+        <p class="text-gray-500 text-lg">No transactions yet</p>
+        <p class="text-sm text-gray-400">Start tracking your income and expenses</p>
+        <button 
+            class="mt-4 bg-[#1c4532] text-white px-4 py-2 rounded flex items-center"
+            (click)="onAddTransaction()"
+        >
+            Add Transaction
+            <span class="material-symbols-rounded text-xl ml-2">add</span>
+        </button>
+    </div>
+}
 
-@if(hasNoTransactions()) {
-    <p class="no-result">No transactions yet</p>
-} 
-
-@if(hasNoFilterResults()) {
-    <p class="no-result">No results found</p>
+@if(totalCount() > 0) {
+    <app-pagination
+        [pageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+    />
 }

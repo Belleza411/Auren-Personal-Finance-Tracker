@@ -1,7 +1,7 @@
 import { Category } from "../../categories/models/categories.model";
 
-interface Transaction {
-    transactionId: string;
+export interface Transaction {
+    id: string;
     userId: string;
     categoryId: string;
     category: Category;
@@ -13,7 +13,7 @@ interface Transaction {
     createdAt: Date | string;
 }
 
-interface NewTransaction {
+export interface NewTransaction {
     name: string;
     amount: number;
     category: string;
@@ -22,28 +22,23 @@ interface NewTransaction {
     transactionDate: Date | string;
 }
 
-interface TransactionFilter {
+export interface TransactionFilter {
     searchTerm: string;
     transactionType: TransactionType | null;
-    minAmount: number | null;
-    maxAmount: number | null;
     startDate: Date | string | null;
     endDate: Date | string | null;
     category: string[];
     paymentType: PaymentType | null;
 }
 
-export enum TransactionType {
-    Income = 1,
-    Expense = 2
-}
+export const TRANSACTION_TYPE = ['Income', 'Expense'] as const;
+export const PAYMENT_TYPE = ['Cash', 'CreditCard', 'BankTransfer', 'Other'] as const;
 
-export enum PaymentType {
-    Cash = 1,
-    CreditCard = 2,
-    BankTransfer = 3,
-    Other = 4
-}
+export type TransactionType = typeof TRANSACTION_TYPE[number];
+export type PaymentType = typeof PAYMENT_TYPE[number];
+
+export type TransactionTypeFilterOption = TransactionType | 'All Types';
+export type PaymentTypeFilterOption = PaymentType | 'All Payment Method';
 
 export enum TimePeriod {
     AllTime = 1,
@@ -54,23 +49,15 @@ export enum TimePeriod {
     ThisYear = 6
 }
 
-interface BalanceSummary {
+export interface BalanceSummary {
     income: number;
     expense: number;
     balance: number;
 }
 
-interface PagedResult<T> {
+export interface PagedResult<T> {
     items: T[];
     pageNumber: number;
     pageSize: number;
     totalCount: number;
-}
-
-export type {
-    Transaction,
-    NewTransaction,
-    TransactionFilter,
-    BalanceSummary,
-    PagedResult
 }

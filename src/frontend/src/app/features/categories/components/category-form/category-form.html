@@ -14,8 +14,8 @@
                     #incomeInput
                     type="radio" 
                     name="transactionType"
-                    [checked]="categoryForm.transactionType().value() === TransactionType.Income"
-                    (change)="categoryForm.transactionType().value.set(TransactionType.Income)">
+                    [checked]="categoryForm.transactionType().value() === 'Income'"
+                    (change)="categoryForm.transactionType().value.set('Income')">
                 Income
             </label>
             <label 
@@ -27,8 +27,8 @@
                     #expenseInput
                     type="radio" 
                     name="transactionType"
-                    [checked]="categoryForm.transactionType().value() === TransactionType.Expense"
-                    (change)="categoryForm.transactionType().value.set(TransactionType.Expense)">
+                    [checked]="categoryForm.transactionType().value() === 'Expense'"
+                    (change)="categoryForm.transactionType().value.set('Expense')">
                 Expense
             </label>
         </div>

@@ -41,8 +41,6 @@ namespace Auren.Application.Specifications.Transactions
 
             return !string.IsNullOrWhiteSpace(filter.SearchTerm) ||
                    filter.TransactionType.HasValue ||
-                   filter.MinAmount.HasValue ||
-                   filter.MaxAmount.HasValue ||
                    filter.StartDate.HasValue ||
                    filter.EndDate.HasValue ||
                    filter.PaymentType.HasValue ||
@@ -64,11 +62,6 @@ namespace Auren.Application.Specifications.Transactions
             if(_filter.StartDate.HasValue && _filter.EndDate.HasValue)
             {
                 spec = spec.And(new DateRangeFilterSpecification(_filter.StartDate.Value, _filter.EndDate.Value));
-            }
-
-            if(_filter.MinAmount.HasValue && _filter.MaxAmount.HasValue) 
-            {
-                spec = spec.And(new AmountRangeFilterspecification(_filter.MinAmount.Value, _filter.MaxAmount.Value));
             }
 
             if(_filter.Category?.Any() == true)

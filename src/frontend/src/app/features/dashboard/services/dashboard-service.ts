@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { DashboardSummary, ExpenseBreakdown, IncomeVsExpenseResponse } from '../models/dashboard.model';
 import { TimePeriod } from '../../transactions/models/transaction.model';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
-import { TimePeriodMap } from '../../../shared/utils/enum-mapper.util';
 
 @Injectable({
   providedIn: 'root',
@@ -13,8 +12,6 @@ import { TimePeriodMap } from '../../../shared/utils/enum-mapper.util';
 export class DashboardService {
   private http = inject(HttpClient);
   private baseUrl = `${apiUrl}/api/dashboard`;
-
-  TimePeriodMap = TimePeriodMap;
 
   getDashboardSummary(timePeriod?: TimePeriod): Observable<DashboardSummary> {
     const params = this.createTimePeriodParams(timePeriod);
@@ -35,7 +32,7 @@ export class DashboardService {
   }
 
   private createTimePeriodParams(timePeriod?: TimePeriod) {
-    const filters = timePeriod !== undefined ? { timePeriod: TimePeriodMap[timePeriod].replace(/\s+/g, '') } : {};
+    const filters = timePeriod !== undefined ? { timePeriod: timePeriod.toString().replace(/\s+/g, '') } : {};
     return createHttpParams(filters);
   }
 }

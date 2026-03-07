@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex;
+    @apply flex items-center;
 }
 
 .profile-image {

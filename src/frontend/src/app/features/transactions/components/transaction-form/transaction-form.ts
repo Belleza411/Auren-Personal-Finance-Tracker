@@ -1,13 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { NewTransaction, TransactionType } from '../../models/transaction.model';
-import { FieldState, form, FormField, required, submit, validate } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { form, FormField, required, submit, validate } from '@angular/forms/signals';
+
+import { NewTransaction } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
-import { EnumSelect } from '../../../../shared/components/enum-select/enum-select';
-import { PaymentTypeMap, TransactionTypeMap } from '../../../../shared/utils/enum-mapper.util';
+import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-transaction-form',
-  imports: [EnumSelect, FormField],
+  imports: [FormField],
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -18,11 +18,15 @@ export class TransactionForm {
   save = output<NewTransaction>();
   cancel = output<void>();
   categories = input.required<Category[]>();
-  TransactionTypeMap = TransactionTypeMap;
-  PaymentTypeMap = PaymentTypeMap;
-  TransactionType = TransactionType;
 
   isLoading = signal(false);
+
+  paymentTypes = [
+    { value: 'Cash', label: 'Cash' },
+    { value: 'CreditCard', label: 'Credit Card' },
+    { value: 'BankTransfer', label: 'Bank Transfer' },
+    { value: 'Other', label: 'Other' }
+  ];
 
   private readonly modelSignal = signal({} as NewTransaction);
   protected readonly transactionForm = form(this.modelSignal, schema => {
@@ -54,16 +58,20 @@ export class TransactionForm {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    const categoryName = this.categories().find(c => c.categoryId === this.modelSignal().category)?.name ?? '';
-
-    const updatedModel: NewTransaction = {
-      ...this.modelSignal(),
-      category: categoryName,
-    } 
-    
     submit(this.transactionForm, async () => {
       this.isLoading.set(true);
-      this.save.emit(updatedModel);
+      const categoryName = this.categories().find(c => c.id === this.modelSignal().category)?.name ?? '';
+
+      const updatedModel: NewTransaction = {
+        ...this.modelSignal(),
+        category: categoryName,
+      } 
+
+      try {
+        this.save.emit(updatedModel);
+      } finally {
+        this.isLoading.set(false)
+      }
     })
   }
 
@@ -71,20 +79,12 @@ export class TransactionForm {
     this.cancel.emit();
   }
 
-  protected readonly fieldErrors = {
-    name: this.createErrorSignal(() => this.transactionForm.name()),
-    amount: this.createErrorSignal(() => this.transactionForm.amount()),
-    category: this.createErrorSignal(() => this.transactionForm.category()),
-    transactionType: this.createErrorSignal(() => this.transactionForm.transactionType()),
-    paymentType: this.createErrorSignal(() => this.transactionForm.paymentType()),
-    transactionDate: this.createErrorSignal(() => this.transactionForm.transactionDate())
-  }
-
-  private createErrorSignal<T>(field: () => FieldState<T>) {
-    return computed(() => this.setShowError(field()));
-  };
-
-  private setShowError<T>(field: FieldState<T>) {
-    return field.invalid() && field.touched();
-  };
+  protected readonly fieldErrors = createFieldErrors({
+    name:            () => this.transactionForm.name(),
+    amount:          () => this.transactionForm.amount(),
+    category:        () => this.transactionForm.category(),
+    transactionType: () => this.transactionForm.transactionType(),
+    paymentType:     () => this.transactionForm.paymentType(),
+    transactionDate: () => this.transactionForm.transactionDate()
+  });
 }

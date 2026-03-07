@@ -120,7 +120,6 @@ namespace Auren.Infrastructure.Extensions
                 });
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<IGoalRepository, GoalRepository>();
             builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IProfileRepository, ProfileRepository>();

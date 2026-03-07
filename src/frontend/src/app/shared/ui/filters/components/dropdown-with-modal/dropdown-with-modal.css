@@ -1,0 +1,9 @@
+@reference 'tailwindcss';
+
+.filter-name {
+    @apply mr-1.5 text-[0.8rem]
+}
+
+.filter-value {
+    @apply text-[0.7rem] ml-1.5 rounded-md bg-[#c1c1c1] py-0.5 px-2.5;
+}

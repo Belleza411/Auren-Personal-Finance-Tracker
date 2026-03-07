@@ -1,0 +1,23 @@
+<div>
+    <h1 class="text-white text-2xl">Auren</h1>
+</div>
+<nav>
+    <ul class="list-none flex gap-10">
+        @for (items of sidebarItems; track items.route) {
+            <li>
+                <a 
+                    [routerLink]="items.route"
+                    class="w-full py-2 px-3 cursor-pointer rounded-md transition-colors duration-150"
+                >
+                    <span 
+                        class="text-gray-300 text-sm"
+                        routerLinkActive="text-white" 
+                    >
+                        {{ items.label }}
+                    </span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+<app-profile />

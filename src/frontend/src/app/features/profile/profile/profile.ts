@@ -2,6 +2,8 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { ProfileService } from '../service/profile-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserResponse } from '../models/profile.model';
+import { AuthService } from '../../../core/auth/service/auth-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -11,18 +13,37 @@ import { UserResponse } from '../models/profile.model';
 })
 export class ProfileComponent implements OnInit {
   private profileService = inject(ProfileService);
+  private readonly authSer = inject(AuthService);
+  private readonly router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   user = signal<UserResponse | null>(null);
 
-  readonly email = computed(() => this.user()?.email)
+  readonly email = computed(() => this.user()?.email ?? "guest@gmail.com")
   readonly fullName = computed(() => {
     const user = this.user();
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? `${user.firstName} ${user.lastName}` : 'Guest';
   });
 
   readonly bgColor = computed(() => this.stringToColor(this.fullName()));
   readonly initials = computed(() => this.getInitials(this.fullName()));
+
+  isOpen = signal(false);
+  toggle() {
+    this.isOpen.update(v => !v);
+  }
+
+  logout() {
+    this.authSer.logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.router.navigate(['/auth/sign-in']),
+        error: err => {
+          console.error("Something went wrong ", err);
+          this.router.navigate(['/auth/sign-in']);
+        }
+      })
+  }
 
   ngOnInit(): void {
     this.profileService.getUserProfile()

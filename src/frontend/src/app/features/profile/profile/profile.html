@@ -12,7 +12,25 @@
         {{ initials() }}
     </div>
 }
-<div class="flex flex-col justify-center ml-3">
-    <p class="text-white text-sm">{{ fullName() }}</p>
-    <p class="text-white text-xs">{{ email() }}</p>
+<span class="material-symbols-rounded text-white relative cursor-pointer" (click)="toggle()">
+    keyboard_arrow_down
+</span>
+<div 
+    [hidden]="!isOpen()" 
+    class="flex flex-col absolute top-15 right-20 bg-[#1c4532] rounded-md gray-border z-50"
+>
+    <div class="pl-3 pr-15 pb-1.5 pt-2 flex flex-col">
+        <p class="text-white font-medium">{{ fullName() }}</p>
+        <p class="text-gray-400 tex-xs">{{ email() }}</p>
+    </div>
+    <button 
+        class="border-t border-gray-600 bg-transparent flex items-center text-white text-sm cursor-pointer hover:opacity-80 transition-opacity py-1.5 px-3"
+        (click)="logout()"
+        type="button" 
+    >
+        <span class="material-symbols-rounded mr-3 text-[1.2rem]! font-light! text-white">
+            logout
+        </span>
+        Log out
+    </button>
 </div>

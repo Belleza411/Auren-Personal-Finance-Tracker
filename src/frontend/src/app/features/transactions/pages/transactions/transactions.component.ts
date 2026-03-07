@@ -1,157 +1,150 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, output, resource, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {  filter, firstValueFrom, Subject, switchMap, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
-import { TransactionService } from '../../services/transaction.service';
-import { NewTransaction, TimePeriod, Transaction, TransactionFilter } from '../../models/transaction.model';
+import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
 import { Category } from '../../../categories/models/categories.model';
-import { CategoryService } from '../../../categories/services/category.service';
 import { EditTransaction } from '../../components/edit-transaction/edit-transaction';
 import { AddTransaction } from '../../components/add-transaction/add-transaction';
-import { dummyCategories, dummyTransactions } from '../../../../shared/fake-data';
+import { TransactionStateService } from '../../services/transaction-state.service';
+import { Filter } from "../../../../shared/ui/filters/filter/filter";
+import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
+import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
+import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
+import { CategoryStateService } from '../../../categories/services/category-state.service';
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable],
+  imports: [TransactionTable, Filter, PaginationComponent],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransactionComponent implements OnInit {
-    private transactionSer = inject(TransactionService);
-    private categorySer = inject(CategoryService);
+export class TransactionComponent {
+    private transactionStateSer = inject(TransactionStateService);
+    private categoryStateService = inject(CategoryStateService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private dialog = inject(MatDialog);
 
-    selectedRange = signal<TimePeriod>(1);
-
-    pageNumber = signal<number>(1);
-    pageSize = signal<number>(10);
-
-    timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
-
-    protected readonly dummyCategories = signal<Category[]>(dummyCategories);
-
-    protected dummyTransactions = signal<Transaction[]>(dummyTransactions);
+    id = input<string | null>(null);
     
-    currentFilters = signal<TransactionFilter>({
+    config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
+    private pagination = signal({ pageNumber: 1, pageSize: 10});
+
+    rawFilters = signal<TransactionFilter>({
         searchTerm: '',
         transactionType: null,
-        minAmount: null,
-        maxAmount: null,
         startDate: null,
         endDate: null,
         category: [],
         paymentType: null
     });
 
-    options = {
-        duration: 1.2,
-        separator: ',',
-        prefix: '$',
-        decimalPlaces: 2
-    };
-
-    transactions = computed(() => this.transactionResource.value()?.items ?? []);
-    categories = computed(() => this.categoryResource.value()?.items ?? []);
-    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
-    isLoading = computed(() => this.transactionResource.isLoading());
+    timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
+    pageSizeOptions: number[] = [10, 20, 30, 40, 50];
     
-    hasNoTransactions = computed(() => 
-        !this.isLoading() &&
-        this.totalCount() === 0 &&
-        !this.hasActiveFilters()
+    private debouncedFilter$ = toObservable(this.rawFilters).pipe(
+        debounceTime(300),
+        distinctUntilChanged((a, b) =>
+            JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
+        )
+    );
+    private pageNumber$ = toObservable(computed(() => this.pagination().pageNumber));
+    private pageSize$ = toObservable(computed(() => this.pagination().pageSize));
+    private reload$ = new Subject<void>();
+
+    private transactionData$ = combineLatest([
+        this.debouncedFilter$,
+        this.pageNumber$,
+        this.pageSize$,
+        this.reload$.pipe(startWith(null))
+    ]).pipe(
+        debounceTime(300),
+        switchMap(([filters, pageNumber, pageSize]) =>
+            this.transactionStateSer.getTransactions(filters, pageSize, pageNumber).pipe(
+                startWith(null)
+            )
+        ),
+        shareReplay(1)
     );
 
-    hasNoFilterResults = computed(() =>
-        !this.isLoading() &&
-        this.totalCount() === 0 &&
-        this.hasActiveFilters()
-    )
+    private categoryData$ = this.categoryStateService.getCategories({}, 30, 1)
+        .pipe(
+            shareReplay(1)
+        );
+        
+    transactionData = toSignal(this.transactionData$, { initialValue: null });
+    categoryData = toSignal(this.categoryData$, { initialValue: null })
+    transactions = computed(() => this.transactionData()?.items ?? []);
+    categories = computed(() => this.categoryData()?.items ?? [])
+    totalCount = computed(() => this.transactionData()?.totalCount ?? 0);
+    isLoading = computed(() => this.transactionData() === null);
+    
+    pageSize = toSignal(this.pageSize$, { initialValue: 10 })
+    pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
 
-    ngOnInit(): void {
-        this.route.params
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(params => {
-                const transactionId = params['id'];
-                const shouldOpenEditModal = this.route.snapshot.data['openEditModal'];
-                const shouldOpenAddModal = this.route.snapshot.data['openAddModal'];
-
-                if (transactionId && shouldOpenEditModal) {
-                    this.openEditModalById(transactionId);  
-                } else if (shouldOpenAddModal) {
-                    this.openAddModal();
-                }
-            });
-    }  
-
-    transactionResource = resource({
-        params: () => ({
-            filters: this.currentFilters(),
-            pageSize: this.pageSize(),
-            pageNumber: this.pageNumber()
-        }),
-        loader: ({ params }) => {
-            return firstValueFrom(this.transactionSer.getAllTransactions(
-                params.filters,
-                params.pageSize,
-                params.pageNumber
-            ));
-
-        }
-    });
-
-    categoryResource = resource({
-        loader: () => 
-            firstValueFrom(this.categorySer.getAllCategories({}, 50, 1))
-    })
+    selectedTransaction = computed(() => 
+        this.transactions().find(t => t.id === this.id())
+    );
 
     hasActiveFilters = computed(() => {
-        const filter = this.currentFilters();
-
-        const hasSearch = filter.searchTerm.trim().length !== 0;
-        const hasType = filter.transactionType !== null;
-        const hasCategory = filter.category.length !== 0;
-        const hasPayment = filter.paymentType !== null;
-        const hasAmount = filter.minAmount !== null|| filter.maxAmount !== null;
-        const hasDate = filter.startDate !== null || filter.endDate !== null;
-
-        return hasSearch || hasType || hasCategory || hasPayment || hasAmount || hasDate;
+        const f = this.rawFilters();
+        return (
+            f.searchTerm !== '' ||
+            f.transactionType !== null ||
+            f.startDate !== null ||
+            f.endDate !== null ||
+            f.category.length > 0 ||
+            f.paymentType !== null
+        );
     });
 
-    deleteTransaction(id: string) {
-        this.transactionSer.deleteTransaction(id)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe({
-                next: () => this.transactionResource.reload(),
-                error: err => {
-                    console.error('Failed to delete transaction:', err);
-                }
-            })
+    constructor() {
+        effect(() => {
+            const id = this.id();
+            const transaction = this.selectedTransaction();
+
+            const { openEditModal, openAddModal } = this.route.snapshot.data;
+
+            if (this.dialog.openDialogs.length > 0) return;
+
+            if(this.isLoading()) return;
+           
+            if (id && openEditModal && transaction) {
+                this.openEditModal(transaction);
+                return;
+            }
+
+            if(id && openEditModal && !transaction) {
+                this.router.navigate(['/transactions']);
+                return;
+            }
+
+            if (openAddModal) 
+                this.openAddModal();
+            
+        });
     }
 
-    openEditModalById(id: string): void {
-        const transaction = this.transactions()
-            .find(t => t.transactionId === id);
-
-        if (!transaction) {
-            console.error('Transaction not found');
-            this.router.navigate(['/transactions']);
-            return;
-        }
-
-        this.openEditModal(transaction);
+    deleteTransaction(id: string) {
+        this.transactionStateSer.deleteTransaction(id)
+            .pipe(
+                take(1),
+                takeUntilDestroyed(this.destroyRef),
+                tap(() => this.reload$.next())
+            )
+            .subscribe();
     }
 
     openAddModal(): void {
         const dialogRef = this.dialog.open<
             AddTransaction,
-            Category[] | null,
+            Category[],
             NewTransaction
         >(AddTransaction, {
             width: '30rem',
@@ -167,13 +160,17 @@ export class TransactionComponent implements OnInit {
 
         dialogRef.afterClosed()
             .pipe(
+                take(1),
                 takeUntilDestroyed(this.destroyRef),
                 tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
-                switchMap(result => this.transactionSer.createTransaction(result))
+                switchMap(result => this.transactionStateSer.createTransaction(result))
             )
             .subscribe({
-                next: () => this.transactionResource.reload(),
+                next: () => {
+                    this.transactionStateSer.clearCache();
+                    this.reload$.next();
+                },
                 error: err => console.error('Create failed', err)            
             });
     }
@@ -181,9 +178,9 @@ export class TransactionComponent implements OnInit {
     openEditModal(transaction: Transaction): void {
         const dialogRef = this.dialog.open<
             EditTransaction,
-            { transaction: Transaction; categories: Category[] } | null,
-            NewTransaction>
-        (EditTransaction,
+            { transaction: Transaction; categories: Category[] },
+            NewTransaction
+        >(EditTransaction,
             {
                 width: '30rem',
                 height: '100%',
@@ -203,18 +200,19 @@ export class TransactionComponent implements OnInit {
 
         dialogRef.afterClosed()
             .pipe(
+                take(1),
                 takeUntilDestroyed(this.destroyRef),
                 tap(() => this.router.navigate(['/transactions'])),
                 filter((result): result is NewTransaction => !!result),
                 switchMap(result =>
-                    this.transactionSer.updateTransaction(
-                        transaction.transactionId,
-                        result
-                    )             
+                    this.transactionStateSer.updateTransaction(transaction.id, result)           
                 )
             )
             .subscribe({
-                next: () => this.transactionResource.reload(),
+                next: () => {
+                    this.transactionStateSer.clearCache();
+                    this.reload$.next();
+                },
                 error: err => console.error('Update failed', err)
         });
     }
@@ -228,26 +226,15 @@ export class TransactionComponent implements OnInit {
     }
 
     onFiltersChange(filters: TransactionFilter) {
-        if (JSON.stringify(filters) === JSON.stringify(this.currentFilters())) {
-            return;
-        }
-
-        this.currentFilters.set(filters);
-        this.pageNumber.set(1);
+        this.rawFilters.set(filters);
+        this.onPageChange(1);
     }
 
-    onPageChange(page: number): void {
-        this.pageNumber.set(page);
+    onPageSizeChange(size: number) {
+        this.pagination.set({ pageNumber: 1, pageSize: size }); 
     }
 
-    onPageSizeChange(size: number): void {
-        this.pageSize.set(size);
-        this.pageNumber.set(1);
-    }
-
-    onRangeChange(e: Event) {
-        this.selectedRange.set(
-            Number((e.target as HTMLSelectElement).value) + 1
-        );
+    onPageChange(page: number) {
+        this.pagination.update(p => ({ ...p, pageNumber: page }));
     }
 }

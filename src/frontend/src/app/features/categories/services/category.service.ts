@@ -1,9 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
-import { HttpClient } from "@angular/common/http";
-import { Category, CategoryFilter, NewCategory } from "../models/categories.model";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Category, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
-import { createHttpParams } from "../../../shared/utils/http-params.util";
 import { PagedResult } from "../../transactions/models/transaction.model";
 
 @Injectable({
@@ -13,13 +12,7 @@ export class CategoryService {
     private readonly baseUrl = `${apiUrl}/api/categories`;
     private http = inject(HttpClient);
 
-    getAllCategories(
-        filters?: Partial<CategoryFilter>,
-        pageSize: number = 5,
-        pageNumber: number = 1
-    ): Observable<PagedResult<Category>> {
-        const params = createHttpParams(filters, pageSize, pageNumber);
-
+    getAllCategories(params: HttpParams): Observable<PagedResult<Category>> {
         return this.http.get<PagedResult<Category>>(this.baseUrl, { params });
     }
 

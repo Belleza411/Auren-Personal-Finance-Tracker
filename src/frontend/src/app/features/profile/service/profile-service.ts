@@ -8,7 +8,7 @@ import { UserDto, UserResponse } from '../models/profile.model';
   providedIn: 'root',
 })
 export class ProfileService {
-  private readonly baseUrl = `${apiUrl}/api/profile`;
+  private readonly baseUrl = `${apiUrl}/api/profiles`;
   private http = inject(HttpClient);
 
   getUserProfile(): Observable<UserResponse> {
