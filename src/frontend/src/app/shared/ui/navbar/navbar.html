@@ -7,10 +7,12 @@
             <li>
                 <a 
                     [routerLink]="items.route"
-                    routerLinkActive="rounded-md bg-[#00cc6d33]" 
                     class="w-full py-2 px-3 cursor-pointer rounded-md transition-colors duration-150"
                 >
-                    <span class="text-white text-sm">
+                    <span 
+                        class="text-gray-300 text-sm"
+                        routerLinkActive="text-white" 
+                    >
                         {{ items.label }}
                     </span>
                 </a>

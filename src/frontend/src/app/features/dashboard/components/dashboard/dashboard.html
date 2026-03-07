@@ -1,12 +1,12 @@
 <header class="flex items-center gap-1">
     <div class="flex flex-col">
-        <h2 class="text-xl mb-1 tracking-wider">Welcome, Aevan!</h2>
-        <p class="text-[#999] text-sm">It is the best time to manage your finances</p>
+        <h2 class="text-3xl text-white mb-1 tracking-wider">Welcome, Aevan!</h2>
+        <p class="text-white text-sm">It is the best time to manage your finances</p>
     </div>
     <div class="flex items-center justify-center gap-3 ml-auto">
         <div>
             <select 
-                class="p-2 rounded-md border border-[#c5c5c5] border-solid"
+                class="py-2 pl-2 pr-14 rounded-md border border-[#c5c5c5] border-solid text-white"
                 (change)="onTimePeriodChange($event)"
             >
                 @for(range of timePeriodOptions; track $index) {
@@ -81,7 +81,7 @@
         <p class="amount" [countUp]="avgDailySpending()" [countUpOptions]="options">0</p>
    </app-summary-card>
 </div>
-<div class="grid gap-4 grid-cols-3 grid-rows-1">
+<div class="grid gap-4 grid-cols-3 grid-rows-1 mt-14">
     <app-summary-card class="col-span-2">
         <p class="text-[1.15rem] font-medium mb-1">Income vs Expense</p>
         <p class="text-[0.85rem] text-gray-500">Showing your incomes and expenses for {{ selectedTimePeriod() }}</p>
@@ -93,7 +93,7 @@
         <app-expense-breakdown-chart [data]="expenseBreakdown()" [timePeriod]="selectedTimePeriod()" />
     </app-summary-card>
 </div>
-<div class="grid gap-4 grid-cols-3 grid-rows-1">
+<div class="mb-6">
     <app-summary-card class="col-span-2 flex flex-col gap-3">
         <div class="flex items-center justify-between">
             <p class="text-[1.15rem] font-medium">Recent Transaction</p>

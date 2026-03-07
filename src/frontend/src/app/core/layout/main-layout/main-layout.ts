@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Navbar } from "../../../shared/ui/navbar/navbar.component";
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-main-layout',
@@ -10,5 +10,11 @@ import { RouterOutlet } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MainLayout {
+  private readonly router = inject(Router);
 
+  isDashboard() {
+    console.log(this.router.url);
+    
+    return this.router.url === "/dashboard"
+  }
 }
