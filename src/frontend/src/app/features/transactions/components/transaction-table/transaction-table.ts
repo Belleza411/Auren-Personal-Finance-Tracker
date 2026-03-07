@@ -34,15 +34,6 @@ export class TransactionTable {
       : FULL_TRANSACTION_COLUMNS
   );
   
-  pageNumberChange = output<number>();
-  pageSizeChange = output<number>();
-
-  pageNumber = signal(1);
-  pageSize = signal(10);
-  totalCount = input<number>();
-
-  pageSizeOptions: number[] = [10, 20, 30, 40, 50];
-
   openModalId = signal<string | null>(null);
 
   toggleModalId(id: string) {

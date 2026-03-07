@@ -1,5 +1,5 @@
 @reference "tailwindcss";
 
 :host {
-  @apply w-full flex items-center justify-between bg-[#1c4532] px-10 h-14;
+  @apply w-full flex items-center justify-between bg-[#1c4532] px-20 h-18;
 }
