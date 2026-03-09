@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { form, required, email, submit, minLength, FieldState, FormField } from '@angular/forms/signals'
 import { AuthService } from '../../service/auth-service';
 import { Router, RouterLink } from '@angular/router';
@@ -10,7 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-sign-in',
   imports: [FormField, RouterLink],
   templateUrl: './sign-in.html',
-  styleUrl: './sign-in.css',
+  styleUrls: ['./sign-in.css', '../../styles/auth.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignInFormComponent {
   private readonly authSer = inject(AuthService);

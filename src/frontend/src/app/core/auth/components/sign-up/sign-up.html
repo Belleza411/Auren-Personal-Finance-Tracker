@@ -127,7 +127,7 @@
     <button 
         type="submit"
         [disabled]="isLoading() || registerForm().invalid()"
-        class="font-bold bg-[#1c4532] text-white border-none py-4 text-[0.9rem] rounded-lg"
+        class="font-bold bg-(--bg-main-color) text-white border-none py-4 text-[0.9rem] rounded-lg"
     >
         @if(isLoading()) {
             <span class="material-symbols-rounded animate-spin">

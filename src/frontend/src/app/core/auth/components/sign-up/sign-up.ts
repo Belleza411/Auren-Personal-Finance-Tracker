@@ -9,7 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-sign-up',
   imports: [RouterLink, FormField],
   templateUrl: './sign-up.html',
-  styleUrl: './sign-up.css',
+  styleUrls: ['./sign-up.css', '../../styles/auth.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignUpFormComponent {

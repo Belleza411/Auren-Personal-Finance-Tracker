@@ -1,23 +1,17 @@
 @import 'tailwindcss';
-@import '@ctrl/ngx-emoji-mart/picker';
 
 @layer base {
+  *, *::before, *::after {
+    @apply box-border;
+  }
+
   * {
-    margin: 0;
-    padding: 0;
+    @apply m-0 p-0;
   }
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
 body {
-  min-width: 100dvw;
-  min-height: 100dvh;    
-  font-family: "Onest", sans-serif;
-  background-color: #F9F9F9;
-  overflow-x: hidden;
+  @apply min-w-dvw min-h-dvh font-onest bg-[#f9f9f9] overflow-x-hidden;
 }
 
 .dialog .mdc-dialog__surface {
@@ -28,4 +22,9 @@ body {
   .gray-border {
     @apply border border-solid border-[#c5c5c5] rounded-md;
   }
+}
+
+@theme {
+  --bg-main-color: #1c4532;
+  --font-onest: "Onest", sans-serif; 
 }
