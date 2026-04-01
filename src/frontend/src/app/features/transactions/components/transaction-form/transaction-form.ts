@@ -9,7 +9,7 @@ import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
   selector: 'app-transaction-form',
   imports: [FormField],
   templateUrl: './transaction-form.html',
-  styleUrl: './transaction-form.css',
+  styleUrls: ['./transaction-form.css', '../../../../shared/styles/form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionForm {

@@ -6,7 +6,7 @@ import { FieldState, form, required, submit, FormField } from '@angular/forms/si
   selector: 'app-category-form',
   imports: [FormField],
   templateUrl: './category-form.html',
-  styleUrl: './category-form.css',
+  styleUrls: ['./category-form.css', '../../../../shared/styles/form.css'],
 })
 export class CategoryForm {
   isEdit = input(false);
