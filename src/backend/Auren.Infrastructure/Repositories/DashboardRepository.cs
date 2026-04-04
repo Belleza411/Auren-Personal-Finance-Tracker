@@ -6,6 +6,7 @@ using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,9 +20,12 @@ namespace Auren.Infrastructure.Repositories
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var (startDate, endDate) = GetTimePeriodRange(timePeriod);
+            var (lastStartDate, lastEndDate) = GetPreviousTimePeriodRange(timePeriod);
 
             var monthlyData = await dbContext.Transactions
-                .Where(t => t.UserId == userId && t.TransactionDate >= endDate)
+                .Where(t => t.UserId == userId 
+                    && t.TransactionDate <= endDate
+                    && t.TransactionDate >= startDate)
                 .GroupBy(t => new
                 {
                     IsCurrentMonth = t.TransactionDate >= startDate,
@@ -38,17 +42,29 @@ namespace Auren.Infrastructure.Repositories
             var currentIncome = monthlyData
                 .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Income)?.Total ?? 0;
 
-            var lastMonthIncome = monthlyData
-                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Income)?.Total ?? 0;
-
             var currentExpense = monthlyData
                 .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
-            var lastMonthExpense = monthlyData
-                .FirstOrDefault(x => !x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
+            var lastMonthData = await dbContext.Transactions
+                .Where(t => t.UserId == userId
+                    && t.TransactionDate >= lastStartDate
+                    && t.TransactionDate <= lastEndDate)
+                .GroupBy(t => t.TransactionType)
+                .Select(g => new
+                {
+                    TransactionType = g.Key,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .ToListAsync(cancellationToken);
+
+            var lastMonthIncome = lastMonthData
+                .FirstOrDefault(x => x.TransactionType == TransactionType.Income)?.Total ?? 0;
+
+            var lastMonthExpense = lastMonthData
+                .FirstOrDefault(x => x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
             var currentBalance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
-            var lastMonthBalance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
+            var lastMonthBalance = await transactionRepository.GetBalanceAsync(userId, lastStartDate, lastEndDate, cancellationToken);
 
             var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
@@ -234,6 +250,20 @@ namespace Auren.Infrastructure.Repositories
                 TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
                 TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
                 TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
+                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
+                _ => (DateTime.MinValue, DateTime.Today)
+            };
+        }
+
+        private static (DateTime start, DateTime end) GetPreviousTimePeriodRange(TimePeriod? timePeriod)
+        {
+            return timePeriod switch
+            {
+                TimePeriod.Last3Months => DateTime.Today.AddMonths(-3).GetLast3MonthRange(),
+                TimePeriod.Last6Months => DateTime.Today.AddMonths(-6).GetLast6MonthRange(),
+                TimePeriod.ThisYear => DateTime.Today.AddYears(-1).GetThisYearRange(),
+                TimePeriod.LastMonth => DateTime.Today.AddMonths(-2).GetLastMonthRange(), 
+                TimePeriod.ThisMonth => DateTime.Today.GetLastMonthRange(),               
                 TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
                 _ => (DateTime.MinValue, DateTime.Today)
             };

@@ -20,13 +20,13 @@ namespace Auren.API.Controllers
 	{
 		[HttpGet("summary")]
 		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
-            [FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth, 
+            [FromQuery] TimePeriod? timePeriod, 
             CancellationToken cancellationToken = default)
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			var summary = await dashboardService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
+			var summary = await dashboardService.GetDashboardSummary(userId.Value, timePeriod ?? TimePeriod.ThisMonth, cancellationToken);
             return Ok(summary.Value);
         }
 
