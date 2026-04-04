@@ -4,7 +4,7 @@ import { Chart, ChartData, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from "ng2-charts";
 import { CurrencyPipe } from '@angular/common';
 import { centerTextPlugin } from '../constants/center-text-plugin';
-import { TimePeriod } from '../../../transactions/models/transaction.model';
+import { TimePeriod } from '../../../../core/models/time-period.enum';
 
 Chart.register(centerTextPlugin);
 

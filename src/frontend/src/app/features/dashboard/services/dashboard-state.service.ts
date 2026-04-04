@@ -2,10 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { CacheStateService } from '../../../core/services/cache-state.service';
 import { DashboardData } from '../models/dashboard.model';
 import { forkJoin, Observable } from 'rxjs';
-import { TimePeriod } from '../../transactions/models/transaction.model';
-import { createTimePeriodParams } from '../../../shared/utils/createTimePeriodParams.util';
 import { DashboardService } from './dashboard.service';
 import { TransactionService } from '../../transactions/services/transaction.service';
+import { TimePeriod, TimePeriodLabel } from '../../../core/models/time-period.enum';
+import { createHttpParams } from '../../../shared/utils/http-params.util';
 
 @Injectable({
   providedIn: 'root',
@@ -17,9 +17,11 @@ export class DashboardStateService extends CacheStateService<DashboardData, any>
   protected override initialKey: string = "auren:dashboard";
   
   getDashboardData(timePeriod?: TimePeriod): Observable<DashboardData> {
-    const params = createTimePeriodParams(timePeriod);
-    const key = this.generateCacheKey(params);
+    const filters = timePeriod !== undefined ? { timePeriod: TimePeriodLabel[timePeriod] }: {};
+    
+    const key = this.generateCacheKey(filters);
     return this.getFromCache(key, () => {
+      const params = createHttpParams(filters);
       return forkJoin({
         summary: this.dashboardService.getDashboardSummary(params),
         incomeVsExpense: this.dashboardService.getIncomeVsExpense(params),

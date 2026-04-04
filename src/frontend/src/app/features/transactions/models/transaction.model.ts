@@ -40,15 +40,6 @@ export type PaymentType = typeof PAYMENT_TYPE[number];
 export type TransactionTypeFilterOption = TransactionType | 'All Types';
 export type PaymentTypeFilterOption = PaymentType | 'All Payment Method';
 
-export enum TimePeriod {
-    AllTime = 1,
-    ThisMonth = 2,
-    LastMonth = 3,
-    Last3Months = 4,
-    Last6Months = 5,
-    ThisYear = 6
-}
-
 export interface BalanceSummary {
     income: number;
     expense: number;

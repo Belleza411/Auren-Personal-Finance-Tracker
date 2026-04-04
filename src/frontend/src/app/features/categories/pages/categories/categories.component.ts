@@ -5,7 +5,6 @@ import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, fi
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { TimePeriod } from '../../../transactions/models/transaction.model';
 import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
 import { CategoryTable } from "../../components/category-table/category-table";
@@ -14,6 +13,7 @@ import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.mo
 import { CATEGORY_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
 import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
+import { TimePeriod } from '../../../../core/models/time-period.enum';
 
 @Component({
   selector: 'app-categories',

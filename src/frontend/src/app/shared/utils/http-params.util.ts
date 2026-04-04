@@ -1,5 +1,4 @@
 import { HttpParams } from '@angular/common/http';
-import { TimePeriod } from '../../features/transactions/models/transaction.model';
 
 export function createHttpParams<T extends Record<string, any>>(
   filters: T = {} as T,

@@ -2,9 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable} from 'rxjs';
 
-import { BalanceSummary, NewTransaction, PagedResult, TimePeriod, Transaction, TransactionFilter } from '../models/transaction.model';
+import { BalanceSummary, NewTransaction, PagedResult, Transaction } from '../models/transaction.model';
 import { apiUrl } from '../../../../environments/environment';
-import { createHttpParams } from '../../../shared/utils/http-params.util';
+import { createTimePeriodParams } from '../../../shared/utils/createTimePeriodParams.util';
+import { TimePeriod } from '../../../core/models/time-period.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -40,8 +41,7 @@ export class TransactionService {
 	}
 
 	getBalance(timePeriod?: TimePeriod): Observable<BalanceSummary> {
-		const filters = timePeriod !== undefined ? { timePeriod } : {};
-		const params = createHttpParams(filters);
+		const params = createTimePeriodParams(timePeriod);
 
 		return this.http.get<BalanceSummary>(`${this.baseUrl}/balance`, { params });
 	}

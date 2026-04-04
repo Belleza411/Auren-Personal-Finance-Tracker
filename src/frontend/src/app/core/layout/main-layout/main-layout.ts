@@ -13,8 +13,6 @@ export class MainLayout {
   private readonly router = inject(Router);
 
   isDashboard() {
-    console.log(this.router.url);
-    
     return this.router.url === "/dashboard"
   }
 }

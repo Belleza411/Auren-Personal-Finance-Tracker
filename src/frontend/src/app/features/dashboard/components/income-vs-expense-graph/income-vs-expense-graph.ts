@@ -3,7 +3,7 @@ import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { ChartData, ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { ChartTooltip } from "../chart-tooltip/chart-tooltip";
-import { TimePeriod } from '../../../transactions/models/transaction.model';
+import { TimePeriod } from '../../../../core/models/time-period.enum';
 
 @Component({
   selector: 'app-income-vs-expense-graph',

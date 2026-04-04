@@ -1,3 +1,4 @@
+import { TimePeriod } from "../../core/models/time-period.enum";
 import { CategoryFilter } from "../../features/categories/models/categories.model";
 import { 
     PAYMENT_TYPE,
@@ -82,3 +83,12 @@ export const CATEGORY_FILTER_KIND_CONFIG: FilterKindConfig<CategoryFilter>[] = [
         options: transactionTypeOptions
     },
 ]
+
+export const TIME_PERIOD_OPTIONS = [
+  { label: 'All Time',      value: TimePeriod.AllTime },
+  { label: 'This Month',    value: TimePeriod.ThisMonth },
+  { label: 'Last Month',    value: TimePeriod.LastMonth },
+  { label: 'Last 3 Months', value: TimePeriod.Last3Months },
+  { label: 'Last 6 Months', value: TimePeriod.Last6Months },
+  { label: 'This Year',     value: TimePeriod.ThisYear },
+];
