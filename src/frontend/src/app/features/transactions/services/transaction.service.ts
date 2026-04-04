@@ -35,10 +35,7 @@ export class TransactionService {
 		return this.http.delete<void>(`${this.baseUrl}/${id}`);
 	}
 
-	getAvgDailySpending(timePeriod?: TimePeriod): Observable<number> {
-		const filters = timePeriod !== undefined ? { timePeriod } : {};
-		const params = createHttpParams(filters);
-
+	getAvgDailySpending(params: HttpParams): Observable<number> {
 		return this.http.get<number>(`${this.baseUrl}/average-daily-spending`, { params });
 	}
 

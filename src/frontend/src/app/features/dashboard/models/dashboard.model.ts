@@ -1,29 +1,31 @@
-interface DashboardSummary {
+export interface DashboardSummary {
     totalBalance: Metric;
     income: Metric;
     expense: Metric;
 }
 
-interface Metric {
+export interface Metric {
     amount: number;
     percentageChange: number;
 }
 
-interface IncomeVsExpenseResponse {
+export interface IncomeVsExpenseResponse {
     labels: string[];
     incomes: number[];
     expenses: number[];
 }
 
-interface ExpenseBreakdown {
+export interface ExpenseBreakdown {
     labels: string[];
     data: number[];
     percentage: number[];
     backgroundColor: string[];
     totalSpent: number;
 }
-export type {
-    DashboardSummary,
-    IncomeVsExpenseResponse,
-    ExpenseBreakdown 
+
+export interface DashboardData {
+    summary: DashboardSummary;
+    incomeVsExpense: IncomeVsExpenseResponse;
+    expenseBreakdown: ExpenseBreakdown;
+    avgDailySpending: number;
 }

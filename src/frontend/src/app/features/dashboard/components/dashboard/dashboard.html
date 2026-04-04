@@ -24,13 +24,13 @@
                 attach_money
             </span>
         </div>
-        <p class="amount" [countUp]="totalBalance().amount" [countUpOptions]="options">0</p>
+        <p class="amount" [countUp]="dashboardSummary().totalBalance.amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
                     arrow_upward
                 </span>
-                <span class="percentage">{{ totalBalance().percentageChange }}%</span>
+                <span class="percentage">{{ dashboardSummary().totalBalance.percentageChange }}%</span>
             </p>
             <p class="last-month">vs last month</p>
         </div>
@@ -42,13 +42,13 @@
                 trending_up
             </span>
         </div>
-        <p class="amount" [countUp]="income().amount" [countUpOptions]="options">0<p>
+        <p class="amount" [countUp]="dashboardSummary().income.amount" [countUpOptions]="options">0<p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
                     arrow_upward
                 </span>
-                <span class="percentage">{{ income().percentageChange }}%</span>
+                <span class="percentage">{{ dashboardSummary().income.percentageChange }}%</span>
             </p>
             <p class="last-month">vs last month</p>
         </div>
@@ -60,13 +60,13 @@
                 trending_down
             </span>
         </div>
-        <p class="amount" [countUp]="expense().amount" [countUpOptions]="options">0</p>
+        <p class="amount" [countUp]="dashboardSummary().expense.amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
             <p class="change">
                 <span class="material-symbols-rounded">
                     arrow_downward
                 </span>
-                <span class="percentage">{{ expense().percentageChange }}%</span>
+                <span class="percentage">{{ dashboardSummary().expense.percentageChange }}%</span>
             </p>
             <p class="last-month">vs last month</p>
         </div>
@@ -90,7 +90,7 @@
     <app-summary-card>
         <p class="text-[1.15rem] font-medium mb-1">Expenses Breadown</p>
         <p class="text-[0.85rem] text-gray-500 mb-4">Total expenses for {{ selectedTimePeriod() }}</p>
-        <app-expense-breakdown-chart [data]="expenseBreakdown()" [timePeriod]="selectedTimePeriod()" />
+        <app-expense-breakdown-chart [data]="expenseBreakdownData()" [timePeriod]="selectedTimePeriod()" />
     </app-summary-card>
 </div>
 <div class="mb-6">
