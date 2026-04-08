@@ -24,27 +24,38 @@ namespace Auren.Infrastructure.Extensions
             IConfiguration config)
         {
             builder.Services.AddDbContext<AurenDbContext>(options =>
-                options.UseSqlServer(config.GetConnectionString("AurenDbConnection")));
+                options.UseSqlServer(config.GetConnectionString("AurenDbConnection"), opt =>
+                {
+                    opt.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null
+                    );
+                    opt.CommandTimeout(30);
+                }));
 
             builder.Services.AddDbContext<AurenAuthDbContext>(options => 
-                options.UseSqlServer(config.GetConnectionString("AurenAuthDbConnection")));
+                options.UseSqlServer(config.GetConnectionString("AurenAuthDbConnection"), opt =>
+                {
+                    opt.EnableRetryOnFailure(
+                       maxRetryCount: 3,
+                       maxRetryDelay: TimeSpan.FromSeconds(5),
+                       errorNumbersToAdd: null
+                   );
+                    opt.CommandTimeout(30);
+                }));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
-                // Strong password policy
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequiredUniqueChars = 4;
-
-                // Account lockout
                 options.Lockout.AllowedForNewUsers = true;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                 options.Lockout.MaxFailedAccessAttempts = 5;
-
-                // User settings
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = false;
             })
