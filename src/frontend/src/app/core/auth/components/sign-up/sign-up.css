@@ -1,5 +1,5 @@
 @reference 'tailwindcss';
 
 :host {
-    @apply flex flex-col mx-16 my-10
+    @apply flex flex-col mx-10 xl:mx-15 my-10
 }

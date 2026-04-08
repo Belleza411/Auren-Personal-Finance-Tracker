@@ -80,9 +80,10 @@
         <div class="relative flex items-center">
             <input
                 [type]="showPassword() ? 'text' : 'password'"
-                placeholder="&@^ncq2"
+                placeholder="Must have atleast 8 characters"
                 [class.error]="fieldErrors.password()"
                 [formField]="registerForm.password"
+                autocomplete="new-password"
                 />
             <span
                 class="material-symbols-rounded toggle-icon"
@@ -104,10 +105,11 @@
         <div class="relative flex items-center">
             <input
                 [type]="showConfirmPassword() ? 'text' : 'password'"
-                placeholder="&@^ncq2"
+                placeholder="Must have atleast 8 characters"
                 [class.error]="fieldErrors.confirmPassword()"
                 [formField]="registerForm.confirmPassword"
                 class="w-full pr-10"
+                autocomplete="new-password"
             />
             <span
                 class="material-symbols-rounded toggle-icon"

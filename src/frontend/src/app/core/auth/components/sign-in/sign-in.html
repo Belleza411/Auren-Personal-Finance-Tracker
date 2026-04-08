@@ -14,7 +14,9 @@
             type="email" 
             placeholder="example@gmail.com"
             [class.error]="fieldErrors.email()"
-            [formField]="loginForm.email">
+            [formField]="loginForm.email"
+            autocomplete="email"
+        >
         @if(fieldErrors.email()) {
             <ul class="error-list">
                 @for (error of loginForm.email().errors(); track error.kind) {
@@ -30,6 +32,8 @@
                     [type]="showPassword() ? 'text' : 'password'"
                     [class.error]="fieldErrors.password()"
                     [formField]="loginForm.password"
+                    placeholder="Must have atleast 8 characters"
+                    autocomplete="current-password"
                 />
             <span
                 class="material-symbols-rounded toggle-icon"
@@ -55,7 +59,7 @@
         [disabled]="isLoading() || loginForm().invalid()"
     >
         @if(isLoading()) {
-            <span class="material-symbols-outlined animate-spin">
+            <span class="material-symbols-rounded animate-spin">
                 progress_activity
             </span>
         } @else {
