@@ -150,7 +150,7 @@ namespace Auren.Infrastructure.Repositories
 
             var percentages = data
                 .Select(x => totalSpent > 0
-                    ? Math.Round((x.Total / totalSpent) * 100, 2)
+                    ? Math.Round((x.Total / totalSpent) * 100, 1, MidpointRounding.AwayFromZero)
                     : 0)
                 .ToList();
 
@@ -164,10 +164,11 @@ namespace Auren.Infrastructure.Repositories
 
         private static decimal CalculatePercentageChange(decimal current, decimal previous)
         {
-            if (previous == 0) return current > 0 ? 100 : 0;
-            var change = ((current - previous) / previous) * 100;
+            if (previous == 0) return current == 0 ? 100 : 0;
 
-            return Math.Round(change, 2);
+            var change = ((current - previous) / Math.Abs(previous)) * 100;
+
+            return Math.Round(Math.Clamp(change, -100, 100), 1, MidpointRounding.AwayFromZero);
         }
 
         private static IncomesVsExpenseResponse BuildDailyHybridData(
