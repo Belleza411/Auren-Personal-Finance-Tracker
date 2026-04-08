@@ -10,7 +10,7 @@ import { ExpenseBreakdownChart } from "../expense-breakdown-chart/expense-breakd
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DashboardStateService } from '../../services/dashboard-state.service';
 import { TransactionStateService } from '../../../transactions/services/transaction-state.service';
-import { TimePeriod } from '../../../../core/models/time-period.enum';
+import { TimePeriod, TimePeriodLabel } from '../../../../core/models/time-period.enum';
 import { TIME_PERIOD_OPTIONS } from '../../../../shared/constants/type-options';
 
 @Component({
@@ -32,6 +32,7 @@ export class DashboardComponent {
   private transactionStateSer = inject(TransactionStateService);
 
   selectedTimePeriod = signal<TimePeriod>(2);
+  TimePeriodLabel = TimePeriodLabel
 
   timePeriodOptions = TIME_PERIOD_OPTIONS
   

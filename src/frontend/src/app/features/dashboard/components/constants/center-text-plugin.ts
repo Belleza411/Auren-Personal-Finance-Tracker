@@ -2,6 +2,8 @@ export const centerTextPlugin = {
     id: 'centerText',
     afterDraw(chart: any) {
         if(chart.config.type !== 'doughnut') return;
+        var totalSpent = chart.config.data.datasets[0].data.reduce((a: number, b: number) => a + b, 0)
+        var roundedTotal = Math.round(totalSpent * 100) / 100;
 
         const { ctx, chartArea } = chart;
         if(!chartArea) return;
@@ -15,8 +17,7 @@ export const centerTextPlugin = {
         ctx.textBaseline = 'middle';
 
         ctx.font = 'bold 32px Arial';
-        ctx.fillText('$' + chart.config.data.datasets[0].data.reduce((a: number, b: number) => a + b, 0), centerX, centerY - 10);
-
+        ctx.fillText('$' + roundedTotal, centerX, centerY - 10);
 
         ctx.font = '14px Arial';
         ctx.fillStyle = '#666';
