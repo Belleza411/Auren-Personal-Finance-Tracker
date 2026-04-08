@@ -14,11 +14,11 @@ namespace Auren.API.Controllers
 {
 	[Route("api/categories")]
 	[ApiController]
-    [EnableRateLimiting("fixed")]
     [Authorize]
 	public class CategoriesController(ICategoryService categoryService) : ControllerBase
 	{
 		[HttpGet]
+        [EnableRateLimiting("read")]
         public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(
             [FromQuery] CategoriesFilter categoriesFilter,
             [FromQuery] int pageSize = 5, 
@@ -33,6 +33,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("{categoryId:guid}")]
+        [EnableRateLimiting("read")]
         public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
@@ -44,6 +45,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpPost]
+        [EnableRateLimiting("write")]
         public async Task<ActionResult<Category>> CreateCategory([FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
@@ -70,6 +72,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpPut("{categoryId:guid}")]
+        [EnableRateLimiting("write")]
         public async Task<ActionResult<Category>> UpdateCategory([FromRoute] Guid categoryId, [FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
@@ -96,6 +99,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpDelete("{categoryId:guid}")]
+        [EnableRateLimiting("write")]
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();

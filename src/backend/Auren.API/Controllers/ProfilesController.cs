@@ -18,7 +18,9 @@ namespace Auren.API.Controllers
     public class ProfilesController(IProfileService profileService) : ControllerBase
 	{
 		[HttpGet("me")]
-		public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken cancellationToken)
+        [EnableRateLimiting("read")]
+
+        public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken cancellationToken)
 		{
 			var userId = User.GetCurrentUserId();
 
@@ -30,7 +32,9 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPut("update-user")]
-		public async Task<ActionResult<UserResponse>> UpdateUserProfile([FromForm] UserDto userDto, CancellationToken cancellationToken)
+        [EnableRateLimiting("write")]
+
+        public async Task<ActionResult<UserResponse>> UpdateUserProfile([FromForm] UserDto userDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

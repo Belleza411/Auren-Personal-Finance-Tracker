@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace Auren.API.Controllers
@@ -21,7 +22,8 @@ namespace Auren.API.Controllers
 	{
 
 		[HttpPost("register")]
-		public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
+        [EnableRateLimiting("auth")]
+        public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterRequest request, CancellationToken cancellationToken)
 		{
 			var result = await userService.RegisterAsync(request, cancellationToken);
 
@@ -41,7 +43,8 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPost("login")]
-		public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
+        [EnableRateLimiting("auth")]
+        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 		{
 			var result = await userService.LoginAsync(request, cancellationToken);
 
@@ -61,7 +64,8 @@ namespace Auren.API.Controllers
 		}
 
 		[HttpPost("logout")]
-		public async Task<ActionResult<AuthResponse>> Logout(CancellationToken cancellationToken)
+        [EnableRateLimiting("write")]
+        public async Task<ActionResult<AuthResponse>> Logout(CancellationToken cancellationToken)
 		{
 			var userId = User.GetCurrentUserId();
 

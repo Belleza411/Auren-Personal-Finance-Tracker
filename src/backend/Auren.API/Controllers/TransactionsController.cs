@@ -18,11 +18,11 @@ namespace Auren.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-    [EnableRateLimiting("fixed")]
     [Authorize]
     public class TransactionsController(ITransactionService transactionService) : ControllerBase
 	{
 		[HttpGet]
+        [EnableRateLimiting("read")]
 		public async Task<ActionResult<PagedResult<Transaction>>> GetAllTransaction(
             [FromQuery] TransactionFilter transactionFilter,
             [FromQuery] int pageSize = 10,
@@ -38,7 +38,8 @@ namespace Auren.API.Controllers
         }
 
 		[HttpGet("{transactionId:guid}")]
-		public async Task<ActionResult<Transaction>> GetTransactionById([FromRoute] Guid transactionId, CancellationToken cancellationToken)
+        [EnableRateLimiting("read")]
+        public async Task<ActionResult<Transaction>> GetTransactionById([FromRoute] Guid transactionId, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -49,7 +50,8 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPost]
-		public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
+        [EnableRateLimiting("sensitive")]
+        public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -77,6 +79,7 @@ namespace Auren.API.Controllers
         }
 
 		[HttpPut("{transactionId:guid}")]
+        [EnableRateLimiting("sensitive")]
 		public async Task<ActionResult<Transaction>> UpdateTransaction(
             [FromRoute] Guid transactionId, 
             [FromBody] TransactionDto transactionDto, 
@@ -107,6 +110,7 @@ namespace Auren.API.Controllers
         }
 
 		[HttpDelete("{transactionId:guid}")]
+        [EnableRateLimiting("write")]
 		public async Task<IActionResult> DeleteTransaction([FromRoute] Guid transactionId, CancellationToken cancellationToken)  
 		{
             var userId = User.GetCurrentUserId();
@@ -118,6 +122,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("average-daily-spending")]
+        [EnableRateLimiting("read")]
         public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
@@ -129,6 +134,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("balance")]
+        [EnableRateLimiting("sensitive")]
         public async Task<ActionResult<BalanceSummaryResponse>> GetUserBalance([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();

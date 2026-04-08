@@ -19,7 +19,8 @@ namespace Auren.API.Controllers
         ) : ControllerBase
 	{
 		[HttpGet("summary")]
-		public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
+        [EnableRateLimiting("read")]
+        public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
             [FromQuery] TimePeriod? timePeriod, 
             CancellationToken cancellationToken = default)
 		{
@@ -31,7 +32,8 @@ namespace Auren.API.Controllers
         }
 
 		[HttpGet("expense-breakdown")]
-		public async Task<ActionResult<ExpenseBreakdownResponse>> GetExpenseOverview(TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
+        [EnableRateLimiting("read")]
+        public async Task<ActionResult<ExpenseBreakdownResponse>> GetExpenseOverview(TimePeriod timePeriod = TimePeriod.ThisMonth, CancellationToken cancellationToken = default)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -41,6 +43,8 @@ namespace Auren.API.Controllers
         }
 
         [HttpGet("income-vs-expense")]
+        [EnableRateLimiting("read")]
+
         public async Task<ActionResult<IncomesVsExpenseResponse>> GetIncomesVsExpenses(
             [FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth,
             CancellationToken cancellationToken = default)

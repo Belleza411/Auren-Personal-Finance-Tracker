@@ -1,5 +1,6 @@
 ﻿using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
+using Auren.Infrastructure.Configuration;
 using Auren.Infrastructure.Persistence;
 using Auren.Infrastructure.Repositories;
 using CloudinaryDotNet;
@@ -127,35 +128,7 @@ namespace Auren.Infrastructure.Extensions
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-            builder.Services.AddRateLimiter(options =>
-            {
-                options.AddFixedWindowLimiter("fixed", opt =>
-                {
-                    opt.PermitLimit = 10;
-                    opt.Window = TimeSpan.FromMinutes(1);
-                    opt.QueueLimit = 0;
-                });
-
-                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-                {
-                    var userId = context.User.FindFirst("UserId")?.Value;
-
-                    if (string.IsNullOrEmpty(userId))
-                        userId = context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
-
-                    return RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: userId,
-                        factory: _ => new FixedWindowRateLimiterOptions
-                        {
-                            PermitLimit = 100,
-                            Window = TimeSpan.FromMinutes(1),
-                            QueueLimit = 0
-                        });
-                });
-
-                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            });
-
+            builder.Services.AddRateLimiting();
 
             var cloudinarySection = config.GetSection("Cloudinary");
             builder.Services.Configure<CloudinaryConfiguration>(cloudinarySection);
