@@ -42,7 +42,7 @@ namespace Auren.Infrastructure.Extensions
                        maxRetryDelay: TimeSpan.FromSeconds(5),
                        errorNumbersToAdd: null
                    );
-                    opt.CommandTimeout(30);
+                    opt.CommandTimeout(15);
                 }));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
