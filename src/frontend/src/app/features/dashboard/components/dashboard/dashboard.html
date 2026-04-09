@@ -1,9 +1,9 @@
-<header class="flex items-center gap-1">
+<header class="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-1">
     <div class="flex flex-col">
         <h2 class="text-3xl text-white mb-1 tracking-wider">Welcome, Aevan!</h2>
         <p class="text-white text-sm">It is the best time to manage your finances</p>
     </div>
-    <div class="flex items-center justify-center gap-3 ml-auto">
+    <div class="center gap-3 sm:ml-auto">
         <div>
             <select 
                 class="py-2 pl-2 pr-14 rounded-md border border-[#c5c5c5] border-solid text-white"
@@ -18,7 +18,7 @@
         </div>
     </div>
 </header>
-<div class="grid grid-cols-4 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
    <app-summary-card>
         <div class="header">
             <p>Total Balance</p>
@@ -83,10 +83,10 @@
         <p class="amount" [countUp]="avgDailySpending()" [countUpOptions]="options">0</p>
    </app-summary-card>
 </div>
-<div class="grid gap-4 grid-cols-3 grid-rows-1 mt-14">
-    <app-summary-card class="col-span-2">
+<div class="grid gap-4 grid-cols-1 lg:grid-cols-3 grid-rows-1 mt-14">
+    <app-summary-card class="lg:col-span-2 col-span-1">
         <p class="text-[1.15rem] font-medium mb-1">Income vs Expense</p>
-        <p class="text-[0.85rem] text-gray-500">Showing your incomes and expenses for {{ selectedTimePeriod() }}</p>
+        <p class="text-[0.85rem] text-gray-500">Showing your incomes and expenses for {{ TimePeriodLabel[selectedTimePeriod()] }}</p>
         <app-income-vs-expense-graph [chartData]="incomeVsExpenseData()" [timePeriod]="selectedTimePeriod()" />
     </app-summary-card>
     <app-summary-card>

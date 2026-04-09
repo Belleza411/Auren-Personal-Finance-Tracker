@@ -6,7 +6,7 @@
     >
         <p class="font-bold mb-1.5 text-[0.8rem]">{{ date() }}</p>
         @for (item of items(); track item.label) {
-            <div class="flex justify-between items-center gap-5">
+            <div class="center gap-5">
                 <span 
                     [class]="getValueColorByLabel(item.label)"
                     class="text-[0.8rem]"

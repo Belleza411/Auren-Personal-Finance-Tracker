@@ -1,5 +1,23 @@
 @reference "tailwindcss";
 
 :host {
-  @apply w-full flex items-center justify-between bg-[#1c4532] px-20 h-18;
+  @apply w-full flex items-center justify-between bg-[#1c4532] px-10 lg:px-20 h-18;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.2s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
 }

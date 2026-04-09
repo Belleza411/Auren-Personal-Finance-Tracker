@@ -22,6 +22,10 @@ body {
   .gray-border {
     @apply border border-solid border-[#c5c5c5] rounded-md;
   }
+
+  .center {
+    @apply flex items-center justify-center;
+  }
 }
 
 @theme {
