@@ -1,3 +1,5 @@
+@reference('tailwindcss');
+
 :host {
     @apply bg-white border border-solid border-[#c5c5c5] flex flex-col px-[1.2rem] py-[1.1rem] shadow-lg
 }
