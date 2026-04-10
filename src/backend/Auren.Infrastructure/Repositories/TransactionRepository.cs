@@ -86,5 +86,31 @@ namespace Auren.Infrastructure.Repositories
             };
         }
 
+        public async Task<(decimal Income, decimal Expense)> GetMonthlyTotalsAsync(
+            Guid userId,
+            DateTime startDate,
+            DateTime endDate,
+            CancellationToken cancellationToken = default)
+        {
+            var totals = await _dbContext.Transactions
+                .Where(t => t.UserId == userId
+                    && t.TransactionDate >= startDate
+                    && t.TransactionDate <= endDate)
+                .GroupBy(t => t.TransactionType)
+                .Select(g => new
+                {
+                    TransactionType = g.Key,
+                    Total = g.Sum(t => t.Amount)
+                })
+                .ToListAsync(cancellationToken);
+
+            var income = totals
+                .FirstOrDefault(x => x.TransactionType == TransactionType.Income)?.Total ?? 0;
+
+            var expense = totals
+                .FirstOrDefault(x => x.TransactionType == TransactionType.Expense)?.Total ?? 0;
+
+            return (income, expense);
+        }
     }
 }

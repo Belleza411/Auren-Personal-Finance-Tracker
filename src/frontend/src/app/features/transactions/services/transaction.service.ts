@@ -36,10 +36,6 @@ export class TransactionService {
 		return this.http.delete<void>(`${this.baseUrl}/${id}`);
 	}
 
-	getAvgDailySpending(params: HttpParams): Observable<number> {
-		return this.http.get<number>(`${this.baseUrl}/average-daily-spending`, { params });
-	}
-
 	getBalance(timePeriod?: TimePeriod): Observable<BalanceSummary> {
 		const params = createTimePeriodParams(timePeriod);
 

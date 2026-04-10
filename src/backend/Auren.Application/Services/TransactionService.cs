@@ -146,33 +146,6 @@ namespace Auren.Application.Services
                 : Result.Failure<Transaction>(Error.UpdateFailed("Failed to update transaction. "));
         }
 
-        public async Task<Result<decimal>> GetAvgDailySpending(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
-        {
-            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
-
-            var filter = new TransactionFilter
-            {
-                TransactionType = TransactionType.Expense,
-                StartDate = startDate,
-                EndDate = endDate,
-            };
-
-            var expenses = await transactionRepository.GetTransactionsAsync(userId, filter, int.MaxValue, 1, cancellationToken);
-
-            if (expenses is null)
-                return Result.Success(0m);
-
-            var totalSpending = expenses.Items.Sum(e => e.Amount);
-            var totalDays = (endDate - startDate).TotalDays + 1;
-
-            if (totalDays <= 0)
-                return Result.Success(0m);
-
-            var avg = Math.Round(totalSpending / (decimal)totalDays, 2);
-
-            return Result.Success(avg);
-        }
-
         private static (DateTime StartDate, DateTime EndDate) GetTimePeriodRange(TimePeriod timePeriod)
         {
             return timePeriod switch

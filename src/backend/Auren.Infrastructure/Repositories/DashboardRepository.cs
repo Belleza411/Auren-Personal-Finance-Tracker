@@ -22,53 +22,21 @@ namespace Auren.Infrastructure.Repositories
             var (startDate, endDate) = GetTimePeriodRange(timePeriod);
             var (lastStartDate, lastEndDate) = GetPreviousTimePeriodRange(timePeriod);
 
-            var monthlyData = await dbContext.Transactions
-                .Where(t => t.UserId == userId 
-                    && t.TransactionDate <= endDate
-                    && t.TransactionDate >= startDate)
-                .GroupBy(t => new
-                {
-                    IsCurrentMonth = t.TransactionDate >= startDate,
-                    t.TransactionType
-                })
-                .Select(g => new
-                {
-                    g.Key.IsCurrentMonth,
-                    g.Key.TransactionType,
-                    Total = g.Sum(t => t.Amount)
-                })
-                .ToListAsync(cancellationToken);
-
-            var currentIncome = monthlyData
-                .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Income)?.Total ?? 0;
-
-            var currentExpense = monthlyData
-                .FirstOrDefault(x => x.IsCurrentMonth && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
-
-            var lastMonthData = await dbContext.Transactions
-                .Where(t => t.UserId == userId
-                    && t.TransactionDate >= lastStartDate
-                    && t.TransactionDate <= lastEndDate)
-                .GroupBy(t => t.TransactionType)
-                .Select(g => new
-                {
-                    TransactionType = g.Key,
-                    Total = g.Sum(t => t.Amount)
-                })
-                .ToListAsync(cancellationToken);
-
-            var lastMonthIncome = lastMonthData
-                .FirstOrDefault(x => x.TransactionType == TransactionType.Income)?.Total ?? 0;
-
-            var lastMonthExpense = lastMonthData
-                .FirstOrDefault(x => x.TransactionType == TransactionType.Expense)?.Total ?? 0;
-
+            var (currentIncome, currentExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, startDate, endDate, cancellationToken);
+            var (lastMonthIncome, lastMonthExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, lastStartDate, lastEndDate, cancellationToken);
+            
             var currentBalance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
             var lastMonthBalance = await transactionRepository.GetBalanceAsync(userId, lastStartDate, lastEndDate, cancellationToken);
 
             var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
             var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense);
+
+            var currentTotalDays = (endDate - startDate).TotalDays + 1;
+            var lastMonthTotalDays = (lastEndDate - lastStartDate).TotalDays + 1;
+            var currentAvgDailySpending = Math.Round(currentTotalDays > 0 ? currentExpense / (decimal)currentTotalDays : 0, 2);
+            var lastMonthAvgDailySpending = Math.Round(lastMonthTotalDays > 0 ? lastMonthExpense / (decimal)lastMonthTotalDays : 0, 2);
+            var avgDailySpendingChange = CalculatePercentageChange(currentAvgDailySpending, lastMonthAvgDailySpending);
 
             return new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
@@ -82,6 +50,10 @@ namespace Auren.Infrastructure.Repositories
                 Expense: new TransactionMetricResponse(
                     Amount: currentExpense,
                     PercentageChange: expenseChange
+                ),
+                AverageDailySpending: new TransactionMetricResponse(
+                    Amount: currentAvgDailySpending,
+                    PercentageChange: avgDailySpendingChange
                 )
             );
         }
@@ -133,7 +105,7 @@ namespace Auren.Infrastructure.Repositories
                 .GroupBy(t => t.Category)
                 .Select(g => new
                 {
-                    Category = g.Key,
+                    Category = g.Key.Name,
                     Total = g.Sum(t => t.Amount)
                 })
                 .OrderByDescending(x => x.Total)
@@ -142,7 +114,7 @@ namespace Auren.Infrastructure.Repositories
 
             var totalSpent = Math.Round(data.Sum(x => x.Total), 2);
 
-            var labels = data.Select(x => x.Category.Name).ToList();
+            var labels = data.Select(x => x.Category).ToList();
 
             var amounts = data
                 .Select(x => Math.Round(x.Total, 2))
@@ -164,7 +136,7 @@ namespace Auren.Infrastructure.Repositories
 
         private static decimal CalculatePercentageChange(decimal current, decimal previous)
         {
-            if (previous == 0) return current == 0 ? 100 : 0;
+            if (previous == 0) return current == 0 ? 0 : 100;
 
             var change = ((current - previous) / Math.Abs(previous)) * 100;
 
@@ -227,8 +199,8 @@ namespace Auren.Infrastructure.Repositories
                 var monthStart = new DateTime(monthGroup.Key.Year, monthGroup.Key.Month, 1);
 
                 labels.Add(monthStart.ToString("MMM"));
-                incomes.Add(0);
-                expenses.Add(0);
+                incomes.Add(monthGroup.Where(x => x.TransactionType == TransactionType.Income).Sum(x => x.Total));
+                expenses.Add(monthGroup.Where(x => x.TransactionType == TransactionType.Expense).Sum(x => x.Total));
 
                 var activeDays = monthGroup
                     .Select(x => x.Date!.Value)

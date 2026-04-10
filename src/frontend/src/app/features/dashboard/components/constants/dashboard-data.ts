@@ -3,7 +3,8 @@ import { DashboardSummary, ExpenseBreakdown, IncomeVsExpenseResponse } from "../
 export const DASHBOARD_SUMMARY_INITIAL_DATA: DashboardSummary = {
   totalBalance: { amount: 0, percentageChange: 0 },
   income: { amount: 0, percentageChange: 0 },
-  expense: { amount: 0, percentageChange: 0 }
+  expense: { amount: 0, percentageChange: 0 },
+  averageDailySpending: { amount: 0, percentageChange: 0 }
 };
 
 export const INCOME_VS_EXPENSE_INITIAL_DATA: IncomeVsExpenseResponse = {

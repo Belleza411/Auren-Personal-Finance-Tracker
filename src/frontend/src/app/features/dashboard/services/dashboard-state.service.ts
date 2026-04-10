@@ -12,7 +12,6 @@ import { createHttpParams } from '../../../shared/utils/http-params.util';
 })
 export class DashboardStateService extends CacheStateService<DashboardData, any> {
   private dashboardService = inject(DashboardService);
-  private transactionService = inject(TransactionService);
   protected override ttl: number = 120_00;
   protected override initialKey: string = "auren:dashboard";
   
@@ -25,8 +24,7 @@ export class DashboardStateService extends CacheStateService<DashboardData, any>
       return forkJoin({
         summary: this.dashboardService.getDashboardSummary(params),
         incomeVsExpense: this.dashboardService.getIncomeVsExpense(params),
-        expenseBreakdown: this.dashboardService.getExpenseBreakdown(params),
-        avgDailySpending: this.transactionService.getAvgDailySpending(params)
+        expenseBreakdown: this.dashboardService.getExpenseBreakdown(params)
       });
     });
   } 

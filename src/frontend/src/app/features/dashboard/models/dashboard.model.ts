@@ -2,6 +2,7 @@ export interface DashboardSummary {
     totalBalance: Metric;
     income: Metric;
     expense: Metric;
+    averageDailySpending: Metric;
 }
 
 export interface Metric {
@@ -27,5 +28,4 @@ export interface DashboardData {
     summary: DashboardSummary;
     incomeVsExpense: IncomeVsExpenseResponse;
     expenseBreakdown: ExpenseBreakdown;
-    avgDailySpending: number;
 }

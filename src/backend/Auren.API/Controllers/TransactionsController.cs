@@ -121,18 +121,6 @@ namespace Auren.API.Controllers
             return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
         }
 
-        [HttpGet("average-daily-spending")]
-        [EnableRateLimiting("read")]
-        public async Task<ActionResult<AvgDailySpendingResponse>> GetAvgDailySpending([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-            var avgSpending = await transactionService.GetAvgDailySpending(userId.Value, timePeriod ?? TimePeriod.AllTime, cancellationToken);
-
-            return Ok(avgSpending.Value);
-        }
-
         [HttpGet("balance")]
         [EnableRateLimiting("sensitive")]
         public async Task<ActionResult<BalanceSummaryResponse>> GetUserBalance([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)

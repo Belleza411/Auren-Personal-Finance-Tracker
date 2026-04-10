@@ -64,7 +64,6 @@ export class DashboardComponent {
   dashboardSummary = computed(() => this.dashboardData()?.summary ?? DASHBOARD_SUMMARY_INITIAL_DATA);
   incomeVsExpenseData = computed(() => this.dashboardData()?.incomeVsExpense ?? INCOME_VS_EXPENSE_INITIAL_DATA);
   expenseBreakdownData = computed(() => this.dashboardData()?.expenseBreakdown ?? EXPENSE_BREAKDOWN_INITIAL_DATA);
-  avgDailySpending = computed(() => this.dashboardData()?.avgDailySpending ?? 0);
   recentTransactions = computed(() => this.transactionData()?.items ?? []);
   isLoading = computed(() => this.dashboardData() === null);
 

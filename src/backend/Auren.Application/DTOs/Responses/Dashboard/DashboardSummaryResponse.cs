@@ -2,5 +2,9 @@
 
 namespace Auren.Application.DTOs.Responses.Dashboard
 {
-	public sealed record DashboardSummaryResponse(TransactionMetricResponse TotalBalance, TransactionMetricResponse Income, TransactionMetricResponse Expense);
+	public sealed record DashboardSummaryResponse(
+		TransactionMetricResponse TotalBalance,
+		TransactionMetricResponse Income,
+		TransactionMetricResponse Expense,
+		TransactionMetricResponse AverageDailySpending);
 }
