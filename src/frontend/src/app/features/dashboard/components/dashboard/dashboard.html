@@ -28,9 +28,14 @@
         </div>
         <p class="amount" [countUp]="dashboardSummary().totalBalance.amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
-            <p class="change">
-                <span class="material-symbols-rounded">
-                    arrow_upward
+            <p 
+                class="change"
+                [class]="dashboardSummary().totalBalance.percentageChange | percentageBgColor"
+            >
+                <span 
+                    class="material-symbols-rounded"
+                >
+                    {{ getArrowIconByPercentageChange(dashboardSummary().totalBalance.percentageChange) }}
                 </span>
                 <span class="percentage">{{ dashboardSummary().totalBalance.percentageChange }}%</span>
             </p>
@@ -46,9 +51,14 @@
         </div>
         <p class="amount" [countUp]="dashboardSummary().income.amount" [countUpOptions]="options">0<p>
         <div class="per-change_last-month">
-            <p class="change">
-                <span class="material-symbols-rounded">
-                    arrow_upward
+            <p 
+                class="change" 
+                [class]="dashboardSummary().income.percentageChange | percentageBgColor"
+            >
+                <span 
+                    class="material-symbols-rounded"
+                >
+                    {{ getArrowIconByPercentageChange(dashboardSummary().income.percentageChange) }}
                 </span>
                 <span class="percentage">{{ dashboardSummary().income.percentageChange }}%</span>
             </p>
@@ -64,9 +74,15 @@
         </div>
         <p class="amount" [countUp]="dashboardSummary().expense.amount" [countUpOptions]="options">0</p>
         <div class="per-change_last-month">
-            <p class="change">
-                <span class="material-symbols-rounded">
-                    arrow_downward
+            <p 
+                class="change"
+                [class]="dashboardSummary().expense.percentageChange | percentageBgColor"
+            >
+                <span 
+                    class="material-symbols-rounded"
+    
+                >
+                    {{ getArrowIconByPercentageChange(dashboardSummary().expense.percentageChange) }}
                 </span>
                 <span class="percentage">{{ dashboardSummary().expense.percentageChange }}%</span>
             </p>

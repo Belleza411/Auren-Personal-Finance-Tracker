@@ -21,11 +21,11 @@
 }
 
 :host .per-change_last-month .change {
-    @apply flex items-center mr-2 px-1.5 py-0.5 rounded-md bg-[#34c7597a];
+    @apply flex items-center mr-2 px-1.5 py-0.5 rounded-md;
 }
 
 :host .per-change_last-month .change span {
-    @apply text-[0.9rem] text-[#004712];
+    @apply text-[0.9rem];
 }
 
 :host .per-change_last-month .change .percentage {

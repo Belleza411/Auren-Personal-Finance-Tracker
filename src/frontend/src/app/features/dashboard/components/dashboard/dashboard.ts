@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { combineLatest, debounceTime, shareReplay, startWith, Subject, switchMap } from 'rxjs';
+import { combineLatest, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
 import { RouterLink } from "@angular/router";
 import { CountUpDirective } from 'ngx-countup';
@@ -12,6 +12,8 @@ import { DashboardStateService } from '../../services/dashboard-state.service';
 import { TransactionStateService } from '../../../transactions/services/transaction-state.service';
 import { TimePeriod, TimePeriodLabel } from '../../../../core/models/time-period.enum';
 import { TIME_PERIOD_OPTIONS } from '../../../../shared/constants/type-options';
+import { DASHBOARD_SUMMARY_INITIAL_DATA, EXPENSE_BREAKDOWN_INITIAL_DATA, INCOME_VS_EXPENSE_INITIAL_DATA } from '../constants/dashboard-data';
+import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,7 +23,8 @@ import { TIME_PERIOD_OPTIONS } from '../../../../shared/constants/type-options';
     CountUpDirective,
     TransactionTable,
     IncomeVsExpenseGraph,
-    ExpenseBreakdownChart
+    ExpenseBreakdownChart,
+    PercentageBgColorPipe
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -58,23 +61,9 @@ export class DashboardComponent {
 
   dashboardData = toSignal(this.dashboardData$, { initialValue: null });
   transactionData = toSignal(this.transactionStateSer.getTransactions({}, 5, 1), { initialValue: null });
-  dashboardSummary = computed(() => this.dashboardData()?.summary ?? {
-    totalBalance: { amount: 0, percentageChange: 0 },
-    income: { amount: 0, percentageChange: 0 },
-    expense: { amount: 0, percentageChange: 0 }
-  });
-  incomeVsExpenseData = computed(() => this.dashboardData()?.incomeVsExpense ?? {
-    labels: [],
-    incomes: [],
-    expenses: []
-  });
-  expenseBreakdownData = computed(() => this.dashboardData()?.expenseBreakdown ?? {
-    labels: [],
-    data: [],
-    percentage: [],
-    backgroundColor: [],
-    totalSpent: 0
-  });
+  dashboardSummary = computed(() => this.dashboardData()?.summary ?? DASHBOARD_SUMMARY_INITIAL_DATA);
+  incomeVsExpenseData = computed(() => this.dashboardData()?.incomeVsExpense ?? INCOME_VS_EXPENSE_INITIAL_DATA);
+  expenseBreakdownData = computed(() => this.dashboardData()?.expenseBreakdown ?? EXPENSE_BREAKDOWN_INITIAL_DATA);
   avgDailySpending = computed(() => this.dashboardData()?.avgDailySpending ?? 0);
   recentTransactions = computed(() => this.transactionData()?.items ?? []);
   isLoading = computed(() => this.dashboardData() === null);
@@ -83,5 +72,11 @@ export class DashboardComponent {
     this.selectedTimePeriod.set(
       Number((e.target as HTMLSelectElement).value) as TimePeriod
     );
+  }
+
+  getArrowIconByPercentageChange(percentageChange: number): string {
+    if(percentageChange > 0) return 'arrow_upward';
+    if(percentageChange < 0) return 'arrow_downward';
+    return '';
   }
 }

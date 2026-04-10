@@ -109,7 +109,7 @@ export class CategoriesComponent {
       }
 
       if(openAddModal) 
-        openAddModal();
+        this.openAddModal()
     })
   }
 
@@ -134,6 +134,7 @@ export class CategoriesComponent {
 
     dialogRef.afterClosed()
       .pipe(
+        take(1),
         takeUntilDestroyed(this.destroyRef),
         tap(() => this.router.navigate(['/categories'])),
         filter((result): result is NewCategory => !!result),
