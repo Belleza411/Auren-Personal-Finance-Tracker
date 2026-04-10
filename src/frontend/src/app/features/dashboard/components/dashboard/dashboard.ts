@@ -59,6 +59,13 @@ export class DashboardComponent {
     shareReplay(1)
   )
 
+  summaryCards = computed(() => [
+    { label: 'Total Balance',      icon: 'attach_money',  ...this.dashboardSummary().totalBalance          },
+    { label: 'Income',             icon: 'trending_up',   ...this.dashboardSummary().income                },
+    { label: 'Expense',            icon: 'trending_down', ...this.dashboardSummary().expense               },
+    { label: 'Avg Daily Spending', icon: 'attach_money',  ...this.dashboardSummary().averageDailySpending  },
+  ]);
+
   dashboardData = toSignal(this.dashboardData$, { initialValue: null });
   transactionData = toSignal(this.transactionStateSer.getTransactions({}, 5, 1), { initialValue: null });
   dashboardSummary = computed(() => this.dashboardData()?.summary ?? DASHBOARD_SUMMARY_INITIAL_DATA);
