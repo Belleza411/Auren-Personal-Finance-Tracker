@@ -5,16 +5,17 @@ export const categoryRoutes: Routes = [
     {
         path: '',
         component: CategoriesComponent,
-        pathMatch: 'full'
+        children: [
+            {
+                path: 'create',
+                data: { openAddModal: true },
+                children: []
+            },
+            {
+                path: ':id/edit',
+                data: { openEditModal: true },
+                children: []
+            }
+        ]
     }, 
-    {
-        path: 'create',
-        component: CategoriesComponent,
-        data: { openAddModal: true }
-    },
-    {
-        path: ':id/edit',
-        component: CategoriesComponent,
-        data: { openEditModal: true }
-    }
 ]

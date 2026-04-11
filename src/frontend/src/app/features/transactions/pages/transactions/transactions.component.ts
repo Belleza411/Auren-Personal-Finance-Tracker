@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, debounceTime, distinctUntilChanged, filter, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
 import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
@@ -15,6 +15,7 @@ import { PaginationComponent } from "../../../../shared/ui/pagination/pagination
 import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
 import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
 import { CategoryStateService } from '../../../categories/services/category-state.service';
+import { NoopScrollStrategy } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-transaction',
@@ -105,30 +106,43 @@ export class TransactionComponent {
     });
 
     constructor() {
+        this.router.events.pipe(
+            filter(e => e instanceof NavigationEnd),
+            startWith(null),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(() => this.tryOpenDialog());
+
         effect(() => {
-            const id = this.id();
-            const transaction = this.selectedTransaction();
-
-            const { openEditModal, openAddModal } = this.route.snapshot.data;
-
-            if (this.dialog.openDialogs.length > 0) return;
-
-            if(this.isLoading()) return;
-           
-            if (id && openEditModal && transaction) {
-                this.openEditModal(transaction);
-                return;
+            if (!this.isLoading()) {
+                this.tryOpenDialog();
             }
-
-            if(id && openEditModal && !transaction) {
-                this.router.navigate(['/transactions']);
-                return;
-            }
-
-            if (openAddModal) 
-                this.openAddModal();
-            
         });
+    }
+
+    private tryOpenDialog(): void {
+        if (this.dialog.openDialogs.length > 0) return;
+        if (this.isLoading()) return;
+
+        const childRoute = this.route.firstChild;
+        if (!childRoute) return;
+
+        const { openAddModal, openEditModal } = childRoute.snapshot.data;
+        const id = childRoute.snapshot.paramMap.get('id');
+
+        if (openAddModal) {
+            this.openAddModal();
+            return;
+        }
+
+        if (openEditModal && id) {
+            const transaction = this.transactions().find(t => t.id === id);
+
+            if (transaction) {
+                this.openEditModal(transaction);
+            } else {
+                this.router.navigate(['/transactions']);
+            }
+        }
     }
 
     deleteTransaction(id: string) {
@@ -147,6 +161,7 @@ export class TransactionComponent {
             Category[],
             NewTransaction
         >(AddTransaction, {
+            scrollStrategy: new NoopScrollStrategy(),
             width: '30rem',
             height: '100%',
             position: {
@@ -182,6 +197,7 @@ export class TransactionComponent {
             NewTransaction
         >(EditTransaction,
             {
+                scrollStrategy: new NoopScrollStrategy(),
                 width: '30rem',
                 height: '100%',
                 position: {

@@ -11,11 +11,15 @@
 }
 
 body {
-  @apply min-w-dvw min-h-dvh font-onest bg-[#f9f9f9] overflow-x-hidden;
+  @apply min-w-dvw min-h-dvh font-onest bg-[#f9f9f9] overflow-x-hidden pr-0!;
 }
 
 .dialog .mdc-dialog__surface {
-  border-radius: 0 !important;
+  @apply rounded-none! overflow-hidden;
+}
+
+.cdk-global-scrollblock {
+  @apply overflow-y-hidden! fixed w-full inset-y-auto;
 }
 
 @layer components {

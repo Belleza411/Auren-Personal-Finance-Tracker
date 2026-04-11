@@ -3,7 +3,7 @@ import { CategoryService } from '../../services/category.service';
 import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
 import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
@@ -14,6 +14,7 @@ import { CATEGORY_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-o
 import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TimePeriod } from '../../../../core/models/time-period.enum';
+import { NoopScrollStrategy } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-categories',
@@ -88,29 +89,43 @@ export class CategoriesComponent {
   })
 
   constructor() {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      startWith(null),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.tryOpenDialog());
+
     effect(() => {
-      const id = this.id();
-      const category = this.selectedCategory();
+        if (!this.isLoading()) {
+          this.tryOpenDialog();
+        }
+    });
+  }
 
-      const { openEditModal, openAddModal } = this.route.snapshot.data;
+  private tryOpenDialog(): void {
+    if (this.dialog.openDialogs.length > 0) return;
+    if(this.isLoading()) return;
 
-      if (this.dialog.openDialogs.length > 0) return;
+    const childRoute = this.route.firstChild;
+    if (!childRoute) return;
 
-      if(this.isLoading()) return;
+    const { openAddModal, openEditModal } = childRoute.snapshot.data;
+    const id = childRoute.snapshot.paramMap.get('id');
 
-      if(id && openEditModal && category) {
-        this.openEditModal(category)
-        return;
-      }
+    if(openAddModal) {
+      this.openAddModal();
+      return;
+    }
 
-      if(id && openEditModal && !category) {
+    if(openEditModal && id) {
+      const category = this.categories().find(c => c.id === id);
+
+      if (category) {
+        this.openEditModal(category);
+      } else {
         this.router.navigate(['/categories']);
-        return;
       }
-
-      if(openAddModal) 
-        this.openAddModal()
-    })
+    }
   }
 
   deleteCategory(id: string) {
@@ -127,10 +142,14 @@ export class CategoriesComponent {
     const dialogRef = this.dialog.open<
       AddCategory, 
       Category[], 
-      NewCategory>(AddCategory, {
-        width: '30rem',
-        data: this.categories()
-      });
+      NewCategory>(
+        AddCategory,
+        {
+          scrollStrategy: new NoopScrollStrategy(),
+          width: '30rem',
+          data: this.categories()
+        }
+    );
 
     dialogRef.afterClosed()
       .pipe(
@@ -154,6 +173,7 @@ export class CategoriesComponent {
       EditCategory,
       Category,
       NewCategory>(EditCategory, {
+        scrollStrategy: new NoopScrollStrategy(),
         width: '30rem',
         data: category
       })
