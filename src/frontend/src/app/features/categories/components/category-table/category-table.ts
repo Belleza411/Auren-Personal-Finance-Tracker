@@ -1,7 +1,8 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { Category } from '../../models/categories.model';
 import { UpperCasePipe } from '@angular/common';
 import { TransactionTypeColorPipe } from "../../../transactions/pipes/transaction-type-color.pipe";
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-category-table',
@@ -10,6 +11,7 @@ import { TransactionTypeColorPipe } from "../../../transactions/pipes/transactio
   styleUrl: './category-table.css',
 })
 export class CategoryTable {
+  private router = inject(Router);
   categories = input.required<Category[]>();
   isLoading = input.required<boolean>();
 
@@ -22,6 +24,16 @@ export class CategoryTable {
     this.openModalId.update(current =>
       current === id ? null : id
     );
+  }
+
+  constructor() {
+    this.router.events.subscribe(e => {
+      if(e instanceof NavigationEnd) {
+        if(e.url.includes('edit')) {
+          this.openModalId.set(null)
+        }
+      }
+    })
   }
 
   onDelete(id: string) {
