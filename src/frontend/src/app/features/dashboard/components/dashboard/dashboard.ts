@@ -14,6 +14,7 @@ import { TimePeriod, TimePeriodLabel } from '../../../../core/models/time-period
 import { TIME_PERIOD_OPTIONS } from '../../../../shared/constants/type-options';
 import { DASHBOARD_SUMMARY_INITIAL_DATA, EXPENSE_BREAKDOWN_INITIAL_DATA, INCOME_VS_EXPENSE_INITIAL_DATA } from '../constants/dashboard-data';
 import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
+import { TimePeriodService } from '../../../../core/services/time-period.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,8 +34,8 @@ import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
 export class DashboardComponent {
   private dashboardStateSer = inject(DashboardStateService);
   private transactionStateSer = inject(TransactionStateService);
+  private timePeriodService = inject(TimePeriodService);
 
-  selectedTimePeriod = signal<TimePeriod>(2);
   TimePeriodLabel = TimePeriodLabel
 
   timePeriodOptions = TIME_PERIOD_OPTIONS
@@ -46,7 +47,7 @@ export class DashboardComponent {
     decimalPlaces: 2
   };
 
-  private timePeriod$ = toObservable(this.selectedTimePeriod);
+  private timePeriod$ = this.timePeriodService.selectedTimePeriod$;
   private reload$ = new Subject<void>();
 
   private dashboardData$ = combineLatest([
@@ -73,9 +74,10 @@ export class DashboardComponent {
   expenseBreakdownData = computed(() => this.dashboardData()?.expenseBreakdown ?? EXPENSE_BREAKDOWN_INITIAL_DATA);
   recentTransactions = computed(() => this.transactionData()?.items ?? []);
   isLoading = computed(() => this.dashboardData() === null);
+  selectedTimePeriod = toSignal(this.timePeriod$, { initialValue: 2 });
 
   onTimePeriodChange(e: Event) {
-    this.selectedTimePeriod.set(
+    this.timePeriodService.setTimePeriod(
       Number((e.target as HTMLSelectElement).value) as TimePeriod
     );
   }
