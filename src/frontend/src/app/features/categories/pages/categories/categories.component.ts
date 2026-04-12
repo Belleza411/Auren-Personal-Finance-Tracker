@@ -144,7 +144,7 @@ export class CategoriesComponent {
         tap(() => this.reload$.next())
       )
       .subscribe({
-        next: () => this.toastr.showSuccess('Category Deleted', `${category.name} has been deleted. Existing transactions were unaffected.`),
+        next: () => this.toastr.showCategoryToast('Deleted', category),
         error: () => this.toastr.showError('Failed to delete category', `This category could not be deleted. Please try again later.`)
       })
   }
@@ -172,7 +172,7 @@ export class CategoriesComponent {
         next: result => {
           this.categoryStateSer.clearCache();
           this.reload$.next()
-          this.toastr.showSuccess('Category Added', `Category ${result.name} has been added`);
+          this.toastr.showCategoryToast('Added', result);
         },
         error: () => this.toastr.showError('Failed to add category', "A category with this name may already exist.")
       })
@@ -201,7 +201,7 @@ export class CategoriesComponent {
         next: result => {
           this.categoryStateSer.clearCache();
           this.reload$.next()
-          this.toastr.showSuccess('Category Updated', `Category ${category.name} has been updated to ${result.name}`);
+          this.toastr.showCategoryToast('Updated', result);
         },
         error: () => this.toastr.showError('Failed to update category', "Unable to update category.")
       })

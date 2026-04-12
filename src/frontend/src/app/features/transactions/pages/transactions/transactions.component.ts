@@ -161,7 +161,7 @@ export class TransactionComponent {
                 tap(() => this.reload$.next())
             )
             .subscribe({
-                next: () => this.toastr.showSuccess('Transaction Deleted', `${transaction.amount} for ${transaction.name} has been deleted`),
+                next: () => this.toastr.showTransactionToast('Deleted', transaction),
                 error: () => this.toastr.showError('Failed to delete transaction', `This transaction could not be deleted. Please try again later.`)
             });
     }
@@ -196,7 +196,7 @@ export class TransactionComponent {
                 next: result => {
                     this.transactionStateSer.clearCache();
                     this.reload$.next();
-                    this.toastr.showSuccess('Transaction Added', `${result.amount} for ${result.name} has been recorded`);
+                    this.toastr.showTransactionToast('Added', result);
                 },
                 error: () => this.toastr.showError('Failed to add transaction', `Please check the entered details and try again.`)          
             });
@@ -240,7 +240,7 @@ export class TransactionComponent {
                 next: () => {
                     this.transactionStateSer.clearCache();
                     this.reload$.next();
-                    this.toastr.showSuccess('Transaction Updated', `Transaction updated to $${transaction.amount} for ${transaction.name}`);
+                    this.toastr.showTransactionToast('Updated', transaction);
                 },
                 error: () => this.toastr.showError('Failed to update transaction', `Changes could not be saved. Please check the entered details and try again.`)
             });
