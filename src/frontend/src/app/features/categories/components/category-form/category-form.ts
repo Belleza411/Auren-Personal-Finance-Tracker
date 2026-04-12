@@ -1,6 +1,7 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, effect, input, output, signal } from '@angular/core';
 import { NewCategory } from '../../models/categories.model';
-import { FieldState, form, required, submit, FormField } from '@angular/forms/signals';
+import { form, required, submit, FormField } from '@angular/forms/signals';
+import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-category-form',
@@ -44,16 +45,8 @@ export class CategoryForm {
     this.cancel.emit();
   }
 
-  protected readonly fieldErrors = {
-    name: this.createErrorSignal(() => this.categoryForm.name()),
-    transactionType: this.createErrorSignal(() => this.categoryForm.transactionType())
-  }
-
-  private createErrorSignal<T>(field: () => FieldState<T>) {
-    return computed(() => this.setShowError(field()));
-  };
-
-  private setShowError<T>(field: FieldState<T>) {
-    return field.invalid() && field.touched();
-  };
+  protected readonly fieldErrors = createFieldErrors({
+    name: () => this.categoryForm.name(),
+    transactionType: () => this.categoryForm.transactionType()
+  })
 }

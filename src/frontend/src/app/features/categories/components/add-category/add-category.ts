@@ -1,8 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
-import { Category, NewCategory } from '../../models/categories.model';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DialogRef } from '@angular/cdk/dialog';
+import { NewCategory } from '../../models/categories.model';
 import { CategoryForm } from "../category-form/category-form";
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-category',
@@ -11,8 +10,7 @@ import { CategoryForm } from "../category-form/category-form";
   styleUrl: './add-category.css',
 })
 export class AddCategory {
-  protected readonly data: Category[] = inject(MAT_DIALOG_DATA);
-  protected dialogRef = inject(DialogRef<NewCategory>);
+  protected dialogRef = inject(MatDialogRef<NewCategory>);
 
   protected model = signal<NewCategory>({
     name: '',
