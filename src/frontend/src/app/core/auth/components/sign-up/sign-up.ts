@@ -4,6 +4,8 @@ import { AuthService } from '../../service/auth-service';
 import { Register } from '../../models/user.model';
 import { email, FieldState, form, minLength, required, submit, validate, FormField } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ToastrService } from '../../../services/toastr.service';
+import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-sign-up',
@@ -14,11 +16,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class SignUpFormComponent {
   private readonly authSer = inject(AuthService);
+  private toastr = inject(ToastrService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   isLoading = signal(false);
-  error = signal<string | null>(null);
   showPassword = signal(false);
   showConfirmPassword = signal(false);
   selectedFile = signal<File | null>(null);
@@ -88,44 +90,34 @@ export class SignUpFormComponent {
 
     submit(this.registerForm, async () => {
       this.isLoading.set(true);
-      this.error.set(null);
 
       const credentials = this.registerModel();    
 
       this.authSer.register(credentials)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: (response) => {
-            console.log(response);
+          next: () => {
             this.profilePreview.set(null);
             this.selectedFile.set(null);
             this.router.navigate(['/auth/sign-in']);
             this.isLoading.set(false)
+            this.toastr.showSuccess('Registration successful! Please log in.', 'Account Created');
           },
-          error: err => {
-            console.error('Registration failed: ', err);
-            this.error.set(err?.error?.message || 'Registration failed. Please try again.');
+          error: () => {
+            this.toastr.showError('Please check your details and try again.', 'Registration Failed');
             this.isLoading.set(false);
           }
         })
     })
   }
 
-  protected fieldErrors = {
-    email: this.createErrorSignal(() => this.registerForm.email()),
-    password: this.createErrorSignal(() => this.registerForm.password()),
-    confirmPassword: this.createErrorSignal(() => this.registerForm.confirmPassword()),
-    firstName: this.createErrorSignal(() => this.registerForm.firstName()),
-    lastName: this.createErrorSignal(() => this.registerForm.lastName())
-  };
-
-  private createErrorSignal(field: () => FieldState<string>) {
-    return computed(() => this.setShowError(field()));
-  };
-
-  private setShowError(field: FieldState<string>) {
-    return field.invalid() && field.touched();
-  };
+  protected readonly fieldErrors = createFieldErrors({
+    email: () => this.registerForm.email(),
+    password: () => this.registerForm.password(),
+    confirmPassword: () => this.registerForm.confirmPassword(),
+    firstName: () => this.registerForm.firstName(),
+    lastName: () => this.registerForm.lastName()
+  })
 
   protected togglePassword(): void {
     this.showPassword.update(v => !v);

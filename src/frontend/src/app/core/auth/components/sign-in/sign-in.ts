@@ -5,6 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 
 import { Login } from '../../models/user.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ToastrService } from '../../../services/toastr.service';
+import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-sign-in',
@@ -15,6 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class SignInFormComponent {
   private readonly authSer = inject(AuthService);
+  private toastr = inject(ToastrService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
@@ -47,33 +50,23 @@ export class SignInFormComponent {
       this.authSer.login(credentials)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: (response) => {
-            console.log(response);
+          next: () => {
             this.router.navigate(['/dashboard']);
             this.isLoading.set(false);
           },
-          error: err => {
-            console.error("Login failed: ", err);
-            this.error.set('Login failed. Please try again.');
+          error: () => {
+            this.toastr.showError('Invalid email or password', 'Login Failed');
             this.isLoading.set(false);
           }
         })
     })
   }
 
-  protected fieldErrors = {
-    email: this.createErrorSignal(() => this.loginForm.email()),
-    password: this.createErrorSignal(() => this.loginForm.password())
-  }
+  protected readonly fieldErrors = createFieldErrors({
+    email: () => this.loginForm.email(),
+    password: () => this.loginForm.password()
+  })
 
-  private createErrorSignal(field: () => FieldState<string>) {
-    return computed(() => this.setShowError(field()));
-  };
-
-  private setShowError(field: FieldState<string>) {
-    return field.invalid() && field.touched();
-  };
-  
   protected togglePassword(): void {
     this.showPassword.update(v => !v);
   }
