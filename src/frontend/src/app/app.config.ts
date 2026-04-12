@@ -1,8 +1,9 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
 
 import { routes } from './app.routes';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/auth/interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -11,6 +12,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(
       withInterceptors([authInterceptor])
-    )
+    ),
+    provideToastr({
+      positionClass: 'toast-top-right',
+      preventDuplicates: true
+    }),
   ]
 };

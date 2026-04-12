@@ -15,6 +15,7 @@ import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TimePeriod } from '../../../../core/models/time-period.enum';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
+import { ToastrService } from '../../../../core/services/toastr.service';
 
 @Component({
   selector: 'app-categories',
@@ -25,6 +26,7 @@ import { NoopScrollStrategy } from '@angular/cdk/overlay';
 export class CategoriesComponent {
   private readonly categorySer = inject(CategoryService);
   private categoryStateSer = inject(CategoryStateService);
+  private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -129,25 +131,32 @@ export class CategoriesComponent {
   }
 
   deleteCategory(id: string) {
+    const category = this.categories().find(c => c.id === id);
+    if (!category) {
+      this.toastr.showError('Category not found', "The category you're trying to delete does not exist.");
+      return;
+    }
+
     this.categoryStateSer.deleteCategory(id)
       .pipe(
         take(1),
         takeUntilDestroyed(this.destroyRef),
         tap(() => this.reload$.next())
       )
-      .subscribe()
+      .subscribe({
+        next: () => this.toastr.showSuccess('Category Deleted', `${category.name} has been deleted. Existing transactions were unaffected.`),
+        error: () => this.toastr.showError('Failed to delete category', `This category could not be deleted. Please try again later.`)
+      })
   }
 
   openAddModal(): void {
     const dialogRef = this.dialog.open<
       AddCategory, 
-      Category[], 
       NewCategory>(
         AddCategory,
         {
           scrollStrategy: new NoopScrollStrategy(),
-          width: '30rem',
-          data: this.categories()
+          width: '30rem'
         }
     );
 
@@ -157,14 +166,15 @@ export class CategoriesComponent {
         takeUntilDestroyed(this.destroyRef),
         tap(() => this.router.navigate(['/categories'])),
         filter((result): result is NewCategory => !!result),
-        switchMap(result => this.categorySer.createCategory(result))
+        switchMap(result => this.categoryStateSer.createCategory(result))
       )
       .subscribe({
-        next: () => {
+        next: result => {
           this.categoryStateSer.clearCache();
           this.reload$.next()
+          this.toastr.showSuccess('Category Added', `Category ${result.name} has been added`);
         },
-        error: err => console.error('Created failed: ', err)
+        error: () => this.toastr.showError('Failed to add category', "A category with this name may already exist.")
       })
   }
 
@@ -188,11 +198,12 @@ export class CategoriesComponent {
         )
       )
       .subscribe({
-        next: () => {
+        next: result => {
           this.categoryStateSer.clearCache();
           this.reload$.next()
+          this.toastr.showSuccess('Category Updated', `Category ${category.name} has been updated to ${result.name}`);
         },
-        error: err => console.error('Update failed: ', err)
+        error: () => this.toastr.showError('Failed to update category', "Unable to update category.")
       })
   }
 

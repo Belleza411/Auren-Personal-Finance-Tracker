@@ -16,6 +16,7 @@ import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/typ
 import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
 import { CategoryStateService } from '../../../categories/services/category-state.service';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
+import { ToastrService } from '../../../../core/services/toastr.service';
 
 @Component({
   selector: 'app-transaction',
@@ -27,6 +28,7 @@ import { NoopScrollStrategy } from '@angular/cdk/overlay';
 export class TransactionComponent {
     private transactionStateSer = inject(TransactionStateService);
     private categoryStateService = inject(CategoryStateService);
+    private toastr = inject(ToastrService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
@@ -146,13 +148,22 @@ export class TransactionComponent {
     }
 
     deleteTransaction(id: string) {
+        const transaction = this.transactions().find(t => t.id === id);
+        if (!transaction) {
+            this.toastr.showError('Transaction Not Found', `The transaction you are trying to delete could not be found.`);
+            return;
+        }
+
         this.transactionStateSer.deleteTransaction(id)
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
                 tap(() => this.reload$.next())
             )
-            .subscribe();
+            .subscribe({
+                next: () => this.toastr.showSuccess('Transaction Deleted', `${transaction.amount} for ${transaction.name} has been deleted`),
+                error: () => this.toastr.showError('Failed to delete transaction', `This transaction could not be deleted. Please try again later.`)
+            });
     }
 
     openAddModal(): void {
@@ -182,11 +193,12 @@ export class TransactionComponent {
                 switchMap(result => this.transactionStateSer.createTransaction(result))
             )
             .subscribe({
-                next: () => {
+                next: result => {
                     this.transactionStateSer.clearCache();
                     this.reload$.next();
+                    this.toastr.showSuccess('Transaction Added', `${result.amount} for ${result.name} has been recorded`);
                 },
-                error: err => console.error('Create failed', err)            
+                error: () => this.toastr.showError('Failed to add transaction', `Please check the entered details and try again.`)          
             });
     }
 
@@ -228,9 +240,10 @@ export class TransactionComponent {
                 next: () => {
                     this.transactionStateSer.clearCache();
                     this.reload$.next();
+                    this.toastr.showSuccess('Transaction Updated', `Transaction updated to $${transaction.amount} for ${transaction.name}`);
                 },
-                error: err => console.error('Update failed', err)
-        });
+                error: () => this.toastr.showError('Failed to update transaction', `Changes could not be saved. Please check the entered details and try again.`)
+            });
     }
 
     onEditFromTable(transactionId: string): void {
