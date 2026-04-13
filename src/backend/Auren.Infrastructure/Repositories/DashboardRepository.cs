@@ -25,10 +25,10 @@ namespace Auren.Infrastructure.Repositories
             var (currentIncome, currentExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, startDate, endDate, cancellationToken);
             var (lastMonthIncome, lastMonthExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, lastStartDate, lastEndDate, cancellationToken);
             
-            var currentBalance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
-            var lastMonthBalance = await transactionRepository.GetBalanceAsync(userId, lastStartDate, lastEndDate, cancellationToken);
+            var totalBalance = await transactionRepository.GetBalanceAsync(userId, cancellationToken);
+            var lastMonthBalance = lastMonthIncome - lastMonthExpense;
 
-            var balanceChange = CalculatePercentageChange(currentBalance.Balance, lastMonthBalance.Balance);
+            var balanceChange = CalculatePercentageChange(totalBalance.Balance, lastMonthBalance);
             var incomeChange = CalculatePercentageChange(currentIncome, lastMonthIncome);
             var expenseChange = CalculatePercentageChange(currentExpense, lastMonthExpense);
 
@@ -40,7 +40,7 @@ namespace Auren.Infrastructure.Repositories
 
             return new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
-                    Amount: currentBalance.Balance,
+                    Amount: totalBalance.Balance,
                     PercentageChange: balanceChange
                 ),
                 Income: new TransactionMetricResponse(

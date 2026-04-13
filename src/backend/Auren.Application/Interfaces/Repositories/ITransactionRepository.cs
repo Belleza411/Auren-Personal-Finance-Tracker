@@ -11,7 +11,7 @@ namespace Auren.Application.Interfaces.Repositories
 	public interface ITransactionRepository : IRepository<Transaction>
 	{
 		Task<PagedResult<Transaction>> GetTransactionsAsync(Guid userId, TransactionFilter filter, int pageSize = 5, int pageNumber = 1, CancellationToken cancellationToken = default);
-		Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken);
+		Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, CancellationToken cancellationToken);
         Task<(decimal Income, decimal Expense)> GetMonthlyTotalsAsync(
             Guid userId,
             DateTime startDate,

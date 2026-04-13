@@ -43,7 +43,7 @@ namespace Auren.Application.Services
 
             if (transactionDto.TransactionType == TransactionType.Expense)
             {
-                var currentBalance = await transactionRepository.GetBalanceAsync(userId, DateTime.MinValue, DateTime.Today, cancellationToken);
+                var currentBalance = await transactionRepository.GetBalanceAsync(userId, cancellationToken);
 
                 if (currentBalance.Balance < transactionDto.Amount)
                 {
@@ -83,7 +83,7 @@ namespace Auren.Application.Services
         {
             var (startDate, endDate) = GetTimePeriodRange(timePeriod);
 
-            var balance = await transactionRepository.GetBalanceAsync(userId, startDate, endDate, cancellationToken);
+            var balance = await transactionRepository.GetBalanceAsync(userId, cancellationToken);
             return Result.Success<BalanceSummaryResponse>(balance);
         }
 

@@ -26,20 +26,14 @@ namespace Auren.Infrastructure.Repositories
             _categoryRepository = categoryRepository;
 		}
 
-		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, DateTime start, DateTime end, CancellationToken cancellationToken)
+		public async Task<BalanceSummaryResponse> GetBalanceAsync(Guid userId, CancellationToken cancellationToken)
 		{
             var income = await _dbContext.Transactions
-                .Where(t => t.UserId == userId &&
-                            t.TransactionType == TransactionType.Income &&
-                            t.TransactionDate >= start &&
-                            t.TransactionDate <= end)
+                .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Income )
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
             var expense = await _dbContext.Transactions
-                .Where(t => t.UserId == userId &&
-                            t.TransactionType == TransactionType.Expense &&
-                            t.TransactionDate >= start &&
-                            t.TransactionDate <= end)
+                .Where(t => t.UserId == userId && t.TransactionType == TransactionType.Expense)
                 .SumAsync(t => (decimal?)t.Amount, cancellationToken) ?? 0m;
 
             return new BalanceSummaryResponse(
