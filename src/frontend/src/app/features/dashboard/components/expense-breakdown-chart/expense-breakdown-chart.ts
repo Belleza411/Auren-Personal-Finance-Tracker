@@ -1,4 +1,4 @@
-import { Component, computed, input, OnChanges, signal, viewChild } from '@angular/core';
+import { Component, computed, input, OnChanges, viewChild } from '@angular/core';
 import { ExpenseBreakdown } from '../../models/dashboard.model';
 import { Chart, ChartData, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from "ng2-charts";

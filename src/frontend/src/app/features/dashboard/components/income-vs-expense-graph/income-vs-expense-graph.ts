@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, input, OnChanges, SimpleChanges, viewChild } from '@angular/core';
+import { AfterViewInit, Component, input, OnChanges, viewChild } from '@angular/core';
 import { IncomeVsExpenseResponse } from '../../models/dashboard.model';
 import { ChartData, ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
@@ -71,7 +71,7 @@ export class IncomeVsExpenseGraph implements OnChanges, AfterViewInit {
     datasets: []
   };
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     if(!this.chartData()) return;
 
     const totalIncomes = this.chartData().incomes.reduce((a, b) => a + b, 0);

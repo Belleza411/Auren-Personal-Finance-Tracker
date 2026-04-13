@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { form, required, email, submit, minLength, FieldState, FormField } from '@angular/forms/signals'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { form, required, email, submit, minLength, FormField } from '@angular/forms/signals'
 import { AuthService } from '../../service/auth-service';
 import { Router, RouterLink } from '@angular/router';
 

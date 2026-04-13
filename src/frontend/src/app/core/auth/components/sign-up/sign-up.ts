@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../service/auth-service';
 import { Register } from '../../models/user.model';
-import { email, FieldState, form, minLength, required, submit, validate, FormField } from '@angular/forms/signals';
+import { email, form, minLength, required, submit, validate, FormField } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from '../../../services/toastr.service';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';

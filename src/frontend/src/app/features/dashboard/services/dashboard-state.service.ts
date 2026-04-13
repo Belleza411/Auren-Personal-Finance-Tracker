@@ -3,7 +3,6 @@ import { CacheStateService } from '../../../core/services/cache-state.service';
 import { DashboardData } from '../models/dashboard.model';
 import { forkJoin, Observable } from 'rxjs';
 import { DashboardService } from './dashboard.service';
-import { TransactionService } from '../../transactions/services/transaction.service';
 import { TimePeriod, TimePeriodLabel } from '../../../core/models/time-period.enum';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
