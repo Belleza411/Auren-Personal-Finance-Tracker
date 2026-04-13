@@ -25,7 +25,7 @@ export class ToastrService {
         message = `$${data.amount} for ${data.category} has been recorded.`;
         break;
       case 'Updated':
-        message = `Updated to $${data.amount} for ${data.category}.`;
+        message = `Updated to $${data.amount} for ${data.name}.`;
         break;
       case 'Deleted':
         message = `$${data.amount} for ${data.category} has been removed.`;
