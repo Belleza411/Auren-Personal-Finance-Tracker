@@ -41,6 +41,7 @@ namespace Auren.Infrastructure.Repositories
             var totalCount = await query.CountAsync(cancellationToken);
 
             var categories = await query
+                .OrderBy(c => c.Name)
                 .Skip(skip)
                 .Take(pageSize)
                 .AsNoTracking()
