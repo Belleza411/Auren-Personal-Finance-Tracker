@@ -18,8 +18,9 @@ export class CategoryForm {
 
   constructor() {
     effect(() => {
-      this.modelSignal.set(this.model());
-    })
+      const model = this.model();
+      this.modelSignal.set({ ...model });
+    });
   }
 
   private readonly modelSignal = signal({} as NewCategory);
@@ -34,7 +35,7 @@ export class CategoryForm {
     submit(this.categoryForm, async () => {
       this.isLoading.set(true);
       try {
-        this.save.emit(this.modelSignal());
+        this.save.emit({ ...this.modelSignal() });
       } finally {
         this.isLoading.set(false)
       }

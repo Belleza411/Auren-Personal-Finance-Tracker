@@ -1,10 +1,22 @@
-import { Component, computed, DestroyRef, effect, inject, input, OnInit, resource, signal } from '@angular/core';
-import { CategoryService } from '../../services/category.service';
-import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
-import { combineLatest, debounceTime, distinctUntilChanged, filter, finalize, firstValueFrom, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
+import { Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
+import { 
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  shareReplay,
+  startWith,
+  Subject,
+  switchMap,
+  take,
+  tap
+} from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { NoopScrollStrategy } from '@angular/cdk/overlay';
+
+import { Category, CategoryFilter, NewCategory } from '../../models/categories.model';
 import { AddCategory } from '../../components/add-category/add-category';
 import { EditCategory } from '../../components/edit-category/edit-category';
 import { CategoryTable } from "../../components/category-table/category-table";
@@ -14,7 +26,6 @@ import { CATEGORY_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-o
 import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TimePeriod } from '../../../../core/models/time-period.enum';
-import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { ToastrService } from '../../../../core/services/toastr.service';
 
 @Component({
@@ -24,7 +35,6 @@ import { ToastrService } from '../../../../core/services/toastr.service';
   styleUrl: './categories.component.css',
 })
 export class CategoriesComponent {
-  private readonly categorySer = inject(CategoryService);
   private categoryStateSer = inject(CategoryStateService);
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
@@ -61,6 +71,7 @@ export class CategoriesComponent {
     this.pageSize$,
     this.reload$.pipe(startWith(null))
   ]).pipe(
+    debounceTime(300),
     switchMap(([filters, pageNumber, pageSize]) =>
       this.categoryStateSer.getCategories(filters, pageSize, pageNumber).pipe(
         startWith(null)
@@ -97,11 +108,7 @@ export class CategoriesComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => this.tryOpenDialog());
 
-    effect(() => {
-        if (!this.isLoading()) {
-          this.tryOpenDialog();
-        }
-    });
+    if(!this.isLoading()) return;
   }
 
   private tryOpenDialog(): void {
@@ -119,14 +126,12 @@ export class CategoriesComponent {
       return;
     }
 
-    if(openEditModal && id) {
-      const category = this.categories().find(c => c.id === id);
+    const category = this.categories().find(c => c.id === id);
 
-      if (category) {
-        this.openEditModal(category);
-      } else {
-        this.router.navigate(['/categories']);
-      }
+    if(openEditModal && id) {
+      if (!category) return;
+      
+      this.openEditModal(category);
     }
   }
 
@@ -171,7 +176,7 @@ export class CategoriesComponent {
       .subscribe({
         next: result => {
           this.categoryStateSer.clearCache();
-          this.reload$.next()
+          this.reload$.next();
           this.toastr.showCategoryToast('Added', result);
         },
         error: () => this.toastr.showError('Failed to add category', "A category with this name may already exist.")
@@ -190,6 +195,7 @@ export class CategoriesComponent {
 
     dialogRef.afterClosed()
       .pipe(
+        take(1),
         takeUntilDestroyed(this.destroyRef),
         tap(() => this.router.navigate(['/categories'])),
         filter((result): result is NewCategory => !!result),

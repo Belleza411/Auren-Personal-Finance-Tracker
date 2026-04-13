@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { Category, NewCategory } from '../../models/categories.model';
@@ -10,15 +10,17 @@ import { CategoryForm } from "../category-form/category-form";
   templateUrl: './edit-category.html',
   styleUrl: './edit-category.css',
 })
-export class EditCategory {
+export class EditCategory implements OnInit {
   protected readonly data: Category = inject(MAT_DIALOG_DATA);
-  protected dialogRef = inject(MatDialogRef<NewCategory>);
+  protected dialogRef = inject(MatDialogRef<EditCategory, NewCategory>);
 
   ngOnInit(): void {
-    this.model.set({
-      name: this.data.name,
-      transactionType: this.data.transactionType
-    })
+    if(this.data) {
+      this.model.set({
+        name: this.data.name,
+        transactionType: this.data.transactionType
+      });
+    }
   }
 
   protected model = signal<NewCategory>({

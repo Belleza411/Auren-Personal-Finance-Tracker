@@ -1,6 +1,6 @@
 import { TransactionType } from "../../transactions/models/transaction.model";
 
-interface Category {
+export interface Category {
     id: string;
     userId: string;
     name: string;
@@ -8,18 +8,12 @@ interface Category {
     createdAt: Date | string;
 }
 
-interface CategoryFilter {
+export interface CategoryFilter {
     searchTerm: string;
     transactionType: TransactionType | null;
 }
 
-interface NewCategory {
+export interface NewCategory {
     name: string;
     transactionType: TransactionType;
-}
-
-export type {
-    Category,
-    CategoryFilter,
-    NewCategory,
 }

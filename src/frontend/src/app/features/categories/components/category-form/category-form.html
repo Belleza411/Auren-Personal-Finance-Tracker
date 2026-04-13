@@ -5,30 +5,18 @@
     <div class="flex flex-col gap-1">
         <label for="type">Transaction Type</label>
         <div class="flex gap-4">    
-            <label 
-                for="income" 
-                class="center flex-1 gray-border py-2 gap-1 cursor-pointer"
-                (click)="incomeInput.checked = true"
-            >
+            <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
                 <input 
-                    #incomeInput
-                    type="radio" 
-                    name="transactionType"
-                    [checked]="categoryForm.transactionType().value() === 'Income'"
-                    (change)="categoryForm.transactionType().value.set('Income')">
+                    type="radio"
+                    value="Income"
+                    [formField]="categoryForm.transactionType">
                 Income
             </label>
-            <label 
-                for="expense" 
-                class="center flex-1 gray-border py-2 gap-1 cursor-pointer"
-                (click)="expenseInput.checked = true"
-            >
-                <input 
-                    #expenseInput
+            <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
+               <input 
                     type="radio" 
-                    name="transactionType"
-                    [checked]="categoryForm.transactionType().value() === 'Expense'"
-                    (change)="categoryForm.transactionType().value.set('Expense')">
+                    value="Expense"
+                    [formField]="categoryForm.transactionType">
                 Expense
             </label>
         </div>
