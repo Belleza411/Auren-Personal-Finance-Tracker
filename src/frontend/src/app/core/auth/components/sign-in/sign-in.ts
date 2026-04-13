@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { form, required, email, submit, minLength, FormField } from '@angular/forms/signals'
-import { AuthService } from '../../service/auth-service';
+import { AuthService } from '../../service/auth.service';
 import { Router, RouterLink } from '@angular/router';
 
 import { Login } from '../../models/user.model';
@@ -22,7 +22,6 @@ export class SignInFormComponent {
   private destroyRef = inject(DestroyRef);
 
   isLoading = signal(false);
-  error = signal<string | null>(null);
   showPassword = signal(false);
 
   protected loginModel = signal<Login>({
@@ -43,7 +42,6 @@ export class SignInFormComponent {
 
     submit(this.loginForm, async () => {
       this.isLoading.set(true);
-      this.error.set(null);
 
       const credentials = this.loginModel()
       

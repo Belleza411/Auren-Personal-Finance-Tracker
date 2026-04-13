@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 
 import { apiUrl } from '../../../../environments/environment';
 import { AuthResponse, Login, Register } from '../models/user.model';
@@ -11,6 +11,7 @@ import { AuthResponse, Login, Register } from '../models/user.model';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${apiUrl}/api/auth`;
+  private readonly profileUrl = `${apiUrl}/api/profiles`;
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -21,15 +22,32 @@ export class AuthService {
   }
 
   login(request: Login): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request);
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
+      tap(() => this.isAuthenticatedSubject.next(true))
+    );
   }
 
   logout(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {}, { withCredentials: true });
+    return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {}, { withCredentials: true }).pipe(
+      tap(() => this.isAuthenticatedSubject.next(false))
+    );
   }
 
   refresh(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/refresh`, {}, { withCredentials: true });
+    return this.http.post<void>(`${this.baseUrl}/refresh`, {}, { withCredentials: true }).pipe(
+      tap(() => this.isAuthenticatedSubject.next(true)),
+    );
+  }
+
+  checkAuth(): Observable<boolean> {
+     return this.http.get(`${this.profileUrl}/me`, { withCredentials: true }).pipe(
+      map(() => true),
+      tap(() => this.isAuthenticatedSubject.next(true)),
+      catchError(() => {
+        this.isAuthenticatedSubject.next(false);
+        return of(false);
+      })
+    );
   }
 
   markAuthenticated() {

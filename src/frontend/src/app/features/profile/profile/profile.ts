@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { ProfileService } from '../service/profile-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserResponse } from '../models/profile.model';
-import { AuthService } from '../../../core/auth/service/auth-service';
+import { AuthService } from '../../../core/auth/service/auth.service';
 import { Router } from '@angular/router';
 
 @Component({

@@ -17,5 +17,9 @@ export const routes: Routes = [
         path: '',
         component: MainLayout,
         loadChildren: (() => import('./core/routes/main-route').then(m => m.mainRoutes))
+    },
+    {
+        path: '**',
+        redirectTo: 'auth/sign-in'   
     }
 ];
