@@ -123,12 +123,12 @@ namespace Auren.API.Controllers
 
         [HttpGet("balance")]
         [EnableRateLimiting("sensitive")]
-        public async Task<ActionResult<BalanceSummaryResponse>> GetUserBalance([FromQuery] TimePeriod? timePeriod, CancellationToken cancellationToken)
+        public async Task<ActionResult<BalanceSummaryResponse>> GetUserBalance(CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var balance = await transactionService.GetBalance(userId.Value, timePeriod ?? TimePeriod.AllTime, cancellationToken);
+            var balance = await transactionService.GetBalance(userId.Value, cancellationToken);
 
             return Ok(balance.Value);
         }

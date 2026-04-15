@@ -19,8 +19,8 @@ namespace Auren.Infrastructure.Repositories
         private sealed record AggregatedData(DateTime? Date, TransactionType TransactionType, decimal Total);
         public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync(Guid userId, TimePeriod? timePeriod, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
-            var (lastStartDate, lastEndDate) = GetPreviousTimePeriodRange(timePeriod);
+            var (startDate, endDate) = timePeriod.GetTimePeriodRange();
+            var (lastStartDate, lastEndDate) = timePeriod.GetPreviousTimePeriodRange();
 
             var (currentIncome, currentExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, startDate, endDate, cancellationToken);
             var (lastMonthIncome, lastMonthExpense) = await transactionRepository.GetMonthlyTotalsAsync(userId, lastStartDate, lastEndDate, cancellationToken);
@@ -63,7 +63,7 @@ namespace Auren.Infrastructure.Repositories
             TimePeriod? timePeriod,
             CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
+            var (startDate, endDate) = timePeriod.GetTimePeriodRange();
 
             bool isDailyHybrid = timePeriod is TimePeriod.ThisMonth or TimePeriod.LastMonth;
 
@@ -94,7 +94,7 @@ namespace Auren.Infrastructure.Repositories
             TimePeriod? timePeriod,
             CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
+            var (startDate, endDate) = timePeriod.GetTimePeriodRange();
 
             var data = await dbContext.Transactions
                 .Where(t =>
@@ -224,34 +224,6 @@ namespace Auren.Infrastructure.Repositories
             }
 
             return new IncomesVsExpenseResponse(labels, incomes, expenses);
-        }
-
-        private static (DateTime start, DateTime end) GetTimePeriodRange(TimePeriod? timePeriod)
-        {
-            return timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
-        }
-
-        private static (DateTime start, DateTime end) GetPreviousTimePeriodRange(TimePeriod? timePeriod)
-        {
-            return timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.AddMonths(-3).GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.AddMonths(-6).GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.AddYears(-1).GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.AddMonths(-2).GetLastMonthRange(), 
-                TimePeriod.ThisMonth => DateTime.Today.GetLastMonthRange(),               
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
         }
 
         private static string GetColorFromPercent(decimal percent, double alpha = 1)

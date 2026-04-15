@@ -79,10 +79,8 @@ namespace Auren.Application.Services
                 : Result.Failure<bool>(Error.NotFound("Transaction not found. "));
         }
 
-        public async Task<Result<BalanceSummaryResponse>> GetBalance(Guid userId, TimePeriod timePeriod, CancellationToken cancellationToken)
+        public async Task<Result<BalanceSummaryResponse>> GetBalance(Guid userId, CancellationToken cancellationToken)
         {
-            var (startDate, endDate) = GetTimePeriodRange(timePeriod);
-
             var balance = await transactionRepository.GetBalanceAsync(userId, cancellationToken);
             return Result.Success<BalanceSummaryResponse>(balance);
         }
@@ -144,20 +142,6 @@ namespace Auren.Application.Services
             return updatedTransaction != null
                 ? Result.Success<Transaction>(updatedTransaction)
                 : Result.Failure<Transaction>(Error.UpdateFailed("Failed to update transaction. "));
-        }
-
-        private static (DateTime StartDate, DateTime EndDate) GetTimePeriodRange(TimePeriod timePeriod)
-        {
-            return timePeriod switch
-            {
-                TimePeriod.Last3Months => DateTime.Today.GetLast3MonthRange(),
-                TimePeriod.Last6Months => DateTime.Today.GetLast6MonthRange(),
-                TimePeriod.ThisYear => DateTime.Today.GetThisYearRange(),
-                TimePeriod.LastMonth => DateTime.Today.GetLastMonthRange(),
-                TimePeriod.ThisMonth => DateTime.Today.GetCurrentMonthRange(),
-                TimePeriod.AllTime => (DateTime.MinValue, DateTime.Today),
-                _ => (DateTime.MinValue, DateTime.Today)
-            };
         }
     }
 }
