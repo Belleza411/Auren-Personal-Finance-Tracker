@@ -21,13 +21,13 @@ namespace Auren.API.Controllers
 		[HttpGet("summary")]
         [EnableRateLimiting("read")]
         public async Task<ActionResult<DashboardSummaryResponse>> GetDashboardSummary(
-            [FromQuery] TimePeriod? timePeriod, 
+            TimePeriod timePeriod = TimePeriod.ThisMonth, 
             CancellationToken cancellationToken = default)
 		{
 			var userId = User.GetCurrentUserId();
 			if (userId == null) return Unauthorized();
 
-			var summary = await dashboardService.GetDashboardSummary(userId.Value, timePeriod ?? TimePeriod.ThisMonth, cancellationToken);
+			var summary = await dashboardService.GetDashboardSummary(userId.Value, timePeriod, cancellationToken);
             return Ok(summary.Value);
         }
 
@@ -46,7 +46,7 @@ namespace Auren.API.Controllers
         [EnableRateLimiting("read")]
 
         public async Task<ActionResult<IncomesVsExpenseResponse>> GetIncomesVsExpenses(
-            [FromQuery] TimePeriod timePeriod = TimePeriod.ThisMonth,
+            TimePeriod timePeriod = TimePeriod.ThisMonth,
             CancellationToken cancellationToken = default)
         {
             var userId = User.GetCurrentUserId();

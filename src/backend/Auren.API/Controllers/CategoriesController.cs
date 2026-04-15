@@ -34,7 +34,7 @@ namespace Auren.API.Controllers
 
         [HttpGet("{categoryId:guid}")]
         [EnableRateLimiting("read")]
-        public async Task<ActionResult<Category>> GetCategoryById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> GetCategoryById(Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -46,7 +46,7 @@ namespace Auren.API.Controllers
 
         [HttpPost]
         [EnableRateLimiting("write")]
-        public async Task<ActionResult<Category>> CreateCategory([FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> CreateCategory(CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -73,7 +73,7 @@ namespace Auren.API.Controllers
 
         [HttpPut("{categoryId:guid}")]
         [EnableRateLimiting("write")]
-        public async Task<ActionResult<Category>> UpdateCategory([FromRoute] Guid categoryId, [FromBody] CategoryDto categoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> UpdateCategory(Guid categoryId, CategoryDto categoryDto, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -100,7 +100,7 @@ namespace Auren.API.Controllers
 
         [HttpDelete("{categoryId:guid}")]
         [EnableRateLimiting("write")]
-        public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteCategory(Guid categoryId, CancellationToken cancellationToken)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

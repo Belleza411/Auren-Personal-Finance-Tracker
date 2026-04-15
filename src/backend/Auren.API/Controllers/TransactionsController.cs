@@ -39,7 +39,7 @@ namespace Auren.API.Controllers
 
 		[HttpGet("{transactionId:guid}")]
         [EnableRateLimiting("read")]
-        public async Task<ActionResult<Transaction>> GetTransactionById([FromRoute] Guid transactionId, CancellationToken cancellationToken)
+        public async Task<ActionResult<Transaction>> GetTransactionById(Guid transactionId, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -51,7 +51,7 @@ namespace Auren.API.Controllers
 
 		[HttpPost]
         [EnableRateLimiting("sensitive")]
-        public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionDto transactionDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<Transaction>> CreateTransaction(TransactionDto transactionDto, CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -81,8 +81,8 @@ namespace Auren.API.Controllers
 		[HttpPut("{transactionId:guid}")]
         [EnableRateLimiting("sensitive")]
 		public async Task<ActionResult<Transaction>> UpdateTransaction(
-            [FromRoute] Guid transactionId, 
-            [FromBody] TransactionDto transactionDto, 
+            Guid transactionId, 
+            TransactionDto transactionDto, 
             CancellationToken cancellationToken)
 		{
             var userId = User.GetCurrentUserId();
@@ -111,7 +111,7 @@ namespace Auren.API.Controllers
 
 		[HttpDelete("{transactionId:guid}")]
         [EnableRateLimiting("write")]
-		public async Task<IActionResult> DeleteTransaction([FromRoute] Guid transactionId, CancellationToken cancellationToken)  
+		public async Task<IActionResult> DeleteTransaction(Guid transactionId, CancellationToken cancellationToken)  
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();

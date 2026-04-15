@@ -44,7 +44,7 @@ namespace Auren.API.Controllers
 
 		[HttpPost("login")]
         [EnableRateLimiting("auth")]
-        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<AuthResponse>> Login(LoginRequest request, CancellationToken cancellationToken)
 		{
 			var result = await userService.LoginAsync(request, cancellationToken);
 
