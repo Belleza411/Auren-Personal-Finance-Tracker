@@ -201,8 +201,13 @@ export class TransactionComponent {
                 right: '0'
             },
             panelClass: 'dialog',
-            data: this.categories()
+            data: this.categories(),
+            disableClose: true
         });
+
+        dialogRef.backdropClick().subscribe(() => {
+            dialogRef.componentInstance.startClose();
+        })
 
         dialogRef.afterClosed()
             .pipe(

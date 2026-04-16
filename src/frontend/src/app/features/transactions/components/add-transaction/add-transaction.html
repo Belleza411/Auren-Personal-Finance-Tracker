@@ -1,7 +1,12 @@
-<app-transaction-form
-    [model]="model()"
-    (save)="onSave($event)"
-    (cancel)="dialogRef.close()"
-    [categories]="data"
-    [isEdit]="false"
-/>
+<div 
+    class="h-full w-full bg-white" 
+    [class.slide-in]="!isClosing()"
+    [class.slide-out]="isClosing()">
+    <app-transaction-form
+        [model]="model()"
+        (save)="onSave($event)"
+        (cancel)="dialogRef.close()"
+        [categories]="data"
+        [isEdit]="false"
+    />
+</div>

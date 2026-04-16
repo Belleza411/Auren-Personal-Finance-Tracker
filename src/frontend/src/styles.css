@@ -15,8 +15,17 @@ body {
   @apply min-w-dvw min-h-dvh font-onest bg-[#f9f9f9] overflow-x-hidden pr-0!;
 }
 
+.dialog .mat-mdc-dialog-container,
+.dialog .mat-mdc-dialog-surface {
+  @apply animate-none! transform-none! transition-none!;
+}
+
 .dialog .mdc-dialog__surface {
-  @apply rounded-none! overflow-hidden;
+  @apply rounded-none! overflow-hidden bg-transparent!;
+}
+
+.dialog .mat-mdc-dialog-container {
+  @apply animate-none! transform-none!;
 }
 
 .cdk-global-scrollblock {

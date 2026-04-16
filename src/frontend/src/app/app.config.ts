@@ -5,6 +5,7 @@ import { provideToastr } from 'ngx-toastr';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/interceptors/auth-interceptor';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,5 +18,11 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-top-right',
       preventDuplicates: true
     }),
+    {
+      provide: OVERLAY_DEFAULT_CONFIG,
+      useValue: {
+        usePopover: false
+      }
+    }
   ]
 };

@@ -16,6 +16,8 @@ export class AddTransaction {
   protected readonly data: Category[] = inject(MAT_DIALOG_DATA);
   protected dialogRef = inject(MatDialogRef<NewTransaction>);
 
+  isClosing = signal(false);
+
   protected model = signal<NewTransaction>({
     name: '',
     amount: 0,
@@ -27,5 +29,13 @@ export class AddTransaction {
 
   onSave(data: NewTransaction) {
     this.dialogRef.close(data);
+  }
+
+  startClose() {
+    this.isClosing.set(true);
+
+    setTimeout(() => {
+      this.dialogRef.close();
+    }, 200);
   }
 }
