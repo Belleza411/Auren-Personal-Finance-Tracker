@@ -47,6 +47,23 @@ export class TransactionForm {
       }
       return null;
     });
+
+    validate(schema.category, ({ value, valueOf }) => {
+      const categoryId = value();
+      const transactionType = valueOf(schema.transactionType);
+
+      const category = this.categories().find(c => c.id === categoryId);
+
+      if(!category) return null;
+        
+      if (category.transactionType !== transactionType) {
+        return {
+          kind: 'invalidTransactionType',
+          message: 'Invalid category type for the selected transaction type'
+        };
+      }
+      return null;
+    }); 
   });
 
   constructor() {
