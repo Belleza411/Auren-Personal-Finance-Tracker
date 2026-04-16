@@ -9,7 +9,7 @@ import { MatDialogRef } from '@angular/material/dialog';
   selector: 'app-add-transaction',
   imports: [TransactionForm],
   templateUrl: './add-transaction.html',
-  styleUrl: './add-transaction.css',
+  styleUrls: ['./add-transaction.css','../../styles/dialog-animation.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransaction {
@@ -17,6 +17,7 @@ export class AddTransaction {
   protected dialogRef = inject(MatDialogRef<NewTransaction>);
 
   isClosing = signal(false);
+  private readonly closeResult = signal<NewTransaction | null>(null);
 
   protected model = signal<NewTransaction>({
     name: '',
@@ -28,14 +29,15 @@ export class AddTransaction {
   });
 
   onSave(data: NewTransaction) {
-    this.dialogRef.close(data);
+    this.startClose(data);
   }
 
-  startClose() {
+  startClose(result?: NewTransaction) {
+    this.closeResult.set(result ?? null);
     this.isClosing.set(true);
 
     setTimeout(() => {
-      this.dialogRef.close();
+      this.dialogRef.close(this.closeResult())
     }, 200);
   }
 }

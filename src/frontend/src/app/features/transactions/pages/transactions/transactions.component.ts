@@ -37,6 +37,7 @@ import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.mo
 import { CategoryStateService } from '../../../categories/services/category-state.service';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { ToastrService } from '../../../../core/services/toastr.service';
+import { SlidePanelService } from '../../services/slide-panel.service';
 
 @Component({
   selector: 'app-transaction',
@@ -49,6 +50,7 @@ export class TransactionComponent {
     private transactionStateSer = inject(TransactionStateService);
     private categoryStateService = inject(CategoryStateService);
     private toastr = inject(ToastrService);
+    private slidePanelService = inject(SlidePanelService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
@@ -187,27 +189,13 @@ export class TransactionComponent {
     }
 
     openAddModal(): void {
-        const dialogRef = this.dialog.open<
+        const dialogRef = this.slidePanelService.open<
             AddTransaction,
             Category[],
-            NewTransaction
-        >(AddTransaction, {
-            scrollStrategy: new NoopScrollStrategy(),
-            width: '30rem',
-            height: '100%',
-            position: {
-                top: '0',
-                bottom: '0',
-                right: '0'
-            },
-            panelClass: 'dialog',
+            NewTransaction>
+        (AddTransaction, {
             data: this.categories(),
-            disableClose: true
         });
-
-        dialogRef.backdropClick().subscribe(() => {
-            dialogRef.componentInstance.startClose();
-        })
 
         dialogRef.afterClosed()
             .pipe(
@@ -228,28 +216,16 @@ export class TransactionComponent {
     }
 
     openEditModal(transaction: Transaction): void {
-        const dialogRef = this.dialog.open<
+        const dialogRef = this.slidePanelService.open<
             EditTransaction,
             { transaction: Transaction; categories: Category[] },
             NewTransaction
-        >(EditTransaction,
-            {
-                scrollStrategy: new NoopScrollStrategy(),
-                width: '30rem',
-                height: '100%',
-                position: {
-                    top: '0',
-                    bottom: '0',
-                    right: '0'
-                },
-                data: {
-                    transaction: transaction,
-                    categories: this.categories()
-                },
-                panelClass: 'dialog',
-                disableClose: false
+        >(EditTransaction, {
+            data: {
+                transaction: transaction,
+                categories: this.categories()
             }
-        );
+        });
 
         dialogRef.afterClosed()
             .pipe(
