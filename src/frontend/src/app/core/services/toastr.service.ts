@@ -22,13 +22,13 @@ export class ToastrService {
 
     switch (action) {
       case 'Added':
-        message = `$${data.amount} for ${data.category} has been recorded.`;
+        message = `$${data.amount} for ${data.name} has been recorded.`;
         break;
       case 'Updated':
         message = `Updated to $${data.amount} for ${data.name}.`;
         break;
       case 'Deleted':
-        message = `$${data.amount} for ${data.category} has been removed.`;
+        message = `$${data.amount} for ${data.name} has been removed.`;
         break;
     }
 
