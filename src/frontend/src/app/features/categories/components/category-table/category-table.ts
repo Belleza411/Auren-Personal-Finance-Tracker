@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { Category } from '../../models/categories.model';
 import { UpperCasePipe } from '@angular/common';
 import { TransactionTypeColorPipe } from "../../../transactions/pipes/transaction-type-color.pipe";
@@ -9,6 +9,7 @@ import { NavigationEnd, Router } from '@angular/router';
   imports: [UpperCasePipe, TransactionTypeColorPipe],
   templateUrl: './category-table.html',
   styleUrl: './category-table.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryTable {
   private router = inject(Router);

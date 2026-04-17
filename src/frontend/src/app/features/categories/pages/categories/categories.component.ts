@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
 import { 
   combineLatest,
   debounceTime,
@@ -33,6 +33,7 @@ import { ToastrService } from '../../../../core/services/toastr.service';
   imports: [CategoryTable, Filter, PaginationComponent],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoriesComponent {
   private categoryStateSer = inject(CategoryStateService);

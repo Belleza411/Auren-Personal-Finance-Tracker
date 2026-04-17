@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { Category, NewCategory } from '../../models/categories.model';
@@ -9,6 +9,7 @@ import { CategoryForm } from "../category-form/category-form";
   imports: [CategoryForm],
   templateUrl: './edit-category.html',
   styleUrl: './edit-category.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditCategory implements OnInit {
   protected readonly data: Category = inject(MAT_DIALOG_DATA);

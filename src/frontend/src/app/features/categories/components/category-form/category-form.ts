@@ -1,4 +1,4 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { NewCategory } from '../../models/categories.model';
 import { form, required, submit, FormField } from '@angular/forms/signals';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
@@ -8,6 +8,7 @@ import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
   imports: [FormField],
   templateUrl: './category-form.html',
   styleUrls: ['./category-form.css', '../../../../shared/styles/form.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryForm {
   isEdit = input(false);

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NewCategory } from '../../models/categories.model';
 import { CategoryForm } from "../category-form/category-form";
 import { MatDialogRef } from '@angular/material/dialog';
@@ -8,6 +8,7 @@ import { MatDialogRef } from '@angular/material/dialog';
   imports: [CategoryForm],
   templateUrl: './add-category.html',
   styleUrl: './add-category.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddCategory {
   protected dialogRef = inject(MatDialogRef<NewCategory>);
