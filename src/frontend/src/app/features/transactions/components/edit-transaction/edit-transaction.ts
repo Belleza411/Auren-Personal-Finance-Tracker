@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { MAT_DIALOG_DATA, MatDialogRef  } from '@angular/material/dialog';
 
 import { NewTransaction, Transaction } from '../../models/transaction.model';
-import { Category, NewCategory } from '../../../categories/models/categories.model';
+import { Category } from '../../../categories/models/categories.model';
 import { TransactionForm } from "../transaction-form/transaction-form";
 
 @Component({
   selector: 'app-edit-transaction',
   imports: [TransactionForm],
   templateUrl: './edit-transaction.html',
-  styleUrls: ['./edit-transaction.css', '../../styles/dialog-animation.css'],
+  styleUrls: ['./edit-transaction.css', '../../../../shared/styles/dialog-animation.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditTransaction implements OnInit {

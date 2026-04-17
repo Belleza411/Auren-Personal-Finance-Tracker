@@ -9,7 +9,7 @@ import { MatDialogRef } from '@angular/material/dialog';
   selector: 'app-add-transaction',
   imports: [TransactionForm],
   templateUrl: './add-transaction.html',
-  styleUrls: ['./add-transaction.css','../../styles/dialog-animation.css'],
+  styleUrls: ['./add-transaction.css', '../../../../shared/styles/dialog-animation.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransaction {

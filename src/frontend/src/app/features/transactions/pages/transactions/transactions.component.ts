@@ -37,7 +37,7 @@ import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.mo
 import { CategoryStateService } from '../../../categories/services/category-state.service';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { ToastrService } from '../../../../core/services/toastr.service';
-import { SlidePanelService } from '../../services/slide-panel.service';
+import { SlidePanelService } from '../../../../core/services/slide-panel.service';
 
 @Component({
   selector: 'app-transaction',
@@ -195,6 +195,13 @@ export class TransactionComponent {
             NewTransaction>
         (AddTransaction, {
             data: this.categories(),
+            height: '100%',
+            width: '30rem',
+            position: {
+                right: '0', 
+                top: '0',
+                bottom: '0'
+            }
         });
 
         dialogRef.afterClosed()
@@ -221,6 +228,12 @@ export class TransactionComponent {
             { transaction: Transaction; categories: Category[] },
             NewTransaction
         >(EditTransaction, {
+            width: '30rem',
+            position: {
+                right: '0', 
+                top: '0',
+                bottom: '0'
+            },
             data: {
                 transaction: transaction,
                 categories: this.categories()
