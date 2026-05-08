@@ -27,7 +27,6 @@ namespace Auren.Application.Services
 		private readonly IValidator<LoginRequest> _loginValidator;
         private readonly IProfileRepository _profileRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly ILogger<UserService> _logger;
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -36,7 +35,6 @@ namespace Auren.Application.Services
             IValidator<LoginRequest> loginValidator,
             IProfileRepository profileRepository,
             ICategoryRepository categoryRepository,
-            ILogger<UserService> logger,
             ITokenService tokenService,
             IHttpContextAccessor httpContextAccessor)
 		{
@@ -45,7 +43,6 @@ namespace Auren.Application.Services
 			_loginValidator = loginValidator;
 			_profileRepository = profileRepository;
 			_categoryRepository = categoryRepository;
-			_logger = logger;
             _tokenService = tokenService;
 			_httpContextAccessor = httpContextAccessor;
 		}
@@ -73,17 +70,17 @@ namespace Auren.Application.Services
 
             if (request.ProfileImage != null)
             {
-                var imageUploadResult = await TryUploadProfileImageAsync(
+                var (Success, ImagePath, ErrorMessage) = await TryUploadProfileImageAsync(
                     request.ProfileImage,
                     request.FirstName,
                     request.LastName,
                     cancellationToken
                 );
 
-                if (!imageUploadResult.Success)
-                    return Result.Failure<AuthResponse>(Error.UploadFailed(imageUploadResult.ErrorMessage ?? "Failed to upload image."));
+                if (!Success)
+                    return Result.Failure<AuthResponse>(Error.UploadFailed(ErrorMessage ?? "Failed to upload image."));
 
-                user.ProfilePictureUrl = imageUploadResult.ImagePath;
+                user.ProfilePictureUrl = ImagePath;
             }
 
             var result = await _userRepository.CreateUserAsync(user, request.Password);
@@ -145,9 +142,8 @@ namespace Auren.Application.Services
 
                 return Result.Success(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Logout failed");
                 return Result.Failure<bool>(Error.UserError.LogoutFailed("Logout failed."));
             }
         }
@@ -201,14 +197,9 @@ namespace Auren.Application.Services
                 CreatedAt = DateTime.UtcNow
             }).ToList();
 
-            try
-            {
-                await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to seed default categories for user {UserId}", userId);
-            }
+            
+            await _categoryRepository.SeedDefaultCategoryToUserAsync(categories, cancellationToken);
+            
         }
         private static UserResponse MapToUserResponse(ApplicationUser user)
         {
@@ -226,8 +217,6 @@ namespace Auren.Application.Services
             user.LastLoginAt = DateTime.UtcNow;
             await _userRepository.UpdateUserAsync(user);
 
-            _logger.LogInformation("Successful login for user: {Email}", email);
-
             return await SignUserInAsync(user, "Login successfully");
         }
 
@@ -235,12 +224,6 @@ namespace Auren.Application.Services
         {
             var lockoutEnd = await _userRepository.GetLockoutEndDateAsync(user);
             var remainingTime = lockoutEnd?.Subtract(DateTimeOffset.UtcNow);
-
-            _logger.LogWarning(
-                "Login attempt for locked out user: {Email}. Lockout ends at: {LockoutEnd}",
-                email,
-                lockoutEnd
-            );
 
             var errorMessage = remainingTime.HasValue && remainingTime.Value.TotalMinutes > 0
                 ? $"Account is temporarily locked due to multiple failed login attempts. Please try again in {Math.Ceiling(remainingTime.Value.TotalMinutes)} minutes."
@@ -252,12 +235,6 @@ namespace Auren.Application.Services
         private async Task<AuthResponse> HandleFailedLoginAsync(ApplicationUser user, string email)
         {
             var failedAttempts = await _userRepository.GetAccessFailedCountAsync(user);
-
-            _logger.LogWarning(
-                "Failed login attempt for user: {Email}. Failed attempts: {FailedAttempts}",
-                email,
-                failedAttempts
-            );
 
             return CreateErrorResponse("Invalid credentials", "Invalid email or password");
         }
