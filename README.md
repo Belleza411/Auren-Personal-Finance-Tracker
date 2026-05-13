@@ -1,6 +1,47 @@
 # Auren
 Auren is a full-stack personal finance tracker application built using **.NET Core Web API** and **Angular**.  
+# 📂 Project Structure
 
+```bash
+Auren/
+|
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/
+|   |   |   |   ├── auth/
+|   |   |   |   ├── layout/
+|   |   |   |   ├── models/
+|   |   |   |   ├── routes/
+|   |   |   |   ├── services/
+│   │   │   ├── features/
+|   |   |   |   ├── categories/
+|   |   |   |   ├── dashboard/
+|   |   |   |   ├── profile/
+|   |   |   |   ├── transactions/
+│   │   │   ├── shared/
+│
+├── backend/
+│   ├── Auren.API/
+│   ├── Auren.Application/
+│   ├── Auren.Domain/
+│   ├── Auren.Infrastructure/
+```
+
+---
+# 🚀 Getting Started
+
+## Prerequisites
+
+Ensure you have the following installed:
+
+- Node.js
+- Angular CLI
+- .NET SDK 8+
+- SQL Server
+- Visual Studio / VS Code
+
+---
 # ⚙️ Installation
 
 ## Clone the repository
