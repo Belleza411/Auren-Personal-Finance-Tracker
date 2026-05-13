@@ -58,3 +58,26 @@ Run Angular development server:
 ```bash
 ng serve
 ```
+
+# 🤝 Contributing
+
+Contributions, suggestions, and improvements are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+Developed by **Aevan Belleza**
+
+Auren — Personal Finance Tracker
