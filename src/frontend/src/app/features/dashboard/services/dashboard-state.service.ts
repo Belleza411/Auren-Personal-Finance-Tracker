@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { CacheStateService } from '../../../core/services/cache-state.service';
 import { DashboardData } from '../models/dashboard.model';
 import { forkJoin, Observable } from 'rxjs';
@@ -6,9 +6,7 @@ import { DashboardService } from './dashboard.service';
 import { TimePeriod, TimePeriodLabel } from '../../../core/models/time-period.enum';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class DashboardStateService extends CacheStateService<DashboardData, any> {
   private dashboardService = inject(DashboardService);
   protected override ttl: number = 120_00;

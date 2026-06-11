@@ -1,13 +1,11 @@
-import { inject, Injectable } from "@angular/core";
+import { inject, Service,  } from "@angular/core";
 import { apiUrl } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Category, NewCategory } from "../models/categories.model";
 import { Observable } from "rxjs";
 import { PagedResult } from "../../transactions/models/transaction.model";
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CategoryService {
     private readonly baseUrl = `${apiUrl}/api/categories`;
     private http = inject(HttpClient);

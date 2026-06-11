@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { CacheStateService } from '../../../core/services/cache-state.service';
 import { PagedResult } from '../../transactions/models/transaction.model';
 import { Category, CategoryFilter, NewCategory } from '../models/categories.model';
@@ -6,9 +6,7 @@ import { Observable, tap } from 'rxjs';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 import { CategoryService } from './category.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CategoryStateService extends CacheStateService<PagedResult<Category>, CategoryFilter> {
   protected override ttl: number = 120_000;
   protected override readonly initialKey: string = "auren:categories";

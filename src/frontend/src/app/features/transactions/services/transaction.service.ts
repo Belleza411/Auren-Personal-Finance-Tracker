@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable} from 'rxjs';
 
@@ -7,9 +7,7 @@ import { apiUrl } from '../../../../environments/environment';
 import { createTimePeriodParams } from '../../../shared/utils/createTimePeriodParams.util';
 import { TimePeriod } from '../../../core/models/time-period.enum';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class TransactionService {
 	private readonly baseUrl = `${apiUrl}/api/transactions`;
 	private http = inject(HttpClient);

@@ -1,11 +1,9 @@
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
-import { inject, Injectable, Type } from '@angular/core';
+import { inject, Service, Type } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SlidePanel, SlidePanelConfig } from '../../shared/models/slide-panel';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class SlidePanelService {
   private dialog = inject(MatDialog);
 

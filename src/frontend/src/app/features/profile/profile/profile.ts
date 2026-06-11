@@ -1,5 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { ProfileService } from '../service/profile-service';
+import { ProfileService } from '../service/profile.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserResponse } from '../models/profile.model';
 import { AuthService } from '../../../core/auth/service/auth.service';

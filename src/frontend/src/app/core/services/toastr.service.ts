@@ -1,11 +1,9 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { ToastrService as NgxToastrService } from 'ngx-toastr';
 import { Transaction } from '../../features/transactions/models/transaction.model';
 import { Category } from '../../features/categories/models/categories.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ToastrService {
   private toastr = inject(NgxToastrService)
 

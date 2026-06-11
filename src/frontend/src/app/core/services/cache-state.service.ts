@@ -1,8 +1,8 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { OnDestroy, OnInit, Service } from '@angular/core';
 import { CacheEntry } from '../../shared/models/cache.model';
 import { Observable, shareReplay, tap } from 'rxjs';
 
-@Injectable()
+@Service()
 export abstract class CacheStateService<T, TFilter extends object = object> implements OnInit, OnDestroy {
   protected abstract ttl: number;
   protected abstract initialKey: string;

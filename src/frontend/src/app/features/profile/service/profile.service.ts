@@ -1,12 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { apiUrl } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserDto, UserResponse } from '../models/profile.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ProfileService {
   private readonly baseUrl = `${apiUrl}/api/profiles`;
   private http = inject(HttpClient);

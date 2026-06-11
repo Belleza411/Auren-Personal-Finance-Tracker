@@ -1,13 +1,11 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { TransactionService } from './transaction.service';
 import { Observable, tap } from 'rxjs';
 import { NewTransaction, PagedResult, Transaction, TransactionFilter } from '../models/transaction.model';
 import { createHttpParams } from '../../../shared/utils/http-params.util';
 import { CacheStateService } from '../../../core/services/cache-state.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class TransactionStateService extends CacheStateService<PagedResult<Transaction>, TransactionFilter> {
   transactionService = inject(TransactionService);
   protected override ttl: number = 120_000;
