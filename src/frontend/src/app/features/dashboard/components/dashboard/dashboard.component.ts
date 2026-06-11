@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { combineLatest, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
 import { RouterLink } from "@angular/router";
 import { CountUpDirective } from 'ngx-countup';
