@@ -73,7 +73,7 @@ export class DashboardComponent {
   recentTransactions = computed(() => this.recentTransactionsResource.value()?.items ?? []);
   isLoading = computed(() => this.dashboardResource.isLoading());
 
-selectedTimePeriod = this.selectedTimePeriodSignal;
+  selectedTimePeriod = this.selectedTimePeriodSignal;
 
   onTimePeriodChange(e: Event) {
     this.timePeriodService.setTimePeriod(

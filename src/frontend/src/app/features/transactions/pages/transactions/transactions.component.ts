@@ -78,7 +78,7 @@ export class TransactionComponent {
         ),
         { initialValue: this.rawFilters() }
     );
-    
+
     private reloadTrigger = signal(0);
 
     transactionResource = rxResource({
@@ -100,6 +100,8 @@ export class TransactionComponent {
     categories = computed(() => this.categoryResource.value()?.items ?? []);
     totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
     isLoading = computed(() => this.transactionResource.isLoading());
+    pageSize = computed(() => this.pagination().pageSize);
+    pageNumber = computed(() => this.pagination().pageNumber);
 
     selectedTransaction = computed(() => 
         this.transactions().find(t => t.id === this.id())

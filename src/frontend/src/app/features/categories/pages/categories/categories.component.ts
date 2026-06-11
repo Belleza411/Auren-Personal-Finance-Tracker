@@ -79,6 +79,8 @@ export class CategoriesComponent {
   categories = computed(() => this.categoryResource.value()?.items ?? [])
   totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 0);
   isLoading = computed(() => this.categoryResource.isLoading());
+  pageSize = computed(() => this.pagination().pageSize);
+  pageNumber = computed(() => this.pagination().pageNumber);
 
   selectedCategory = computed(() => 
     this.categories().find(c => c.id === this.id())
