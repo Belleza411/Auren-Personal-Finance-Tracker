@@ -11,7 +11,7 @@ import {
   take,
   tap
 } from 'rxjs';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource, takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
@@ -56,38 +56,32 @@ export class CategoriesComponent {
   config = signal<FilterKindConfig<CategoryFilter>[]>(CATEGORY_FILTER_KIND_CONFIG);
   pageSizeOptions: number[] = [10, 20, 30, 40, 50];
 
-  private debouncedFilter$ = toObservable(this.rawFilters).pipe(
-    debounceTime(300),
-    distinctUntilChanged((a, b) =>
-      JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
-    )
+  private debouncedFilters = toSignal(
+      toObservable(this.rawFilters).pipe(
+          debounceTime(300),
+          distinctUntilChanged((a, b) =>
+              JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
+          )
+      ),
+      { initialValue: this.rawFilters() }
   );
-  private pageNumber$ = toObservable(computed(() => this.pagination().pageNumber));
-  private pageSize$ = toObservable(computed(() => this.pagination().pageSize));
-  private reload$ = new Subject<void>();
 
-  private categoryData$ = combineLatest([
-    this.debouncedFilter$,
-    this.pageNumber$,
-    this.pageSize$,
-    this.reload$.pipe(startWith(null))
-  ]).pipe(
-    debounceTime(300),
-    switchMap(([filters, pageNumber, pageSize]) =>
-      this.categoryStateSer.getCategories(filters, pageSize, pageNumber).pipe(
-        startWith(null)
-      )
-    ),
-    shareReplay(1)
-  )
+  private reloadTrigger = signal(0)
 
-  categoryData = toSignal(this.categoryData$, { initialValue: null });
-  categories = computed(() => this.categoryData()?.items ?? [])
-  totalCount = computed(() => this.categoryData()?.totalCount ?? 0);
-  isLoading = computed(() => this.categoryData() === null);
+  private categoryResource = rxResource({
+    params: () => ({
+      filters: this.debouncedFilters(),
+      pageSize: this.pagination().pageSize,
+      pageNumber: this.pagination().pageNumber,
+      reload: this.reloadTrigger()
+    }),
+    stream: ({ params }) =>
+      this.categoryStateSer.getCategories(params.filters, params.pageSize, params.pageNumber)
+  })
 
-  pageSize = toSignal(this.pageSize$, { initialValue: 10 })
-  pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
+  categories = computed(() => this.categoryResource.value()?.items ?? [])
+  totalCount = computed(() => this.categoryResource.value()?.totalCount ?? 0);
+  isLoading = computed(() => this.categoryResource.isLoading());
 
   selectedCategory = computed(() => 
     this.categories().find(c => c.id === this.id())
@@ -147,7 +141,7 @@ export class CategoriesComponent {
       .pipe(
         take(1),
         takeUntilDestroyed(this.destroyRef),
-        tap(() => this.reload$.next())
+        tap(() => this.categoryResource.reload())
       )
       .subscribe({
         next: () => this.toastr.showCategoryToast('Deleted', category),
@@ -177,7 +171,7 @@ export class CategoriesComponent {
       .subscribe({
         next: result => {
           this.categoryStateSer.clearCache();
-          this.reload$.next();
+          this.categoryResource.reload();
           this.toastr.showCategoryToast('Added', result);
         },
         error: () => this.toastr.showError('Failed to add category', "A category with this name may already exist.")
@@ -207,7 +201,7 @@ export class CategoriesComponent {
       .subscribe({
         next: result => {
           this.categoryStateSer.clearCache();
-          this.reload$.next()
+          this.categoryResource.reload();
           this.toastr.showCategoryToast('Updated', result);
         },
         error: () => this.toastr.showError('Failed to update category', "Unable to update category.")

@@ -9,18 +9,15 @@ import {
     signal   
 } from '@angular/core';
 import { 
-    combineLatest,
     debounceTime,
     distinctUntilChanged,
     filter,
-    shareReplay,
     startWith,
-    Subject,
     switchMap,
     take,
     tap
 } from 'rxjs';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource, takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
 
@@ -35,7 +32,6 @@ import { PaginationComponent } from "../../../../shared/ui/pagination/pagination
 import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
 import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
 import { CategoryStateService } from '../../../categories/services/category-state.service';
-import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { ToastrService } from '../../../../core/services/toastr.service';
 import { SlidePanelService } from '../../../../core/services/slide-panel.service';
 
@@ -73,45 +69,37 @@ export class TransactionComponent {
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
     pageSizeOptions: number[] = [10, 20, 30, 40, 50];
     
-    private debouncedFilter$ = toObservable(this.rawFilters).pipe(
-        debounceTime(300),
-        distinctUntilChanged((a, b) =>
-            JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
-        )
-    );
-    private pageNumber$ = toObservable(computed(() => this.pagination().pageNumber));
-    private pageSize$ = toObservable(computed(() => this.pagination().pageSize));
-    private reload$ = new Subject<void>();
-
-    private transactionData$ = combineLatest([
-        this.debouncedFilter$,
-        this.pageNumber$,
-        this.pageSize$,
-        this.reload$.pipe(startWith(null))
-    ]).pipe(
-        debounceTime(300),
-        switchMap(([filters, pageNumber, pageSize]) =>
-            this.transactionStateSer.getTransactions(filters, pageSize, pageNumber).pipe(
-                startWith(null)
+    private debouncedFilters = toSignal(
+        toObservable(this.rawFilters).pipe(
+            debounceTime(300),
+            distinctUntilChanged((a, b) =>
+                JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
             )
         ),
-        shareReplay(1)
+        { initialValue: this.rawFilters() }
     );
-
-    private categoryData$ = this.categoryStateService.getCategories({}, 30, 1)
-        .pipe(
-            shareReplay(1)
-        );
-        
-    transactionData = toSignal(this.transactionData$, { initialValue: null });
-    categoryData = toSignal(this.categoryData$, { initialValue: null })
-    transactions = computed(() => this.transactionData()?.items ?? []);
-    categories = computed(() => this.categoryData()?.items ?? [])
-    totalCount = computed(() => this.transactionData()?.totalCount ?? 0);
-    isLoading = computed(() => this.transactionData() === null);
     
-    pageSize = toSignal(this.pageSize$, { initialValue: 10 })
-    pageNumber = toSignal(this.pageNumber$, { initialValue: 1 })
+    private reloadTrigger = signal(0);
+
+    transactionResource = rxResource({
+        params: () => ({
+            filters: this.debouncedFilters(),
+            pageNumber: this.pagination().pageNumber,
+            pageSize: this.pagination().pageSize,
+            reload: this.reloadTrigger()
+        }),
+        stream: ({ params }) => 
+            this.transactionStateSer.getTransactions(params.filters, params.pageSize, params.pageNumber)
+    })
+
+    categoryResource = rxResource({
+        stream: () => this.categoryStateService.getCategories({}, 30, 1)
+    });
+   
+    transactions = computed(() => this.transactionResource.value()?.items ?? []);
+    categories = computed(() => this.categoryResource.value()?.items ?? []);
+    totalCount = computed(() => this.transactionResource.value()?.totalCount ?? 0);
+    isLoading = computed(() => this.transactionResource.isLoading());
 
     selectedTransaction = computed(() => 
         this.transactions().find(t => t.id === this.id())
@@ -180,7 +168,7 @@ export class TransactionComponent {
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef),
-                tap(() => this.reload$.next())
+                tap(() => this.transactionResource.reload())
             )
             .subscribe({
                 next: () => this.toastr.showTransactionToast('Deleted', transaction),
@@ -215,7 +203,7 @@ export class TransactionComponent {
             .subscribe({
                 next: result => {
                     this.transactionStateSer.clearCache();
-                    this.reload$.next();
+                    this.transactionResource.reload();
                     this.toastr.showTransactionToast('Added', result);
                 },
                 error: () => this.toastr.showError('Failed to add transaction', `Please check the entered details and try again.`)          
@@ -253,7 +241,7 @@ export class TransactionComponent {
             .subscribe({
                 next: () => {
                     this.transactionStateSer.clearCache();
-                    this.reload$.next();
+                    this.transactionResource.reload();
                     this.toastr.showTransactionToast('Updated', transaction);
                 },
                 error: () => this.toastr.showError('Failed to update transaction', `Changes could not be saved. Please check the entered details and try again.`)
