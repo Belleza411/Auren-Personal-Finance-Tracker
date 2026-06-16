@@ -1,12 +1,12 @@
 @if(user()?.profilePictureUrl) {
     <img 
         [src]="user()?.profilePictureUrl" 
-        class="profile-image" 
+        class="profile-image size-9" 
         [alt]="fullName()"
         aria-hidden="true">
 } @else {
     <div
-        class="profile-image"
+        class="profile-image size-9"
         [style.backgroundColor]="bgColor()"
     >
         {{ initials() }}
@@ -19,14 +19,32 @@
     [hidden]="!isOpen()" 
     class="flex flex-col absolute top-15 right-20 bg-[#1c4532] rounded-md gray-border z-50"
 >
-    <div class="pl-3 pr-15 pb-1.5 pt-2 flex flex-col">
-        <p class="text-white font-medium">{{ fullName() }}</p>
-        <p class="text-gray-400 tex-xs">{{ email() }}</p>
+    <div class="w-full pl-3 pr-15 pb-1.5 pt-2">
+        <div class="mb-2">
+            @if(user()?.profilePictureUrl) {
+                <img 
+                    [src]="user()?.profilePictureUrl" 
+                    class="profile-image size-22" 
+                    [alt]="fullName()"
+                    aria-hidden="true">
+            } @else {
+                <div
+                    class="profile-image size-22 text-[clamp(0.9rem,4.5cqmin,1.5rem)]"
+                    [style.backgroundColor]="bgColor()"
+                >
+                    {{ initials() }}
+                </div>
+            }
+        </div>
+        <div class="flex flex-col">
+            <p class="text-white font-medium">{{ fullName() }}</p>
+            <p class="text-gray-400 tex-xs">{{ email() }}</p>
+        </div>
     </div>
     <button 
         class="border-t border-gray-600 bg-transparent flex items-center text-white text-sm cursor-pointer hover:opacity-80 transition-opacity py-1.5 px-3"
         (click)="logout()"
-        type="button" 
+        type="button"   
     >
         <span class="material-symbols-rounded mr-3 text-[1.2rem]! font-light! text-white">
             logout
