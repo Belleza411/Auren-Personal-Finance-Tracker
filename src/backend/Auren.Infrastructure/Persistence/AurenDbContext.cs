@@ -1,5 +1,6 @@
 ﻿using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Auren.Infrastructure.Persistence
 {
@@ -22,7 +23,13 @@ namespace Auren.Infrastructure.Persistence
                 entity.Property(t => t.Amount)
                     .HasPrecision(12, 2);
             });
-                
+
+            builder.Entity<Transaction>()
+                .HasIndex(t => new { t.UserId, t.TransactionDate });
+
+            builder.Entity<Transaction>()
+                .HasIndex(t => t.CategoryId);
+
             builder.Entity<Category>().HasKey(c => c.Id);
         }
     }
