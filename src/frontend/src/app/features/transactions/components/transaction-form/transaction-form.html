@@ -48,7 +48,10 @@
     <p>
         <label for="amount">Amount</label>
         <input 
-            type="number"
+            type="number" 
+            step="0.01" 
+            inputmode="decimal"
+            placeholder="0.00"
             [formField]="transactionForm.amount"
             [class.error]="fieldErrors.amount()">
         @if(fieldErrors.amount()) {
