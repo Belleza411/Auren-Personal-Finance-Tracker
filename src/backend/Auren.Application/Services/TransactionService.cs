@@ -47,7 +47,7 @@ namespace Auren.Application.Services
 
                 if (currentBalance.Balance < transactionDto.Amount)
                 {
-                    return Result.Failure<Transaction>(Error.NotEnoughBalance($"{currentBalance} is not enough. "));
+                    return Result.Failure<Transaction>(Error.NotEnoughBalance("Not enough balance"));
                 }
             }
 

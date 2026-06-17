@@ -208,7 +208,7 @@ export class TransactionComponent {
                     this.transactionResource.reload();
                     this.toastr.showTransactionToast('Added', result);
                 },
-                error: () => this.toastr.showError('Failed to add transaction', `Please check the entered details and try again.`)          
+                error: e => this.toastr.showError('Failed to add transaction', e.error?.messages ?? 'Please check the entered details and try again.')          
             });
     }
 
