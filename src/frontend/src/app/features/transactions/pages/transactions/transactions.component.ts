@@ -69,9 +69,8 @@ export class TransactionComponent {
     timePeriodOptions: string[] = ['All Time', 'This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year'];
     pageSizeOptions: number[] = [10, 20, 30, 40, 50];
     
-    private debouncedFilters = toSignal(
+    private filters = toSignal(
         toObservable(this.rawFilters).pipe(
-            debounceTime(300),
             distinctUntilChanged((a, b) =>
                 JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
             )
@@ -83,7 +82,7 @@ export class TransactionComponent {
 
     transactionResource = rxResource({
         params: () => ({
-            filters: this.debouncedFilters(),
+            filters: this.filters(),
             pageNumber: this.pagination().pageNumber,
             pageSize: this.pagination().pageSize,
             reload: this.reloadTrigger()
