@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { CountUpDirective } from 'ngx-countup';
 import { TransactionTable } from "../../../transactions/components/transaction-table/transaction-table";
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
@@ -17,8 +17,8 @@ import { TimePeriodService } from '../../../../core/services/time-period.service
 @Component({
   selector: 'app-dashboard',
   imports: [
-    SummaryCard,
     RouterLink,
+    SummaryCard,
     CountUpDirective,
     TransactionTable,
     IncomeVsExpenseGraph,
@@ -33,6 +33,7 @@ export class DashboardComponent {
   private dashboardStateSer = inject(DashboardStateService);
   private transactionStateSer = inject(TransactionStateService);
   private timePeriodService = inject(TimePeriodService);
+  private router = inject(Router);
 
   TimePeriodLabel = TimePeriodLabel
   timePeriodOptions = TIME_PERIOD_OPTIONS
@@ -79,6 +80,10 @@ export class DashboardComponent {
     this.timePeriodService.setTimePeriod(
       Number((e.target as HTMLSelectElement).value) as TimePeriod
     );
+  }
+
+  onAddTransaction(): void {
+      this.router.navigate(['/transactions', 'create']);
   }
 
   getArrowIconByPercentageChange(percentageChange: number): string {
