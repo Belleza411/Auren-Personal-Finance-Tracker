@@ -36,7 +36,6 @@
     "chart.js": "^4.5.1",
     "chroma-js": "^3.2.0",
     "ng2-charts": "^8.0.0",
-    "ngx-countup": "^21.0.0",
     "ngx-toastr": "^20.0.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
