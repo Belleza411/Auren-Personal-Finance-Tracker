@@ -34,6 +34,7 @@ export class DashboardComponent {
   private transactionStateSer = inject(TransactionStateService);
   private timePeriodService = inject(TimePeriodService);
   private router = inject(Router);
+  private router = inject(Router);
 
   TimePeriodLabel = TimePeriodLabel
   timePeriodOptions = TIME_PERIOD_OPTIONS
@@ -80,6 +81,10 @@ export class DashboardComponent {
     this.timePeriodService.setTimePeriod(
       Number((e.target as HTMLSelectElement).value) as TimePeriod
     );
+  }
+
+  onAddTransaction(): void {
+      this.router.navigate(['/transactions', 'create']);
   }
 
   onAddTransaction(): void {
