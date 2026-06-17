@@ -34,7 +34,7 @@
                 <div class="per-change_last-month">
                 <p class="change" [class]="card.percentageChange | percentageBgColor">
                     <span class="material-symbols-rounded">
-                    {{ getArrowIconByPercentageChange(card.percentageChange) }}
+                        {{ card.percentageChange | arrowIconByPercentageChange }}
                     </span>
                     <span class="percentage">{{ card.percentageChange }}%</span>
                 </p>

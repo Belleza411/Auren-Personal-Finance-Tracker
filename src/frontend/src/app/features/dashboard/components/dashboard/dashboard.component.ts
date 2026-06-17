@@ -13,6 +13,7 @@ import { TIME_PERIOD_OPTIONS } from '../../../../shared/constants/type-options';
 import { DASHBOARD_SUMMARY_INITIAL_DATA, EXPENSE_BREAKDOWN_INITIAL_DATA, INCOME_VS_EXPENSE_INITIAL_DATA } from '../constants/dashboard-data';
 import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
 import { TimePeriodService } from '../../../../core/services/time-period.service';
+import { ArrowIconByPercentageChangePipe } from '../../pipes/arrow-icon-by-percentage.pipe';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,7 +24,8 @@ import { TimePeriodService } from '../../../../core/services/time-period.service
     TransactionTable,
     IncomeVsExpenseGraph,
     ExpenseBreakdownChart,
-    PercentageBgColorPipe
+    PercentageBgColorPipe,
+    ArrowIconByPercentageChangePipe
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -84,11 +86,5 @@ export class DashboardComponent {
 
   onAddTransaction(): void {
       this.router.navigate(['/transactions', 'create']);
-  }
-
-  getArrowIconByPercentageChange(percentageChange: number): string {
-    if(percentageChange > 0) return 'arrow_upward';
-    if(percentageChange < 0) return 'arrow_downward';
-    return '';
   }
 }
