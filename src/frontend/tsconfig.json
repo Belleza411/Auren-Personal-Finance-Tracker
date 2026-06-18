@@ -23,13 +23,16 @@
       ],
       "@spartan-ng/helm/icon": [
         "src/app/libs/ui/icon/src/index.ts"
+      ],
+      "@spartan-ng/helm/avatar": [
+        "./src/app/libs/ui/avatar/src/index.ts"
       ]
     }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true, 
+    "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
   "files": [],

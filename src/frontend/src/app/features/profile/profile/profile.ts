@@ -4,10 +4,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserResponse } from '../models/profile.model';
 import { AuthService } from '../../../core/auth/service/auth.service';
 import { Router } from '@angular/router';
+import { HlmAvatar, HlmAvatarFallback, HlmAvatarImage } from "../../../libs/ui/avatar/src";
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [
+    HlmAvatar,
+    HlmAvatarFallback,
+    HlmAvatarImage, 
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

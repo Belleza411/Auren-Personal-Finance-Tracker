@@ -1,17 +1,18 @@
-@if(user()?.profilePictureUrl) {
-    <img 
-        [src]="user()?.profilePictureUrl" 
-        class="profile-image size-9" 
-        [alt]="fullName()"
-        aria-hidden="true">
-} @else {
-    <div
-        class="profile-image size-9"
+<hlm-avatar class="size-9">
+    @if (user()?.profilePictureUrl) {
+        <img
+            hlmAvatarImage
+            [src]="user()?.profilePictureUrl"
+            [alt]="fullName()" />
+    }
+    
+    <span 
+        hlmAvatarFallback 
         [style.backgroundColor]="bgColor()"
     >
         {{ initials() }}
-    </div>
-}
+    </span>
+</hlm-avatar>
 <span class="material-symbols-rounded text-white relative cursor-pointer" (click)="toggle()">
     keyboard_arrow_down
 </span>
@@ -20,22 +21,22 @@
     class="flex flex-col absolute top-15 right-20 bg-[#1c4532] rounded-md gray-border z-50"
 >
     <div class="w-full pl-3 pr-15 pb-1.5 pt-2">
-        <div class="mb-2">
-            @if(user()?.profilePictureUrl) {
-                <img 
-                    [src]="user()?.profilePictureUrl" 
-                    class="profile-image size-22" 
-                    [alt]="fullName()"
-                    aria-hidden="true">
-            } @else {
-                <div
-                    class="profile-image size-22 text-[clamp(0.9rem,4.5cqmin,1.5rem)]"
-                    [style.backgroundColor]="bgColor()"
-                >
-                    {{ initials() }}
-                </div>
+        <hlm-avatar class="size-26 mb-2">
+            @if (user()?.profilePictureUrl) {
+                <img
+                    hlmAvatarImage
+                    [src]="user()?.profilePictureUrl"
+                    [alt]="fullName()" />
             }
-        </div>
+            
+            <span 
+                hlmAvatarFallback 
+                [style.backgroundColor]="bgColor()"
+                class="text-2xl"
+            >
+                {{ initials() }}
+            </span>
+        </hlm-avatar>
         <div class="flex flex-col">
             <p class="text-white font-medium">{{ fullName() }}</p>
             <p class="text-gray-400 tex-xs">{{ email() }}</p>

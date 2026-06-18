@@ -3,7 +3,3 @@
 :host {
     @apply flex items-center;
 }
-
-.profile-image {
-    @apply rounded-full flex items-center justify-center text-white;
-}
