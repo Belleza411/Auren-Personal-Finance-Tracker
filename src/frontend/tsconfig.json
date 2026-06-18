@@ -32,6 +32,15 @@
       ],
       "@spartan-ng/helm/skeleton": [
         "./src/app/libs/ui/skeleton/src/index.ts"
+      ],
+      "@spartan-ng/helm/button": [
+        "./src/app/libs/ui/button/src/index.ts"
+      ],
+      "@spartan-ng/helm/dropdown-menu": [
+        "./src/app/libs/ui/dropdown-menu/src/index.ts"
+      ],
+      "@spartan-ng/helm/checkbox": [
+        "./src/app/libs/ui/checkbox/src/index.ts"
       ]
     }
   },

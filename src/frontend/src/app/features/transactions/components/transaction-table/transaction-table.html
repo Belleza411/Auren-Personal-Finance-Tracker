@@ -1,102 +1,50 @@
-<div hlmTableContainer class="gray-border bg-white">
-    <table hlmTable>
-        <thead hlmTHead>
-            <tr hlmTr>
-                @for(column of columns(); track column.key) {
-                    <th>{{ column.label }}</th>
-                }
-            </tr>
-        </thead>
-        <tbody hlmTBody>
-            @if(isLoading()) {
-                @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
+@defer {
+    <div hlmTableContainer class="gray-border bg-white">
+        <table hlmTable>    
+            <thead hlmTHead>
+                @for (headerGroup of _table.getHeaderGroups(); track headerGroup.id) {
                     <tr hlmTr>
-                        @for(column of columns(); track column.key) {
-                            <td>
-                                <hlm-skeleton class="h-4" />
-                            </td>
+                        @for (header of headerGroup.headers; track header.id) {
+                            <th hlmTh [attr.colSpan]="header.colSpan">
+                                @if (!header.isPlaceholder) {
+                                    <ng-container
+                                        *flexRender="header.column.columnDef.header; props: header.getContext(); let headerText"
+                                    >
+                                        <div [innerHTML]="headerText"></div>
+                                    </ng-container>
+                                }
+                            </th>
                         }
                     </tr>
-                }       
-            } @else {
-                @for(t of transactions(); track t.id) {
-                    <tr hlmTr>
-                        @for(column of columns(); track column.key) {
-                            <td hlmTd>
-                                @switch (column.key) {
-                                    @case ('transactionDate') {
-                                        <p>{{ t.transactionDate }}</p>
-                                    }
-
-                                    @case ('dateCreated') {
-                                        <p>{{ t.createdAt }}</p>
-                                    }
-
-                                    @case ('title') {
-                                        <p class="font-medium">{{ t.name }}</p>
-                                    }
-
-                                    @case ('category') {
-                                        <p>{{ t.category.name }}</p>
-                                    }
-
-                                    @case ('type') {
-                                        <p 
-                                            class="text-[0.6rem] inline-flex items-center px-2 py-1 rounded-full font-medium"
-                                            [class]="t.transactionType | transactionTypeColor:true"
-                                        >
-                                            {{ t.transactionType | uppercase }}
-                                        </p>
-                                    }
-
-                                    @case ('amount') {
-                                        <p 
-                                            [class]="t.transactionType | transactionTypeColor:false"
-                                        >
-                                            {{ t.transactionType | transactionAmountSign }}{{ t.amount | currency }}
-                                        </p>
-                                    }
-
-                                    @case ('paymentMethod') {
-                                        <p>{{ t.paymentType | addWhitespace }}</p>
-                                    }
-
-                                    @case ('actions') {
-                                        <div 
-                                            role="button" 
-                                            class="relative flex items-center cursor-pointer"
-                                            (click)="toggleModalId(t.id)"
-                                        >
-                                            <span class="material-symbols-rounded">
-                                                more_horiz
-                                            </span>
-                                        </div>
-
-                                        @if(openModalId() === t.id) {
-                                            <div class="absolute right-20 mt-2 bg-white shadow-lg rounded-md py-1.5 px-1 z-10 gray-border">
-                                                <button 
-                                                    class="w-full text-left rounded-sm pl-3 pr-20 py-1 hover:bg-gray-100 flex items-center gap-2.5"
-                                                    (click)="onEdit(t.id)"
-                                                >
-                                                    <span class="material-symbols-rounded text-sm">edit</span>
-                                                    Edit
-                                                </button>
-                                                <button 
-                                                    class="w-full text-left px-3 py-1 rounded-sm hover:bg-gray-100 flex items-center gap-2 text-red-600"
-                                                    (click)="onDelete(t.id)"
-                                                >
-                                                    <span class="material-symbols-rounded">delete</span>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        }
-                                    }
-                                }
-                            </td>
-                        } 
-                    </tr>
                 }
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody hlmTBody>
+                @if (isLoading()) {
+                    @for (skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
+                        <tr hlmTr>
+                            @for (column of _columns; track column.id) {
+                                <td hlmTd><hlm-skeleton class="h-4" /></td>
+                            }
+                        </tr>
+                    }
+                } @else {
+                    @for (row of _table.getRowModel().rows; track row.id) {
+                        <tr hlmTr [attr.data-state]="row.getIsSelected() && 'selected'">
+                            @for (cell of row.getVisibleCells(); track cell.id) {
+                                <td hlmTd>
+                                    <ng-container *flexRender="cell.column.columnDef.cell; props: cell.getContext(); let cellContent">
+                                        <div [innerHTML]="cellContent"></div>
+                                    </ng-container>
+                                </td>
+                            }
+                        </tr>
+                    } @empty {
+                        <tr hlmTr>
+                            <td hlmTd class="text-center py-6" [attr.colspan]="_columns.length">No transactions found.</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AlertService } from '../../../core/services/alert.service';
 import { AsyncPipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -17,6 +17,7 @@ import { HlmAlert, HlmAlertDescription, HlmAlertTitle } from "../../../libs/ui/a
   providers: [provideIcons({ lucideCircleCheck, lucideCircleX })],
   templateUrl: './alert-container.html',
   styleUrl: './alert-container.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlertContainer {
   private readonly alertService = inject(AlertService);
