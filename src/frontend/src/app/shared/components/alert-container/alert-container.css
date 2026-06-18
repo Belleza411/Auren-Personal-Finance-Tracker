@@ -1,0 +1,29 @@
+.alert-in {
+  animation: alertIn 0.2s ease-out forwards;
+}
+
+.alert-out {
+  animation: alertOut 0.2s ease-in forwards;
+}
+
+@keyframes alertIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes alertOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

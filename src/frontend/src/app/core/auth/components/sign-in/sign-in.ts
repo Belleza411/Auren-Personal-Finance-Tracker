@@ -5,8 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 
 import { Login } from '../../models/user.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ToastrService } from '../../../services/toastr.service';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
+import { AlertService } from 'src/app/core/services/alert.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -17,7 +17,7 @@ import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 })
 export class SignInFormComponent {
   private readonly authSer = inject(AuthService);
-  private toastr = inject(ToastrService);
+  private alert = inject(AlertService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
@@ -53,7 +53,7 @@ export class SignInFormComponent {
             this.isLoading.set(false);
           },
           error: () => {
-            this.toastr.showError('Invalid email or password', 'Login Failed');
+            this.alert.error('Invalid email or password', 'Login Failed');
             this.isLoading.set(false);
           }
         })

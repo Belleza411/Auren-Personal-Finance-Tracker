@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
 import { Router, RouterLink } from "@angular/router";
-import { CountUpDirective } from 'ngx-countup';
 import { TransactionTable } from "../../../transactions/components/transaction-table/transaction-table";
 import { IncomeVsExpenseGraph } from "../income-vs-expense-graph/income-vs-expense-graph";
 import { ExpenseBreakdownChart } from "../expense-breakdown-chart/expense-breakdown-chart";
@@ -20,7 +19,6 @@ import { ArrowIconByPercentageChangePipe } from '../../pipes/arrow-icon-by-perce
   imports: [
     RouterLink,
     SummaryCard,
-    CountUpDirective,
     TransactionTable,
     IncomeVsExpenseGraph,
     ExpenseBreakdownChart,

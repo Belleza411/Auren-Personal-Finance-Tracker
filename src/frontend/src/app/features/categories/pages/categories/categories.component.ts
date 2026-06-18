@@ -23,7 +23,7 @@ import { CATEGORY_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-o
 import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TimePeriod } from '../../../../core/models/time-period.enum';
-import { ToastrService } from '../../../../core/services/toastr.service';
+import { AlertService } from 'src/app/core/services/alert.service';
 
 @Component({
   selector: 'app-categories',
@@ -34,7 +34,7 @@ import { ToastrService } from '../../../../core/services/toastr.service';
 })
 export class CategoriesComponent {
   private categoryStateSer = inject(CategoryStateService);
-  private toastr = inject(ToastrService);
+  private alert = inject(AlertService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -132,7 +132,7 @@ export class CategoriesComponent {
   deleteCategory(id: string) {
     const category = this.categories().find(c => c.id === id);
     if (!category) {
-      this.toastr.showError('Category not found', "The category you're trying to delete does not exist.");
+      this.alert.error('Category not found', "The category you're trying to delete does not exist.");
       return;
     }
 
@@ -143,8 +143,8 @@ export class CategoriesComponent {
         tap(() => this.categoryResource.reload())
       )
       .subscribe({
-        next: () => this.toastr.showCategoryToast('Deleted', category),
-        error: () => this.toastr.showError('Failed to delete category', `This category could not be deleted. Please try again later.`)
+        next: () => this.alert.success('Category Deleted', `The category has been deleted successfully.`),
+        error: () => this.alert.error('Failed to delete category', `This category could not be deleted. Please try again later.`)
       })
   }
 
@@ -171,9 +171,9 @@ export class CategoriesComponent {
         next: result => {
           this.categoryStateSer.clearCache();
           this.categoryResource.reload();
-          this.toastr.showCategoryToast('Added', result);
+          this.alert.success('Category Added', `The category has been added successfully.`);
         },
-        error: () => this.toastr.showError('Failed to add category', "A category with this name may already exist.")
+        error: () => this.alert.error('Failed to add category', "A category with this name may already exist.")
       })
   }
 
@@ -201,9 +201,9 @@ export class CategoriesComponent {
         next: result => {
           this.categoryStateSer.clearCache();
           this.categoryResource.reload();
-          this.toastr.showCategoryToast('Updated', result);
+          this.alert.success('Category Updated', `The category has been updated successfully.`);
         },
-        error: () => this.toastr.showError('Failed to update category', "Unable to update category.")
+        error: () => this.alert.error('Failed to update category', "Unable to update category.")
       })
   }
 

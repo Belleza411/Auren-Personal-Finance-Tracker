@@ -1,0 +1,22 @@
+<div class="fixed top-4 right-4 z-50 w-96 space-y-2">
+  @for (alert of alerts$ | async; track alert.id) {
+        <hlm-alert
+            class="alert-in"
+            [class.alert-out]="alert.leaving"
+            [variant]="
+                alert.type === 'error'
+                ? 'destructive'
+                : 'default'
+            "
+            [class]="alert.type === 'success'
+                ? 'border-green-500 bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300'
+                : 'border-red-500 bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300'"
+            >
+            <ng-icon 
+                [name]="alert.type === 'error' ? 'lucideCircleX' : 'lucideCircleCheck'"
+            />
+            <h4 hlmAlertTitle>{{ alert.title }}</h4>
+            <div hlmAlertDescription class="text-current opacity-90">{{ alert.message }}</div>
+        </hlm-alert>
+    }
+</div>

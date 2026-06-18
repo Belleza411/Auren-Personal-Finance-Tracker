@@ -4,8 +4,8 @@ import { AuthService } from '../../service/auth.service';
 import { Register } from '../../models/user.model';
 import { email, form, minLength, required, submit, validate, FormField } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ToastrService } from '../../../services/toastr.service';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
+import { AlertService } from 'src/app/core/services/alert.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,7 +16,7 @@ import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
 })
 export class SignUpFormComponent {
   private readonly authSer = inject(AuthService);
-  private toastr = inject(ToastrService);
+  private alert = inject(AlertService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
@@ -101,10 +101,10 @@ export class SignUpFormComponent {
             this.selectedFile.set(null);
             this.router.navigate(['/auth/sign-in']);
             this.isLoading.set(false)
-            this.toastr.showSuccess('Registration successful! Please log in.', 'Account Created');
+            this.alert.success('Registration successful! Please log in.', 'Account Created');
           },
           error: () => {
-            this.toastr.showError('Please check your details and try again.', 'Registration Failed');
+            this.alert.error('Please check your details and try again.', 'Registration Failed');
             this.isLoading.set(false);
           }
         })

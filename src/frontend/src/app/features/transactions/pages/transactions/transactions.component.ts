@@ -31,9 +31,9 @@ import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TRANSACTION_FILTER_KIND_CONFIG } from '../../../../shared/constants/type-options';
 import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.model';
-import { CategoryStateService } from '../../../categories/services/category-state.service';
-import { ToastrService } from '../../../../core/services/toastr.service';
+import { CategoryStateService } from '../../../categories/services/category-state.service'
 import { SlidePanelService } from '../../../../core/services/slide-panel.service';
+import { AlertService } from 'src/app/core/services/alert.service';
 
 @Component({
   selector: 'app-transaction',
@@ -45,7 +45,7 @@ import { SlidePanelService } from '../../../../core/services/slide-panel.service
 export class TransactionComponent {
     private transactionStateSer = inject(TransactionStateService);
     private categoryStateService = inject(CategoryStateService);
-    private toastr = inject(ToastrService);
+    private alert = inject(AlertService);
     private slidePanelService = inject(SlidePanelService);
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
@@ -161,7 +161,7 @@ export class TransactionComponent {
     deleteTransaction(id: string) {
         const transaction = this.transactions().find(t => t.id === id);
         if (!transaction) {
-            this.toastr.showError('Transaction Not Found', `The transaction you are trying to delete could not be found.`);
+            this.alert.error('Transaction Not Found', `The transaction you are trying to delete could not be found.`);
             return;
         }
 
@@ -172,8 +172,8 @@ export class TransactionComponent {
                 tap(() => this.transactionResource.reload())
             )
             .subscribe({
-                next: () => this.toastr.showTransactionToast('Deleted', transaction),
-                error: () => this.toastr.showError('Failed to delete transaction', `This transaction could not be deleted. Please try again later.`)
+                next: () => this.alert.success('Transaction Deleted', `The transaction has been deleted successfully.`),
+                error: () => this.alert.error('Failed to delete transaction', `This transaction could not be deleted. Please try again later.`)
             });
     }
 
@@ -205,10 +205,10 @@ export class TransactionComponent {
                 next: result => {
                     this.transactionStateSer.clearCache();
                     this.transactionResource.reload();
-                    this.toastr.showTransactionToast('Added', result);
+                    this.alert.success('Transaction Added', `The transaction has been added successfully.`);
                 },
                 error: e => 
-                    this.toastr.showError('Failed to add transaction', e.error?.messages ?? 'Please check the entered details and try again.')          
+                    this.alert.error('Failed to add transaction', e.error?.messages ?? 'Please check the entered details and try again.')          
             });
     }
 
@@ -244,9 +244,9 @@ export class TransactionComponent {
                 next: () => {
                     this.transactionStateSer.clearCache();
                     this.transactionResource.reload();
-                    this.toastr.showTransactionToast('Updated', transaction);
+                    this.alert.success('Transaction Updated', `The transaction has been updated successfully.`);
                 },
-                error: () => this.toastr.showError('Failed to update transaction', `Changes could not be saved. Please check the entered details and try again.`)
+                error: () => this.alert.error('Failed to update transaction', `Changes could not be saved. Please check the entered details and try again.`)
             });
     }
 
