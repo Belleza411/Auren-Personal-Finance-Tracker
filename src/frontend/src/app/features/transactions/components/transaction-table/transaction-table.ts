@@ -7,6 +7,18 @@ import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.p
 import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
 import { AddWhitespacePipe } from '../../pipes/add-whitespace.pipe';
 import { NavigationEnd, Router } from '@angular/router';
+import { 
+	HlmCaption,
+	HlmTable,
+	HlmTableContainer,
+	HlmTBody,
+	HlmTd,
+	HlmTFoot,
+	HlmTh,
+	HlmTHead,
+	HlmTr,
+} from "../../../../libs/ui/table/src/lib/hlm-table"
+import { HlmSkeleton } from '../../../../libs/ui/skeleton/src/lib/hlm-skeleton';
 
 @Component({
   selector: 'app-transaction-table',
@@ -15,7 +27,14 @@ import { NavigationEnd, Router } from '@angular/router';
     UpperCasePipe,
     TransactionAmountSignPipe,
     TransactionTypeColorPipe,
-    AddWhitespacePipe
+    AddWhitespacePipe,
+    HlmTable,
+    HlmTableContainer,
+    HlmTBody,
+    HlmTd,
+    HlmTHead,
+    HlmTr,
+    HlmSkeleton
   ],
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',

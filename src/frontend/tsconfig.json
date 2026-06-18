@@ -26,6 +26,12 @@
       ],
       "@spartan-ng/helm/avatar": [
         "./src/app/libs/ui/avatar/src/index.ts"
+      ],
+      "@spartan-ng/helm/table": [
+        "./src/app/libs/ui/table/src/index.ts"
+      ],
+      "@spartan-ng/helm/skeleton": [
+        "./src/app/libs/ui/skeleton/src/index.ts"
       ]
     }
   },

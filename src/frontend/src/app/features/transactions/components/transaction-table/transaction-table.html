@@ -1,28 +1,28 @@
-<div 
-    class="w-full gray-border overflow-x-scroll xl:overflow-hidden flex flex-col rounded-md bg-white"
->
-    <table class="w-full border-collapse">
-        <thead class="bg-gray-100 border-b border-solid border-[#c5c5c5]">
-            <tr>
+<div hlmTableContainer class="gray-border bg-white">
+    <table hlmTable>
+        <thead hlmTHead>
+            <tr hlmTr>
                 @for(column of columns(); track column.key) {
                     <th>{{ column.label }}</th>
                 }
             </tr>
         </thead>
-        <tbody>
+        <tbody hlmTBody>
             @if(isLoading()) {
                 @for(skeleton of [1,2,3,4,5,6,7,8,9,10]; track skeleton) {
-                    <tr class="border-b border-solid border-[#cacaca] animate-pulse">
-                        @for(column of columns(); track column.key) {
-                            <td><div class="skeleton"></div></td>
-                        }
-                    </tr>
-                }
-            } @else {
-                @for(t of transactions(); track t.id) {
-                    <tr class="border-b border-solid border-[#cacaca] hover:bg-gray-50 transition-colors duration-150">
+                    <tr hlmTr>
                         @for(column of columns(); track column.key) {
                             <td>
+                                <hlm-skeleton class="h-4" />
+                            </td>
+                        }
+                    </tr>
+                }       
+            } @else {
+                @for(t of transactions(); track t.id) {
+                    <tr hlmTr>
+                        @for(column of columns(); track column.key) {
+                            <td hlmTd>
                                 @switch (column.key) {
                                     @case ('transactionDate') {
                                         <p>{{ t.transactionDate }}</p>
