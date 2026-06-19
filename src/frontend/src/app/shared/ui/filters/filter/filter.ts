@@ -15,18 +15,10 @@ import {
   PaymentType 
 } from '../../../../features/transactions/models/transaction.model';
 import { HlmButton } from './../../../../libs/ui/button/src';
-import { lucideX, lucideChevronDown } from '@ng-icons/lucide';
+import { lucideX, lucideChevronDown, lucideListFilter } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { 
-  HlmSelect,
-  HlmSelectContent,
-  HlmSelectGroup,
-  HlmSelectItem,
-  HlmSelectPortal,
-  HlmSelectTrigger,
-  HlmSelectValue
-} from 'src/app/libs/ui/select/src/';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
+import { HlmInput } from './../../../../libs/ui/input/src';
 
 @Component({
   selector: 'app-filter',
@@ -35,9 +27,10 @@ import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
     DropdownWithModal,
     HlmButton,
     NgIcon,
-    HlmDropdownMenuImports
+    HlmDropdownMenuImports,
+    HlmInput
   ],
-  providers: [provideIcons({ lucideX, lucideChevronDown })],
+  providers: [provideIcons({ lucideX, lucideChevronDown, lucideListFilter })],
   templateUrl: './filter.html',
   styleUrl: './filter.css',
   changeDetection: ChangeDetectionStrategy.OnPush

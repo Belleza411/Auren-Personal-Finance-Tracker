@@ -1,62 +1,41 @@
-<div class="relative py-1.5 pr-1 pl-2 rounded-md gray-border bg-gray-50">
+<hlm-popover sideOffset="5">
     <button 
-        class="cursor-pointer flex items-center border-0 bg-none" 
-        (click)="onToggle()"
+        hlmBtn
+        hlmPopoverTrigger
+        variant="outline"
     >
-        @switch (kind()) {
-            @case ('date') {
-                @if(!hasValue()) {
-                    <span class="material-symbols-rounded mr-1 text-[1.4rem]!">
-                        {{ labelOption().icon }}
-                    </span>
-                } @else {
-                    <div class="filter-value">
-                        {{ end() }} - {{ start() }} 
-                    </div>
-                    <span 
-                        class="material-symbols-rounded ml-1.5" 
-                        role="button"
-                        (click)="clear.emit()"
-                    >
-                        close
-                    </span>
-                }
-                <p class="filter-name">{{ labelOption().label }}</p>
-            }
+        @if (!hasValue()) {
+            <ng-icon [name]="labelOption().icon" size="1.2rem" />
+            <p class="filter-name">{{ labelOption().label }}</p>
+        } @else {
+            <div class="filter-value">{{ start() }} - {{ end() }}</div>
+            <span 
+                class="material-symbols-rounded ml-1.5" 
+                role="button"
+                (click)="$event.stopPropagation(); clear.emit()"
+            >
+                close   
+            </span>
         }
+        
     </button>
-    <div 
-        class="absolute bg-white rounded-lg p-4 flex-col top-12.5 left-0 gray-border" 
-        [class.flex]="isOpen()" 
-        [class.hidden]="!isOpen()"
-    >
-        <div class="flex items-center gap-2">
-            <p>
-                <label 
-                    class="text-[0.8rem]"
-                >
-                    {{ labelOption().startLabel }}
-                </label>
-                <input 
-                    class="py-2 px-4 gray-border"
-                    [type]="kind()"  
-                    [placeholder]="labelOption().startPlaceholder"
-                    [value]="start()"
-                    (input)="onStartChange($event)">
-            </p>
-            <p>
-                <label 
-                    class="text-[0.8rem]"
-                >
-                    {{ labelOption().endLabel }}
-                </label>
-                <input 
-                    class="py-2 px-4 gray-border"
-                    [type]="kind()"
-                    [placeholder]="labelOption().endPlaceholder"
-                    [value]="end()"
-                    (input)="onEndChange($event)">
-            </p>
-        </div>
-    </div>
-</div>
+
+    <hlm-popover-content class="flex items-center p-4" *hlmPopoverPortal>
+        <p class="w-full flex items-center justify-between">
+            <label class="text-[0.8rem] w-full">{{ labelOption().startLabel }}</label>
+            <input
+                hlmInput
+                [type]="kind()"
+                [value]="start()"
+                (input)="onStartChange($event)" />
+        </p>
+        <p class="w-full flex items-center justify-between">
+            <label class="text-[0.8rem] w-full">{{ labelOption().endLabel }}</label>
+            <input
+                hlmInput
+                [type]="kind()"
+                [value]="end()"
+                (input)="onEndChange($event)" />
+        </p>
+    </hlm-popover-content>
+</hlm-popover>

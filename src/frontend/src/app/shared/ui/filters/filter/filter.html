@@ -3,21 +3,19 @@
         @if(f.kind === "searchTerm") {
             <div class="flex lg:flex-col gap-2 flex-wrap sm:flex-nowrap w-full">
                 <input 
-                    type="text"
-                    class="w-full py-2 pr-16 pl-3 gray-border text-[0.8rem] font-medium bg-gray-50"
+                    hlmInput
                     [placeholder]="f.placeholder"
                     [value]="searchInput()"
                     (input)="searchInput.set($event.target.value)"
                 >
                 <button
-                    type="button"
-                    class="flex items-center gray-border px-2 py-2 text-[0.8rem] lg:hidden cursor-pointer"
+                    hlmBtn
+                    variant="outline"
+                    class="bg-white lg:hidden cursor-pointer gap-2"
                     (click)="toggleFilter()"
                     [ariaExpanded]="isFilterOpen()"
                 >
-                    <span class="material-symbols-rounded mr-1">
-                        filter_list
-                    </span>
+                    <ng-icon name="lucideListFilter" size="1rem" />
                     Filters
                 </button>
             </div>
@@ -77,6 +75,7 @@
 
             @case ('dateRange') {
                 <app-dropdown-with-modal 
+                    class="z-50"
                     kind="date"
                     [start]="startDate()"
                     [end]="endDate()"

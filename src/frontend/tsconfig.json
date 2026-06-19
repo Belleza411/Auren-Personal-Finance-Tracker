@@ -44,6 +44,12 @@
       ],
       "@spartan-ng/helm/select": [
         "./src/app/libs/ui/select/src/index.ts"
+      ],
+      "@spartan-ng/helm/input": [
+        "./src/app/libs/ui/input/src/index.ts"
+      ],
+      "@spartan-ng/helm/popover": [
+        "./src/app/libs/ui/popover/src/index.ts"
       ]
     }
   },

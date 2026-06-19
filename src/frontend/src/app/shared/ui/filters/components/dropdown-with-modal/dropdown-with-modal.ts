@@ -1,9 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { DropdownKind, DropdownLabelOption } from '../../models/filter.model';
+import { HlmPopover, HlmPopoverContent, HlmPopoverPortal, HlmPopoverTrigger } from './../../../../../libs/ui/popover/src'
+import { HlmInput } from './../../../../../libs/ui/input/src';
+import { HlmButton } from './../../../../../libs/ui/button/src';
+import { lucideCalendar } from '@ng-icons/lucide';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dropdown-with-modal',
-  imports: [],
+  imports: [
+    HlmPopover,
+    HlmPopoverContent,
+    HlmPopoverPortal,
+    HlmPopoverTrigger,
+    HlmButton,
+    NgIcon,
+    HlmInput
+  ],
+  providers: [provideIcons({ lucideCalendar })],
   templateUrl: './dropdown-with-modal.html',
   styleUrl: './dropdown-with-modal.css',
   changeDetection: ChangeDetectionStrategy.OnPush

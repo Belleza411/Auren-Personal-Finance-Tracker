@@ -42,7 +42,7 @@ export const DATE_FILTER_LABEL_OPTION: DropdownLabelOption = {
     endLabel: 'End Date',
     startPlaceholder: 'Select start date',
     endPlaceholder: 'Select end date',
-    icon: 'calendar_today'
+    icon: 'lucideCalendar'
 }
 
 export const TRANSACTION_FILTER_KIND_CONFIG: FilterKindConfig<TransactionFilter>[] = [
