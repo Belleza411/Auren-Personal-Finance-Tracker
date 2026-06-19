@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { injectFlexRenderContext, CellContext } from '@tanstack/angular-table';
+import { CellContext, injectFlexRenderContext } from '@tanstack/angular-table';
 import { Transaction } from 'src/app/features/transactions/models/transaction.model';
 import { HlmCheckbox } from 'src/app/libs/ui/checkbox/src/lib/hlm-checkbox';
 
@@ -8,11 +8,12 @@ import { HlmCheckbox } from 'src/app/libs/ui/checkbox/src/lib/hlm-checkbox';
   imports: [HlmCheckbox],
   template: `
     <hlm-checkbox type="checkbox"
-      [checked]="context.row.getIsSelected()"
-      (change)="context.row.toggleSelected()" />
+      [checked]="ctx.row.getIsSelected()"
+      [disabled]="!ctx.row.getCanSelect()"
+      (checkedChange)="ctx.row.toggleSelected($event === true)" />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableRowSelection {
-  protected readonly context = injectFlexRenderContext<CellContext<Transaction, unknown>>();
+  protected ctx = injectFlexRenderContext<CellContext<Transaction, unknown>>();
 }

@@ -9,7 +9,6 @@ import {
     signal   
 } from '@angular/core';
 import { 
-    debounceTime,
     distinctUntilChanged,
     filter,
     startWith,
@@ -20,6 +19,8 @@ import {
 import { rxResource, takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { MatDialog } from '@angular/material/dialog';
+import { lucidePlus } from '@ng-icons/lucide';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 
 import { NewTransaction, Transaction, TransactionFilter } from '../../models/transaction.model';
 import { TransactionTable } from "../../components/transaction-table/transaction-table";
@@ -34,10 +35,13 @@ import { FilterKindConfig } from '../../../../shared/ui/filters/models/filter.mo
 import { CategoryStateService } from '../../../categories/services/category-state.service'
 import { SlidePanelService } from '../../../../core/services/slide-panel.service';
 import { AlertService } from 'src/app/core/services/alert.service';
+import { HlmButton } from './../../../../libs/ui/button/src'
+
 
 @Component({
   selector: 'app-transaction',
-  imports: [TransactionTable, Filter, PaginationComponent],
+  imports: [TransactionTable, Filter, PaginationComponent, HlmButton, NgIcon],
+  providers: [provideIcons({ lucidePlus })],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

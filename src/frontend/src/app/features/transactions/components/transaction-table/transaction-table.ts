@@ -1,12 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CurrencyPipe, UpperCasePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
-import { TransactionAmountSignPipe } from '../../pipes/transaction-amount-sign.pipe';
-import { TransactionTypeColorPipe } from '../../pipes/transaction-type-color.pipe';
-import { AddWhitespacePipe } from '../../pipes/add-whitespace.pipe';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { 
 	HlmTable,
 	HlmTableContainer,
@@ -29,6 +25,8 @@ import {
 	getSortedRowModel,
 	type RowSelectionState,
 	type SortingState,
+  type RowData,
+  type VisibilityState,
 } from '@tanstack/angular-table';
 
 import { ActionDropdown } from 'src/app/shared/components/action-dropdown/action-dropdown';
@@ -36,7 +34,6 @@ import { TableRowSelection } from 'src/app/shared/components/table-row-selection
 import { TableHeadSortButton } from 'src/app/shared/components/table-head-sort-button/table-head-sort-button';
 import { TableHeadSelection } from 'src/app/shared/components/table-head-selection/table-head-selection';
 
-import type { RowData } from '@tanstack/angular-table';
 import { TransactionTypeBadge } from 'src/app/shared/components/transaction-type-badge/transaction-type-badge';
 
 declare module '@tanstack/angular-table' {
@@ -66,8 +63,6 @@ declare module '@tanstack/angular-table' {
   }
 })
 export class TransactionTable {
-  private router = inject(Router);
-
   transactions = input.required<Transaction[]>();
   isLoading = input<boolean>();
   variant = input<'full' | 'compact'>('full');
@@ -78,25 +73,16 @@ export class TransactionTable {
       : FULL_TRANSACTION_COLUMNS
   );
 
-  constructor() {
-    this.router.events.subscribe(e => {
-      if(e instanceof NavigationEnd) {
-        if(e.url.includes('edit')) {
-          this.openModalId.set(null)
-        }
-      }
-    })
-  }
-
   private readonly _columnFilters = signal<ColumnFiltersState>([]);
 	private readonly _sorting = signal<SortingState>([]);
 	private readonly _rowSelection = signal<RowSelectionState>({});
+  private readonly _columnVisibility = signal<VisibilityState>({});
 
   protected readonly _columns: ColumnDef<Transaction>[] = [
     {
       id: 'select',
-			header: () => flexRenderComponent(TableHeadSelection, { inputs: {} }),
-			cell: () => flexRenderComponent(TableRowSelection, { inputs: {} }),
+			header: () => flexRenderComponent(TableHeadSelection),
+			cell: () => flexRenderComponent(TableRowSelection),
 			enableSorting: false,
 			enableHiding: false,
     },
@@ -165,6 +151,7 @@ export class TransactionTable {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getRowId: (row) => row.id,
     onSortingChange: (updater) => {
 			updater instanceof Function ? this._sorting.update(updater) : this._sorting.set(updater);
 		},
@@ -174,24 +161,22 @@ export class TransactionTable {
 		onRowSelectionChange: (updater) => {
 			updater instanceof Function ? this._rowSelection.update(updater) : this._rowSelection.set(updater);
 		},
+    onColumnVisibilityChange: (updater) => {
+        updater instanceof Function 
+          ? this._columnVisibility.update(updater) 
+          : this._columnVisibility.set(updater);
+    },
 		state: {
 			sorting: this._sorting(),
 			columnFilters: this._columnFilters(),
-			rowSelection: this._rowSelection(), 
+			rowSelection: this._rowSelection(),
+			columnVisibility: this._columnVisibility(),
 		},
     meta: {
-    onEdit: (id: string) => this.onEdit(id),
-    onDelete: (id: string) => this.onDelete(id),
-  },
+      onEdit: (id: string) => this.onEdit(id),
+      onDelete: (id: string) => this.onDelete(id),
+    },
   }))
-  
-  openModalId = signal<string | null>(null);
-
-  toggleModalId(id: string) {
-    this.openModalId.update(current =>
-      current === id ? null : id
-    );
-  }
   
   delete = output<string>();
   edit = output<string>(); 

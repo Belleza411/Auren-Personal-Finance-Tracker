@@ -8,7 +8,9 @@
                             <th hlmTh [attr.colSpan]="header.colSpan">
                                 @if (!header.isPlaceholder) {
                                     <ng-container
-                                        *flexRender="header.column.columnDef.header; props: header.getContext(); let headerText"
+                                        *flexRender="header.column.columnDef.header;
+                                        props: header.getContext();
+                                        let headerText"
                                     >
                                         <div [innerHTML]="headerText"></div>
                                     </ng-container>
@@ -29,18 +31,18 @@
                     }
                 } @else {
                     @for (row of _table.getRowModel().rows; track row.id) {
-                        <tr hlmTr [attr.data-state]="row.getIsSelected() && 'selected'">
+                        <tr hlmTr [attr.key]="row.id" [attr.data-state]="row.getIsSelected() && 'selected'">
                             @for (cell of row.getVisibleCells(); track cell.id) {
                                 <td hlmTd>
-                                    <ng-container *flexRender="cell.column.columnDef.cell; props: cell.getContext(); let cellContent">
+                                    <ng-container 
+                                        *flexRender="cell.column.columnDef.cell; 
+                                        props: cell.getContext(); 
+                                        let cellContent"
+                                    >
                                         <div [innerHTML]="cellContent"></div>
                                     </ng-container>
                                 </td>
                             }
-                        </tr>
-                    } @empty {
-                        <tr hlmTr>
-                            <td hlmTd class="text-center py-6" [attr.colspan]="_columns.length">No transactions found.</td>
                         </tr>
                     }
                 }
