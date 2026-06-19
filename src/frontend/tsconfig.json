@@ -41,6 +41,9 @@
       ],
       "@spartan-ng/helm/checkbox": [
         "./src/app/libs/ui/checkbox/src/index.ts"
+      ],
+      "@spartan-ng/helm/select": [
+        "./src/app/libs/ui/select/src/index.ts"
       ]
     }
   },

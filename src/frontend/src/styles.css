@@ -32,8 +32,8 @@ body {
     @apply animate-none! transform-none!;
 }
 
-.cdk-global-scrollblock {
-    @apply overflow-y-hidden! fixed w-full inset-y-auto;
+html {
+    @apply overflow-y-hidden
 }
 
 @layer components {
