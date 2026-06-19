@@ -40,36 +40,31 @@
             }
 
             @case ('categories') {
-                <div class="relative py-1 pl-2 pr-1 gray-border bg-gray-50 flex items-center z-50">
                     <button 
-                        class="cursor-pointer flex items-center" 
-                        aria-label="Filter by categories"
-                        (click)="toggleCategoryModal()"
+                        hlmBtn
+                        variant="outline"   
+                        [hlmDropdownMenuTrigger]="open"
                     >
                         <p class="text-[0.8rem]">Categories</p>
-                        <span class="material-symbols-rounded">
-                            keyboard_arrow_down
-                        </span>
+                        <ng-icon name="lucideChevronDown" />
                     </button>
-                    <div 
-                        class="modal gray-border overflow-y-scroll" 
-                        [class.flex]="isCategoryOpen()"
-                        [class.hidden]="!isCategoryOpen()"
-                    >
-                        @for (c of categories(); track c.id) {
-                            <label class="flex items-center">
-                                <input
-                                    class="mr-2"
-                                    type="checkbox"
-                                    [value]="c.name"
-                                    [checked]="categoriesSelected().includes(c.name)"
-                                    (change)="onCategoryToggle(c.name, $event.target.checked)"
-                                />
-                                {{ c.name }}
-                            </label>
-                        }
-                    </div>
-                </div>
+
+                    <ng-template #open>
+                        <hlm-dropdown-menu class="h-40">
+                            <hlm-dropdown-menu-group>
+                                @for (c of categories(); track c.id) {
+                                    <button 
+                                        hlmDropdownMenuCheckbox 
+                                        [checked]="categoriesSelected().includes(c.name)"
+                                        (triggered)="onCategoryToggle(c.name)"
+                                    >
+                                        {{ c.name }}
+                                        <hlm-dropdown-menu-checkbox-indicator />
+                                    </button>
+                                }
+                            </hlm-dropdown-menu-group>
+                        </hlm-dropdown-menu>
+                    </ng-template>
             }
                 
             @case ('paymentType') {
@@ -95,13 +90,11 @@
     }
     @if(hasActiveFilters()) {
         <button 
-            type="button" 
+            hlmBtn
+            variant="ghost"
             (click)="clearFilter()" 
-            class="flex items-center justify-center py-1 rounded-lg cursor-pointer text-[0.8rem]"
         >
-            <span class="material-symbols-rounded mr-1.5 text-xl">
-                close
-            </span>
+            <ng-icon name="lucideX" size="1rem" />
             Clear Filters
         </button>
     }

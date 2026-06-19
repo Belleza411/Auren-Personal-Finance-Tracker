@@ -14,10 +14,30 @@ import {
   TransactionType,
   PaymentType 
 } from '../../../../features/transactions/models/transaction.model';
+import { HlmButton } from './../../../../libs/ui/button/src';
+import { lucideX, lucideChevronDown } from '@ng-icons/lucide';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { 
+  HlmSelect,
+  HlmSelectContent,
+  HlmSelectGroup,
+  HlmSelectItem,
+  HlmSelectPortal,
+  HlmSelectTrigger,
+  HlmSelectValue
+} from 'src/app/libs/ui/select/src/';
+import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 
 @Component({
   selector: 'app-filter',
-  imports: [Dropdown, DropdownWithModal],
+  imports: [
+    Dropdown,
+    DropdownWithModal,
+    HlmButton,
+    NgIcon,
+    HlmDropdownMenuImports
+  ],
+  providers: [provideIcons({ lucideX, lucideChevronDown })],
   templateUrl: './filter.html',
   styleUrl: './filter.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -111,12 +131,13 @@ export class Filter<T extends object> {
         : value as PaymentType) as T[keyof T]);
   }
 
-  onCategoryToggle(category: string, checked: boolean) {
+  onCategoryToggle(category: string) {
     const current = (this.filters() as Record<string, unknown>)['category'] as string[] ?? [];
-    this.setFilter('category' as keyof T, (checked
-      ? [...current, category]
-      : current.filter(c => c !== category)) as T[keyof T]
-    );
+    const next = current.includes(category)
+        ? current.filter(c => c !== category)
+        : [...current, category];
+    
+    this.setFilter('category' as keyof T, next as T[keyof T]);
   }
 
   onStartDateChange(value: string | Date | null) {
