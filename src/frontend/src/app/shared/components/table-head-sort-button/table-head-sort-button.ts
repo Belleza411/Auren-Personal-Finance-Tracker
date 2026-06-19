@@ -10,6 +10,7 @@ import { Transaction } from 'src/app/features/transactions/models/transaction.mo
   providers: [provideIcons({ lucideMoveUp, lucideMoveDown })],
   template: `
     <button 
+      class="flex items-center justify-center gap-1"
       hlmBtn 
       size="icon" 
       variant="ghost"
