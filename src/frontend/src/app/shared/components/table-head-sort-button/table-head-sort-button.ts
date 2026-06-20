@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMoveUp, lucideMoveDown  } from '@ng-icons/lucide';
+import { lucideArrowUp, lucideArrowDown  } from '@ng-icons/lucide';
 import { HeaderContext, injectFlexRenderContext } from '@tanstack/angular-table';
 import { Transaction } from 'src/app/features/transactions/models/transaction.model';
 
 @Component({
   selector: 'app-table-head-sort-button',
   imports: [NgIcon],
-  providers: [provideIcons({ lucideMoveUp, lucideMoveDown })],
+  providers: [provideIcons({ lucideArrowUp, lucideArrowDown })],
   template: `
     <button 
       class="flex items-center justify-center gap-1"
@@ -15,13 +15,14 @@ import { Transaction } from 'src/app/features/transactions/models/transaction.mo
       size="icon" 
       variant="ghost"
       (click)="context.column.getToggleSortingHandler()?.($event)"
-    >
+    > 
       {{ header() }}
       <ng-icon [name]="context.column.getIsSorted() === 'asc' 
-        ? 'lucideMoveUp' 
+        ? 'lucideArrowUp' 
         : context.column.getIsSorted() === 'desc' 
-        ? 'lucideMoveDown'
-        : 'lucideMoveDown'" 
+        ? 'lucideArrowDown'
+        : 'lucideArrowDown'" 
+        size="1rem"
       />
     </button>
   `,

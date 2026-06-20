@@ -8,7 +8,7 @@ import { TransactionType } from 'src/app/features/transactions/models/transactio
   imports: [UpperCasePipe, TransactionTypeColorPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p class="text-[0.6rem] inline-flex items-center px-2 py-1 rounded-full font-medium"
+    <p class="text-[0.8rem] inline-flex items-center px-2 py-1 rounded-full font-medium"
        [class]="type() | transactionTypeColor:true">
       {{ type() | uppercase }}
     </p>

@@ -35,6 +35,7 @@ import { TableHeadSortButton } from 'src/app/shared/components/table-head-sort-b
 import { TableHeadSelection } from 'src/app/shared/components/table-head-selection/table-head-selection';
 
 import { TransactionTypeBadge } from 'src/app/shared/components/transaction-type-badge/transaction-type-badge';
+import { TransactionAmountBadge } from 'src/app/shared/components/transaction-amount-badge/transaction-amount-badge';
 
 declare module '@tanstack/angular-table' {
   interface TableMeta<TData extends RowData> {
@@ -113,17 +114,17 @@ export class TransactionTable {
     {
 			accessorKey: 'amount',
 			id: 'amount',
-			header: '<p>Amount</p>',
-			enableSorting: false,
+			header: () => flexRenderComponent(TableHeadSortButton, { inputs: { header: 'Amount' } }),
 			cell: info => {
-				const amount = parseFloat(info.getValue<string>());
-				const formatted = new Intl.NumberFormat('en-US', {
-					style: 'currency',
-					currency: 'USD',
-				}).format(amount);
-
-				return `<p>${formatted}</p>`;
-			},
+				return flexRenderComponent(TransactionAmountBadge,
+          { 
+            inputs: { 
+              type: info.row.original.transactionType,
+              amount: parseFloat(info.getValue<string>())
+            } 
+          }
+        )
+			}
 		},
     {
       accessorKey: 'createdAt',
