@@ -136,7 +136,10 @@ export class TransactionTable {
       accessorKey: 'paymentType',
       id: 'paymentType',
       header: () => flexRenderComponent(TableHeadSortButton, { inputs: { header: 'Payment Method' } }),
-      cell: info => `<p>${info.getValue<string>()}</p>`
+      cell: info => {
+        const value = info.getValue<string>().replace(/([A-Z])/g, ' $1').trim();
+        return `<p>${value}</p>`;
+      }
     },
     {
 			id: 'actions',
