@@ -13,6 +13,7 @@ import { DASHBOARD_SUMMARY_INITIAL_DATA, EXPENSE_BREAKDOWN_INITIAL_DATA, INCOME_
 import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
 import { TimePeriodService } from '../../../../core/services/time-period.service';
 import { ArrowIconByPercentageChangePipe } from '../../pipes/arrow-icon-by-percentage.pipe';
+import { HlmSelectImports } from '@spartan-ng/helm/select';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,7 +24,8 @@ import { ArrowIconByPercentageChangePipe } from '../../pipes/arrow-icon-by-perce
     IncomeVsExpenseGraph,
     ExpenseBreakdownChart,
     PercentageBgColorPipe,
-    ArrowIconByPercentageChangePipe
+    ArrowIconByPercentageChangePipe,
+    HlmSelectImports
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -75,14 +77,16 @@ export class DashboardComponent {
   isLoading = computed(() => this.dashboardResource.isLoading());
 
   selectedTimePeriod = this.selectedTimePeriodSignal;
-
-  onTimePeriodChange(e: Event) {
-    this.timePeriodService.setTimePeriod(
-      Number((e.target as HTMLSelectElement).value) as TimePeriod
-    );
-  }
-
+  
   onAddTransaction(): void {
       this.router.navigate(['/transactions', 'create']);
   }
+
+  onTimePeriodChange(value: string | null | undefined) {
+    if (!value) return;
+    this.timePeriodService.setTimePeriod(+value as unknown as TimePeriod);
+  } 
+
+  timePeriodToString = (value: string): string =>
+    this.timePeriodOptions.find(o => o.value.toString() === value)?.label ?? '';
 }

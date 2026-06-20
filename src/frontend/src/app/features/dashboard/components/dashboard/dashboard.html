@@ -5,19 +5,24 @@
     </div>
     <div class="center gap-3 sm:ml-auto">
         <div>
-            <select 
-                class="py-2 pl-2 pr-14 rounded-md border border-[#c5c5c5] border-solid text-white"
-                (change)="onTimePeriodChange($event)"
+            <hlm-select
+                [value]="selectedTimePeriod().toString()"
+                (valueChange)="onTimePeriodChange($event)"
+                [itemToString]="timePeriodToString"
             >
-                @for(option of timePeriodOptions; track option.value) {
-                    <option 
-                        class="text-black"
-                        [value]="option.value" [selected]="option.value === selectedTimePeriod()"
-                    >
-                        {{ option.label }}
-                    </option>
-                }
-            </select>
+                <hlm-select-trigger class="w-full text-white">
+                    <hlm-select-value />
+                </hlm-select-trigger>
+                <hlm-select-content *hlmSelectPortal>
+                    <hlm-select-group>
+                        @for (option of timePeriodOptions; track option.value) {
+                            <hlm-select-item [value]="option.value.toString()">
+                                {{ option.label }}
+                            </hlm-select-item>
+                        }
+                    </hlm-select-group>
+                </hlm-select-content>
+            </hlm-select>
         </div>
     </div>
 </header>
