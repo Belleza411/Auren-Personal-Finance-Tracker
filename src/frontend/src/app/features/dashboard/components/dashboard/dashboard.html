@@ -10,7 +10,7 @@
                 (valueChange)="onTimePeriodChange($event)"
                 [itemToString]="timePeriodToString"
             >
-                <hlm-select-trigger class="w-full text-white">
+                <hlm-select-trigger class="w-48 text-white">
                     <hlm-select-value />
                 </hlm-select-trigger>
                 <hlm-select-content *hlmSelectPortal>
@@ -64,15 +64,12 @@
     <app-summary-card class="col-span-2 flex flex-col gap-3">
         <div class="flex items-center justify-between">
             <p class="text-[1.15rem] font-medium">Recent Transaction</p>
-            <a 
-                routerLink="/transactions"
-                class="bg-[#1c4532] text-white rounded-sm py-1 pl-3 pr-1 flex items-center text-[0.75rem]"
-            >
-                View More
-                <span class="material-symbols-rounded text-xs ml-0.5">
-                    chevron_right
-                </span>
-            </a>
+            <button hlmBtn variant="outline" class="bg-[#1c4532] text-white">
+                <a routerLink="/transactions" class="flex items-center text-[0.75rem]">
+                    View More
+                </a>
+                <ng-icon name="lucideChevronRight" size="1.2rem" />
+            </button>
         </div>
         @if(recentTransactions().length !== 0) {
             <app-transaction-table

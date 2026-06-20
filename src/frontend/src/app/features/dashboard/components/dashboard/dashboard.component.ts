@@ -14,6 +14,9 @@ import { PercentageBgColorPipe } from '../../pipes/percentage-bg-color.pipe';
 import { TimePeriodService } from '../../../../core/services/time-period.service';
 import { ArrowIconByPercentageChangePipe } from '../../pipes/arrow-icon-by-percentage.pipe';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideChevronRight } from '@ng-icons/lucide';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,8 +28,11 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
     ExpenseBreakdownChart,
     PercentageBgColorPipe,
     ArrowIconByPercentageChangePipe,
-    HlmSelectImports
+    HlmSelectImports,
+    HlmButtonImports,
+    NgIcon    
   ],
+  providers: [provideIcons({ lucideChevronRight })],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush

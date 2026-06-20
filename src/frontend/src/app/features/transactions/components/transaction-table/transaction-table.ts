@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
-import { Router } from '@angular/router';
 import { 
 	HlmTable,
 	HlmTableContainer,
