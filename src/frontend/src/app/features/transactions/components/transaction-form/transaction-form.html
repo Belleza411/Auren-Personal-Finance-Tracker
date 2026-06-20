@@ -5,118 +5,145 @@
     {{ isEdit() ? 'Edit your' : 'Add a new' }} transaction to track your finances
 </p>
 <form class="flex flex-col gap-5" (submit)="onSubmit($event)">
-    <div class="flex flex-col gap-1">
-        <label for="type">Transaction Type</label>
-        <div class="flex gap-4">    
-            <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
-                <input 
-                    type="radio" 
-                    value="Income"
-                    [formField]="transactionForm.transactionType">
-                Income
-            </label>
-            <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
-                <input 
-                    type="radio" 
-                    value="Expense"
-                    [formField]="transactionForm.transactionType">
-                Expense
-            </label>
-        </div>
-        @if(fieldErrors.transactionType()) {
-            <ul class="error-list">
-                @for(error of transactionForm.transactionType().errors(); track error.kind) {
-                    <li>{{ error.message }}</li>
+    <hlm-field-group>
+        <hlm-field class="flex flex-col gap-1">
+            <label hlmFieldLabel for="type">Transaction Type</label>
+            <div class="flex gap-4">    
+                <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
+                    <input 
+                        type="radio" 
+                        value="Income"
+                        [formField]="transactionForm.transactionType">
+                    Income
+                </label>
+                <label class="center flex-1 gray-border py-2 gap-1 cursor-pointer">
+                    <input 
+                        type="radio" 
+                        value="Expense"
+                        [formField]="transactionForm.transactionType">
+                    Expense
+                </label>
+            </div>
+            @if(fieldErrors.transactionType()) {
+                <ul class="error-list">
+                    @for(error of transactionForm.transactionType().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </hlm-field>
+        <hlm-field [forceInvalid]="fieldErrors.name()">
+            <label hlmFieldLabel for="name">Name</label>
+            <input 
+                hlmInput
+                type="text"
+                [formField]="transactionForm.name">
+            <hlm-field-error>
+                @if(fieldErrors.name()) {
+                    <ul class="error-list">
+                        @for(error of transactionForm.name().errors(); track error.kind) {
+                            <li>{{ error.message }}</li>
+                        }
+                    </ul>
                 }
-            </ul>
-        }
-    </div>
-    <p>
-        <label for="name">Name</label>
+            </hlm-field-error>           
+        </hlm-field>
+    </hlm-field-group>
+    <hlm-field [forceInvalid]="fieldErrors.amount()">
+        <label hlmFieldLabel for="amount">Amount</label>
         <input 
-            type="text"
-            [formField]="transactionForm.name"
-            [class.error]="fieldErrors.name()">
-        @if(fieldErrors.name()) {
-            <ul class="error-list">
-                @for(error of transactionForm.name().errors(); track error.kind) {
-                    <li>{{ error.message }}</li>
-                }
-            </ul>
-        }
-    </p>
-    <p>
-        <label for="amount">Amount</label>
-        <input 
+            hlmInput
             type="number" 
             step="0.01" 
             inputmode="decimal"
             placeholder="0.00"
-            [formField]="transactionForm.amount"
-            [class.error]="fieldErrors.amount()">
-        @if(fieldErrors.amount()) {
+            [formField]="transactionForm.amount">
+        <hlm-field-error>
+            @if(fieldErrors.amount()) {
+                <ul class="error-list">
+                    @for(error of transactionForm.amount().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </hlm-field-error>      
+    </hlm-field>
+    <hlm-field [forceInvalid]="fieldErrors.category()">
+        <label hlmFieldLabel for="category">Category</label>
+        <hlm-select 
+            [value]="transactionForm.category().value() || undefined"
+            [itemToString]="categoryToString"
+            (valueChange)="onCategoryChange($event)"
+        >
+            <hlm-select-trigger [forceInvalid]="fieldErrors.category()" class="w-full">
+                <hlm-select-value placeholder="Select a category" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+                <hlm-select-group>
+                    @for (c of categories(); track c.id) {
+                        <hlm-select-item [value]="c.id">{{ c.name }}</hlm-select-item>
+                    }
+                </hlm-select-group> 
+            </hlm-select-content>
+        </hlm-select>
+        <hlm-field-error>
+            @if(fieldErrors.category()) {
+                <ul class="error-list">
+                    @for(error of transactionForm.category().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </hlm-field-error>
+    </hlm-field>
+    <hlm-field [forceInvalid]="fieldErrors.transactionDate()">
+        <label hlmFieldLabel for="transaction-date">Date</label>
+        <hlm-date-picker [(date)]="selectedDate">
+            <hlm-date-picker-trigger class="w-full">
+                {{ selectedDate() ? selectedDate()!.toLocaleDateString() : 'Pick a date' }}
+            </hlm-date-picker-trigger>
+        </hlm-date-picker>
+        <hlm-field-error>
+            @if(fieldErrors.transactionDate()) {
+                <ul class="error-list">
+                    @for(error of transactionForm.transactionDate().errors(); track error.kind) {
+                        <li>{{ error.message }}</li>
+                    }
+                </ul>
+            }
+        </hlm-field-error>
+    </hlm-field>
+    <hlm-field [forceInvalid]="fieldErrors.paymentType()">
+        <label for="payment-type">Payment Method</label>
+        <hlm-select
+            [value]="transactionForm.paymentType().value() || undefined"
+            [itemToString]="paymentTypeToString"
+            (valueChange)="onPaymentTypeChange($event)"
+        >
+            <hlm-select-trigger [forceInvalid]="fieldErrors.paymentType()" class="w-full">
+                <hlm-select-value placeholder="Select a category" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+                <hlm-select-group>
+                    @for(type of paymentTypes; track type.value) {
+                        <hlm-select-item [value]="type.value">{{ type.label }}</hlm-select-item>
+                    }
+                </hlm-select-group> 
+            </hlm-select-content>
+        </hlm-select>
+    </hlm-field>
+   <hlm-field-error>
+        @if(fieldErrors.paymentType()) {
             <ul class="error-list">
-                @for(error of transactionForm.amount().errors(); track error.kind) {
+                @for(error of transactionForm.paymentType().errors(); track error.kind) {
                     <li>{{ error.message }}</li>
                 }
             </ul>
         }
-    </p>
-    <p>
-        <label for="category">Category</label>
-        <select [formField]="transactionForm.category" [class.error]="fieldErrors.category()">
-            @if(!isEdit()) {
-                <option value="" disabled>Select a category</option>
-            }
-            @for(category of categories(); track category.id) {
-                <option [value]="category.id">
-                    {{ category.name }}
-                </option>
-            }
-        </select>
-        @if(fieldErrors.category()) {
-            <ul class="error-list">
-                @for(error of transactionForm.category().errors(); track error.kind) {
-                    <li>{{ error.message }}</li>
-                }
-            </ul>
-        }
-    </p>
-    <p>
-        <label for="transaction-date">Date</label>
-        <input 
-            [formField]="transactionForm.transactionDate"
-            [class.error]="fieldErrors.transactionDate()"
-            (input)="transactionForm.transactionDate()"
-            type="date">
-        @if(fieldErrors.transactionDate()) {
-            <ul class="error-list">
-                @for(error of transactionForm.transactionDate().errors(); track error.kind) {
-                    <li>{{ error.message }}</li>
-                }
-            </ul>
-        }
-    </p>
-    <p>
-       <label for="payment-type">Payment Method</label>
-       <select 
-            [formField]="transactionForm.paymentType"
-            [class.error]="fieldErrors.paymentType()"
-       >
-        @for(type of paymentTypes; track type.value) {
-            <option [value]="type.value">{{ type.label }}</option>
-        }
-       </select> 
-    </p>
-    @if(fieldErrors.paymentType()) {
-        <ul class="error-list">
-            @for(error of transactionForm.paymentType().errors(); track error.kind) {
-                <li>{{ error.message }}</li>
-            }
-        </ul>
-    }
+    </hlm-field-error>
     <button 
-        class="bg-(--bg-main-color) text-white border-0 py-[0.8rem] rounded-lg cursor-pointer"
+        hlmBtn
+        class="bg-(--bg-main-color)"
         type="submit" 
         [disabled]="isLoading() || transactionForm().invalid()"
     >

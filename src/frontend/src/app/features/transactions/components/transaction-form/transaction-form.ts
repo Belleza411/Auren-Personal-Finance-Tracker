@@ -1,13 +1,37 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { form, FormField, required, submit, validate } from '@angular/forms/signals';
 
-import { NewTransaction } from '../../models/transaction.model';
+import { NewTransaction, PaymentType } from '../../models/transaction.model';
 import { Category } from '../../../categories/models/categories.model';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
+import { HlmInput } from './../../../../libs/ui/input/src';
+import { HlmButton } from './../../../../libs/ui/button/src';
+import { 
+  HlmField,
+	HlmFieldError,
+	HlmFieldGroup,
+	HlmFieldLabel,
+} from './../../../../libs/ui/field/src';
+import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { 
+  HlmDatePicker,
+  HlmDatePickerTrigger
+} from './../../../../libs/ui/date-picker/src';
 
 @Component({
   selector: 'app-transaction-form',
-  imports: [FormField],
+  imports: [
+    FormField,
+    HlmInput,
+    HlmButton,
+    HlmField,
+    HlmFieldError,
+    HlmFieldGroup,
+    HlmFieldLabel,
+    HlmSelectImports,
+    HlmDatePicker,
+    HlmDatePickerTrigger
+  ],
   templateUrl: './transaction-form.html',
   styleUrls: ['./transaction-form.css', '../../../../shared/styles/form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,6 +51,8 @@ export class TransactionForm {
     { value: 'BankTransfer', label: 'Bank Transfer' },
     { value: 'Other', label: 'Other' }
   ];
+
+  selectedDate = signal<Date | undefined>(undefined);
 
   private readonly modelSignal = signal({} as NewTransaction);
   protected readonly transactionForm = form(this.modelSignal, schema => {
@@ -68,7 +94,17 @@ export class TransactionForm {
 
   constructor() {
     effect(() => {
-      this.modelSignal.set(this.model());
+        this.modelSignal.set(this.model());
+        const date = this.model().transactionDate;
+        if (date) this.selectedDate.set(new Date(date));
+    });
+
+    effect(() => {
+      const date = this.selectedDate();
+      if (!date) return;
+      const formatted = date.toISOString().split('T')[0];
+      if (this.modelSignal().transactionDate === formatted) return;
+      this.modelSignal.update(m => ({ ...m, transactionDate: formatted }));
     });
   }
 
@@ -104,4 +140,20 @@ export class TransactionForm {
     paymentType:     () => this.transactionForm.paymentType(),
     transactionDate: () => this.transactionForm.transactionDate()
   });
+
+  onCategoryChange(id: string | null | undefined) {
+    if (!id) return;
+    this.modelSignal.update(m => ({ ...m, category: id }));
+  }
+
+  onPaymentTypeChange(value: string | null | undefined) {
+    if (!value) return;
+    this.modelSignal.update(m => ({ ...m, paymentType: value as PaymentType }));
+}
+
+  categoryToString = (id: string): string => 
+    this.categories().find(c => c.id === id)?.name ?? '';
+
+  paymentTypeToString = (value: string): string =>
+    this.paymentTypes.find(t => t.value === value)?.label ?? '';
 }
