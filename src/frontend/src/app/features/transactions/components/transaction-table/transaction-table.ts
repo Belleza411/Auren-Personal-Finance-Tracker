@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { Transaction, TransactionType } from '../../models/transaction.model';
-import { COMPACT_TRANSACTION_COLUMNS, FULL_TRANSACTION_COLUMNS } from '../../models/transaction-column.model';
 import { 
 	HlmTable,
 	HlmTableContainer,
@@ -58,20 +57,11 @@ declare module '@tanstack/angular-table' {
   templateUrl: './transaction-table.html',
   styleUrl: './transaction-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '[class.compact]': "variant() === 'compact'"
-  }
+
 })
 export class TransactionTable {
   transactions = input.required<Transaction[]>();
   isLoading = input<boolean>();
-  variant = input<'full' | 'compact'>('full');
-
-  columns = computed(() =>
-    this.variant() === 'compact'
-      ? COMPACT_TRANSACTION_COLUMNS
-      : FULL_TRANSACTION_COLUMNS
-  );
 
   private readonly _columnFilters = signal<ColumnFiltersState>([]);
 	private readonly _sorting = signal<SortingState>([]);

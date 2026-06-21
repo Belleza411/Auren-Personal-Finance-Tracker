@@ -4,10 +4,6 @@
     @apply flex flex-col gap-4
 }
 
-:host(.compact) {
-    @apply border-0 p-0 bg-transparent rounded-none;
-}
-
 th {
     @apply text-left text-[0.8rem] tracking-wider py-3 px-4 whitespace-nowrap;
 }
