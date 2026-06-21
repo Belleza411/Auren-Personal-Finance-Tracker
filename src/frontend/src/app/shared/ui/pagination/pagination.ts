@@ -1,8 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { 
+  HlmField,
+	HlmFieldError,
+	HlmFieldGroup,
+	HlmFieldLabel,
+} from './../../../libs/ui/field/src'
 
 @Component({
   selector: 'app-pagination',
-  imports: [],
+  imports: [HlmSelectImports, HlmFieldLabel],
   templateUrl: './pagination.html',
   styleUrl: './pagination.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -75,9 +82,8 @@ export class PaginationComponent {
     }
   }
 
-  onPageSizeChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const newSize = parseInt(target.value, 10);
-    this.pageSizeChange.emit(newSize);
+  onPageSizeChange(value: string | null | undefined): void {
+      if (!value) return;
+      this.pageSizeChange.emit(+value);
   }
 }

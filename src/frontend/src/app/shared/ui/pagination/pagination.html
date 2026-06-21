@@ -5,16 +5,22 @@
 </div>
 <div class="flex flex-col lg:w-full lg:ml-auto lg:justify-end sm:flex-row gap-3">
     <div class="flex items-center mr-4">
-        <label for="per-size" class="text-[0.8rem] mr-1.5 font-medium whitespace-nowrap">Rows Per Page: </label>
-        <select 
-            [value]="pageSize()" 
-            (change)="onPageSizeChange($event)"
-            class="border border-solid border-[#c5c5c5] rounded-md py-1 px-2"
+        <label hlmFieldLabel for="per-size" class="text-[0.8rem] mr-1.5 font-medium whitespace-nowrap">Rows Per Page: </label>
+        <hlm-select 
+            [value]="pageSize().toString()" 
+            (valueChange)="onPageSizeChange($event)"
         >
-            @for (size of pageSizeOptions(); track size) {
-                <option [value]="size">{{ size }}</option>
-                }
-        </select>
+            <hlm-select-trigger>
+                <hlm-select-value placeholder="Select a category" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+                <hlm-select-group>
+                    @for (size of pageSizeOptions(); track size) {
+                        <hlm-select-item [value]="size.toString()">{{ size }}</hlm-select-item>
+                    }
+                </hlm-select-group>
+            </hlm-select-content>
+        </hlm-select>
     </div>
     <div class="flex gap-2">
         <button
