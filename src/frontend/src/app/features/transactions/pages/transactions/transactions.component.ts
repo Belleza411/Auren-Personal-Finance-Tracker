@@ -58,7 +58,7 @@ export class TransactionComponent {
     id = input<string | null>(null);
     
     config = signal<FilterKindConfig<TransactionFilter>[]>(TRANSACTION_FILTER_KIND_CONFIG);
-    private pagination = signal({ pageNumber: 1, pageSize: 10});
+    protected pagination = signal({ pageNumber: 1, pageSize: 10});
 
     rawFilters = signal<TransactionFilter>({
         searchTerm: '',
@@ -133,6 +133,8 @@ export class TransactionComponent {
                 this.tryOpenDialog();
             }
         });
+
+        console.log(this.pagination().pageSize);
     }
 
     private tryOpenDialog(): void {
@@ -266,7 +268,7 @@ export class TransactionComponent {
         this.onPageChange(1);
     }
 
-    onPageSizeChange(size: number) {
+    onPageSizeChange(size: number) {    
         this.pagination.set({ pageNumber: 1, pageSize: size }); 
     }
 
@@ -274,3 +276,4 @@ export class TransactionComponent {
         this.pagination.update(p => ({ ...p, pageNumber: page }));
     }
 }
+ 
