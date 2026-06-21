@@ -37,7 +37,6 @@ import { SlidePanelService } from '../../../../core/services/slide-panel.service
 import { AlertService } from 'src/app/core/services/alert.service';
 import { HlmButton } from './../../../../libs/ui/button/src'
 
-
 @Component({
   selector: 'app-transaction',
   imports: [TransactionTable, Filter, PaginationComponent, HlmButton, NgIcon],

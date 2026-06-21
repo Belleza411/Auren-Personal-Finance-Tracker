@@ -4,14 +4,14 @@
         <p class="text-white text-sm">Create and manage your categories</p>
     </div>
     <div class="center">
-        <button 
-            class="center border-0 text-white bg-[#00753f] text-sm py-1.5 px-4 rounded-md font-extralight cursor-pointer whitespace-nowrap"
+       <button 
+            hlmBtn
+            variant="ghost" 
+            class="bg-[#00753f] text-white"
             (click)="onAddCategory()"
         >
             Add Category
-            <span class="material-symbols-rounded text-xl ml-2">
-                add
-            </span>
+            <ng-icon name="lucidePlus" size="1.2rem" />
         </button>
     </div>
 </header>

@@ -24,10 +24,14 @@ import { Filter } from "../../../../shared/ui/filters/filter/filter";
 import { PaginationComponent } from "../../../../shared/ui/pagination/pagination";
 import { TimePeriod } from '../../../../core/models/time-period.enum';
 import { AlertService } from 'src/app/core/services/alert.service';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { NgIcon, provideIcons } from "@ng-icons/core";
+import { lucidePlus } from '@ng-icons/lucide';
 
 @Component({
   selector: 'app-categories',
-  imports: [CategoryTable, Filter, PaginationComponent],
+  imports: [CategoryTable, Filter, PaginationComponent, HlmButtonImports, NgIcon],
+  providers: [provideIcons({ lucidePlus})],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

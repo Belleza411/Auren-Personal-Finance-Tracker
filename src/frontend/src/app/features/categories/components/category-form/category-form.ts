@@ -2,10 +2,25 @@ import { ChangeDetectionStrategy, Component, effect, input, output, signal } fro
 import { NewCategory } from '../../models/categories.model';
 import { form, required, submit, FormField } from '@angular/forms/signals';
 import { createFieldErrors } from '../../../../shared/utils/form-errors.util';
-
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmInput } from './../../../../libs/ui/input/src';
+import { 
+  HlmField,
+	HlmFieldError,
+	HlmFieldGroup,
+	HlmFieldLabel,
+} from './../../../../libs/ui/field/src';
 @Component({
   selector: 'app-category-form',
-  imports: [FormField],
+  imports: [
+    FormField,
+    HlmButtonImports,
+    HlmInput,
+    HlmField,
+    HlmFieldError,
+    HlmFieldGroup,
+    HlmFieldLabel,
+  ],
   templateUrl: './category-form.html',
   styleUrls: ['./category-form.css', '../../../../shared/styles/form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
