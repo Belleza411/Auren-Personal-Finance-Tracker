@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from "@angular/router";
-import { ProfileComponent } from "../../../features/profile/profile/profile";
+import { ProfileComponent } from "../../../features/profile/profile-popover/profile";
 import { NAVBAR_MENU } from './navbar-menu';
 import { BreakpointObserver } from '@angular/cdk/layout';
 

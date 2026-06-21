@@ -3,8 +3,14 @@ import { ProfileService } from '../service/profile.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserResponse } from '../models/profile.model';
 import { AuthService } from '../../../core/auth/service/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HlmAvatar, HlmAvatarFallback, HlmAvatarImage } from "../../../libs/ui/avatar/src";
+import { HlmPopoverImports } from '@spartan-ng/helm/popover';
+import { BrnPopoverContent } from '@spartan-ng/brain/popover';
+import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
+import { lucideChevronDown, lucideLogOut, lucideUser, lucideSettings } from '@ng-icons/lucide';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 
 @Component({
   selector: 'app-profile',
@@ -12,7 +18,14 @@ import { HlmAvatar, HlmAvatarFallback, HlmAvatarImage } from "../../../libs/ui/a
     HlmAvatar,
     HlmAvatarFallback,
     HlmAvatarImage, 
+    HlmPopoverImports,
+    BrnPopoverContent,
+    HlmSeparatorImports,
+    NgIcon,
+    RouterLink,
+    HlmButtonImports
   ],
+  providers: [provideIcons({ lucideChevronDown, lucideLogOut, lucideUser, lucideSettings })],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
