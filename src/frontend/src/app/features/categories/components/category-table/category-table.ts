@@ -91,7 +91,6 @@ export class CategoryTable {
     columns: this._columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,
     onSortingChange: (updater) => {
