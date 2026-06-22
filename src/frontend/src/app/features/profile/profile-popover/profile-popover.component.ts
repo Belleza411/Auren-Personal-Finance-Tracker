@@ -26,10 +26,10 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
     HlmButtonImports
   ],
   providers: [provideIcons({ lucideChevronDown, lucideLogOut, lucideUser, lucideSettings })],
-  templateUrl: './profile.html',
-  styleUrl: './profile.css',
+  templateUrl: './profile-popover.html',
+  styleUrl: './profile-popover.css',
 })
-export class ProfileComponent implements OnInit {
+export class ProfilePopover implements OnInit {
   private profileService = inject(ProfileService);
   private readonly authSer = inject(AuthService);
   private readonly router = inject(Router);
