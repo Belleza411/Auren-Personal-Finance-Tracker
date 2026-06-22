@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { DashboardComponent } from "../../features/dashboard/components/dashboard/dashboard.component";
 import { authGuard } from "../auth/guards/auth.guard";
+import { Profile } from "src/app/features/profile/pages/profile/profile";
 
 export const mainRoutes: Routes = [
     {
@@ -19,5 +20,10 @@ export const mainRoutes: Routes = [
         canActivate: [authGuard],
         loadChildren: () => import('../../features/categories/routes/category-route')
             .then(m => m.categoryRoutes)
+    },
+    {
+        path: 'profile',
+        canActivate: [authGuard],
+        component: Profile
     }
 ]

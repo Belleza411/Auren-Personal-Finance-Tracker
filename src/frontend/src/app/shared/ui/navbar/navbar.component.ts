@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { NAVBAR_MENU } from './navbar-menu';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { ProfilePopover } from "src/app/features/profile/profile-popover/profile-popover.component";
+import { ProfilePopover } from "src/app/features/profile/components/profile-popover/profile-popover.component";
 
 @Component({
   selector: 'app-navbar',

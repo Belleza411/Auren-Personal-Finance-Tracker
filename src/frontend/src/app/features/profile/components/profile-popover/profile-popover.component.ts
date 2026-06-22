@@ -1,16 +1,18 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { ProfileService } from '../service/profile.service';
+import { ProfileService } from '../../service/profile.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { UserResponse } from '../models/profile.model';
-import { AuthService } from '../../../core/auth/service/auth.service';
+import { UserResponse } from '../../models/profile.model';
+import { AuthService } from '../../../../core/auth/service/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { HlmAvatar, HlmAvatarFallback, HlmAvatarImage } from "../../../libs/ui/avatar/src";
+import { HlmAvatar, HlmAvatarFallback, HlmAvatarImage } from "../../../../libs/ui/avatar/src";
 import { HlmPopoverImports } from '@spartan-ng/helm/popover';
 import { BrnPopoverContent } from '@spartan-ng/brain/popover';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
 import { lucideChevronDown, lucideLogOut, lucideUser, lucideSettings } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { stringToColor } from '../../utils/stringToColor';
+import { getInitials } from '../../utils/getInitials';
 
 @Component({
   selector: 'app-profile',
@@ -43,8 +45,8 @@ export class ProfilePopover implements OnInit {
     return user ? `${user.firstName} ${user.lastName}` : 'Guest';
   });
 
-  readonly bgColor = computed(() => this.stringToColor(this.fullName()));
-  readonly initials = computed(() => this.getInitials(this.fullName()));
+  readonly bgColor = computed(() => stringToColor(this.fullName()));
+  readonly initials = computed(() => getInitials(this.fullName()));
 
   isOpen = signal(false);
   toggle() {
@@ -72,34 +74,5 @@ export class ProfilePopover implements OnInit {
         next: val => this.user.set(val),
         error: err => console.error("Failed to get profile: ", err)
       })
-  }
-
-  stringToColor(str: string): string {
-    let hash = 0;
-
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += value.toString(16).padStart(2, '0');
-    }
-
-    return color;
-  }
-
-  getInitials(fullName: string) {
-    const words = fullName
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-
-    if(words.length === 0) return ''
-
-    if (words.length === 1) return words[0][0].toUpperCase();
-    
-    return (words[0][0] + words[1][0]).toUpperCase();
   }
 }

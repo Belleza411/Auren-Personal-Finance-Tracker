@@ -1,0 +1,137 @@
+<header class="flex flex-col mb-6">
+    <h2 class="text-3xl text-white font-bold">Profile</h2>
+    <p class="text-white text-sm">Manage your personal account information</p>
+</header>
+
+<form class="flex flex-col gap-6" (submit)="onSubmit($event)">
+    <hlm-card>
+        <hlm-card-header>
+            <div class="flex items-center gap-4">
+                <hlm-avatar class="size-20">
+                    @if (user()?.profilePictureUrl) {
+                        <img hlmAvatarImage [src]="user()?.profilePictureUrl" [alt]="fullName()" />
+                    }
+                    <span hlmAvatarFallback [style.backgroundColor]="bgColor()" class="text-2xl font-medium">
+                        {{ initials() }}
+                    </span>
+                </hlm-avatar>
+                <div class="flex gap-2">
+                    <button hlmBtn type="button" variant="outline" (click)="onChangePicture()">
+                        @if(user()?.profilePictureUrl !== null) {
+                            Change Photo
+                        } @else {
+                            <ng-icon name="lucideUpload" size="1.1rem" />
+                            Upload Photo
+                        }
+                    </button>
+                    <button hlmBtn type="button" variant="ghost" (click)="onDeletePicture()">
+                        Remove
+                    </button>
+                </div>
+                <div class="flex gap-2 ml-auto">
+                    @if (isEditing()) {
+                        <button hlmBtn variant="outline" type="button" (click)="onCancel()">Cancel</button>
+                        <button hlmBtn type="submit" [disabled]="isLoading()">
+                            @if (isLoading()) {
+                                <hlm-spinner />
+                            } @else {
+                                Save Changes
+                            }
+                        </button>
+                    } @else {
+                        <button hlmBtn variant="outline" type="button" (click)="onEdit()">
+                            <ng-icon name="lucidePencil" size="1rem" class="mr-1" />
+                            Edit Profile
+                        </button>
+                    }
+                </div>
+            </div>
+        </hlm-card-header>
+        <hlm-separator />
+        <div hlmCardContent>
+            <h3 class="font-semibold mb-4">Personal Information</h3>
+            <div class="grid grid-cols-2 gap-4 max-w-lg">
+                <hlm-field>
+                    <label hlmFieldLabel>First Name</label>
+                    <input 
+                        hlmInput 
+                        placeholder="First Name" 
+                        [value]="user()?.firstName ?? ''"
+                        [disabled]="!isEditing()" />
+                </hlm-field>
+                <hlm-field>
+                    <label hlmFieldLabel>Last Name</label>
+                    <input 
+                        hlmInput 
+                        placeholder="Last Name" 
+                        [value]="user()?.lastName ?? ''"
+                        [disabled]="!isEditing()" />
+                </hlm-field>
+                <hlm-field class="col-span-2">
+                    <label hlmFieldLabel>Email</label>
+                    <input 
+                        hlmInput 
+                        type="email"
+                        placeholder="Email" 
+                        [value]="user()?.email ?? ''"
+                        [disabled]="!isEditing()" />
+                </hlm-field>
+            </div>
+        </div>
+        <hlm-separator />
+        <div hlmCardContent>
+            <h3 class="font-semibold mb-4">Change Password</h3>
+            <div class="flex flex-col gap-4 max-w-lg">
+                <hlm-field>
+                    <label hlmFieldLabel>Current Password</label>
+                    <input 
+                        hlmInput 
+                        type="password" 
+                        placeholder="Current password"
+                        [disabled]="!isEditing()" />
+                </hlm-field>
+                <div class="grid grid-cols-2 gap-4">
+                    <hlm-field>
+                        <label hlmFieldLabel>New Password</label>
+                        <input 
+                            hlmInput 
+                            type="password" 
+                            placeholder="New password"
+                            [disabled]="!isEditing()" />
+                    </hlm-field>
+                    <hlm-field>
+                        <label hlmFieldLabel>Confirm Password</label>
+                        <input 
+                            hlmInput 
+                            type="password" 
+                            placeholder="Confirm password"
+                            [disabled]="!isEditing()" />
+                    </hlm-field>
+                </div>
+            </div>
+        </div>
+        <hlm-separator />
+        <div hlmCardContent>
+            <h3 class="font-semibold mb-4">Account Info</h3>
+            <div class="grid grid-cols-2 gap-2 max-w-lg text-sm">
+                <p class="text-gray-400">Member Since</p>
+                <p class="text-gray-400">Last Login</p>
+                <p class="font-medium">{{ user()?.createdAt ?? '—' }}</p>
+                <p class="font-medium">{{ user()?.lastLoginAt ?? '—' }}</p>
+            </div>
+        </div>
+        <hlm-separator />
+        <hlm-card-footer class="flex justify-between items-center">
+            <div>
+                <h3 class="font-semibold">Delete Account</h3>
+                <p class="text-sm text-gray-400">Permanently removes your account and all data</p>
+            </div>
+            <div class="flex gap-2">
+                <button hlmBtn variant="destructive" type="button" (click)="onDeleteAccount()">
+                    <ng-icon name="lucideTrash" size="1rem" class="mr-1" />
+                    Delete Account
+                </button>
+            </div>
+        </hlm-card-footer>
+    </hlm-card>
+</form>
