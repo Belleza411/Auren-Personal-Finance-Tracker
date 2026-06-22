@@ -1,11 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmCard, HlmCardContent } from './../../../../libs/ui/card/src'
-import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+ import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
-import { Router } from '@angular/router';
-import { AuthService } from 'src/app/core/auth/service/auth.service';
-import { UserResponse } from '../../models/profile.model';
+import { UserDto, UserResponse } from '../../models/profile.model';
 import { ProfileService } from '../../service/profile.service';
 import { getInitials } from '../../utils/getInitials';
 import { stringToColor } from '../../utils/stringToColor';
@@ -16,6 +13,10 @@ import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmSpinnerImports } from './../../../../libs/ui/spinner/src/index';
 import { lucideTrash, lucideUpload, lucidePencil } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
+import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { email, form, submit, FormField, disabled } from '@angular/forms/signals';
+import { AlertService } from 'src/app/core/services/alert.service';
+import { createFieldErrors } from 'src/app/shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-profile',
@@ -27,22 +28,59 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
     HlmInputImports,
     HlmFieldImports,
     HlmSpinnerImports,
-    NgIcon
-  ],
+    HlmSelectImports,
+    NgIcon,
+    FormField
+],
   providers: [provideIcons({ lucideTrash, lucideUpload, lucidePencil })],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Profile implements OnInit {
+export class Profile {
   private profileService = inject(ProfileService);
-  private readonly authSer = inject(AuthService);
-  private readonly router = inject(Router);
+  private alertService = inject(AlertService)
   private destroyRef = inject(DestroyRef);
+
+  currencyOptions = [
+    { value: 'USD', label: 'USD — US Dollar' },
+    { value: 'EUR', label: 'EUR — Euro' },
+    { value: 'GBP', label: 'GBP — British Pound' },
+    { value: 'NZD', label: 'NZD — New Zealand Dollar' },
+    { value: 'AUD', label: 'AUD — Australian Dollar' },
+  ];
+
+  readonly user = this.profileService.user;
 
   isEditing = signal(false)
   isLoading = signal(false)
-  user = signal<UserResponse | null>(null);
+  isPasswordLoading = signal(false);
+  selectedFile = signal<File | null>(null);
+  profilePreview = signal<string | null>(null);
+
+  protected profileModel = signal<UserDto>({
+    email: '',
+    firstName: '',
+    lastName: '',
+    profileImageUploadRequest: null,
+    currency: ''
+  })
+
+  protected profileForm = form(this.profileModel, schema => {
+    email(schema.email, { message: 'Enter a valid email'})
+
+    disabled(schema.firstName, { when: () => !this.isEditing()})
+    disabled(schema.lastName, { when: () => !this.isEditing()})
+    disabled(schema.email, { when: () => !this.isEditing()})
+    disabled(schema.currency, { when: () => !this.isEditing()})
+  })
+
+  protected readonly profilePictureUrl = computed(() => this.user()?.profilePictureUrl ?? null);
+  protected pendingProfileImage =   signal<File | null>(null);
+  protected previewUrl = computed(() => {
+    const file = this.pendingProfileImage();
+    return file ? URL.createObjectURL(file) : null;
+  });
 
   readonly email = computed(() => this.user()?.email ?? "guest@gmail.com")
   readonly fullName = computed(() => {
@@ -53,22 +91,56 @@ export class Profile implements OnInit {
   readonly bgColor = computed(() => stringToColor(this.fullName()));
   readonly initials = computed(() => getInitials(this.fullName()));
 
-  ngOnInit(): void {
-    this.profileService.getUserProfile()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: val => this.user.set(val),
-        error: err => console.error("Failed to get profile: ", err)
-      })
+  constructor() {
+    effect(() => {
+        const user = this.user();
+        if (!user) return;
+        this.profileModel.set({
+          email: user.email ?? '',
+          firstName: user.firstName ?? '',
+          lastName: user.lastName ?? '',
+          profileImageUploadRequest: null,
+          currency: "USD"
+        });
+    });
   }
 
   onSubmit(event: Event) {
     event.preventDefault();
     if (!this.isEditing()) return;
-    // save logic here
-    this.isEditing.set(false);
+    submit(this.profileForm, async () => {
+        this.isLoading.set(true);
+
+        const profile = this.profileModel();
+        const formData = new FormData();
+
+        formData.append('Email', profile.email ?? '');
+        formData.append('FirstName', profile.firstName ?? '');
+        formData.append('LastName', profile.lastName ?? '');
+        formData.append('Currency', profile.currency ?? '');
+
+        const file = profile.profileImageUploadRequest;
+        if (file && file?.file) {
+          formData.append('profilePictureUrl.file', file.file);
+          formData.append('profilePictureUrl.name', file.name ?? '');
+          formData.append('profilePictureUrl.description', file.description ?? '');
+        }
+
+        this.profileService.updateUser(formData)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+              next: () => {
+                this.pendingProfileImage.set(null);
+                this.isLoading.set(false);
+                this.isEditing.set(false);
+                this.alertService.success('Profile Information Updated', 'Updated Successfully');
+              },
+              error: () => {
+                this.isLoading.set(false);
+                this.alertService.error('Failed to update profile info', 'Update Failure');
+              }
+          });
+    });
   }
 
   onEdit() {
@@ -76,18 +148,49 @@ export class Profile implements OnInit {
   }
 
   onCancel() {
-      this.isEditing.set(false);
+    this.isEditing.set(false);
   }
 
-  onChangePicture() {
-      // trigger file input when ready
+  onChangePicture(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.pendingProfileImage.set(file);
+    this.profileModel.update(m => ({ 
+      ...m, 
+      profileImageUploadRequest: {
+        ...m.profileImageUploadRequest,
+        file: file,
+        name: m.profileImageUploadRequest?.name ?? '',
+        description: m.profileImageUploadRequest?.description ?? ''
+      }
+    }));
   }
 
   onDeletePicture() {
-      // call profile service to remove picture
+    this.pendingProfileImage.set(null);
+    this.profileModel.update(m => ({ ...m, profileImageUploadRequest: null }));
   }
 
   onDeleteAccount() {
       // show confirmation dialog before deleting
   }
+
+  onChangePassword(event: Event) {
+    event.preventDefault();
+    // wire to password change service when ready
+  }
+
+  currencyToString = (value: string): string =>
+    this.currencyOptions.find(c => c.value === value)?.label ?? '';
+
+  onCurrencyChange(value: string | null | undefined) {
+    if (!value) return;
+    this.profileModel.update(m => ({ ...m, currency: value }));
+  }
+
+  protected readonly fieldErrors = createFieldErrors({
+    email: () => this.profileForm.email(),
+    firstName: () => this.profileForm.firstName(),
+    lastName: () => this.profileForm.lastName()
+  })
 }

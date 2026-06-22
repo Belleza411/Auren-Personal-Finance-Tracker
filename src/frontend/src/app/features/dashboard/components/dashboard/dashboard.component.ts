@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+  import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { SummaryCard } from "../../../../shared/ui/summary-card/summary-card";
 import { Router, RouterLink } from "@angular/router";
 import { TransactionTable } from "../../../transactions/components/transaction-table/transaction-table";

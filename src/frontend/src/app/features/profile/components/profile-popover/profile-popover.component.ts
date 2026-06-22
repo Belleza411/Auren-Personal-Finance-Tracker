@@ -37,7 +37,7 @@ export class ProfilePopover implements OnInit {
   private readonly router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  user = signal<UserResponse | null>(null);
+  readonly user = this.profileService.user;
 
   readonly email = computed(() => this.user()?.email ?? "guest@gmail.com")
   readonly fullName = computed(() => {
@@ -47,11 +47,6 @@ export class ProfilePopover implements OnInit {
 
   readonly bgColor = computed(() => stringToColor(this.fullName()));
   readonly initials = computed(() => getInitials(this.fullName()));
-
-  isOpen = signal(false);
-  toggle() {
-    this.isOpen.update(v => !v);
-  }
 
   logout() {
     this.authSer.logout()
@@ -66,13 +61,6 @@ export class ProfilePopover implements OnInit {
   }
 
   ngOnInit(): void {
-    this.profileService.getUserProfile()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: val => this.user.set(val),
-        error: err => console.error("Failed to get profile: ", err)
-      })
-  }
+    this.profileService.loadProfile();
+  } 
 }
