@@ -1,6 +1,4 @@
 ﻿using Auren.Application.Categories.DTOs;
-using Auren.Application.Common.Specifications;
-using Auren.Application.Interfaces.Specification;
 using Auren.Application.Specifications.Common;
 using Auren.Application.Specifications.Transactions;
 using Auren.Domain.Entities;

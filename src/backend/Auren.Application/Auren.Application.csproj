@@ -24,6 +24,7 @@
     <Folder Include="Dashboard\Validators\" />
     <Folder Include="Auth\Commands\" />
     <Folder Include="Auth\Queries\" />
+    <Folder Include="Interfaces\Specification\" />
     <Folder Include="Profile\Commands\" />
     <Folder Include="Profile\Queries\" />
     <Folder Include="Transactions\Commands\" />

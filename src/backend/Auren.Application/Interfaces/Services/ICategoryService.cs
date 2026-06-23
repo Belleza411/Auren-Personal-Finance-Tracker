@@ -1,5 +1,5 @@
 ﻿using Auren.Application.Categories.DTOs;
-using Auren.Application.Common;
+using Auren.Application.Common.Models;
 using Auren.Application.Common.Result;
 using Auren.Application.DTOs.Responses.Dashboard;
 using Auren.Domain.Entities;

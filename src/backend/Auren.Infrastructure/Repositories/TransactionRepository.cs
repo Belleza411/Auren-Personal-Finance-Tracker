@@ -1,4 +1,4 @@
-﻿using Auren.Application.Common;
+﻿using Auren.Application.Common.Models;
 using Auren.Application.Dashboard.DTOs;
 using Auren.Application.DTOs.Requests;
 using Auren.Application.Extensions;
