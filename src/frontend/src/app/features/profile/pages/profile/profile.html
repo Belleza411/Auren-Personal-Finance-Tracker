@@ -37,7 +37,14 @@
                             Upload Photo
                         }
                     </button>
-                    <button hlmBtn type="button" variant="ghost" (click)="onDeletePicture()">Remove</button>
+                    <button 
+                        [disabled]="!isEditing()" 
+                        hlmBtn type="button" 
+                        variant="ghost" 
+                        (click)="onDeletePicture()"
+                    >
+                        Remove
+                    </button>
                 </div>
                 <div class="flex gap-2 ml-auto">
                     @if (isEditing()) {
@@ -137,16 +144,28 @@
             <div class="flex flex-col gap-4 max-w-lg">
                 <hlm-field>
                     <label hlmFieldLabel>Current Password</label>
-                    <input hlmInput type="password" placeholder="Current password" />
+                    <input 
+                        hlmInput    
+                        type="password" 
+                        placeholder="Current password"
+                        [formField]="passwordForm.currentPassword" />
                 </hlm-field>
                 <div class="grid grid-cols-2 gap-4">
                     <hlm-field>
                         <label hlmFieldLabel>New Password</label>
-                        <input hlmInput type="password" placeholder="New password" />
+                        <input 
+                            hlmInput 
+                            type="password" 
+                            placeholder="New password"
+                            [formField]="passwordForm.newPassword" />
                     </hlm-field>
                     <hlm-field>
                         <label hlmFieldLabel>Confirm Password</label>
-                        <input hlmInput type="password" placeholder="Confirm password" />
+                        <input 
+                            hlmInput 
+                            type="password" 
+                            placeholder="Confirm password"
+                            [formField]="passwordForm.confirmPassword" />
                     </hlm-field>
                 </div>
             </div>

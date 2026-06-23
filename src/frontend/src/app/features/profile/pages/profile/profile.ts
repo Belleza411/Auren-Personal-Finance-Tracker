@@ -14,7 +14,7 @@ import { HlmSpinnerImports } from './../../../../libs/ui/spinner/src/index';
 import { lucideTrash, lucideUpload, lucidePencil } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
-import { email, form, submit, FormField, disabled } from '@angular/forms/signals';
+import { email, form, submit, FormField, disabled, minLength, required, validate } from '@angular/forms/signals';
 import { AlertService } from 'src/app/core/services/alert.service';
 import { createFieldErrors } from 'src/app/shared/utils/form-errors.util';
 
@@ -66,6 +66,12 @@ export class Profile {
     currency: ''
   })
 
+  protected passwordModel = signal({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
   protected profileForm = form(this.profileModel, schema => {
     email(schema.email, { message: 'Enter a valid email'})
 
@@ -73,6 +79,26 @@ export class Profile {
     disabled(schema.lastName, { when: () => !this.isEditing()})
     disabled(schema.email, { when: () => !this.isEditing()})
     disabled(schema.currency, { when: () => !this.isEditing()})
+  })
+
+  protected passwordForm = form(this.passwordModel, schema => {
+    required(schema.currentPassword, { message: 'Password is required' });
+    minLength(schema.currentPassword, 8, { message: 'Password must be at least 8 characters' });
+    required(schema.confirmPassword, { message: 'Confirm password is required' });
+
+    validate(schema.confirmPassword, ({ value, valueOf }) => {
+      const confirm = value();
+      const password = valueOf(schema.currentPassword);
+
+      if(confirm !== password) {
+        return {
+          kind: 'passwordMismatch',
+          message: "Passwords do not match"
+        }
+      }
+
+      return null;
+    })
   })
 
   protected readonly profilePictureUrl = computed(() => this.user()?.profilePictureUrl ?? null);
@@ -135,9 +161,9 @@ export class Profile {
                 this.isEditing.set(false);
                 this.alertService.success('Profile Information Updated', 'Updated Successfully');
               },
-              error: () => {
+              error: e => {
                 this.isLoading.set(false);
-                this.alertService.error('Failed to update profile info', 'Update Failure');
+                this.alertService.error('Failed to update profile', e.error?.messages ?? 'Please try again.');
               }
           });
     });
@@ -158,7 +184,6 @@ export class Profile {
     this.profileModel.update(m => ({ 
       ...m, 
       profileImageUploadRequest: {
-        ...m.profileImageUploadRequest,
         file: file,
         name: m.profileImageUploadRequest?.name ?? '',
         description: m.profileImageUploadRequest?.description ?? ''
@@ -168,16 +193,27 @@ export class Profile {
 
   onDeletePicture() {
     this.pendingProfileImage.set(null);
-    this.profileModel.update(m => ({ ...m, profileImageUploadRequest: null }));
+    this.profileModel.update(m => ({ 
+      ...m,
+      profileImageUploadRequest: null
+    }));
   }
 
   onDeleteAccount() {
-      // show confirmation dialog before deleting
+    // show confirmation dialog before deleting
   }
 
   onChangePassword(event: Event) {
     event.preventDefault();
-    // wire to password change service when ready
+    submit(this.passwordForm, async () => {
+        this.isPasswordLoading.set(true);
+        try {
+            // call your password change service here
+        } finally {
+            this.isPasswordLoading.set(false);
+            this.passwordModel.set({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        }
+    });
   }
 
   currencyToString = (value: string): string =>
@@ -187,10 +223,4 @@ export class Profile {
     if (!value) return;
     this.profileModel.update(m => ({ ...m, currency: value }));
   }
-
-  protected readonly fieldErrors = createFieldErrors({
-    email: () => this.profileForm.email(),
-    firstName: () => this.profileForm.firstName(),
-    lastName: () => this.profileForm.lastName()
-  })
 }

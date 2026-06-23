@@ -13,11 +13,11 @@ export class ProfileService {
   readonly user = this._user.asReadonly();
 
   loadProfile() {
-      this.getUserProfile()
-        .subscribe({
-            next: val => this._user.set(val),
-            error: err => console.error('Failed to get profile:', err)
-        });
+    this.getUserProfile()
+      .subscribe({
+        next: val => this._user.set(val),
+        error: err => console.error('Failed to get profile:', err)
+      });
   }
 
   getUserProfile(): Observable<UserResponse> {
