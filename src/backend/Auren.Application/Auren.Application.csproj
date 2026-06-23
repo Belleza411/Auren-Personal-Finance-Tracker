@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Auren.Domain\Auren.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Transactions\" />
+  </ItemGroup>
+
 </Project>

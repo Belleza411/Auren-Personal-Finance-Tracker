@@ -1,4 +1,5 @@
-﻿using Auren.Application.Interfaces.Repositories;
+﻿using Auren.Application.Common.Interfaces;
+using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Configuration;
 using Auren.Infrastructure.Persistence;
@@ -138,6 +139,8 @@ namespace Auren.Infrastructure.Extensions
             builder.Services.AddScoped<ITokenRepository, TokenRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AurenDbContext>());
+            builder.Services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AurenAuthDbContext>());
 
             builder.Services.AddRateLimiting();
 

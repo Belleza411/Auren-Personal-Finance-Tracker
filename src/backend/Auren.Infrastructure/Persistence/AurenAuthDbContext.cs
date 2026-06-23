@@ -1,11 +1,12 @@
-﻿using Auren.Domain.Entities;
+﻿using Auren.Application.Common.Interfaces;
+using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Infrastructure.Persistence
 {
-    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IAuthDbContext
     {
         public AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : base(options)
         {
