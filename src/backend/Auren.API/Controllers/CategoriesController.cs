@@ -1,6 +1,6 @@
-﻿using Auren.Application.Categories.DTOs;
-using Auren.Application.Common.Result;
+﻿using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Categories.DTOs;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;

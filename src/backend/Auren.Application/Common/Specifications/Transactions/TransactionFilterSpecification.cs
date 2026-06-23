@@ -1,5 +1,5 @@
-﻿using Auren.Application.Specifications.Common;
-using Auren.Application.Transactions.DTOs;
+﻿using Auren.Application.Features.Transactions.DTOs;
+using Auren.Application.Specifications.Common;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using System;

@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Dashboard.DTOs;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Dashboard.DTOs;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;

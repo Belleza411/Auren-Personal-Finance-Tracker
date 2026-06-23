@@ -1,9 +1,9 @@
-﻿using Auren.Application.Auth.DTOs;
-using Auren.Application.Common.Result;
+﻿using Auren.Application.Common.Result;
 using Auren.Application.Constants;
+using Auren.Application.Features.Auth.DTOs;
+using Auren.Application.Features.Profile.DTOs;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
-using Auren.Application.Profile.DTOs;
 using Auren.Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication;

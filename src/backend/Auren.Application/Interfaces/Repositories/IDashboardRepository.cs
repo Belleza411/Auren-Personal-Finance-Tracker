@@ -1,4 +1,4 @@
-﻿using Auren.Application.Dashboard.DTOs;
+﻿using Auren.Application.Features.Dashboard.DTOs;
 using Auren.Domain.Enums;
 using System;
 using System.Collections.Generic;

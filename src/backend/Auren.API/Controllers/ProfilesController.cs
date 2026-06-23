@@ -1,6 +1,6 @@
-﻿using Auren.Application.Auth.DTOs;
-using Auren.Application.Common.Result;
+﻿using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Auth.DTOs;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Enums;

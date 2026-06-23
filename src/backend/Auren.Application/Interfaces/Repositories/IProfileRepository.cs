@@ -1,5 +1,5 @@
-﻿using Auren.Application.Auth.DTOs;
-using Auren.Application.Profile.DTOs;
+﻿using Auren.Application.Features.Auth.DTOs;
+using Auren.Application.Features.Profile.DTOs;
 using Auren.Domain.Entities;
 
 namespace Auren.Application.Interfaces.Repositories

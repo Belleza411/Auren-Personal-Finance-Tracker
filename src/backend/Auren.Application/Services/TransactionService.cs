@@ -1,10 +1,10 @@
 ﻿using Auren.Application.Common.Models;
 using Auren.Application.Common.Result;
-using Auren.Application.Dashboard.DTOs;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Dashboard.DTOs;
+using Auren.Application.Features.Transactions.DTOs;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
-using Auren.Application.Transactions.DTOs;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using FluentValidation;

@@ -1,5 +1,5 @@
-﻿using Auren.Application.Auth.DTOs;
-using Auren.Application.Common.Result;
+﻿using Auren.Application.Common.Result;
+using Auren.Application.Features.Auth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

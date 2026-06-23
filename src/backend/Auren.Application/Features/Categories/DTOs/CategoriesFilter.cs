@@ -1,0 +1,11 @@
+﻿using Auren.Domain.Enums;
+
+namespace Auren.Application.Features.Categories.DTOs
+{
+	public class CategoriesFilter
+	{
+        public string? SearchTerm { get; set; }
+        public TransactionType? TransactionType { get; set; }
+        public IEnumerable<string>? Categories { get; set; }
+    }
+}

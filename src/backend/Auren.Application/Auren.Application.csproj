@@ -17,18 +17,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Categories\Commands\" />
-    <Folder Include="Categories\Queries\" />
-    <Folder Include="Dashboard\Commands\" />
-    <Folder Include="Dashboard\Queries\" />
-    <Folder Include="Dashboard\Validators\" />
-    <Folder Include="Auth\Commands\" />
-    <Folder Include="Auth\Queries\" />
+    <Folder Include="Features\Categories\Commands\" />
+    <Folder Include="Features\Categories\Queries\" />
+    <Folder Include="Features\Dashboard\Commands\" />
+    <Folder Include="Features\Dashboard\Queries\" />
+    <Folder Include="Features\Dashboard\Validators\" />
+    <Folder Include="Features\Auth\Commands\" />
+    <Folder Include="Features\Auth\Queries\" />
     <Folder Include="Interfaces\Specification\" />
-    <Folder Include="Profile\Commands\" />
-    <Folder Include="Profile\Queries\" />
-    <Folder Include="Transactions\Commands\" />
-    <Folder Include="Transactions\Queries\" />
+    <Folder Include="Features\Profile\Commands\" />
+    <Folder Include="Features\Profile\Queries\" />
+    <Folder Include="Features\Transactions\Commands\Create\" />
+    <Folder Include="Features\Transactions\Queries\" />
   </ItemGroup>
 
 </Project>

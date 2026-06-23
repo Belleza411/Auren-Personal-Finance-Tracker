@@ -1,5 +1,5 @@
-﻿using Auren.Application.Categories.DTOs;
-using Auren.Application.Common.Models;
+﻿using Auren.Application.Common.Models;
+using Auren.Application.Features.Categories.DTOs;
 using Auren.Domain.Entities;
 
 namespace Auren.Application.Interfaces.Repositories
