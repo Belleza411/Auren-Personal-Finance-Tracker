@@ -2,7 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
-namespace Auren.Application.Validators
+namespace Auren.Application.Profile.Validators
 {
 	public class ProfileImageUploadValidator : AbstractValidator<ProfileImageUploadRequest>
 	{

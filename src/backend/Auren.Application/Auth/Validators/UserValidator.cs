@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auren.Application.Validators
+namespace Auren.Application.Auth.Validators
 {
     public class UserValidator : AbstractValidator<UserDto>
 	{

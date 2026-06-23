@@ -1,4 +1,5 @@
-﻿using Auren.Application.DTOs.Filters;
+﻿using Auren.Application.Common.Specifications;
+using Auren.Application.DTOs.Filters;
 using Auren.Application.Interfaces.Specification;
 using Auren.Application.Specifications.Common;
 using Auren.Domain.Entities;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Auren.Application.Specifications.Transactions
+namespace Auren.Application.Common.Specifications.Transactions
 {
 	public class TransactionFilterSpecification : BaseSpecification<Transaction>
 	{

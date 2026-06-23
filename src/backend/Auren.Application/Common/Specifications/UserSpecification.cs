@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Auren.Application.Specifications.Common
+namespace Auren.Application.Common.Specifications
 {
-	public class NameFilterSpecification<TEntity>(string name) : BaseSpecification<TEntity> where TEntity : IHasName
+	public class UserSpecification<TEntity>(Guid userId) : BaseSpecification<TEntity> where TEntity : IEntity
 	{
 		public override Expression<Func<TEntity, bool>> ToExpression()
 		{
-			return e => e.Name.Contains(name.Trim());
+			return e => e.UserId == userId;
 		}
 	}
 }

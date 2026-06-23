@@ -23,7 +23,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Transactions\" />
+    <Folder Include="Categories\Commands\" />
+    <Folder Include="Categories\DTOs\" />
+    <Folder Include="Categories\Queries\" />
+    <Folder Include="Dashboard\Commands\" />
+    <Folder Include="Dashboard\DTOs\" />
+    <Folder Include="Dashboard\Queries\" />
+    <Folder Include="Dashboard\Validators\" />
+    <Folder Include="Auth\Commands\" />
+    <Folder Include="Auth\DTOs\" />
+    <Folder Include="Auth\Queries\" />
+    <Folder Include="Profile\Commands\" />
+    <Folder Include="Profile\DTOs\" />
+    <Folder Include="Profile\Queries\" />
+    <Folder Include="Transactions\Commands\" />
+    <Folder Include="Transactions\DTOs\" />
+    <Folder Include="Transactions\Queries\" />
+    <Folder Include="Validators\" />
   </ItemGroup>
 
 </Project>

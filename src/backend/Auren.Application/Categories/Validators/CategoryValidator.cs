@@ -1,7 +1,7 @@
 ﻿using Auren.Application.DTOs.Requests;
 using FluentValidation;
 
-namespace Auren.Application.Validators
+namespace Auren.Application.Categories.Validators
 {
 	public class CategoryValidator : AbstractValidator<CategoryDto>
 	{

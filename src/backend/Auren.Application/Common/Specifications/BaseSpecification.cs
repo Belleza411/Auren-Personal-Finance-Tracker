@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Auren.Application.Specifications
+namespace Auren.Application.Common.Specifications
 {
 	public abstract class BaseSpecification<TEntity> : ISpecification<TEntity>
 	{

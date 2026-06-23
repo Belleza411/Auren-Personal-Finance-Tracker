@@ -1,4 +1,5 @@
-﻿using Auren.Application.DTOs.Filters;
+﻿using Auren.Application.Common.Specifications;
+using Auren.Application.DTOs.Filters;
 using Auren.Domain.Common;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Auren.Application.Specifications.Common
+namespace Auren.Application.Common.Specifications.Common
 {
 	public class TransactionTypeFilterSpecification<TEntity>(TransactionType type) : BaseSpecification<TEntity> where TEntity : IHasTransactionType
     {

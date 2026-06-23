@@ -1,10 +1,11 @@
-﻿using Auren.Domain.Entities;
+﻿using Auren.Application.Common.Specifications;
+using Auren.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Auren.Application.Specifications.Categories
+namespace Auren.Application.Common.Specifications.Categories
 {
     public class CategoriesFilterSpec(IEnumerable<Guid> categoriesIds) : BaseSpecification<Category>
     {
