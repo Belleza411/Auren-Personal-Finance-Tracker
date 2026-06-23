@@ -27,8 +27,10 @@
     <Folder Include="Interfaces\Specification\" />
     <Folder Include="Features\Profile\Commands\" />
     <Folder Include="Features\Profile\Queries\" />
-    <Folder Include="Features\Transactions\Commands\Create\" />
-    <Folder Include="Features\Transactions\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Features\Transactions\Queries\GetBalance\GetBalanceQuery.cs" />
   </ItemGroup>
 
 </Project>

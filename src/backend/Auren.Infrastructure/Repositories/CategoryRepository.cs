@@ -1,7 +1,6 @@
 ﻿using Auren.Application.Common.Models;
 using Auren.Application.Features.Categories.DTOs;
 using Auren.Application.Interfaces.Repositories;
-using Auren.Application.Specifications.Categories;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;

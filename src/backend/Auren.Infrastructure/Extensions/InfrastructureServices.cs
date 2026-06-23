@@ -1,4 +1,10 @@
 ﻿using Auren.Application.Common.Interfaces;
+using Auren.Application.Features.Transactions.Commands.CreateTransaction;
+using Auren.Application.Features.Transactions.Commands.DeleteTransaction;
+using Auren.Application.Features.Transactions.Commands.UpdateTransaction;
+using Auren.Application.Features.Transactions.Queries.GetBalance;
+using Auren.Application.Features.Transactions.Queries.GetTransactionById;
+using Auren.Application.Features.Transactions.Queries.GetTransactions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Configuration;
@@ -133,7 +139,6 @@ namespace Auren.Infrastructure.Extensions
                 });
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
             builder.Services.AddScoped<ITokenRepository, TokenRepository>();
@@ -141,6 +146,13 @@ namespace Auren.Infrastructure.Extensions
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AurenDbContext>());
             builder.Services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AurenAuthDbContext>());
+
+            builder.Services.AddScoped<CreateTransactionHandler>();
+            builder.Services.AddScoped<UpdateTransactionHandler>();
+            builder.Services.AddScoped<DeleteTransactionHandler>();
+            builder.Services.AddScoped<GetTransactionsHandler>();
+            builder.Services.AddScoped<GetTransactionByIdHandler>();
+            builder.Services.AddScoped<GetBalanceHandler>();
 
             builder.Services.AddRateLimiting();
 
