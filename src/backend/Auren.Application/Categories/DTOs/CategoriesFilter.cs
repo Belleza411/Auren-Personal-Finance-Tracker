@@ -1,6 +1,6 @@
 ﻿using Auren.Domain.Enums;
 
-namespace Auren.Application.DTOs.Filters
+namespace Auren.Application.Categories.DTOs
 {
 	public class CategoriesFilter
 	{

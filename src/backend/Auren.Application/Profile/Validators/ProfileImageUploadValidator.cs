@@ -1,4 +1,4 @@
-﻿using Auren.Application.DTOs.Requests;
+﻿using Auren.Application.Profile.DTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 

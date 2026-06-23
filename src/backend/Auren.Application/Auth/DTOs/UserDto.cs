@@ -1,4 +1,6 @@
-﻿namespace Auren.Application.DTOs.Requests
+﻿using Auren.Application.Profile.DTOs;
+
+namespace Auren.Application.Auth.DTOs
 {
 	public sealed record UserDto(
          string? Email,

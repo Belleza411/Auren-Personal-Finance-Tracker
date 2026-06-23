@@ -1,4 +1,4 @@
-﻿using Auren.Application.DTOs.Requests;
+﻿using Auren.Application.Transactions.DTOs;
 using FluentValidation;
 
 namespace Auren.Application.Transactions.Validators 

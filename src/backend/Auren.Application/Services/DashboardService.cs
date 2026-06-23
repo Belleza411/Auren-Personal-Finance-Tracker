@@ -1,5 +1,5 @@
 ﻿using Auren.Application.Common.Result;
-using Auren.Application.DTOs.Responses.Dashboard;
+using Auren.Application.Dashboard.DTOs;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;
 using Auren.Domain.Enums;

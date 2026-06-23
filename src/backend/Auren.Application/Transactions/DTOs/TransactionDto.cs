@@ -1,6 +1,6 @@
 ﻿using Auren.Domain.Enums;
 
-namespace Auren.Application.DTOs.Requests
+namespace Auren.Application.Transactions.DTOs
 {
 	public sealed record TransactionDto(
         string Name,

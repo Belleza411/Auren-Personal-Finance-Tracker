@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auren.Application.DTOs.Responses.Dashboard
+namespace Auren.Application.Dashboard.DTOs
 {
 	public sealed record ExpenseBreakdownResponse(
 		IEnumerable<string> Labels,

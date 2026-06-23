@@ -1,6 +1,5 @@
-﻿using Auren.Application.Common.Result;
-using Auren.Application.DTOs.Requests;
-using Auren.Application.DTOs.Responses.User;
+﻿using Auren.Application.Auth.DTOs;
+using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;

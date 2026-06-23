@@ -1,7 +1,6 @@
-﻿
-using Auren.Domain.Enums;
+﻿using Auren.Domain.Enums;
 
-namespace Auren.Application.DTOs.Filters
+namespace Auren.Application.Transactions.DTOs
 {
 	public class TransactionFilter
 	{

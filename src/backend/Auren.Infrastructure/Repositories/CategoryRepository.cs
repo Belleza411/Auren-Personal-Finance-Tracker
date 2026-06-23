@@ -1,6 +1,5 @@
-﻿using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Requests;
-using Auren.Application.DTOs.Responses;
+﻿using Auren.Application.Categories.DTOs;
+using Auren.Application.Common;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Specifications.Categories;
 using Auren.Domain.Entities;

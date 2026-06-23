@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auren.Application.DTOs.Responses.Transaction
+namespace Auren.Application.Dashboard.DTOs
 {
 	public sealed record BalanceSummaryResponse(decimal Income, decimal Expense, decimal Balance);
 }

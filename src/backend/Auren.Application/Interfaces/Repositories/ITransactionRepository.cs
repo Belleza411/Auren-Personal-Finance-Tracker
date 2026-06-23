@@ -1,8 +1,8 @@
 ﻿
-using Auren.Application.DTOs.Filters;
+using Auren.Application.Common;
+using Auren.Application.Dashboard.DTOs;
 using Auren.Application.DTOs.Requests;
-using Auren.Application.DTOs.Responses;
-using Auren.Application.DTOs.Responses.Transaction;
+using Auren.Application.Transactions.DTOs;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 

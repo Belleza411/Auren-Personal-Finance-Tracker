@@ -1,4 +1,4 @@
-﻿using Auren.Application.DTOs.Requests;
+﻿using Auren.Application.Auth.DTOs;
 using FluentValidation;
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auren.Application.DTOs.Responses
+namespace Auren.Application.Common
 {
 	public class PagedResult<T>
 	{

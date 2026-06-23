@@ -1,4 +1,4 @@
-﻿namespace Auren.Application.DTOs.Responses.User
+﻿namespace Auren.Application.Auth.DTOs
 {
 	public class AuthResponse
 	{

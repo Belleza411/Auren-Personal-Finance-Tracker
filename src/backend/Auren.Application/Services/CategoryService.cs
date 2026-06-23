@@ -1,8 +1,7 @@
-﻿using Auren.Application.Common.Result;
+﻿using Auren.Application.Categories.DTOs;
+using Auren.Application.Common;
+using Auren.Application.Common.Result;
 using Auren.Application.Constants;
-using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Requests;
-using Auren.Application.DTOs.Responses;
 using Auren.Application.DTOs.Responses.Dashboard;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Application.Interfaces.Services;

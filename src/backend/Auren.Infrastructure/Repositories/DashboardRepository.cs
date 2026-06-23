@@ -1,4 +1,4 @@
-﻿using Auren.Application.DTOs.Responses.Dashboard;
+﻿using Auren.Application.Dashboard.DTOs;
 using Auren.Application.DTOs.Responses.Transaction;
 using Auren.Application.Extensions;
 using Auren.Application.Interfaces.Repositories;

@@ -1,7 +1,7 @@
 ﻿using Auren.Application.Common.Specifications;
-using Auren.Application.DTOs.Filters;
 using Auren.Application.Interfaces.Specification;
 using Auren.Application.Specifications.Common;
+using Auren.Application.Transactions.DTOs;
 using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using System;

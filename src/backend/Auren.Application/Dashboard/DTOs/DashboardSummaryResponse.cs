@@ -1,6 +1,4 @@
-﻿using Auren.Application.DTOs.Responses.Transaction;
-
-namespace Auren.Application.DTOs.Responses.Dashboard
+﻿namespace Auren.Application.Dashboard.DTOs
 {
 	public sealed record DashboardSummaryResponse(
 		TransactionMetricResponse TotalBalance,
