@@ -17,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Categories\Commands\" />
-    <Folder Include="Features\Categories\Queries\" />
     <Folder Include="Features\Dashboard\Commands\" />
     <Folder Include="Features\Dashboard\Queries\" />
     <Folder Include="Features\Dashboard\Validators\" />
