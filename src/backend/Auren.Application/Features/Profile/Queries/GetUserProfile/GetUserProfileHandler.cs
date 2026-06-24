@@ -19,7 +19,7 @@ namespace Auren.Application.Features.Profile.Queries.GetUserProfile
             var user = await db.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u =>
-                    u.UserId == cmd.UserId,
+                    u.Id == cmd.UserId,
                     ct);
 
             return user != null
