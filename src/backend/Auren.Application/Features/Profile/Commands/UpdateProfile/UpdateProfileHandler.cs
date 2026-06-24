@@ -1,5 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces; 
 using Auren.Application.Common.Result;
+using Auren.Application.Extensions;
 using Auren.Application.Features.Auth.DTOs;
 using Auren.Application.Features.Profile.DTOs;
 using Auren.Domain.Entities;
@@ -49,28 +50,16 @@ namespace Auren.Application.Features.Profile.Commands.UpdateProfile
 
                 if (!string.IsNullOrEmpty(uploadResponse?.Path))
                     user.ProfilePictureUrl = uploadResponse.Path;
-
-                user.Email = cmd.Dto.Email ?? user.Email;
-                user.FirstName = cmd.Dto.FirstName ?? user.FirstName;
-                user.LastName = cmd.Dto.LastName ?? user.LastName;
-                user.Currency = cmd.Dto.Currency ?? user.Currency;
-
-                await db.SaveChangesAsync(ct);
-
-                return Result.Success(MapToUserResponse(user));
             }
-        }
 
-        private static UserResponse MapToUserResponse(ApplicationUser user)
-        {
-            return new UserResponse(
-                user.Email!,
-                user.FirstName,
-                user.LastName,
-                user.ProfilePictureUrl,
-                user.CreatedAt,
-                user.LastLoginAt
-            );
+            user.Email = cmd.Dto.Email ?? user.Email;
+            user.FirstName = cmd.Dto.FirstName ?? user.FirstName;
+            user.LastName = cmd.Dto.LastName ?? user.LastName;
+            user.Currency = cmd.Dto.Currency ?? user.Currency;
+
+            await db.SaveChangesAsync(ct);
+
+            return Result.Success(user.ToUserResponse());
         }
     }
 }

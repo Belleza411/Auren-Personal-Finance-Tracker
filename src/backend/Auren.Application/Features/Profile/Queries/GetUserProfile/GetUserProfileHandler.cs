@@ -1,5 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
+using Auren.Application.Extensions;
 using Auren.Application.Features.Auth.DTOs;
 using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,20 +23,8 @@ namespace Auren.Application.Features.Profile.Queries.GetUserProfile
                     ct);
 
             return user != null
-                ? Result.Success(MapToUserResponse(user))
+                ? Result.Success(user.ToUserResponse())
                 : Result.Failure<UserResponse>(Error.NotFound("User not found."));
-        }
-
-        private static UserResponse MapToUserResponse(ApplicationUser user)
-        {
-            return new UserResponse(
-                user.Email!,
-                user.FirstName,
-                user.LastName,
-                user.ProfilePictureUrl,
-                user.CreatedAt,
-                user.LastLoginAt
-            );
         }
     }
 }
