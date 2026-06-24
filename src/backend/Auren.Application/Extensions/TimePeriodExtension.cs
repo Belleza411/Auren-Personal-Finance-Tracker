@@ -7,7 +7,7 @@ namespace Auren.Application.Extensions
 {
     public static class TimePeriodExtension
     {
-        extension(TimePeriod? timePeriod)
+        extension(TimePeriod timePeriod)
         {
             public (DateTime start, DateTime end) GetTimePeriodRange()
             {
