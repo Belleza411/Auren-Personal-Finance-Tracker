@@ -1,51 +1,18 @@
 ﻿using Auren.Application.Common.Interfaces;
-using Auren.Application.Features.Transactions.Commands.CreateTransaction;
 using Auren.Domain.Entities;
-using Auren.Infrastructure.Common.Interfaces;
-using Auren.Infrastructure.Configuration;
-using Auren.Infrastructure.Identity;
 using Auren.Infrastructure.Persistence;
-using Auren.Infrastructure.Services;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using CloudinaryConfiguration = Auren.Infrastructure.Configuration.CloudinaryConfiguration;
 
-namespace Auren.Infrastructure.Extensions
+namespace Auren.Infrastructure.DI
 {
-    public static class InfrastructureServices
+    public static class AuthRegistration
     {
-        public static void AddInfrastructureServices(
-            this WebApplicationBuilder builder,
-            IConfiguration config)
+        public static void AddAuthServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddDbContext<AurenDbContext>(options =>
-                options.UseSqlServer(config.GetConnectionString("AurenDbConnection"), opt =>
-                {
-                    opt.EnableRetryOnFailure(
-                        maxRetryCount: 3,
-                        maxRetryDelay: TimeSpan.FromSeconds(5),
-                        errorNumbersToAdd: null
-                    );
-                    opt.CommandTimeout(30);
-                }));
-
-            builder.Services.AddDbContext<AurenAuthDbContext>(options => 
-                options.UseSqlServer(config.GetConnectionString("AurenAuthDbConnection"), opt =>
-                {
-                    opt.EnableRetryOnFailure(
-                       maxRetryCount: 3,
-                       maxRetryDelay: TimeSpan.FromSeconds(5),
-                       errorNumbersToAdd: null
-                   );
-                    opt.CommandTimeout(15);
-                }));
-
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -131,40 +98,6 @@ namespace Auren.Infrastructure.Extensions
                         await Task.CompletedTask;
                     };
                 });
-
-            builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AurenDbContext>());
-            builder.Services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AurenAuthDbContext>());
-            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-            builder.Services.AddScoped<IIdentityService, IdentityService>();
-            builder.Services.AddScoped<ITokenService, TokenService>();
-
-            builder.Services.Scan(scan => scan
-                .FromAssemblyOf<CreateTransactionHandler>()
-                .AddClasses(classes => classes.Where(t => t.Name.EndsWith("Handler")))
-                .AsSelf()
-                .WithScopedLifetime());
-
-            builder.Services.AddRateLimiting();
-
-            var cloudinarySection = config.GetSection("Cloudinary");
-            builder.Services.Configure<CloudinaryConfiguration>(cloudinarySection);
-
-            var cloudinaryOptions = cloudinarySection.Get<CloudinaryConfiguration>()
-            ?? throw new InvalidOperationException("Cloudinary configuration is missing.");
-
-            var cloudName = cloudinaryOptions.CloudName ??
-                throw new InvalidOperationException("Cloudinary CloudName is not configured.");
-            var apiKey = cloudinaryOptions.ApiKey ??
-                throw new InvalidOperationException("Cloudinary ApiKey is not configured.");
-            var apiSecret = cloudinaryOptions.ApiSecret ??
-                throw new InvalidOperationException("Cloudinary ApiSecret is not configured.");
-
-            var account = new Account(cloudName, apiKey, apiSecret);
-            var cloudinary = new Cloudinary(account);
-            cloudinary.Api.Secure = true;
-
-            builder.Services.AddSingleton(cloudinary);
         }
-    }  
-
+    }
 }
