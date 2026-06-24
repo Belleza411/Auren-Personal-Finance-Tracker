@@ -6,13 +6,10 @@ using Auren.Application.Features.Categories.Commands.UpdateCategory;
 using Auren.Application.Features.Categories.DTOs;
 using Auren.Application.Features.Categories.Queries.GetCategories;
 using Auren.Application.Features.Categories.Queries.GetCategoryById;
-using Auren.Application.Interfaces.Services;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Security.Claims;
 
 namespace Auren.API.Controllers
 {

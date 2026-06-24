@@ -3,11 +3,7 @@ using Auren.Infrastructure.Common.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace Auren.Infrastructure.Services
 {

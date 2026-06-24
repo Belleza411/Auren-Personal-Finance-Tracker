@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Auren.Domain\Auren.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
-  </ItemGroup>
-
 </Project>

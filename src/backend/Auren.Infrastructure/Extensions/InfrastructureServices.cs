@@ -1,28 +1,19 @@
 ﻿using Auren.Application.Common.Interfaces;
-using Auren.Application.Features.Categories.Commands.CreateCategory;
 using Auren.Application.Features.Transactions.Commands.CreateTransaction;
-using Auren.Application.Features.Transactions.Commands.DeleteTransaction;
-using Auren.Application.Features.Transactions.Commands.UpdateTransaction;
-using Auren.Application.Features.Transactions.Queries.GetBalance;
-using Auren.Application.Features.Transactions.Queries.GetTransactionById;
-using Auren.Application.Features.Transactions.Queries.GetTransactions;
-using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
 using Auren.Infrastructure.Common.Interfaces;
 using Auren.Infrastructure.Configuration;
+using Auren.Infrastructure.Identity;
 using Auren.Infrastructure.Persistence;
-using Auren.Infrastructure.Repositories;
 using Auren.Infrastructure.Services;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.RateLimiting;
 using CloudinaryConfiguration = Auren.Infrastructure.Configuration.CloudinaryConfiguration;
 
 namespace Auren.Infrastructure.Extensions
@@ -103,7 +94,7 @@ namespace Auren.Infrastructure.Extensions
 
                     options.Events.OnValidatePrincipal = async context =>
                     {
-                        var tokenService = context.HttpContext.RequestServices.GetRequiredService<ITokenRepository>();
+                        var tokenService = context.HttpContext.RequestServices.GetRequiredService<ITokenService>();
                         await tokenService.ValidateRefreshTokenAsync(context);
                     };
 
@@ -144,6 +135,8 @@ namespace Auren.Infrastructure.Extensions
             builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AurenDbContext>());
             builder.Services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AurenAuthDbContext>());
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+            builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.Scan(scan => scan
                 .FromAssemblyOf<CreateTransactionHandler>()

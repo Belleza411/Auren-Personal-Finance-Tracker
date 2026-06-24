@@ -20,9 +20,6 @@
     <Folder Include="Features\Dashboard\Commands\" />
     <Folder Include="Features\Dashboard\Queries\" />
     <Folder Include="Features\Dashboard\Validators\" />
-    <Folder Include="Features\Auth\Commands\" />
-    <Folder Include="Features\Auth\Queries\" />
-    <Folder Include="Interfaces\Specification\" />
   </ItemGroup>
 
   <ItemGroup>

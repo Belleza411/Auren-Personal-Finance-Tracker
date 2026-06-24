@@ -1,12 +1,6 @@
-﻿using Auren.Application.Common.Specifications;
-using Auren.Application.DTOs.Filters;
-using Auren.Domain.Common;
-using Auren.Domain.Entities;
+﻿using Auren.Domain.Common;
 using Auren.Domain.Enums;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Auren.Application.Common.Specifications.Common
 {

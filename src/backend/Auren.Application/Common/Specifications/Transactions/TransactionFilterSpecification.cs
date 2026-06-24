@@ -1,11 +1,7 @@
-﻿using Auren.Application.Features.Transactions.DTOs;
-using Auren.Application.Specifications.Common;
+﻿using Auren.Application.Common.Specifications.Common;
+using Auren.Application.Features.Transactions.DTOs;
 using Auren.Domain.Entities;
-using Auren.Domain.Enums;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Auren.Application.Common.Specifications.Transactions
 {

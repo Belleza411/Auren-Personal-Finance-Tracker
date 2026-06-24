@@ -1,7 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Auren.Infrastructure.Persistence
 {

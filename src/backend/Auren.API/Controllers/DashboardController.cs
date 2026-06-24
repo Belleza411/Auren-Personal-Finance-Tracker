@@ -1,14 +1,8 @@
-﻿using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Responses.Transaction;
-using Auren.Application.Extensions;
+﻿using Auren.Application.Extensions;
 using Auren.Application.Features.Dashboard.DTOs;
-using Auren.Application.Interfaces.Repositories;
-using Auren.Application.Interfaces.Services;
 using Auren.Domain.Enums;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Threading;
 
 namespace Auren.API.Controllers
 {
