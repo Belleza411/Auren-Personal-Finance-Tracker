@@ -8,9 +8,11 @@ using Auren.Application.Features.Transactions.Queries.GetTransactionById;
 using Auren.Application.Features.Transactions.Queries.GetTransactions;
 using Auren.Application.Interfaces.Repositories;
 using Auren.Domain.Entities;
+using Auren.Infrastructure.Common.Interfaces;
 using Auren.Infrastructure.Configuration;
 using Auren.Infrastructure.Persistence;
 using Auren.Infrastructure.Repositories;
+using Auren.Infrastructure.Services;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -141,6 +143,7 @@ namespace Auren.Infrastructure.Extensions
 
             builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AurenDbContext>());
             builder.Services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AurenAuthDbContext>());
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
             builder.Services.Scan(scan => scan
                 .FromAssemblyOf<CreateTransactionHandler>()

@@ -23,8 +23,6 @@
     <Folder Include="Features\Auth\Commands\" />
     <Folder Include="Features\Auth\Queries\" />
     <Folder Include="Interfaces\Specification\" />
-    <Folder Include="Features\Profile\Commands\" />
-    <Folder Include="Features\Profile\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
