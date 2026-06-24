@@ -1,14 +1,11 @@
-﻿using Auren.Domain.Entities;
+﻿using Auren.Application.Common.Interfaces;
+using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Auren.Infrastructure.Persistence
 {
-    public class AurenDbContext : DbContext
+    public class AurenDbContext(DbContextOptions<AurenDbContext> options) : DbContext(options), IAppDbContext
     {
-        public AurenDbContext(DbContextOptions<AurenDbContext> options) : base(options)
-        {
-        }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
 

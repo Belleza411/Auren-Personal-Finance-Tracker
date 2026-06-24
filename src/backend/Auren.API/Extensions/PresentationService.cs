@@ -1,12 +1,14 @@
 ﻿using Auren.API.Middleware;
+using Auren.Application.Extensions;
+using Auren.Infrastructure.DI;
 using Newtonsoft.Json.Converters;
 
 namespace Auren.API.Extensions
 {
-	public static class PresentationService
-	{
-		public static void AddPresentationServices(this WebApplicationBuilder builder)
-		{
+    public static class PresentationService
+    {
+        public static void AddPresentationServices(this WebApplicationBuilder builder)
+        {
             builder.Services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
@@ -39,6 +41,14 @@ namespace Auren.API.Extensions
                         .AllowAnyMethod();
                 });
             });
+
+            builder.Services.Scan(scan => scan
+                .FromAssemblies(
+                    typeof(ApplicationService).Assembly,     
+                    typeof(InfrastructureServices).Assembly) 
+                .AddClasses(classes => classes.Where(t => t.Name.EndsWith("Handler")))
+                .AsSelf()
+                .WithScopedLifetime());
         }
     }
 }

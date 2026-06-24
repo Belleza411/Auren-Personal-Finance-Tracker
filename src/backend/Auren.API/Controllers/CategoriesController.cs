@@ -1,21 +1,27 @@
 ﻿using Auren.Application.Common.Result;
-using Auren.Application.DTOs.Filters;
-using Auren.Application.DTOs.Requests;
 using Auren.Application.Extensions;
-using Auren.Application.Interfaces.Services;
+using Auren.Application.Features.Categories.Commands.CreateCategory;
+using Auren.Application.Features.Categories.Commands.DeleteCategory;
+using Auren.Application.Features.Categories.Commands.UpdateCategory;
+using Auren.Application.Features.Categories.DTOs;
+using Auren.Application.Features.Categories.Queries.GetCategories;
+using Auren.Application.Features.Categories.Queries.GetCategoryById;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Security.Claims;
 
 namespace Auren.API.Controllers
 {
 	[Route("api/categories")]
 	[ApiController]
     [Authorize]
-	public class CategoriesController(ICategoryService categoryService) : ControllerBase
+	public class CategoriesController(
+        CreateCategoryHandler createHandler,
+        GetCategoriesHandler getHandler,
+        GetCategoryByIdHandler getByIdHandler,
+        UpdateCategoryHandler updateHandler,
+        DeleteCategoryHandler deleteHandler) : ControllerBase
 	{
 		[HttpGet]
         [EnableRateLimiting("read")]
@@ -23,35 +29,41 @@ namespace Auren.API.Controllers
             [FromQuery] CategoriesFilter categoriesFilter,
             [FromQuery] int pageSize = 5, 
             [FromQuery] int pageNumber = 1,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var categories = await categoryService.GetCategories(userId.Value, categoriesFilter, pageSize, pageNumber, cancellationToken);
+            var query = new GetCategoriesQuery(userId.Value, categoriesFilter, pageSize, pageNumber);
+
+            var categories = await getHandler.Handle(query, ct);
             return Ok(categories.Value);
         }
 
         [HttpGet("{categoryId:guid}")]
         [EnableRateLimiting("read")]
-        public async Task<ActionResult<Category>> GetCategoryById(Guid categoryId, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> GetCategoryById(Guid categoryId, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var category =  await categoryService.GetCategoryById(categoryId, userId.Value, cancellationToken);
+            var cmd = new GetCategoryByIdCommand(userId.Value, categoryId);
+
+            var category = await getByIdHandler.Handle(cmd, ct);
 
             return category.IsSuccess ? Ok(category.Value) : NotFound($"Category with ID {categoryId} not found.");
         }
 
         [HttpPost]
         [EnableRateLimiting("write")]
-        public async Task<ActionResult<Category>> CreateCategory(CategoryDto categoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> CreateCategory(CategoryDto categoryDto, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
+            ;
+            var cmd = new CreateCategoryCommand(categoryDto, userId.Value);
 
-            var createdCategory = await categoryService.CreateCategory(categoryDto, userId.Value, cancellationToken);
+            var createdCategory = await createHandler.Handle(cmd, ct);
 
             if (!createdCategory.IsSuccess)
             {
@@ -73,12 +85,14 @@ namespace Auren.API.Controllers
 
         [HttpPut("{categoryId:guid}")]
         [EnableRateLimiting("write")]
-        public async Task<ActionResult<Category>> UpdateCategory(Guid categoryId, CategoryDto categoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<Category>> UpdateCategory(Guid categoryId, CategoryDto categoryDto, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var updatedCategory = await categoryService.UpdateCategory(categoryId, userId.Value, categoryDto, cancellationToken);
+            var cmd = new UpdateCategoryCommand(categoryId, userId.Value, categoryDto);
+
+            var updatedCategory = await updateHandler.Handle(cmd, ct);
 
             if (!updatedCategory.IsSuccess)
             {
@@ -100,12 +114,14 @@ namespace Auren.API.Controllers
 
         [HttpDelete("{categoryId:guid}")]
         [EnableRateLimiting("write")]
-        public async Task<IActionResult> DeleteCategory(Guid categoryId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteCategory(Guid categoryId, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var deleted = await categoryService.DeleteCategory(categoryId, userId.Value, cancellationToken);
+            var cmd = new DeleteCategoryCommand(userId.Value, categoryId);
+
+            var deleted = await deleteHandler.Handle(cmd, ct);
 
             return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
         }

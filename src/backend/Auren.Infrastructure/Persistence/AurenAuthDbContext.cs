@@ -1,16 +1,13 @@
-﻿using Auren.Domain.Entities;
+﻿using Auren.Application.Common.Interfaces;
+using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Infrastructure.Persistence
 {
-    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options), IAuthDbContext
     {
-        public AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProfileUserImage> ProfileUserImages { get; set; }
 

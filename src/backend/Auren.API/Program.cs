@@ -1,7 +1,7 @@
 using Auren.API.Extensions;
 using Auren.Infrastructure.Persistence;
-using Auren.Infrastructure.Extensions;
 using Auren.Application.Extensions;
+using Auren.Infrastructure.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
