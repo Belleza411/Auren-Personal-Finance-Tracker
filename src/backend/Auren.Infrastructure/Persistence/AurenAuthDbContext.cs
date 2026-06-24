@@ -6,12 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Infrastructure.Persistence
 {
-    public class AurenAuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IAuthDbContext
+    public class AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options), IAuthDbContext
     {
-        public AurenAuthDbContext(DbContextOptions<AurenAuthDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProfileUserImage> ProfileUserImages { get; set; }
 

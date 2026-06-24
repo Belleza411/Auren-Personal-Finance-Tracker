@@ -29,7 +29,7 @@ namespace Auren.Application.Features.Categories.Commands.CreateCategory
             var existingCategory = await GetCategoryByName(cmd.UserId, cmd.Dto, ct);
 
             if(existingCategory != null)
-                return Result.Failure<Category>(Error.CategoryError.AlreadyExists($"Category with the name of {categoryDto.Name} already exists"));
+                return Result.Failure<Category>(Error.CategoryError.AlreadyExists($"Category with the name of {cmd.Dto.Name} already exists"));
 
             var newCategory = new Category
             {

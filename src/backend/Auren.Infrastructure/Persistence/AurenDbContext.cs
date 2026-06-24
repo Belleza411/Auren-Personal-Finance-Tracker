@@ -4,11 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Infrastructure.Persistence
 {
-    public class AurenDbContext : DbContext, IAppDbContext
+    public class AurenDbContext(DbContextOptions<AurenDbContext> options) : DbContext(options), IAppDbContext
     {
-        public AurenDbContext(DbContextOptions<AurenDbContext> options) : base(options)
-        {
-        }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
 
