@@ -27,7 +27,6 @@ namespace Auren.Application.Features.Categories.Commands.UpdateCategory
             }
 
             var category = await db.Categories
-                .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.Id == cmd.CategoryId &&
                     c.UserId == cmd.UserId,
