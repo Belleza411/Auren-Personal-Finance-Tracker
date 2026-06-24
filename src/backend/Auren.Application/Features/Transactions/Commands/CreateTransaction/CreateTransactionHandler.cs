@@ -39,7 +39,7 @@ namespace Auren.Application.Features.Transactions.Commands.CreateTransaction
             if (category == null)
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));
 
-            if (cmd.Dto.TransactionType == category.TransactionType)
+            if (cmd.Dto.TransactionType != category.TransactionType)
                 return Result.Failure<Transaction>(Error.TypeMismatch("Transaction type does not match category type."));
 
             if(cmd.Dto.TransactionType == TransactionType.Expense)

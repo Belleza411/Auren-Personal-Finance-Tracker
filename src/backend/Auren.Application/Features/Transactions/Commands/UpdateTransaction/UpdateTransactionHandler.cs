@@ -28,7 +28,6 @@ namespace Auren.Application.Features.Transactions.Commands.UpdateTransaction
             }
 
             var transaction = await db.Transactions
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t =>
                     t.Id == cmd.TransactionId &&
                     t.UserId == cmd.UserId,
@@ -53,10 +52,9 @@ namespace Auren.Application.Features.Transactions.Commands.UpdateTransaction
             transaction.Name = cmd.Dto.Name;
             transaction.Amount = cmd.Dto.Amount;
             transaction.PaymentType = cmd.Dto.PaymentType;
-            transaction.PaymentType = cmd.Dto.PaymentType;
             transaction.TransactionType = cmd.Dto.TransactionType;
             transaction.CategoryId = category.Id;
-            transaction.TransactionDate = transaction.TransactionDate;
+            transaction.TransactionDate = cmd.Dto.TransactionDate;
 
             var saved = await db.SaveChangesAsync(ct) > 0;
 
