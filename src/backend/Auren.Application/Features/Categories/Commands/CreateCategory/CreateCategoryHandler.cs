@@ -54,6 +54,7 @@ namespace Auren.Application.Features.Categories.Commands.CreateCategory
             CancellationToken ct)
         {
             return await db.Categories
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.UserId == userId &&
                     c.Name.Equals(dto.Name) &&

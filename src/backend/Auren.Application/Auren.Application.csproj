@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Dashboard\Validators\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Features\Transactions\Queries\GetBalance\GetBalanceQuery.cs" />
   </ItemGroup>
 

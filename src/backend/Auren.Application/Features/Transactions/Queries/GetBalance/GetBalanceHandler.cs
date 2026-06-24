@@ -19,6 +19,7 @@ namespace Auren.Application.Features.Transactions.Queries.GetBalance
                 .Where(t => t.UserId == query.UserId)
                 .GroupBy(t => t.TransactionType)
                 .Select(g => new { Type = g.Key, Total = g.Sum(t => t.Amount) })
+                .AsNoTracking()
                 .ToListAsync(ct);
 
             var income = totals.FirstOrDefault(x => x.Type == TransactionType.Income)?.Total ?? 0;

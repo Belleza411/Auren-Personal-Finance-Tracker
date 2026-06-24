@@ -22,6 +22,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
                             t.TransactionDate <= endDate)
                 .GroupBy(t => new { t.TransactionType, IsCurrent = t.TransactionDate >= startDate })
                 .Select(g => new { g.Key.TransactionType, g.Key.IsCurrent, Total = g.Sum(t => t.Amount) })
+                .AsNoTracking()
                 .ToListAsync(ct);
 
             var currentIncome = periodTotals.FirstOrDefault(x => x.IsCurrent && x.TransactionType == TransactionType.Income)?.Total ?? 0;

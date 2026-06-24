@@ -30,6 +30,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetIncomesVsExpenses
                     g.Key.Date,
                     g.Key.TransactionType,
                     g.Sum(t => t.Amount)))
+                .AsNoTracking()
                 .ToListAsync(ct);
 
             bool isDailyHybrid = query.TimePeriod is TimePeriod.ThisMonth or TimePeriod.LastMonth;

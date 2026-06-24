@@ -15,9 +15,10 @@ namespace Auren.Application.Features.Transactions.Commands.DeleteTransaction
             CancellationToken ct)
         {
             var transaction = await db.Transactions
-            .FirstOrDefaultAsync(t =>
-                t.Id == cmd.TransactionId &&
-                t.UserId == cmd.UserId, ct);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t =>
+                    t.Id == cmd.TransactionId &&
+                    t.UserId == cmd.UserId, ct);
 
             if (transaction == null)
                 return Result.Failure<bool>(Error.NotFound("Transaction not found."));

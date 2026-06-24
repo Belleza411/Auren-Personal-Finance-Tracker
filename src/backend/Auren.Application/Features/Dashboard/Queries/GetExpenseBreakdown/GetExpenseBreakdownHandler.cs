@@ -33,6 +33,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
                     Total = g.Sum(t => t.Amount)
                 })
                 .OrderByDescending(x => x.Total)
+                .AsNoTracking()
                 .ToListAsync(ct);
 
             var totalSpent = Math.Round(data.Sum(c => c.Total), 2);

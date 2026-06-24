@@ -29,10 +29,12 @@ namespace Auren.Application.Features.Transactions.Commands.CreateTransaction
             }
             
             var category = await db.Categories
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.UserId == cmd.UserId &&
                     c.Name == cmd.Dto.Category &&
-                    c.TransactionType == cmd.Dto.TransactionType, ct);
+                    c.TransactionType == cmd.Dto.TransactionType,
+                    ct);
 
             if (category == null)
                 return Result.Failure<Transaction>(Error.NotFound("Category not found. "));

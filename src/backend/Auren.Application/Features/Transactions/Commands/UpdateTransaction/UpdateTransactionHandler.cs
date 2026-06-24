@@ -38,6 +38,7 @@ namespace Auren.Application.Features.Transactions.Commands.UpdateTransaction
                 return Result.Failure<Transaction>(Error.NotFound("Transaction not found"));
 
             var category = await db.Categories
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.UserId == cmd.UserId &&
                     c.Name == cmd.Dto.Category &&
