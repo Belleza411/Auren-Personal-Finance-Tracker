@@ -1,8 +1,5 @@
 ﻿using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Common.Interfaces
 {
@@ -14,5 +11,10 @@ namespace Auren.Application.Common.Interfaces
         Task<SignInResult> CheckPasswordAsync(ApplicationUser user, string password);
         Task<DateTimeOffset?> GetLockoutEndDateAsync(ApplicationUser user);
         Task<int> GetAccessFailedCountAsync(ApplicationUser user);
+        Task<IdentityResult> ChangePasswordAsync(
+            ApplicationUser user,
+            string currentPassword,
+            string newPassword);
+        Task<ApplicationUser?> FindByIdAsync(Guid userId);
     }
 }

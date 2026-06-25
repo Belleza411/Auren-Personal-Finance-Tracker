@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Auth.Commands.ChangePassword;
 using Auren.Application.Features.Auth.Commands.Login;
 using Auren.Application.Features.Auth.Commands.Logout;
 using Auren.Application.Features.Auth.Commands.Register;
@@ -19,6 +20,7 @@ namespace Auren.API.Controllers
     ITokenService tokenService,
     RegisterHandler registerHandler,
     LoginHandler loginHandler,
+    ChangePasswordHandler changePassword,
     LogoutHandler logoutHandler) : ControllerBase
     {
         [HttpPost("register")]
@@ -65,6 +67,29 @@ namespace Auren.API.Controllers
 
             await Task.Delay(1000, ct);
             return Ok(result.Value);
+        }
+
+        [HttpPut("change-password")]
+        [EnableRateLimiting("auth")]
+        public async Task<ActionResult<AuthResponse>> ChangePassword(
+            ChangePasswordRequest request, CancellationToken ct)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var cmd = new ChangePasswordCommand(
+                userId.Value,
+                new ChangePasswordDto(
+                    request.CurrentPassword,
+                    request.NewPassword,
+                    request.ConfirmPassword)
+                );
+
+            var result = await changePassword.Handle(cmd, ct);
+
+            return result.IsSuccess
+                ? Ok("Password changed successfully.")
+                : BadRequest(result.Error);
         }
 
         [HttpPost("logout")]

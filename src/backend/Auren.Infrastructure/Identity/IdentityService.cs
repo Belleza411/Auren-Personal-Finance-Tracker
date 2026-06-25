@@ -12,7 +12,7 @@ namespace Auren.Infrastructure.Identity
         SignInManager<ApplicationUser> signInManager) : IIdentityService
     {
         public Task<ApplicationUser?> FindByEmailAsync(string email)
-        => userManager.FindByEmailAsync(email);
+            => userManager.FindByEmailAsync(email);
 
         public Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
             => userManager.CreateAsync(user, password);
@@ -28,5 +28,14 @@ namespace Auren.Infrastructure.Identity
 
         public Task<int> GetAccessFailedCountAsync(ApplicationUser user)
             => userManager.GetAccessFailedCountAsync(user);
+
+        public Task<IdentityResult> ChangePasswordAsync(
+            ApplicationUser user,
+            string currentPassword,
+            string newPassword)
+                => userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+        public Task<ApplicationUser?> FindByIdAsync(Guid userId)
+            => userManager.FindByIdAsync(userId.ToString());
     }
 }
