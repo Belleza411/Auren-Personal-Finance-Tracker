@@ -2,8 +2,6 @@
     <h2 class="mb-1 text-3xl text-white">Profile</h2>
     <p class="text-white text-sm">Manage your personal account information</p>
 </header>
-
-<!-- Profile Form -->
 <form class="flex flex-col gap-6" (submit)="onSubmit($event)">
     <hlm-card>
         <hlm-card-header>
@@ -133,47 +131,4 @@
         </hlm-card-footer>
     </hlm-card>
 </form>
-<form class="flex flex-col gap-6" (submit)="onChangePassword($event)">
-    <hlm-card>
-        <hlm-card-header>
-            <h3 class="font-semibold">Change Password</h3>
-            <p class="text-sm text-gray-400">Update your password to keep your account secure</p>
-        </hlm-card-header>
-        <hlm-separator />
-        <div hlmCardContent>
-            <div class="flex flex-col gap-4 max-w-lg">
-                <hlm-field>
-                    <label hlmFieldLabel>Current Password</label>
-                    <input 
-                        hlmInput    
-                        type="password" 
-                        placeholder="Current password"
-                        [formField]="passwordForm.currentPassword" />
-                </hlm-field>
-                <div class="grid grid-cols-2 gap-4">
-                    <hlm-field>
-                        <label hlmFieldLabel>New Password</label>
-                        <input 
-                            hlmInput 
-                            type="password" 
-                            placeholder="New password"
-                            [formField]="passwordForm.newPassword" />
-                    </hlm-field>
-                    <hlm-field>
-                        <label hlmFieldLabel>Confirm Password</label>
-                        <input 
-                            hlmInput 
-                            type="password" 
-                            placeholder="Confirm password"
-                            [formField]="passwordForm.confirmPassword" />
-                    </hlm-field>
-                </div>
-            </div>
-        </div>
-        <hlm-card-footer class="flex justify-end">
-            <button hlmBtn type="submit" [disabled]="isPasswordLoading()">
-                @if (isPasswordLoading()) { <hlm-spinner /> } @else { Update Password }
-            </button>
-        </hlm-card-footer>
-    </hlm-card>
-</form>
+<app-change-password />

@@ -38,6 +38,12 @@ interface Register {
     profileImage?: ProfileImageUpload | null;
 }
 
+interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
 interface ProfileImageUpload {
     file: File | null;
     name: string | null;
@@ -54,5 +60,6 @@ export type {
     RefreshToken,
     AuthResponse,
     Register,
-    Login
+    Login,
+    ChangePasswordRequest
 }

@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 
 import { apiUrl } from '../../../../environments/environment';
-import { AuthResponse, Login, Register } from '../models/user.model';
+import { AuthResponse, ChangePasswordRequest, Login, Register } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +25,12 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
       tap(() => this.isAuthenticatedSubject.next(true))
     );
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.baseUrl}/change-password`, request, { 
+      withCredentials: true 
+    });
   }
 
   logout(): Observable<AuthResponse> {

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
- import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
-import { UserDto, UserResponse } from '../../models/profile.model';
+import { UserDto } from '../../models/profile.model';
 import { ProfileService } from '../../service/profile.service';
 import { getInitials } from '../../utils/getInitials';
 import { stringToColor } from '../../utils/stringToColor';
@@ -16,7 +16,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { email, form, submit, FormField, disabled, minLength, required, validate } from '@angular/forms/signals';
 import { AlertService } from 'src/app/core/services/alert.service';
-import { createFieldErrors } from 'src/app/shared/utils/form-errors.util';
+import { ChangePassword } from "../../components/change-password/change-password";
 
 @Component({
   selector: 'app-profile',
@@ -30,7 +30,8 @@ import { createFieldErrors } from 'src/app/shared/utils/form-errors.util';
     HlmSpinnerImports,
     HlmSelectImports,
     NgIcon,
-    FormField
+    FormField,
+    ChangePassword
 ],
   providers: [provideIcons({ lucideTrash, lucideUpload, lucidePencil })],
   templateUrl: './profile.html',
@@ -54,7 +55,6 @@ export class Profile {
 
   isEditing = signal(false)
   isLoading = signal(false)
-  isPasswordLoading = signal(false);
   selectedFile = signal<File | null>(null);
   profilePreview = signal<string | null>(null);
 
@@ -66,12 +66,6 @@ export class Profile {
     currency: ''
   })
 
-  protected passwordModel = signal({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-
   protected profileForm = form(this.profileModel, schema => {
     email(schema.email, { message: 'Enter a valid email'})
 
@@ -79,26 +73,6 @@ export class Profile {
     disabled(schema.lastName, { when: () => !this.isEditing()})
     disabled(schema.email, { when: () => !this.isEditing()})
     disabled(schema.currency, { when: () => !this.isEditing()})
-  })
-
-  protected passwordForm = form(this.passwordModel, schema => {
-    required(schema.currentPassword, { message: 'Password is required' });
-    minLength(schema.currentPassword, 8, { message: 'Password must be at least 8 characters' });
-    required(schema.confirmPassword, { message: 'Confirm password is required' });
-
-    validate(schema.confirmPassword, ({ value, valueOf }) => {
-      const confirm = value();
-      const password = valueOf(schema.currentPassword);
-
-      if(confirm !== password) {
-        return {
-          kind: 'passwordMismatch',
-          message: "Passwords do not match"
-        }
-      }
-
-      return null;
-    })
   })
 
   protected readonly profilePictureUrl = computed(() => this.user()?.profilePictureUrl ?? null);
@@ -201,19 +175,6 @@ export class Profile {
 
   onDeleteAccount() {
     // show confirmation dialog before deleting
-  }
-
-  onChangePassword(event: Event) {
-    event.preventDefault();
-    submit(this.passwordForm, async () => {
-        this.isPasswordLoading.set(true);
-        try {
-            // call your password change service here
-        } finally {
-            this.isPasswordLoading.set(false);
-            this.passwordModel.set({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        }
-    });
   }
 
   currencyToString = (value: string): string =>
