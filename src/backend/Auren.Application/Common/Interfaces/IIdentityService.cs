@@ -16,5 +16,6 @@ namespace Auren.Application.Common.Interfaces
             string currentPassword,
             string newPassword);
         Task<ApplicationUser?> FindByIdAsync(Guid userId);
+        Task<IdentityResult> DeleteAsync(ApplicationUser user);
     }
 }

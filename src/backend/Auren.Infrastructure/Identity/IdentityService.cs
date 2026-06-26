@@ -37,5 +37,8 @@ namespace Auren.Infrastructure.Identity
 
         public Task<ApplicationUser?> FindByIdAsync(Guid userId)
             => userManager.FindByIdAsync(userId.ToString());
+
+        public Task<IdentityResult> DeleteAsync(ApplicationUser user)
+            => userManager.DeleteAsync(user);
     }
 }

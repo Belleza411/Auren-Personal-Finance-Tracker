@@ -2,6 +2,7 @@
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Features.Auth.Commands.ChangePassword;
+using Auren.Application.Features.Auth.Commands.DeleteAccount;
 using Auren.Application.Features.Auth.Commands.Login;
 using Auren.Application.Features.Auth.Commands.Logout;
 using Auren.Application.Features.Auth.Commands.Register;
@@ -21,7 +22,8 @@ namespace Auren.API.Controllers
     RegisterHandler registerHandler,
     LoginHandler loginHandler,
     ChangePasswordHandler changePassword,
-    LogoutHandler logoutHandler) : ControllerBase
+    LogoutHandler logoutHandler,
+    DeleteAccountHandler delete) : ControllerBase
     {
         [HttpPost("register")]
         [EnableRateLimiting("auth")]
@@ -90,6 +92,37 @@ namespace Auren.API.Controllers
             return result.IsSuccess
                 ? Ok("Password changed successfully.")
                 : BadRequest(result.Error);
+        }
+
+        [HttpDelete("delete-account")]
+        [EnableRateLimiting("auth")]
+        public async Task<IActionResult> DeleteAccount(
+            string password,
+            CancellationToken ct)
+        {
+            var userId = User.GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            if (string.IsNullOrEmpty(password))
+                return BadRequest("Password is empty");
+
+            var result = await delete.Handle(
+                new DeleteAccountCommand(userId.Value, password), ct);
+
+            if (!result.IsSuccess)
+            {
+                return result.Error.Code switch
+                {
+                    ErrorTypes.NotFound => NotFound(result.Error),
+                    ErrorTypes.InvalidInput => BadRequest(result.Error),
+                    ErrorTypes.DeleteFailed => StatusCode(500, result.Error),
+                    _ => StatusCode(500, result.Error)
+                };
+            }
+
+            // Sign out after deletion
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok("Account deleted successfully.");
         }
 
         [HttpPost("logout")]
