@@ -120,7 +120,6 @@ namespace Auren.API.Controllers
                 };
             }
 
-            // Sign out after deletion
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok("Account deleted successfully.");
         }

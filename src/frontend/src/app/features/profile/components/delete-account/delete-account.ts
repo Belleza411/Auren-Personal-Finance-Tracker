@@ -50,12 +50,16 @@ import { HlmFieldImports } from '@spartan-ng/helm/field';
           </p>
           <hlm-field class="mt-2">
             <label hlmFieldLabel for="password">Password</label>
-            <input hlmInput type="password"/>
+            <input 
+              hlmInput 
+              type="password"
+              (input)="password.set($any($event.target).value)"/>
           </hlm-field>
         </hlm-alert-dialog-header>
         <hlm-alert-dialog-footer>
           <button 
             hlmAlertDialogAction 
+            [disabled]="!canDelete()"
             variant="destructive"
             (click)="onDelete()"
           >
@@ -80,6 +84,8 @@ export class DeleteAccount {
   protected state = signal<'open' | 'closed'>('open');
 
   readonly user = this.profileService.user;
+  protected readonly password = signal<string>('');
+  protected readonly canDelete = computed(() => this.password().trim().length > 0);
 
   protected readonly profilePictureUrl = computed(() => this.user()?.profilePictureUrl ?? null);
   readonly fullName = computed(() => {
@@ -92,7 +98,7 @@ export class DeleteAccount {
   onStateChanged(state: 'open' | 'closed') {
     this.state.set(state);
     if (state === 'closed') {
-        this.router.navigate(['/profile']);
+      this.router.navigate(['/profile']);
     }
   }
 
@@ -101,7 +107,17 @@ export class DeleteAccount {
   }
 
   onDelete() {
-    // call delete service, then navigate
-    this.router.navigate(['/profile']);
+    if (!this.canDelete()) return;
+
+    this.authService.deleteAccount(this.password())
+      .subscribe({
+        next: () => {
+          this.alertService.success('Account deleted successfully.');
+          this.router.navigate(['/login']);
+        },
+        error: () => {
+          this.alertService.error('Failed to delete account. Please check your password.');
+        }
+      });
   }
 }

@@ -33,6 +33,13 @@ export class AuthService {
     });
   }
 
+  deleteAccount(password: string): Observable<void> {
+    const options = {
+      body: { password }
+    };
+    return this.http.delete<void>(`${this.baseUrl}/delete-account`, options);
+  }
+
   logout(): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/logout`, {}, { withCredentials: true }).pipe(
       tap(() => this.isAuthenticatedSubject.next(false))
