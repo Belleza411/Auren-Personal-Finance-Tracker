@@ -17,21 +17,16 @@ namespace Auren.API.Controllers
 {
     [Route("api/auth")]
     [ApiController]
-    public class AuthController(
-    ITokenService tokenService,
-    RegisterHandler registerHandler,
-    LoginHandler loginHandler,
-    ChangePasswordHandler changePassword,
-    LogoutHandler logoutHandler,
-    DeleteAccountHandler delete) : ControllerBase
+    public class AuthController : ControllerBase
     {
         [HttpPost("register")]
         [EnableRateLimiting("auth")]
         public async Task<ActionResult<AuthResponse>> Register(
+            [FromServices] RegisterHandler handler,
             [FromForm] RegisterRequest request,
             CancellationToken ct)
         {
-            var result = await registerHandler.Handle(new RegisterCommand(request), ct);
+            var result = await handler.Handle(new RegisterCommand(request), ct);
 
             if (!result.IsSuccess)
             {
@@ -51,10 +46,11 @@ namespace Auren.API.Controllers
         [HttpPost("login")]
         [EnableRateLimiting("auth")]
         public async Task<ActionResult<AuthResponse>> Login(
+            [FromServices] LoginHandler handler,
             LoginRequest request,
             CancellationToken ct)
         {
-            var result = await loginHandler.Handle(new LoginCommand(request), ct);
+            var result = await handler.Handle(new LoginCommand(request), ct);
 
             if (!result.IsSuccess)
             {
@@ -74,7 +70,9 @@ namespace Auren.API.Controllers
         [HttpPut("change-password")]
         [EnableRateLimiting("auth")]
         public async Task<ActionResult<AuthResponse>> ChangePassword(
-            ChangePasswordRequest request, CancellationToken ct)
+            [FromServices] ChangePasswordHandler handler,
+            ChangePasswordRequest request,
+            CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
@@ -87,7 +85,7 @@ namespace Auren.API.Controllers
                     request.ConfirmPassword)
                 );
 
-            var result = await changePassword.Handle(cmd, ct);
+            var result = await handler.Handle(cmd, ct);
 
             return result.IsSuccess
                 ? Ok("Password changed successfully.")
@@ -97,6 +95,7 @@ namespace Auren.API.Controllers
         [HttpDelete("delete-account")]
         [EnableRateLimiting("auth")]
         public async Task<IActionResult> DeleteAccount(
+            [FromServices] DeleteAccountHandler handler,
             string password,
             CancellationToken ct)
         {
@@ -106,7 +105,7 @@ namespace Auren.API.Controllers
             if (string.IsNullOrEmpty(password))
                 return BadRequest("Password is empty");
 
-            var result = await delete.Handle(
+            var result = await handler.Handle(
                 new DeleteAccountCommand(userId.Value, password), ct);
 
             if (!result.IsSuccess)
@@ -126,14 +125,14 @@ namespace Auren.API.Controllers
 
         [HttpPost("logout")]
         [EnableRateLimiting("write")]
-        public async Task<ActionResult<AuthResponse>> Logout(CancellationToken ct)
+        public async Task<ActionResult<AuthResponse>> Logout([FromServices] LogoutHandler handler, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
 
             if (userId == null)
                 return BadRequest("Logout attempted without valid user session.");
 
-            var result = await logoutHandler.Handle(new LogoutCommand(userId.Value), ct);
+            var result = await handler.Handle(new LogoutCommand(userId.Value), ct);
 
             if (!result.IsSuccess)
             {
@@ -149,7 +148,7 @@ namespace Auren.API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(CancellationToken ct)
+        public async Task<IActionResult> Refresh([FromServices] ITokenService tokenService, CancellationToken ct)
         {
             var userId = User.GetCurrentUserId();
             if (userId == null)

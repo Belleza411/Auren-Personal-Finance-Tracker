@@ -11,20 +11,18 @@ namespace Auren.API.Controllers
 	[Route("api/[controller]")]
 	[ApiController]
     [EnableRateLimiting("fixed")]
-    public class ProfilesController(
-		GetUserProfileHandler getHanlder,
-		UpdateProfileHandler updateHandler) : ControllerBase
+    public class ProfilesController : ControllerBase
 	{
 		[HttpGet("me")]
         [EnableRateLimiting("read")]
 
-        public async Task<ActionResult<UserResponse>> GetUserProfile(CancellationToken ct)
+        public async Task<ActionResult<UserResponse>> GetUserProfile([FromServices] GetUserProfileHandler handler, CancellationToken ct)
 		{
 			var userId = User.GetCurrentUserId();
 
 			if (userId == null) return Unauthorized();
 
-			var userProfile = await getHanlder.Handle(new GetUserProfileQuery(userId.Value), ct);
+			var userProfile = await handler.Handle(new GetUserProfileQuery(userId.Value), ct);
 
 			return userProfile.IsSuccess ? Ok(userProfile.Value) : NotFound(userProfile.Error);
         }
@@ -32,14 +30,17 @@ namespace Auren.API.Controllers
 		[HttpPut("update-user")]
         [EnableRateLimiting("write")]
 
-        public async Task<ActionResult<UserResponse>> UpdateUserProfile([FromForm] UserDto userDto, CancellationToken ct)
+        public async Task<ActionResult<UserResponse>> UpdateUserProfile(
+			[FromServices] UpdateProfileHandler handler,
+			[FromForm] UserDto userDto,
+			CancellationToken ct)
 		{
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
 			var cmd = new UpdateProfileCommand(userId.Value, userDto);
 
-			var updateProfile = await updateHandler.Handle(cmd, ct);
+			var updateProfile = await handler.Handle(cmd, ct);
 
  			if(!updateProfile.IsSuccess)
 			{
