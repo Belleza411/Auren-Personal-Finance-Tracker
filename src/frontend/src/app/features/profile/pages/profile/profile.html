@@ -124,7 +124,7 @@
                 <h3 class="font-semibold">Delete Account</h3>
                 <p class="text-sm text-gray-400">Permanently removes your account and all data</p>
             </div>
-            <button hlmBtn variant="destructive" type="button" (click)="onDeleteAccount()">
+            <button hlmBtn variant="destructive" (click)="onDeleteAccount()">
                 <ng-icon name="lucideTrash" size="1rem" class="mr-1" />
                 Delete Account
             </button>
@@ -132,3 +132,4 @@
     </hlm-card>
 </form>
 <app-change-password />
+<router-outlet />

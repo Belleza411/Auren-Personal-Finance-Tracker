@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
@@ -14,9 +14,11 @@ import { HlmSpinnerImports } from './../../../../libs/ui/spinner/src/index';
 import { lucideTrash, lucideUpload, lucidePencil } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
-import { email, form, submit, FormField, disabled, minLength, required, validate } from '@angular/forms/signals';
+import { email, form, submit, FormField, disabled } from '@angular/forms/signals';
 import { AlertService } from 'src/app/core/services/alert.service';
 import { ChangePassword } from "../../components/change-password/change-password";
+import { Router, RouterOutlet } from "@angular/router";
+import { DeleteAccount } from "../../components/delete-account/delete-account";
 
 @Component({
   selector: 'app-profile',
@@ -31,7 +33,8 @@ import { ChangePassword } from "../../components/change-password/change-password
     HlmSelectImports,
     NgIcon,
     FormField,
-    ChangePassword
+    ChangePassword,
+    RouterOutlet
 ],
   providers: [provideIcons({ lucideTrash, lucideUpload, lucidePencil })],
   templateUrl: './profile.html',
@@ -42,6 +45,7 @@ export class Profile {
   private profileService = inject(ProfileService);
   private alertService = inject(AlertService)
   private destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router)
 
   currencyOptions = [
     { value: 'USD', label: 'USD — US Dollar' },
@@ -174,7 +178,7 @@ export class Profile {
   }
 
   onDeleteAccount() {
-    // show confirmation dialog before deleting
+    this.router.navigate(['/profile', 'delete-account'])
   }
 
   currencyToString = (value: string): string =>
