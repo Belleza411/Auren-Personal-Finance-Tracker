@@ -1,5 +1,5 @@
-﻿using Auren.Application.Features.Profile.DTOs;
-using Auren.Infrastructure.Common.Interfaces;
+﻿using Auren.Application.Common.Interfaces;
+using Auren.Application.Features.Profile.DTOs;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation;

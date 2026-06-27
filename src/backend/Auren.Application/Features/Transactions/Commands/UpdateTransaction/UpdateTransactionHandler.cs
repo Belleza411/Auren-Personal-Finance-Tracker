@@ -1,14 +1,9 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
-using Auren.Application.Features.Categories.DTOs;
-using Auren.Application.Features.Transactions.Commands.CreateTransaction;
 using Auren.Application.Features.Transactions.DTOs;
 using Auren.Domain.Entities;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Transactions.Commands.UpdateTransaction
 {

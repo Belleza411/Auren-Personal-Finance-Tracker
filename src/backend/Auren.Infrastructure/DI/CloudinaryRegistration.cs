@@ -1,4 +1,4 @@
-﻿using Auren.Infrastructure.Common.Interfaces;
+﻿using Auren.Application.Common.Interfaces;
 using Auren.Infrastructure.Services;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Builder;

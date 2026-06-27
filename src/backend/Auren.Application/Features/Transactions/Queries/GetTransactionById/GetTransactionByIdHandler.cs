@@ -2,9 +2,6 @@
 using Auren.Application.Common.Result;
 using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Transactions.Queries.GetTransactionById
 {

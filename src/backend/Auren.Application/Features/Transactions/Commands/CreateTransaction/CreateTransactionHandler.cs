@@ -5,9 +5,6 @@ using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Transactions.Commands.CreateTransaction
 {

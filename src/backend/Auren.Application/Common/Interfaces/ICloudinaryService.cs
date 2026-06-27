@@ -1,9 +1,6 @@
 ﻿using Auren.Application.Features.Profile.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Auren.Infrastructure.Common.Interfaces
+namespace Auren.Application.Common.Interfaces
 {
     public interface ICloudinaryService
     {

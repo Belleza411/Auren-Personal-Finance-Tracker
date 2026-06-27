@@ -1,15 +1,10 @@
-﻿using Auren.Application.Common.Interfaces; 
+﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Features.Auth.DTOs;
 using Auren.Application.Features.Profile.DTOs;
-using Auren.Domain.Entities;
-using Auren.Infrastructure.Common.Interfaces;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Profile.Commands.UpdateProfile
 {

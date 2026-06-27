@@ -1,8 +1,5 @@
 ﻿using Auren.Application.Features.Auth.DTOs;
 using Auren.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Extensions
 {

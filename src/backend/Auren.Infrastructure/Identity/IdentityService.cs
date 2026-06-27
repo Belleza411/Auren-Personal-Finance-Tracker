@@ -1,9 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Infrastructure.Identity
 {

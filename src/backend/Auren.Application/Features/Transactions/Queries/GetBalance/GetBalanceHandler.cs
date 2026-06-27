@@ -3,9 +3,6 @@ using Auren.Application.Common.Result;
 using Auren.Application.Features.Dashboard.DTOs;
 using Auren.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Transactions.Queries.GetBalance
 {

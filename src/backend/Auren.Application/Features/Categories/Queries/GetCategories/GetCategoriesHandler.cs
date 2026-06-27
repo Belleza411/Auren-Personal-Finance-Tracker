@@ -4,9 +4,6 @@ using Auren.Application.Common.Result;
 using Auren.Application.Common.Specifications.Categories;
 using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Categories.Queries.GetCategories
 {

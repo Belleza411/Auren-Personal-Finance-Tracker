@@ -4,10 +4,6 @@ using Auren.Application.Common.Result;
 using Auren.Application.Common.Specifications.Transactions;
 using Auren.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Auren.Application.Features.Transactions.Queries.GetTransactions
 {

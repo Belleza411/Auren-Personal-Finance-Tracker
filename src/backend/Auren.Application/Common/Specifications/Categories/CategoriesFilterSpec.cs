@@ -1,9 +1,5 @@
-﻿using Auren.Application.Common.Specifications;
-using Auren.Domain.Entities;
-using System;
-using System.Collections.Generic;
+﻿using Auren.Domain.Entities;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Auren.Application.Common.Specifications.Categories
 {

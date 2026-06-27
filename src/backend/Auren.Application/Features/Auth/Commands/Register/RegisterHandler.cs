@@ -5,7 +5,6 @@ using Auren.Application.Features.Auth.DTOs;
 using Auren.Application.Features.Auth.Helper;
 using Auren.Application.Features.Profile.DTOs;
 using Auren.Domain.Entities;
-using Auren.Infrastructure.Common.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 

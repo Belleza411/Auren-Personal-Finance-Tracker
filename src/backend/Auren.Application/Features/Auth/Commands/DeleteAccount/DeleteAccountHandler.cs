@@ -1,9 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Auren.Application.Features.Auth.Commands.DeleteAccount
 {

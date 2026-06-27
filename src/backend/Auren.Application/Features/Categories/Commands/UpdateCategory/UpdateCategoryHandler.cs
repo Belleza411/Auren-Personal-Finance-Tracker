@@ -4,10 +4,6 @@ using Auren.Application.Features.Categories.DTOs;
 using Auren.Domain.Entities;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Auren.Application.Features.Categories.Commands.UpdateCategory
 {
