@@ -19,6 +19,10 @@
 
         public static Result<T> Success<T>(T value) => new(value, true, Error.None);
         public static Result<T> Failure<T>(Error error) => new(default!, false, error);
+        public TOut Match<TOut>(
+            Func<TOut> onSuccess,
+            Func<Error, TOut> onFailure)
+                => IsSuccess ? onSuccess() : onFailure(Error);
     }
 
     public class Result<T> : Result
@@ -30,5 +34,20 @@
         {
             Value = value;
         }
+
+        public Result<TNew> Map<TNew>(Func<T, TNew> mapper)
+            => IsSuccess
+                ? Result.Success(mapper(Value))
+                : Result.Failure<TNew>(Error);
+
+        public Result<TNew> Bind<TNew>(Func<T, Result<TNew>> binder)
+            => IsSuccess
+                ? binder(Value)
+                : Result.Failure<TNew>(Error);
+
+        public TOut Match<TOut>(
+            Func<T, TOut> onSuccess,
+            Func<Error, TOut> onFailure)
+                => IsSuccess ? onSuccess(Value) : onFailure(Error);
     }
 }

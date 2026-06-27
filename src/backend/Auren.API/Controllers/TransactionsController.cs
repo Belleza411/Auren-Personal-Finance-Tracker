@@ -52,9 +52,11 @@
 
                 var query = new GetTransactionByIdQuery(transactionId, userId.Value);
 
-                var transaction = await handler.Handle(query, ct);
+                var result = await handler.Handle(query, ct);
 
-                return transaction.IsSuccess ? Ok(transaction.Value) : NotFound(transaction?.Error);
+                return result.Match<ActionResult<Transaction>>(
+                    onSuccess: value => Ok(value),
+                    onFailure: _ => NotFound($"Transaction with ID {transactionId} not found."));
             }
 
 		    [HttpPost]
@@ -69,26 +71,23 @@
 
                 var cmd = new CreateTransactionCommand(userId.Value, transactionDto);
 
-                var createdTransaction = await handler.Handle(cmd, ct);
+                var result = await handler.Handle(cmd, ct);
 
-                if (!createdTransaction.IsSuccess)
-                {
-                    return createdTransaction.Error.Code switch
+                return result.Match(
+                    onSuccess: value => CreatedAtAction(nameof(GetTransactionById), new { transactionId = value.Id }, value),
+                    onFailure: err => err.Code switch
                     {
                         ErrorTypes.InvalidInput
-                            or ErrorTypes.ValidationFailed
-                            or ErrorTypes.TypeMismatch
-                            or ErrorTypes.NotEnoughBalance
-                                => BadRequest(createdTransaction.Error),
-            
-                        ErrorTypes.NotFound => NotFound(createdTransaction.Error),
-                        ErrorTypes.CreateFailed => StatusCode(500, createdTransaction.Error),
-                   
-                        _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
+                        or ErrorTypes.ValidationFailed
+                        or ErrorTypes.TypeMismatch
+                        or ErrorTypes.NotEnoughBalance
+                            => BadRequest(err),
 
-                return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Value.Id }, createdTransaction.Value);
+                        ErrorTypes.NotFound => NotFound(err),
+                        ErrorTypes.CreateFailed => StatusCode(500, err),
+
+                        _ => StatusCode(500, "An unexpected error occurred.")
+                    });
             }
 
 		    [HttpPut("{transactionId:guid}")]
@@ -104,25 +103,22 @@
 
                 var cmd = new UpdateTransactionCommand(userId.Value, transactionId, transactionDto);
 
-                var updatedTransaction = await handler.Handle(cmd, ct);
+                var result = await handler.Handle(cmd, ct);
 
-                if (!updatedTransaction.IsSuccess)
-                {
-                    return updatedTransaction.Error.Code switch
+                return result.Match(
+                    onSuccess: Ok,
+                    onFailure: err => err.Code switch
                     {
                         ErrorTypes.InvalidInput
                             or ErrorTypes.ValidationFailed
-                            or ErrorTypes.TypeMismatch 
-                                => BadRequest(updatedTransaction.Error),
+                            or ErrorTypes.TypeMismatch
+                                => BadRequest(err),
 
-                        ErrorTypes.NotFound => NotFound(updatedTransaction.Error),
-                        ErrorTypes.UpdateFailed=> StatusCode(500, updatedTransaction.Error),
+                        ErrorTypes.NotFound => NotFound(err),
+                        ErrorTypes.UpdateFailed => StatusCode(500, err),
 
                         _ => StatusCode(500, "An unexpected error occurred.")
-                    };
-                }
-
-                return updatedTransaction != null ? Ok(updatedTransaction.Value) : NotFound(updatedTransaction?.Error);  
+                    });
             }
 
 		    [HttpDelete("{transactionId:guid}")]
@@ -137,9 +133,11 @@
 
                 var cmd = new DeleteTransactionCommand(userId.Value, transactionId);
 
-                var success = await handler.Handle(cmd, ct);
+                var result = await handler.Handle(cmd, ct);
 
-                return success.IsSuccess ? NoContent() : NotFound($"Transaction with ID {transactionId} not found.");
+                return result.Match<IActionResult>(
+                    onSuccess: NoContent,
+                    onFailure: NotFound);
             }
 
             [HttpGet("balance")]
@@ -150,7 +148,6 @@
             {
                 var userId = User.GetCurrentUserId();
                 if (userId == null) return Unauthorized();
-
 
                 var balance = await handler.Handle(new GetBalanceQuery(userId.Value), ct);
 

@@ -16,6 +16,7 @@ namespace Auren.Application.Features.Transactions.Queries.GetTransactionById
         {
             var transaction = await db.Transactions
                 .AsNoTracking()
+                .Include(t => t.Category)
                 .FirstOrDefaultAsync(t =>
                     t.Id == query.TransactionId &&
                     t.UserId == query.UserId,

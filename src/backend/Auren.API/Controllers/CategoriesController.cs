@@ -8,6 +8,7 @@ using Auren.Application.Features.Categories.Queries.GetCategories;
 using Auren.Application.Features.Categories.Queries.GetCategoryById;
 using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -48,13 +49,16 @@ namespace Auren.API.Controllers
 
             var cmd = new GetCategoryByIdCommand(userId.Value, categoryId);
 
-            var category = await handler.Handle(cmd, ct);
+            var result = await handler.Handle(cmd, ct);
 
-            return category.IsSuccess ? Ok(category.Value) : NotFound($"Category with ID {categoryId} not found.");
+            return result.Match<ActionResult<Category>>(
+                onSuccess: value => Ok(value),
+                onFailure: _ => NotFound($"Category with ID {categoryId} not found.")
+            );
         }
 
         [HttpPost]
-        [EnableRateLimiting("write")]
+        [EnableRateLimiting("sensitive")]
         public async Task<ActionResult<Category>> CreateCategory(
             [FromServices] CreateCategoryHandler handler,
             CategoryDto categoryDto,
@@ -65,28 +69,25 @@ namespace Auren.API.Controllers
             ;
             var cmd = new CreateCategoryCommand(categoryDto, userId.Value);
 
-            var createdCategory = await handler.Handle(cmd, ct);
+            var result = await handler.Handle(cmd, ct);
 
-            if (!createdCategory.IsSuccess)
-            {
-                return createdCategory.Error.Code switch
+            return result.Match(
+                onSuccess: value => CreatedAtAction(nameof(GetCategoryById), new { categoryId = value.Id }, value),
+                onFailure: err => err.Code switch
                 {
                     ErrorTypes.InvalidInput
                         or ErrorTypes.ValidationFailed
-                            => BadRequest(createdCategory.Error),
+                            => BadRequest(err),
 
-                    ErrorTypes.CategoryAlreadyExists => Conflict(createdCategory.Error),
-                    ErrorTypes.CreateFailed => StatusCode(500, createdCategory.Error),
+                    ErrorTypes.CategoryAlreadyExists => Conflict(err),
+                    ErrorTypes.CreateFailed => StatusCode(500, err),
 
                     _ => StatusCode(500, "An unexpected error occurred.")
-                };
-            }
-
-            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Value.Id }, createdCategory.Value);
+                });
         }
 
         [HttpPut("{categoryId:guid}")]
-        [EnableRateLimiting("write")]
+        [EnableRateLimiting("sensitive")]
         public async Task<ActionResult<Category>> UpdateCategory(
             [FromServices] UpdateCategoryHandler handler,
             Guid categoryId,
@@ -98,24 +99,19 @@ namespace Auren.API.Controllers
 
             var cmd = new UpdateCategoryCommand(categoryId, userId.Value, categoryDto);
 
-            var updatedCategory = await handler.Handle(cmd, ct);
+            var result = await handler.Handle(cmd, ct);
 
-            if (!updatedCategory.IsSuccess)
-            {
-                return updatedCategory.Error.Code switch
+            return result.Match(
+                onSuccess: Ok,
+                onFailure: err => err.Code switch
                 {
                     ErrorTypes.InvalidInput
                         or ErrorTypes.ValidationFailed
-                            => BadRequest(updatedCategory.Error),
-
-                    ErrorTypes.NotFound => NotFound(updatedCategory.Error),
-                    ErrorTypes.UpdateFailed => StatusCode(500, updatedCategory.Error),
-
+                        => BadRequest(err),
+                    ErrorTypes.NotFound => NotFound(err),
+                    ErrorTypes.UpdateFailed => StatusCode(500, err),
                     _ => StatusCode(500, "An unexpected error occurred.")
-                };
-            }
-
-            return Ok(updatedCategory.Value);
+                });
         }
 
         [HttpDelete("{categoryId:guid}")]
@@ -130,9 +126,11 @@ namespace Auren.API.Controllers
 
             var cmd = new DeleteCategoryCommand(userId.Value, categoryId);
 
-            var deleted = await handler.Handle(cmd, ct);
+            var result = await handler.Handle(cmd, ct);
 
-            return deleted.IsSuccess ? NoContent() : NotFound($"Category with ID {categoryId} not found.");
+            return result.Match<IActionResult>(
+                 onSuccess: NoContent,
+                 onFailure: NotFound);
         }
     }
 }

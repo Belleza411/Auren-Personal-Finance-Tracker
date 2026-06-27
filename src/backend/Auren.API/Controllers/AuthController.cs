@@ -28,19 +28,16 @@ namespace Auren.API.Controllers
         {
             var result = await handler.Handle(new RegisterCommand(request), ct);
 
-            if (!result.IsSuccess)
-            {
-                return result.Error.Code switch
+            return result.Match(
+                onSuccess: Ok,
+                onFailure: err => err.Code switch
                 {
-                    ErrorTypes.ValidationFailed => BadRequest(result.Error),
-                    ErrorTypes.EmailAlreadyInUse => Conflict(result.Error),
-                    ErrorTypes.UploadFailed => StatusCode(500, result.Error),
-                    ErrorTypes.CreateFailed => StatusCode(500, result.Error),
-                    _ => StatusCode(500, result.Error)
-                };
-            }
-
-            return Ok(result.Value);
+                    ErrorTypes.ValidationFailed => BadRequest(err),
+                    ErrorTypes.EmailAlreadyInUse => Conflict(err),
+                    ErrorTypes.UploadFailed => StatusCode(500, err),
+                    ErrorTypes.CreateFailed => StatusCode(500, err),
+                    _ => StatusCode(500, err)
+                });
         }
 
         [HttpPost("login")]
@@ -52,19 +49,16 @@ namespace Auren.API.Controllers
         {
             var result = await handler.Handle(new LoginCommand(request), ct);
 
-            if (!result.IsSuccess)
-            {
-                return result.Error.Code switch
-                {
-                    ErrorTypes.ValidationFailed => BadRequest(result.Error),
-                    ErrorTypes.UserLockedOut => StatusCode(429, result.Error),
-                    ErrorTypes.InvalidInput => BadRequest(result.Error),
-                    _ => StatusCode(500, result.Error)
-                };
-            }
-
             await Task.Delay(1000, ct);
-            return Ok(result.Value);
+            return result.Match(
+                onSuccess: Ok,
+                onFailure: err => err.Code switch
+                {
+                    ErrorTypes.ValidationFailed => BadRequest(err),
+                    ErrorTypes.UserLockedOut => StatusCode(429, err),
+                    ErrorTypes.InvalidInput => BadRequest(err),
+                    _ => StatusCode(500, err)
+                });
         }
 
         [HttpPut("change-password")]
@@ -87,9 +81,9 @@ namespace Auren.API.Controllers
 
             var result = await handler.Handle(cmd, ct);
 
-            return result.IsSuccess
-                ? Ok("Password changed successfully.")
-                : BadRequest(result.Error);
+            return result.Match<ActionResult<AuthResponse>>(
+                onSuccess: value => Ok(value),
+                onFailure: err => BadRequest(err));
         }
 
         [HttpDelete("delete-account")]
@@ -102,25 +96,21 @@ namespace Auren.API.Controllers
             var userId = User.GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            if (string.IsNullOrEmpty(password))
-                return BadRequest("Password is empty");
-
             var result = await handler.Handle(
                 new DeleteAccountCommand(userId.Value, password), ct);
 
-            if (!result.IsSuccess)
-            {
-                return result.Error.Code switch
-                {
-                    ErrorTypes.NotFound => NotFound(result.Error),
-                    ErrorTypes.InvalidInput => BadRequest(result.Error),
-                    ErrorTypes.DeleteFailed => StatusCode(500, result.Error),
-                    _ => StatusCode(500, result.Error)
-                };
-            }
-
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok("Account deleted successfully.");
+            return result.Match<IActionResult>(
+                 onSuccess: () =>
+                 {
+                     HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                     return Ok("Account deleted successfully.");
+                 },
+                 onFailure: err => err.Code switch {
+                     ErrorTypes.NotFound => NotFound(result.Error),
+                     ErrorTypes.InvalidInput => BadRequest(result.Error),
+                     ErrorTypes.DeleteFailed => StatusCode(500, result.Error),
+                     _ => StatusCode(500, result.Error)
+                 });
         }
 
         [HttpPost("logout")]
@@ -134,17 +124,14 @@ namespace Auren.API.Controllers
 
             var result = await handler.Handle(new LogoutCommand(userId.Value), ct);
 
-            if (!result.IsSuccess)
-            {
-                return result.Error.Code switch
+            return result.Match<ActionResult<AuthResponse>>(
+                onSuccess: value => Ok(value),
+                onFailure: err => err.Code switch
                 {
                     ErrorTypes.LogoutFailed => BadRequest(result.Error),
                     ErrorTypes.InvalidInput => BadRequest(result.Error),
                     _ => StatusCode(500, result.Error)
-                };
-            }
-
-            return Ok(new AuthResponse { Success = true, Message = "Logged out successfully." });
+                });
         }
 
         [HttpPost("refresh")]
@@ -167,10 +154,10 @@ namespace Auren.API.Controllers
                 return Unauthorized();
 
             var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, userId.Value.ToString()),
-            new(ClaimTypes.Email, storedToken.Value.User.Email!)
-        };
+            {
+                new(ClaimTypes.NameIdentifier, userId.Value.ToString()),
+                new(ClaimTypes.Email, storedToken.Value.User.Email!)
+            };
 
             var principal = new ClaimsPrincipal(
                 new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));

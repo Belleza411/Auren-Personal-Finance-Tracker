@@ -22,9 +22,11 @@ namespace Auren.API.Controllers
 
 			if (userId == null) return Unauthorized();
 
-			var userProfile = await handler.Handle(new GetUserProfileQuery(userId.Value), ct);
+			var result = await handler.Handle(new GetUserProfileQuery(userId.Value), ct);
 
-			return userProfile.IsSuccess ? Ok(userProfile.Value) : NotFound(userProfile.Error);
+			return result.Match<ActionResult<UserResponse>>(
+				onSuccess: value => Ok(value),
+				onFailure: err => NotFound(err));
         }
 
 		[HttpPut("update-user")]
@@ -40,20 +42,17 @@ namespace Auren.API.Controllers
 
 			var cmd = new UpdateProfileCommand(userId.Value, userDto);
 
-			var updateProfile = await handler.Handle(cmd, ct);
+			var result = await handler.Handle(cmd, ct);
 
- 			if(!updateProfile.IsSuccess)
-			{
-				return updateProfile.Error.Code switch
+			return result.Match(
+				onSuccess: value => Ok(value),
+				onFailure: err => err.Code switch
 				{
-					ErrorTypes.ValidationFailed => BadRequest(updateProfile.Error),
-					ErrorTypes.NotFound => NotFound(updateProfile.Error),
-					ErrorTypes.UpdateFailed => StatusCode(500, updateProfile.Error),
-					_ => StatusCode(500, updateProfile.Error)
-				};
-			}
-
-			return Ok(updateProfile.Value);
+					ErrorTypes.ValidationFailed => BadRequest(err),
+					ErrorTypes.NotFound => NotFound(err),
+					ErrorTypes.UpdateFailed => StatusCode(500, err),
+					_ => StatusCode(500, err)
+				});
         }
     }
 }
