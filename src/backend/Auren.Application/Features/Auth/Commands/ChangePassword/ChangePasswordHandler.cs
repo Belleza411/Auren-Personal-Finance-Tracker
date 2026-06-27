@@ -1,5 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
+using Auren.Application.Extensions;
 using Auren.Application.Features.Auth.DTOs;
 using FluentValidation;
 
@@ -39,10 +40,7 @@ namespace Auren.Application.Features.Auth.Commands.ChangePassword
 
             await token.RevokeAllUserRefreshTokens(cmd.UserId, ct);
 
-            return Result.Success(new AuthResponse
-            {
-                Success = true
-            });
+            return Result.Success(new AuthResponse(user.ToUserResponse(), "Password updated successfully"));
         }
     }
 }

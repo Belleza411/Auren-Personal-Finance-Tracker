@@ -48,12 +48,7 @@ namespace Auren.Application.Features.Auth.Helper
                     AllowRefresh = true
                 });
 
-            return Result.Success(new AuthResponse
-            {
-                Success = true,
-                Message = message,
-                User = user.ToUserResponse()
-            });
+            return Result.Success(new AuthResponse(user.ToUserResponse(), message));
         }
     }
 }
