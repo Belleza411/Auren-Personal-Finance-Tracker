@@ -28,11 +28,11 @@
     <ItemGroup>
 	    <ProjectReference Include="..\Auren.Application\Auren.Application.csproj" />
 		<ProjectReference Include="..\Auren.Domain\Auren.Domain.csproj" />
+		<ProjectReference Include="..\Auren.Infrastructure\Auren.Infrastructure.csproj" />
     </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Features\" />
-    <Folder Include="Common\" />
     <Folder Include="Infrastructure\" />
     <Folder Include="Validators\" />
   </ItemGroup>
