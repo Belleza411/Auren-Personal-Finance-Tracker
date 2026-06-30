@@ -2,6 +2,7 @@
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Features.Dashboard.DTOs;
+using Auren.Application.Features.Dashboard.Helper;
 using Auren.Application.Features.Transactions.Queries.GetBalance;
 using Auren.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -33,22 +34,22 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
             var balance = await GetBalance(query.UserId, ct);
             var lastMonthBalance = lastIncome - lastExpense;
 
-            var currentAvgDaily = AverageDailySpending(currentExpense, startDate, endDate);
-            var lastAvgDaily = AverageDailySpending(lastExpense, lastStartDate, lastEndDate);
+            var currentAvgDaily = DashboardCalculatorHelper.AverageDailySpending(currentExpense, startDate, endDate);
+            var lastAvgDaily = DashboardCalculatorHelper.AverageDailySpending(lastExpense, lastStartDate, lastEndDate);
 
             return Result.Success(new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
                     Amount: balance.Balance,
-                    PercentageChange: PercentageChange(balance.Balance, lastMonthBalance)),
+                    PercentageChange: DashboardCalculatorHelper.PercentageChange(balance.Balance, lastMonthBalance)),
                 Income: new TransactionMetricResponse(
                     Amount: currentIncome,
-                    PercentageChange: PercentageChange(currentIncome, lastIncome)),
+                    PercentageChange: DashboardCalculatorHelper.PercentageChange(currentIncome, lastIncome)),
                 Expense: new TransactionMetricResponse(
                     Amount: currentExpense,
-                    PercentageChange: PercentageChange(currentExpense, lastExpense)),
+                    PercentageChange: DashboardCalculatorHelper.PercentageChange(currentExpense, lastExpense)),
                 AverageDailySpending: new TransactionMetricResponse(
                     Amount: currentAvgDaily,
-                    PercentageChange: PercentageChange(currentAvgDaily, lastAvgDaily))
+                    PercentageChange: DashboardCalculatorHelper.PercentageChange(currentAvgDaily, lastAvgDaily))
             ));
         }
 
@@ -70,19 +71,6 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
                 Expense: expense,
                 Balance: income - expense
             );
-        }
-
-        private static decimal PercentageChange(decimal current, decimal previous)
-        {
-            if (previous == 0) return current == 0 ? 0 : 100;
-            var change = ((current - previous) / Math.Abs(previous)) * 100;
-            return Math.Round(Math.Clamp(change, -100, 100), 1, MidpointRounding.AwayFromZero);
-        }
-
-        private static decimal AverageDailySpending(decimal expense, DateTime start, DateTime end)
-        {
-            var days = (end - start).TotalDays + 1;
-            return Math.Round(days > 0 ? expense / (decimal)days : 0, 2);
         }
     }
 }
