@@ -16,14 +16,11 @@ namespace Auren.Tests.Features.Transactions.Commands
     {
         private readonly AurenDbContext _db = TestDbContextFactory.CreateAppDb();
         private readonly Mock<IValidator<TransactionDto>> _validator = new();
-        private readonly TransactionValidator transactionVal = new();
         private readonly CreateTransactionHandler _handler;
         private readonly Guid _userId = Guid.NewGuid();
-        private readonly ITestOutputHelper _output;
 
-        public CreateTransactionHandlerTests(ITestOutputHelper output)
+        public CreateTransactionHandlerTests()
         {
-            _output = output;
             _handler = new CreateTransactionHandler(_db, _validator.Object);
         }
 
