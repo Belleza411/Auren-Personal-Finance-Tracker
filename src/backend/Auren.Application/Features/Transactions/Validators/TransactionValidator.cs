@@ -27,5 +27,5 @@ namespace Auren.Application.Features.Transactions.Validators
                 .NotEmpty().WithMessage("Transaction type is required.")
 				.IsInEnum().WithMessage("Invalid Type");
         }
-	}
+    }
 }

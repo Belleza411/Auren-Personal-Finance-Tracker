@@ -1,6 +1,7 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.Features.Transactions.Commands.CreateTransaction;
 using Auren.Application.Features.Transactions.DTOs;
+using Auren.Application.Features.Transactions.Validators;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using Auren.Tests.Common.Helpers;
@@ -15,6 +16,7 @@ namespace Auren.Tests.Features.Transactions.Commands
     {
         private readonly AurenDbContext _db = TestDbContextFactory.CreateAppDb();
         private readonly Mock<IValidator<TransactionDto>> _validator = new();
+        private readonly TransactionValidator transactionVal = new();
         private readonly CreateTransactionHandler _handler;
         private readonly Guid _userId = Guid.NewGuid();
         private readonly ITestOutputHelper _output;
@@ -117,6 +119,49 @@ namespace Auren.Tests.Features.Transactions.Commands
 
             result.IsFailure.Should().BeTrue();
             result.Error.Code.Should().Be(ErrorTypes.TypeMismatch);
+        }
+
+        [Fact]
+        public async Task Handle_NotFound_ReturnsFailure()
+        {
+            var ct = TestContext.Current.CancellationToken;
+
+            var dto = Fakers.TransactionDtoFaker()
+               .RuleFor(t => t.Category, "Groceries")
+               .RuleFor(t => t.TransactionType, TransactionType.Expense)
+               .RuleFor(t => t.Amount, 100)
+               .Generate();
+
+            _validator
+                .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var result = await _handler.Handle(new CreateTransactionCommand(_userId, dto), ct);
+
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(ErrorTypes.NotFound);
+        }
+
+        [Fact]
+        public async Task Handle_ValidationFailed_ReturnsFailure()
+        {
+            var ct = TestContext.Current.CancellationToken;
+
+            var dto = Fakers.TransactionDtoFaker().Generate();
+
+            var failures = new List<ValidationFailure>
+            {
+                new("Amount", "Transaction amount must be greater than zero.")
+            };
+
+            _validator
+                .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult(failures));
+
+            var result = await _handler.Handle(new CreateTransactionCommand(_userId, dto), ct);
+
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(ErrorTypes.ValidationFailed);
         }
     }
 }
