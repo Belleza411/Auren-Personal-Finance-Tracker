@@ -61,5 +61,54 @@ namespace Auren.Tests.Features.Dashboard.Helpers
             var result = DashboardCalculatorHelper.PercentageChange(current, previous);
             result.Should().Be(expected);
         }
+
+        [Fact]
+        public void AvgDailySpending_WhenZeroExpense_ReturnsZero()
+        {
+            var start = new DateTime(2026, 1, 1);
+            var end = new DateTime(2026, 1, 31);
+
+            var result = DashboardCalculatorHelper.AverageDailySpending(0, start, end);
+            result.Should().Be(0);
+        }
+
+        [Fact]
+        public void AvgDailySpending_WhenOneDay_ReturnsFullExpense()
+        {
+            var start = new DateTime(2026, 1, 1);
+            var end = new DateTime(2026, 1, 1);
+
+            var result = DashboardCalculatorHelper.AverageDailySpending(100, start, end);
+            result.Should().Be(100);
+        }
+
+        [Fact]
+        public void AvgDailySpending_WhenFullMonth_ReturnsAvgSpending()
+        {
+            var start = new DateTime(2026, 1, 1);
+            var end = new DateTime(2026, 1, 31);
+
+            var result = DashboardCalculatorHelper.AverageDailySpending(200, start, end);
+            result.Should().Be(6.45m);
+        }
+
+        [Fact]
+        public void AvgDailySpending_RoundToTwoDecimalPlaces()
+        {
+            var start = new DateTime(2026, 1, 1);
+            var end = new DateTime(2026, 1, 3);
+
+            var result = DashboardCalculatorHelper.AverageDailySpending(100, start, end);
+            result.Should().Be(33.33m);
+        }
+
+        [Fact]
+        public void AvgDailySpending_WhenSameDate_CountAsOneDay()
+        {
+            var date = new DateTime(2026, 4, 22);
+
+            var result = DashboardCalculatorHelper.AverageDailySpending(100, date, date);
+            result.Should().Be(100);
+        }
     }
 }
