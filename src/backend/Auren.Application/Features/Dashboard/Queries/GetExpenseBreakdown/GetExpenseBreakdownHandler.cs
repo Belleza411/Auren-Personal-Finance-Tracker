@@ -48,7 +48,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
                 .ToList();
 
             var backgroundColors = percentages
-                .Select(p => DashboardCalculatorHelper.GetColorFromPercent(p))
+                .Select(p => ChartColorHelper.GetColorFromPercent(p))
                 .ToList();
 
             return Result.Success(new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent));
