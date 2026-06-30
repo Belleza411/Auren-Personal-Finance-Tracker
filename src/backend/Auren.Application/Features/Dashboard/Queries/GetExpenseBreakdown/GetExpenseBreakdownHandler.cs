@@ -2,6 +2,7 @@
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Features.Dashboard.DTOs;
+using Auren.Application.Features.Dashboard.Helper;
 using Auren.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -47,20 +48,10 @@ namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
                 .ToList();
 
             var backgroundColors = percentages
-                .Select(p => GetColorFromPercent(p))
+                .Select(p => DashboardCalculatorHelper.GetColorFromPercent(p))
                 .ToList();
 
             return Result.Success(new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent));
-        }
-
-        private static string GetColorFromPercent(decimal percent, double alpha = 1)
-        {
-            percent = Math.Clamp(percent, 0.0m, 100.0m);
-
-            var r = (int)Math.Round(255 - (percent * 2.55m));
-            var g = (int)Math.Round(percent * 2.55m);
-
-            return $"rgba({r}, {g}, 0, {alpha.ToString(CultureInfo.InvariantCulture)})";
         }
     }
 }
