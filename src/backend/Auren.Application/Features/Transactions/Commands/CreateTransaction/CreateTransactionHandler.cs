@@ -24,13 +24,12 @@ namespace Auren.Application.Features.Transactions.Commands.CreateTransaction
                     .ToArray();
                 return Result.Failure<Transaction>(Error.ValidationFailed(errors));
             }
-            
+
             var category = await db.Categories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.UserId == cmd.UserId &&
-                    c.Name == cmd.Dto.Category &&
-                    c.TransactionType == cmd.Dto.TransactionType,
+                    c.Name == cmd.Dto.Category,
                     ct);
 
             if (category == null)
