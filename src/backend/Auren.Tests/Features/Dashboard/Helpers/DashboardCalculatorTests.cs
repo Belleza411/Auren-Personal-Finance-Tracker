@@ -6,6 +6,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
     public class DashboardCalculatorTests
     {
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void PercentageChange_WhenBothZero_ReturnsZero()
         {
             var result = DashboardCalculatorHelper.PercentageChange(0, 0);
@@ -13,6 +14,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void PercentageChange_PreviousZeroAndCurrentNot_Returns100()
         {
             var result = DashboardCalculatorHelper.PercentageChange(100, 0);
@@ -20,6 +22,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void PercentageChange_CurrentZeroAndPreviousNot_ReturnsNegative100()
         {
             var result = DashboardCalculatorHelper.PercentageChange(0, 100);
@@ -27,6 +30,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void PercentageChange_WhenDoubled_Reuturns100()
         {
             var result = DashboardCalculatorHelper.PercentageChange(200, 100);
@@ -34,6 +38,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void Percentage_WhenHalves_ReturnsNegative50()
         {
             var result = DashboardCalculatorHelper.PercentageChange(50, 100);
@@ -41,6 +46,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "PercentageChange")]
         public void Percentage_WhenSame_ReturnsZero()
         {
             var result = DashboardCalculatorHelper.PercentageChange(100, 100);
@@ -53,6 +59,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         [InlineData(0, 100, -100)]    // dropped to zero
         [InlineData(150, 100, 50)]    // increased by 50%
         [InlineData(100, 100, 0)]     // no change
+        [Trait("Category", "PercentageChange")]
         public void PercentageChange_ReturnsExpected(
             decimal current,
             decimal previous,
@@ -63,6 +70,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "AvgDailySpending")]
         public void AvgDailySpending_WhenZeroExpense_ReturnsZero()
         {
             var start = new DateTime(2026, 1, 1);
@@ -73,6 +81,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "AvgDailySpending")]
         public void AvgDailySpending_WhenOneDay_ReturnsFullExpense()
         {
             var start = new DateTime(2026, 1, 1);
@@ -83,6 +92,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "AvgDailySpending")]
         public void AvgDailySpending_WhenFullMonth_ReturnsAvgSpending()
         {
             var start = new DateTime(2026, 1, 1);
@@ -93,6 +103,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "AvgDailySpending")]
         public void AvgDailySpending_RoundToTwoDecimalPlaces()
         {
             var start = new DateTime(2026, 1, 1);
@@ -103,6 +114,7 @@ namespace Auren.Tests.Features.Dashboard.Helpers
         }
 
         [Fact]
+        [Trait("Category", "AvgDailySpending")]
         public void AvgDailySpending_WhenSameDate_CountAsOneDay()
         {
             var date = new DateTime(2026, 4, 22);

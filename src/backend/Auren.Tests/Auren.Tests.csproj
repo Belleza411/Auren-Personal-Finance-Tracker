@@ -32,6 +32,8 @@
     </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Transactions\Commands\" />
+    <Folder Include="Features\Transactions\Queries\" />
     <Folder Include="Infrastructure\" />
     <Folder Include="Validators\" />
   </ItemGroup>
