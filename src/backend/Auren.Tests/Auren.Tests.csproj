@@ -34,7 +34,6 @@
   <ItemGroup>
     <Folder Include="Features\Transactions\Queries\" />
     <Folder Include="Infrastructure\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
 </Project>
