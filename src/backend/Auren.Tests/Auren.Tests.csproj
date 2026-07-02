@@ -32,7 +32,6 @@
     </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Transactions\Queries\" />
     <Folder Include="Infrastructure\" />
   </ItemGroup>
 
