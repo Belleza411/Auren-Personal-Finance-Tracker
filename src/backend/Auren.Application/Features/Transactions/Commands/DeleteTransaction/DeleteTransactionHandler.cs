@@ -12,7 +12,6 @@ namespace Auren.Application.Features.Transactions.Commands.DeleteTransaction
             CancellationToken ct)
         {
             var transaction = await db.Transactions
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t =>
                     t.Id == cmd.TransactionId &&
                     t.UserId == cmd.UserId, ct);
