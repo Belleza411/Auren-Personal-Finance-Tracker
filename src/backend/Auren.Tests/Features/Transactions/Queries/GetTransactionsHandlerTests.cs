@@ -325,6 +325,18 @@ namespace Auren.Tests.Features.Transactions.Queries
             result.IsSuccess.Should().BeTrue();
             result.Value.Items.Should().BeEmpty();
             result.Value.TotalCount.Should().Be(0);
+
+            var otherUserResult = await _handler.Handle(new GetTransactionsQuery(
+                UserId: otherUserId,
+                Filter: new TransactionFilter(),
+                PageNumber: 1,
+                PageSize: 10
+            ), ct);
+
+            otherUserResult.IsSuccess.Should().BeTrue();
+            otherUserResult.Value.Items.Should().HaveCount(10);
+            otherUserResult.Value.TotalCount.Should().Be(25);
+            otherUserResult.Value.Items.All(t => t.UserId == otherUserId).Should().BeTrue();
         }
     }
 }

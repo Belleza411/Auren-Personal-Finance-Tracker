@@ -287,12 +287,12 @@ namespace Auren.Tests.Features.Category.Queries
             isExists.Value.Items.Should().HaveCount(0);
             isExists.Value.Items.Should().BeEmpty();
 
-            var noVisibleCategories = await _db.Categories
+            var otherUserCategories = await _db.Categories
                 .Where(c => c.UserId == otherUser)
                 .ToListAsync(ct);
 
-            noVisibleCategories.Should().HaveCount(25);
-            noVisibleCategories.All(c => c.UserId == otherUser).Should().BeTrue();
+            otherUserCategories.Should().HaveCount(25);
+            otherUserCategories.All(c => c.UserId == otherUser).Should().BeTrue();
         }
     }
 }

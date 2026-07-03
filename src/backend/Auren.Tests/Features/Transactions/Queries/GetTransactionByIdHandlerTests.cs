@@ -74,12 +74,20 @@ namespace Auren.Tests.Features.Transactions.Queries
             await _db.Transactions.AddAsync(otherUserTransaction, ct);
             await _db.SaveChangesAsync(ct);
 
-            var result = await _handler.Handle(
+            var isExists = await _handler.Handle(
                 new GetTransactionByIdQuery(otherUserTransaction.Id, _userId), ct);
 
-            result.IsFailure.Should().BeTrue();
-            result.Error.Code.Should().Be(ErrorTypes.NotFound);
-            result.Error.Messages.Should().Contain("Transaction not found");
+            isExists.IsFailure.Should().BeTrue();
+            isExists.Error.Code.Should().Be(ErrorTypes.NotFound);
+            isExists.Error.Messages.Should().Contain("Transaction not found");
+
+            var otherUserTransactionResult = await _handler.Handle(
+                new GetTransactionByIdQuery(otherUserTransaction.Id, otherUserId), ct);
+
+            otherUserTransactionResult.IsSuccess.Should().BeTrue();
+            otherUserTransactionResult.Value.Id.Should().Be(otherUserTransaction.Id);
+            otherUserTransactionResult.Value.UserId.Should().Be(otherUserId);
+
         }
     }
 }
