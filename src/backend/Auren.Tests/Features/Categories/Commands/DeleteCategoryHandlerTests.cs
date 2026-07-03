@@ -1,13 +1,11 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.Features.Categories.Commands.DeleteCategory;
-using Auren.Domain.Entities;
-using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using Auren.Tests.Common.Helpers;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auren.Tests.Features.Category.Commands
+namespace Auren.Tests.Features.Categories.Commands
 {
     public class DeleteCategoryHandlerTests
     {

@@ -4,9 +4,8 @@ using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using Auren.Tests.Common.Helpers;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
-namespace Auren.Tests.Features.Category.Queries
+namespace Auren.Tests.Features.Categories.Queries
 {
     public class GetCategoriesHandlerTests
     {
@@ -287,12 +286,17 @@ namespace Auren.Tests.Features.Category.Queries
             isExists.Value.Items.Should().HaveCount(0);
             isExists.Value.Items.Should().BeEmpty();
 
-            var otherUserCategories = await _db.Categories
-                .Where(c => c.UserId == otherUser)
-                .ToListAsync(ct);
+            var otherUserCategories = await _handler.Handle(
+                new GetCategoriesQuery
+                (
+                    UserId: otherUser,
+                    Filter: new CategoriesFilter(),
+                    PageSize: 20,
+                    PageNumber: 1
+                ), ct);
 
-            otherUserCategories.Should().HaveCount(25);
-            otherUserCategories.All(c => c.UserId == otherUser).Should().BeTrue();
+            otherUserCategories.Value.Items.Should().HaveCount(20);
+            otherUserCategories.Value.Items.All(c => c.UserId == otherUser).Should().BeTrue();
         }
     }
 }

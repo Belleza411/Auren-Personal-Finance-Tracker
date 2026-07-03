@@ -1,15 +1,10 @@
 ﻿using Auren.Application.Common.Result;
 using Auren.Application.Features.Categories.Queries.GetCategoryById;
-using Auren.Domain.Entities;
 using Auren.Infrastructure.Persistence;
 using Auren.Tests.Common.Helpers;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Auren.Tests.Features.Category.Queries
+namespace Auren.Tests.Features.Categories.Queries
 {
     public class GetCategoryByIdHandlerTests
     {
@@ -70,11 +65,12 @@ namespace Auren.Tests.Features.Category.Queries
             isExists.IsFailure.Should().BeTrue();
             isExists.Error.Code.Should().Be(ErrorTypes.NotFound);
 
-            var otherUserCategory = await _db.Categories
-                .FirstOrDefaultAsync(c => c.UserId == otherUserId, ct);
+            var otherUserCategory = await _handler.Handle(
+                new GetCategoryByIdCommand(otherUserId, category.Id), ct);
 
-            otherUserCategory.Should().NotBeNull();
-            otherUserCategory.UserId.Should().Be(otherUserId);
+            otherUserCategory.Value.Should().NotBeNull();
+            otherUserCategory.Value.Id.Should().Be(category.Id);
+            otherUserCategory.Value.UserId.Should().Be(otherUserId);
         }
     }
 }

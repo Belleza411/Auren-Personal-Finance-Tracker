@@ -9,7 +9,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 
-namespace Auren.Tests.Features.Category.Commands
+namespace Auren.Tests.Features.Categories.Commands
 {
     public class UpdateCategoryHandlerTests
     {
