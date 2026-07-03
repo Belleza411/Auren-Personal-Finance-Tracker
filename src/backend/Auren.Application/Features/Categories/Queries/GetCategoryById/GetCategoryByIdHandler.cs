@@ -12,7 +12,6 @@ namespace Auren.Application.Features.Categories.Queries.GetCategoryById
             CancellationToken ct)
         {
             var category = await db.Categories
-                .AsNoTracking()
                 .FirstOrDefaultAsync(c =>
                     c.Id == cmd.CategoryId &&
                     c.UserId == cmd.UserId,
