@@ -1,8 +1,6 @@
 ﻿using Auren.Application.Common.Result;
-using Auren.Application.Features.Transactions.Commands.CreateTransaction;
 using Auren.Application.Features.Transactions.Commands.UpdateTransaction;
 using Auren.Application.Features.Transactions.DTOs;
-using Auren.Domain.Entities;
 using Auren.Domain.Enums;
 using Auren.Infrastructure.Persistence;
 using Auren.Tests.Common.Helpers;
