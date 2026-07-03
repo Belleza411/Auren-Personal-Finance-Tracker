@@ -75,9 +75,18 @@ namespace Auren.Tests.Features.Category.Commands
             result.Error.Code.Should().Be(ErrorTypes.NotFound);
 
             var stillExists = await _db.Categories
-                .FirstOrDefaultAsync(c => c.Id == category.Id, ct);
+                .FirstOrDefaultAsync(c => 
+                    c.Id == category.Id &&
+                    c.UserId == otherUserId, ct);
 
             stillExists.Should().NotBeNull();
+
+            var notVisible = await _db.Categories
+                .FirstOrDefaultAsync(c =>
+                    c.Id == category.Id &&
+                    c.UserId == _userId, ct);
+
+            notVisible.Should().BeNull();
         }
     }
 }

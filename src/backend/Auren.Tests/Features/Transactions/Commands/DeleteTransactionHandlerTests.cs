@@ -51,5 +51,38 @@ namespace Auren.Tests.Features.Transactions.Commands
             result.IsSuccess.Should().BeFalse();
             result.Error.Code.Should().Be(ErrorTypes.NotFound);
         }
+
+        [Fact]
+        public async Task Handle_DeleteOtherUserTransaction_ReturnsNotFound()
+        {
+            var ct = TestContext.Current.CancellationToken;
+
+            var otherUserId = Guid.NewGuid();
+
+            var transaction = Fakers.TransactionFaker(otherUserId).Generate();
+
+            await _db.Transactions.AddAsync(transaction, ct);
+            await _db.SaveChangesAsync(ct);
+
+            var result = await _handler.Handle(
+                new DeleteTransactionCommand(_userId, transaction.Id), ct);
+
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(ErrorTypes.NotFound);
+
+            var existingTransaction = await _db.Transactions
+                .FirstOrDefaultAsync(t => 
+                    t.Id == transaction.Id &&
+                    t.UserId == otherUserId, ct);   
+
+            existingTransaction.Should().NotBeNull();
+
+            var notVisible = await _db.Transactions
+                .FirstOrDefaultAsync(t =>
+                    t.Id == transaction.Id &&
+                    t.UserId == _userId, ct);   
+
+            notVisible.Should().BeNull();
+        }
     }
 }
