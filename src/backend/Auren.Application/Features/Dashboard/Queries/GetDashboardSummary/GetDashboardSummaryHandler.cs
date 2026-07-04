@@ -3,7 +3,6 @@ using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
 using Auren.Application.Features.Dashboard.DTOs;
 using Auren.Application.Features.Dashboard.Helper;
-using Auren.Application.Features.Transactions.Queries.GetBalance;
 using Auren.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,11 +17,19 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
             var (lastStartDate, lastEndDate) = query.TimePeriod.GetPreviousTimePeriodRange();
 
             var periodTotals = await db.Transactions
-                .Where(t => t.UserId == query.UserId &&
-                            t.TransactionDate >= lastStartDate &&
-                            t.TransactionDate <= endDate)
-                .GroupBy(t => new { t.TransactionType, IsCurrent = t.TransactionDate >= startDate })
-                .Select(g => new { g.Key.TransactionType, g.Key.IsCurrent, Total = g.Sum(t => t.Amount) })
+                .Where(t => 
+                    t.UserId == query.UserId &&
+                    t.TransactionDate >= lastStartDate &&
+                    t.TransactionDate <= endDate)
+                .GroupBy(t => new { 
+                    t.TransactionType,
+                    IsCurrent = t.TransactionDate >= startDate 
+                })
+                .Select(g => new {
+                    g.Key.TransactionType,
+                    g.Key.IsCurrent,
+                    Total = g.Sum(t => t.Amount) 
+                })
                 .AsNoTracking()
                 .ToListAsync(ct);
 
@@ -32,7 +39,8 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
             var lastExpense = periodTotals.FirstOrDefault(x => !x.IsCurrent && x.TransactionType == TransactionType.Expense)?.Total ?? 0;
 
             var balance = await GetBalance(query.UserId, ct);
-            var lastMonthBalance = lastIncome - lastExpense;
+            var currentMonthNet = currentIncome - currentExpense;
+            var lastMonthNet = lastIncome - lastExpense;
 
             var currentAvgDaily = DashboardCalculatorHelper.AverageDailySpending(currentExpense, startDate, endDate);
             var lastAvgDaily = DashboardCalculatorHelper.AverageDailySpending(lastExpense, lastStartDate, lastEndDate);
@@ -40,7 +48,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
             return Result.Success(new DashboardSummaryResponse(
                 TotalBalance: new TransactionMetricResponse(
                     Amount: balance.Balance,
-                    PercentageChange: DashboardCalculatorHelper.PercentageChange(balance.Balance, lastMonthBalance)),
+                    PercentageChange: DashboardCalculatorHelper.PercentageChange(currentMonthNet, lastMonthNet)),
                 Income: new TransactionMetricResponse(
                     Amount: currentIncome,
                     PercentageChange: DashboardCalculatorHelper.PercentageChange(currentIncome, lastIncome)),
