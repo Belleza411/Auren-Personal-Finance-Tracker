@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Auren.Application.Features.Dashboard.Helper
+﻿namespace Auren.Application.Features.Dashboard.Helper
 {
     public static class DashboardCalculatorHelper
     {
