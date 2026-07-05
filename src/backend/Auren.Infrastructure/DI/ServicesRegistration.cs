@@ -13,6 +13,7 @@ namespace Auren.Infrastructure.DI
         {
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             builder.Services.Scan(scan => scan
                 .FromAssemblies(

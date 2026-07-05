@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Application.Features.Dashboard.Queries.GetIncomesVsExpenses
 {
-    public class GetIncomesVsExpensesHandler(IAppDbContext db)
+    public class GetIncomesVsExpensesHandler(
+        IAppDbContext db,
+        IDateTimeProvider dateTime)
     {
         private sealed record AggregatedData(DateTime? Date, TransactionType TransactionType, decimal Total);
 
@@ -15,7 +17,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetIncomesVsExpenses
             GetIncomesVsExpensesQuery query,
             CancellationToken ct)
         {
-            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange();
+            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange(dateTime);
 
             var rawData = await db.Transactions
                 .Where(t =>

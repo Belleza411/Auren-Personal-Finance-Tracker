@@ -8,13 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
 {
-    public class GetDashboardSummaryHandler(IAppDbContext db)
+    public class GetDashboardSummaryHandler(
+        IAppDbContext db,
+        IDateTimeProvider dateTime)
     {
         public async Task<Result<DashboardSummaryResponse>> Handle(
-            GetDashboardSummaryQuery query, CancellationToken ct)
+            GetDashboardSummaryQuery query,
+            CancellationToken ct)
         {
-            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange();
-            var (lastStartDate, lastEndDate) = query.TimePeriod.GetPreviousTimePeriodRange();
+            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange(dateTime);
+            var (lastStartDate, lastEndDate) = query.TimePeriod.GetPreviousTimePeriodRange(dateTime);
 
             var periodTotals = await db.Transactions
                 .Where(t => 
@@ -60,7 +63,7 @@ namespace Auren.Application.Features.Dashboard.Queries.GetDashboardSummary
                     PercentageChange: DashboardCalculatorHelper.PercentageChange(currentAvgDaily, lastAvgDaily))
             ));
         }
-
+            
         public async Task<BalanceSummaryResponse> GetBalance(
             Guid userId,
             CancellationToken ct)

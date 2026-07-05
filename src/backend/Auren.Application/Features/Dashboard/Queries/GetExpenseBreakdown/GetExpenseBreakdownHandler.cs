@@ -9,13 +9,15 @@ using System.Globalization;
 
 namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
 {
-    public class GetExpenseBreakdownHandler(IAppDbContext db)
+    public class GetExpenseBreakdownHandler(
+        IAppDbContext db,
+        IDateTimeProvider dateTime)
     {
         public async Task<Result<ExpenseBreakdownResponse>> Handle(
             GetExpenseBreakdownQuery query,
             CancellationToken ct)
         {
-            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange();
+            var (startDate, endDate) = query.TimePeriod.GetTimePeriodRange(dateTime);
 
             var data = await db.Transactions
                 .Where(t =>
