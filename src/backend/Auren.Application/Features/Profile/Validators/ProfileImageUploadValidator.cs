@@ -10,13 +10,15 @@ namespace Auren.Application.Features.Profile.Validators
 
 		public ProfileImageUploadValidator()
 		{
-			RuleFor(f => f.File)
+            RuleFor(f => f.File)
+				.Cascade(CascadeMode.Stop)            
 				.NotEmpty().WithMessage("File is required. ")
-				.Must(BeAValidImageExtension).WithMessage("Unsupported file extension.")
+				.Must(BeAValidImageExtension)
+					.WithMessage("Unsupported file extension.")
 				.Must(f => f.Length <= MaxFileSizeInBytes)
 					.WithMessage($"File size must be less than {MaxFileSizeInBytes / (1024 * 1024)} mb. ");
 
-			RuleFor(f => f.Name)
+            RuleFor(f => f.Name)
 				.NotEmpty().WithMessage("Name is required. ")
 				.MaximumLength(100).WithMessage("Name must be at most 100 characters.");
 		}
