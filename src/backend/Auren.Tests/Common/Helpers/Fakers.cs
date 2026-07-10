@@ -30,9 +30,9 @@ namespace Auren.Tests.Common.Helpers
            new Faker<ApplicationUser>()
                .RuleFor(u => u.Id, f => Guid.NewGuid())
                .RuleFor(u => u.Email, f => f.Internet.Email())
-               .RuleFor(u => u.UserName, (f, u) => u.Email)
                .RuleFor(u => u.FirstName, f => f.Name.FirstName())
                .RuleFor(u => u.LastName, f => f.Name.LastName())
+               .RuleFor(u => u.ProfilePictureUrl, f => f.Internet.Avatar())
                .RuleFor(u => u.CreatedAt, f => DateTime.UtcNow);
 
         public static Faker<TransactionDto> TransactionDtoFaker() =>

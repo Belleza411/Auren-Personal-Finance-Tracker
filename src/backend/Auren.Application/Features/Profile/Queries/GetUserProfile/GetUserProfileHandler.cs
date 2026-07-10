@@ -13,7 +13,6 @@ namespace Auren.Application.Features.Profile.Queries.GetUserProfile
             CancellationToken ct)
         {
             var user = await db.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u =>
                     u.Id == cmd.UserId,
                     ct);
