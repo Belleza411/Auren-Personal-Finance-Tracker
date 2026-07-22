@@ -25,7 +25,6 @@ namespace Auren.Application.Features.Profile.Commands.UpdateProfile
             }
 
             var user = await db.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == cmd.UserId, ct);
 
             if (user == null)
