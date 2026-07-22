@@ -5,7 +5,6 @@ using Auren.Application.Features.Dashboard.DTOs;
 using Auren.Application.Features.Dashboard.Helper;
 using Auren.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
 {
@@ -53,7 +52,12 @@ namespace Auren.Application.Features.Dashboard.Queries.GetExpenseBreakdown
                 .Select(p => ChartColorHelper.GetColorFromPercent(p))
                 .ToList();
 
-            return Result.Success(new ExpenseBreakdownResponse(labels, amounts, percentages, backgroundColors, totalSpent));
+            return Result.Success(new ExpenseBreakdownResponse(
+                labels,
+                amounts,
+                percentages,
+                backgroundColors,
+                totalSpent));
         }
     }
 }

@@ -2,9 +2,9 @@
 {
 	public sealed record ExpenseBreakdownResponse(
 		IEnumerable<string> Labels,
-		IEnumerable<decimal> Data,
-		IEnumerable<decimal> Percentage,
-		IEnumerable<string> BackgroundColor,
+		IEnumerable<decimal> Amounts,
+		IEnumerable<decimal> Percentages,
+		IEnumerable<string> BackgroundColors,
 		decimal TotalSpent
     );
 }
