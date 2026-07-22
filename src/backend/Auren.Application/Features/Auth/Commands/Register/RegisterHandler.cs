@@ -2,11 +2,9 @@
 using Auren.Application.Common.Result;
 using Auren.Application.Constants;
 using Auren.Application.Features.Auth.DTOs;
-using Auren.Application.Features.Auth.Helper;
 using Auren.Application.Features.Profile.DTOs;
 using Auren.Domain.Entities;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 
 namespace Auren.Application.Features.Auth.Commands.Register
 {
@@ -14,8 +12,7 @@ namespace Auren.Application.Features.Auth.Commands.Register
         IIdentityService identity,  
         IAppDbContext appDb,        
         ICloudinaryService cloudinary,
-        ITokenService tokenService,
-        IHttpContextAccessor http,
+        IAuthHelper authHelper,
         IValidator<RegisterRequest> validator)
     {
         public async Task<Result<AuthResponse>> Handle(
@@ -76,9 +73,8 @@ namespace Auren.Application.Features.Auth.Commands.Register
             await appDb.Categories.AddRangeAsync(categories, ct);
             await appDb.SaveChangesAsync(ct);
 
-            return await AuthHelper.SignInAsync(user, "Registered successfully", tokenService, http, ct);
+            return await authHelper.SignInAsync(user, "Registered successfully", ct);
         }
-            
 
         private static string? SanitizeInput(string? input) =>
             string.IsNullOrWhiteSpace(input) ? null : System.Net.WebUtility.HtmlEncode(input.Trim());

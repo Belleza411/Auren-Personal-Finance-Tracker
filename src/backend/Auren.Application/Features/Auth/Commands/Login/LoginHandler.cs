@@ -1,16 +1,13 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
 using Auren.Application.Features.Auth.DTOs;
-using Auren.Application.Features.Auth.Helper;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 
 namespace Auren.Application.Features.Auth.Commands.Login
 {
     public class LoginHandler(
         IIdentityService identity,
-        ITokenService tokenService,
-        IHttpContextAccessor http,
+        IAuthHelper authHelper,
         IValidator<LoginRequest> validator)
     {
         public async Task<Result<AuthResponse>> Handle(
@@ -34,7 +31,7 @@ namespace Auren.Application.Features.Auth.Commands.Login
             {
                 user.LastLoginAt = DateTime.UtcNow;
                 await identity.UpdateAsync(user);
-                return await AuthHelper.SignInAsync(user, "Login successfully", tokenService, http, ct);
+                return await authHelper.SignInAsync(user, "Login successfully", ct);
             }
 
             if (result.IsLockedOut)

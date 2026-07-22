@@ -6,21 +6,15 @@ using Auren.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 
 namespace Auren.Application.Features.Auth.Helper
 {
-    public static class AuthHelper
+    public class AuthHelper(
+        ITokenService tokenService,
+        IHttpContextAccessor http) : IAuthHelper
     {
-        public static async Task<Result<AuthResponse>> SignInAsync(
-            ApplicationUser user,
-            string message,
-            ITokenService tokenService,
-            IHttpContextAccessor http,
-            CancellationToken ct)
+        public async Task<Result<AuthResponse>> SignInAsync(ApplicationUser user, string message, CancellationToken ct)
         {
             var claims = new List<Claim>
             {

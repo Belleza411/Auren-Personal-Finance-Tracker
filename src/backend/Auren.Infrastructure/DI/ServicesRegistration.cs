@@ -1,5 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Extensions;
+using Auren.Application.Features.Auth.Helper;
 using Auren.Infrastructure.Identity;
 using Auren.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,7 @@ namespace Auren.Infrastructure.DI
         {
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddScoped<IAuthHelper, AuthHelper>();
             builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             builder.Services.Scan(scan => scan

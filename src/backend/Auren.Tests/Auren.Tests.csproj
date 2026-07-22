@@ -32,6 +32,7 @@
     </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Auth\Command\" />
     <Folder Include="Infrastructure\" />
   </ItemGroup>
 
