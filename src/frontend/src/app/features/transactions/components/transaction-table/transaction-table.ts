@@ -28,9 +28,7 @@ import {
 } from '@tanstack/angular-table';
 
 import { ActionDropdown } from 'src/app/shared/components/action-dropdown/action-dropdown';
-import { TableRowSelection } from 'src/app/shared/components/table-row-selection/table-row-selection';
 import { TableHeadSortButton } from 'src/app/shared/components/table-head-sort-button/table-head-sort-button';
-import { TableHeadSelection } from 'src/app/shared/components/table-head-selection/table-head-selection';
 
 import { TransactionTypeBadge } from 'src/app/shared/components/transaction-type-badge/transaction-type-badge';
 import { TransactionAmountBadge } from 'src/app/shared/components/transaction-amount-badge/transaction-amount-badge';
@@ -69,13 +67,6 @@ export class TransactionTable {
   private readonly _columnVisibility = signal<VisibilityState>({});
 
   protected readonly _columns: ColumnDef<Transaction>[] = [
-    {
-      id: 'select',
-			header: () => flexRenderComponent(TableHeadSelection),
-			cell: () => flexRenderComponent(TableRowSelection),
-			enableSorting: false,
-			enableHiding: false,
-    },
     {
       accessorKey: 'transactionDate',
       id: 'transactionDate',

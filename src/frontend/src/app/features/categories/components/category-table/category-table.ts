@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { Category } from '../../models/categories.model';
-import { UpperCasePipe } from '@angular/common';
-import { TransactionTypeColorPipe } from "../../../transactions/pipes/transaction-type-color.pipe";
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { 
   type ColumnFiltersState,
   type RowSelectionState,
@@ -11,12 +9,9 @@ import {
   type ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel
 } from '@tanstack/table-core';
 import { createAngularTable, flexRenderComponent, FlexRenderDirective } from '@tanstack/angular-table';
-import { TableHeadSelection } from 'src/app/shared/components/table-head-selection/table-head-selection';
-import { TableRowSelection } from 'src/app/shared/components/table-row-selection/table-row-selection';
 import { TableHeadSortButton } from 'src/app/shared/components/table-head-sort-button/table-head-sort-button';
 import { TransactionTypeBadge } from 'src/app/shared/components/transaction-type-badge/transaction-type-badge';
 import { TransactionType } from 'src/app/features/transactions/models/transaction.model';
@@ -60,13 +55,6 @@ export class CategoryTable {
   private readonly _columnVisibility = signal<VisibilityState>({});
 
   protected readonly _columns: ColumnDef<Category>[] = [
-    {
-      id: 'select',
-      header: () => flexRenderComponent(TableHeadSelection),
-      cell: () => flexRenderComponent(TableRowSelection),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'name',
       id: 'name',
