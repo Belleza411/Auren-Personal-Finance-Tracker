@@ -1,8 +1,6 @@
 ﻿using Auren.Application.Common.Interfaces;
 using Auren.Application.Common.Result;
 using Auren.Application.Extensions;
-using Auren.Application.Features.Auth.Commands.ChangePassword;
-using Auren.Application.Features.Auth.Commands.DeleteAccount;
 using Auren.Application.Features.Auth.Commands.Login;
 using Auren.Application.Features.Auth.Commands.Logout;
 using Auren.Application.Features.Auth.Commands.Register;
@@ -59,58 +57,6 @@ namespace Auren.API.Controllers
                     ErrorTypes.InvalidInput => BadRequest(err),
                     _ => StatusCode(500, err)
                 });
-        }
-
-        [HttpPut("change-password")]
-        [EnableRateLimiting("auth")]
-        public async Task<ActionResult<AuthResponse>> ChangePassword(
-            [FromServices] ChangePasswordHandler handler,
-            ChangePasswordRequest request,
-            CancellationToken ct)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-            var cmd = new ChangePasswordCommand(
-                userId.Value,
-                new ChangePasswordDto(
-                    request.CurrentPassword,
-                    request.NewPassword,
-                    request.ConfirmPassword)
-                );
-
-            var result = await handler.Handle(cmd, ct);
-
-            return result.Match<ActionResult<AuthResponse>>(
-                onSuccess: value => Ok(value),
-                onFailure: err => BadRequest(err));
-        }
-
-        [HttpDelete("delete-account")]
-        [EnableRateLimiting("auth")]
-        public async Task<IActionResult> DeleteAccount(
-            [FromServices] DeleteAccountHandler handler,
-            string password,
-            CancellationToken ct)
-        {
-            var userId = User.GetCurrentUserId();
-            if (userId == null) return Unauthorized();
-
-            var result = await handler.Handle(
-                new DeleteAccountCommand(userId.Value, password), ct);
-
-            return result.Match<IActionResult>(
-                 onSuccess: () =>
-                 {
-                     HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                     return Ok("Account deleted successfully.");
-                 },
-                 onFailure: err => err.Code switch {
-                     ErrorTypes.NotFound => NotFound(result.Error),
-                     ErrorTypes.InvalidInput => BadRequest(result.Error),
-                     ErrorTypes.DeleteFailed => StatusCode(500, result.Error),
-                     _ => StatusCode(500, result.Error)
-                 });
         }
 
         [HttpPost("logout")]

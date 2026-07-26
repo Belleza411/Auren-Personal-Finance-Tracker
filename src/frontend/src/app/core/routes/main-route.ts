@@ -26,14 +26,6 @@ export const mainRoutes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => 
             import('./../../features/profile/pages/profile/profile')
-                .then(c => c.Profile),
-        children: [
-            {
-                path: 'delete-account',
-                loadComponent: () => 
-                    import('./../../features/profile/components/delete-account/delete-account')
-                        .then(c => c.DeleteAccount)
-            }
-        ]
+                .then(c => c.Profile)
     }
 ]

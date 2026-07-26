@@ -16,9 +16,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { email, form, submit, FormField, disabled } from '@angular/forms/signals';
 import { AlertService } from 'src/app/core/services/alert.service';
-import { ChangePassword } from "../../components/change-password/change-password";
 import { Router, RouterOutlet } from "@angular/router";
-import { DeleteAccount } from "../../components/delete-account/delete-account";
 
 @Component({
   selector: 'app-profile',
@@ -33,7 +31,6 @@ import { DeleteAccount } from "../../components/delete-account/delete-account";
     HlmSelectImports,
     NgIcon,
     FormField,
-    ChangePassword,
     RouterOutlet
 ],
   providers: [provideIcons({ lucideTrash, lucideUpload, lucidePencil })],
